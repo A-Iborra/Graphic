@@ -68,9 +68,6 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeaderOutputFile>./Axis.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./</AssemblerListingLocation>
-      <ObjectFileName>./</ObjectFileName>
-      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -116,9 +113,6 @@
       <MinimalRebuild>true</MinimalRebuild>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeaderOutputFile>./Axis.pch</PrecompiledHeaderOutputFile>
-      <AssemblerListingLocation>./</AssemblerListingLocation>
-      <ObjectFileName>./</ObjectFileName>
-      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
       <BrowseInformation>true</BrowseInformation>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
