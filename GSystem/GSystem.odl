@@ -1,0 +1,79 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD9B-55E6-11d3-8365-006008BD5BC3),
+   helpstring("GSystems Common definitions Library"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library GSystems { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   struct DataPoint {
+      double x,y,z;
+   };
+
+   struct DataList {
+      struct DataList *previous,*next;
+      struct DataPoint data;
+      double colorRGB[3];
+   };
+
+   enum CoordinatePlane {
+      CoordinatePlane_unspecified,
+      CoordinatePlane_XY = 1,
+      CoordinatePlane_YX = 2,
+      CoordinatePlane_XZ = 3,
+      CoordinatePlane_ZX = 4,
+      CoordinatePlane_YZ = 5,
+      CoordinatePlane_ZY = 6,
+      CoordinatePlane_screen = 7,
+      CoordinatePlane_normal };
+
+   enum UnitOfMeasure {
+         UNIT_PIXEL = 0,
+         UNIT_PERCENT = 1};
+
+   enum DataArity {
+      DATA_ARITY_UNKNOWN = 0,
+      DATA_ARITY_2D = 1,
+      DATA_ARITY_3D = 2 };
+
+   enum TextFormat {
+      TEXT_FORMAT_NONE             = 0x0000,
+      TEXT_FORMAT_LEFT             = 0x0001,
+      TEXT_FORMAT_RIGHT            = 0x0002,
+      TEXT_FORMAT_CENTER           = 0x0004,
+      TEXT_COORDINATES_FROM_TOP    = 0x0010,
+      TEXT_COORDINATES_FROM_CENTER = 0x0020,
+      TEXT_COORDINATES_FROM_BOTTOM = 0x0040 };
+
+   enum TextSizeUnits {
+      TEXT_SIZE_PIXELS             = 0x0000,
+      TEXT_SIZE_PERCENT            = 0x0001,
+      TEXT_SIZE_POINTS             = 0x0002 };
+
+   [uuid(8CAEFDCD-55E6-11d3-8365-006008BD5BC3)]
+   interface IGSystemStatusBar : IUnknown {
+
+      [propput]
+      HRESULT StatusText([in]long zeroBasedPaneIndex,[in]char* pszText);
+      [propget]
+      HRESULT StatusText([in]long zeroBasedPaneIndex,[out,retval]char** pszText);
+
+   }
+
+   [ uuid(8CAEFD69-55E6-11d3-8365-006008BD5BC3) ]
+   coclass GSystems {
+   interface IUnknown;
+   };
+
+
+
+};
