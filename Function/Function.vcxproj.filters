@@ -144,7 +144,6 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="buildDate" />
     <CustomBuild Include="Evaluator.tlb" />
     <CustomBuild Include="Function.def" />
     <CustomBuild Include="Function.tlb" />

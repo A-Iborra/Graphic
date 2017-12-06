@@ -140,7 +140,7 @@ END
 
 1 RCDATA { "Copyright (c) 1996-2002 Nathan T. Clark" }
 
-RCDATA_BUILD_DATE RCDATA buildDate
+//RCDATA_BUILD_DATE RCDATA buildDate
 
 1 TYPELIB MOVEABLE PURE "Function.tlb"
 

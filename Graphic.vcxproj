@@ -141,53 +141,53 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="axisHandler.cpp" />
-    <ClCompile Include="backgroundHandler.cpp" />
-    <ClCompile Include="IPropertyPage.cpp" />
-    <ClCompile Include="ISpecifyPropertyPages.cpp" />
+    <ClCompile Include="Source\axisHandler.cpp" />
+    <ClCompile Include="Source\backgroundHandler.cpp" />
+    <ClCompile Include="Source\IPropertyPage.cpp" />
+    <ClCompile Include="Source\ISpecifyPropertyPages.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="\Common\Utils\registryUtils.cpp" />
     <ClCompile Include="\Common\Utils\Utils.cpp" />
     <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
-    <ClCompile Include="COMImplementation.cpp" />
-    <ClCompile Include="ContainedFunction.cpp" />
-    <ClCompile Include="ContainedObject.cpp" />
-    <ClCompile Include="ContainedObjectIOleClentSite.cpp" />
-    <ClCompile Include="ContainedObjectIOleClientSite_IDispatch.cpp" />
-    <ClCompile Include="ContainedObjectIOleInPlaceSite.cpp" />
-    <ClCompile Include="dataSourcesHandler.cpp" />
-    <ClCompile Include="functionHandler.cpp" />
-    <ClCompile Include="Graphic.cpp" />
-    <ClCompile Include="GraphicDrawing.cpp" />
-    <ClCompile Include="GraphicHandler.cpp" />
-    <ClCompile Include="GraphicInit.cpp" />
-    <ClCompile Include="GraphicNotebook.cpp" />
-    <ClCompile Include="GraphicPick.cpp" />
-    <ClCompile Include="IAdviseSink.cpp" />
-    <ClCompile Include="IDataObject.cpp" />
-    <ClCompile Include="IGraphic.cpp" />
-    <ClCompile Include="IGraphic_data.cpp" />
-    <ClCompile Include="IGraphic_Properties.cpp" />
-    <ClCompile Include="IGsystemStatusBar.cpp" />
-    <ClCompile Include="IOleControl.cpp" />
-    <ClCompile Include="IOleInPlaceActiveObject.cpp" />
-    <ClCompile Include="IOleInPlaceObject.cpp" />
-    <ClCompile Include="IOleObject.cpp" />
-    <ClCompile Include="IPlotNotify.cpp" />
-    <ClCompile Include="IPropertiesClient.cpp" />
-    <ClCompile Include="IPropertyPageClient.cpp" />
-    <ClCompile Include="IProvideClassInfo.cpp" />
-    <ClCompile Include="IRunnableObject.cpp" />
-    <ClCompile Include="ITextNotify.cpp" />
-    <ClCompile Include="IUnknown.cpp" />
-    <ClCompile Include="IViewObjectEx.cpp" />
-    <ClCompile Include="lightingHandler.cpp" />
-    <ClCompile Include="plotHandler.cpp" />
-    <ClCompile Include="posSizeHandler.cpp" />
-    <ClCompile Include="sampleGraphicHandler.cpp" />
-    <ClCompile Include="statusBarHandler.cpp" />
-    <ClCompile Include="styleHandler.cpp" />
+    <ClCompile Include="Source\COMImplementation.cpp" />
+    <ClCompile Include="Source\ContainedFunction.cpp" />
+    <ClCompile Include="Source\ContainedObject.cpp" />
+    <ClCompile Include="Source\ContainedObjectIOleClentSite.cpp" />
+    <ClCompile Include="Source\ContainedObjectIOleClientSite_IDispatch.cpp" />
+    <ClCompile Include="Source\ContainedObjectIOleInPlaceSite.cpp" />
+    <ClCompile Include="Source\dataSourcesHandler.cpp" />
+    <ClCompile Include="Source\functionHandler.cpp" />
+    <ClCompile Include="Source\Graphic.cpp" />
+    <ClCompile Include="Source\GraphicDrawing.cpp" />
+    <ClCompile Include="Source\GraphicHandler.cpp" />
+    <ClCompile Include="Source\GraphicInit.cpp" />
+    <ClCompile Include="Source\GraphicNotebook.cpp" />
+    <ClCompile Include="Source\GraphicPick.cpp" />
+    <ClCompile Include="Source\IAdviseSink.cpp" />
+    <ClCompile Include="Source\IDataObject.cpp" />
+    <ClCompile Include="Source\IGraphic.cpp" />
+    <ClCompile Include="Source\IGraphic_data.cpp" />
+    <ClCompile Include="Source\IGraphic_Properties.cpp" />
+    <ClCompile Include="Source\IGsystemStatusBar.cpp" />
+    <ClCompile Include="Source\IOleControl.cpp" />
+    <ClCompile Include="Source\IOleInPlaceActiveObject.cpp" />
+    <ClCompile Include="Source\IOleInPlaceObject.cpp" />
+    <ClCompile Include="Source\IOleObject.cpp" />
+    <ClCompile Include="Source\IPlotNotify.cpp" />
+    <ClCompile Include="Source\IPropertiesClient.cpp" />
+    <ClCompile Include="Source\IPropertyPageClient.cpp" />
+    <ClCompile Include="Source\IProvideClassInfo.cpp" />
+    <ClCompile Include="Source\IRunnableObject.cpp" />
+    <ClCompile Include="Source\ITextNotify.cpp" />
+    <ClCompile Include="Source\IUnknown.cpp" />
+    <ClCompile Include="Source\IViewObjectEx.cpp" />
+    <ClCompile Include="Source\lightingHandler.cpp" />
+    <ClCompile Include="Source\plotHandler.cpp" />
+    <ClCompile Include="Source\posSizeHandler.cpp" />
+    <ClCompile Include="Source\sampleGraphicHandler.cpp" />
+    <ClCompile Include="Source\statusBarHandler.cpp" />
+    <ClCompile Include="Source\styleHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphic.def" />
@@ -201,9 +201,9 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ContainedFunction.h" />
+    <ClInclude Include="include\ContainedFunction.h" />
     <ClInclude Include="ContainedObject.h" />
-    <ClInclude Include="graphic.h" />
+    <ClInclude Include="include\graphic.h" />
     <ClInclude Include="include\Graphic_resource.h" />
   </ItemGroup>
   <ItemGroup>
