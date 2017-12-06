@@ -1,0 +1,5 @@
+
+EXPORTS
+     DllGetClassObject     = gsVariables_DllGetClassObject   PRIVATE
+     DllRegisterServer     = gsVariables_DllRegisterServer   PRIVATE
+     DllUnregisterServer   = gsVariables_DllUnregisterServer PRIVATE

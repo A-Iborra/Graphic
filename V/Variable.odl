@@ -1,0 +1,103 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFDC0-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Variable.hlp"),
+   helpstring("G System Variable"), 
+   lcid(0x00000000), 
+   version(1.0)
+] 
+library Variable { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   [ uuid(8CAEFDC1-55E6-11d3-8365-006008BD5BC3),helpstring("Variable Automation Interface"),dual,oleautomation,pointer_default(unique) ] 
+   interface IVariable : IDispatch {
+
+      [propput,helpstring("Set the value of the variable")]
+      HRESULT Value([in]double theValue);
+      [propget,helpstring("Get the value of the variable")]
+      HRESULT Value([out,retval]double* theValue);
+
+      [propput,helpstring("Set the expression for the variable (can use other variables the expression)")]
+      HRESULT ValueExpression([in]BSTR strValue);
+      [propget,helpstring("Get's the expression used to evaluate the variable's value. SysFreeString the returned value.")]
+      HRESULT ValueExpression([out,retval]BSTR* strValue);
+
+      [propput,helpstring("Set the name of the variable")]
+      HRESULT Name([in]BSTR bstrName);
+      [propget,helpstring("Get the name of the variable. SysFreeString the returned value.")]
+      HRESULT Name([out,retval]BSTR* bstrName);
+
+      [propput,helpstring("Determines whether the variable is an Independent variable. That is, whether it's value traverses a range")]
+      HRESULT IsIndependent([in]BOOL isIndependent);
+      [propget,helpstring("Returns TRUE if the variable is an Indpendent variable. That is, that it's value traverses a range")]
+      HRESULT IsIndependent([out,retval]BOOL* isIndependent);
+
+      [propput,helpstring("Set the expression that ranges the variable from it's minimum to it's maximum value (for an independent variable). Or use StepCount(n) for n equal intervals.")]
+      HRESULT DomainExpression([in]BSTR bstrExpression);
+      [propget,helpstring("Returns the expression that ranges the variable from it's minimum to it's maximum value (for an independent variable). SysFreeString the returned value.")]
+      HRESULT DomainExpression([out,retval]BSTR* bstrExpression);
+
+      [propput,helpstring("Set the expression for the minimum value of the variable")]
+      HRESULT MinValueExpression([in]BSTR bstrExpression);
+      [propget,helpstring("Get the expression for the minimum value of the variable. SysFreeString the returned value.")]
+      HRESULT MinValueExpression([out,retval]BSTR* pbstrExpression);
+
+      [propput,helpstring("Set the expression for the maximum value of the variable")]
+      HRESULT MaxValueExpression([in]BSTR bstrExpression);
+      [propget,helpstring("Get the expression for the maximum value of the variable. SysFreeString the returned value.")]
+      HRESULT MaxValueExpression([out,retval]BSTR* pbstrExpression);
+
+      [propput,helpstring("Set the number of values between the minimum and maximum values to evaluate. Unnecessary if you specify the step expression.")]
+      HRESULT StepCount([in]long countValues);
+      [propget,helpstring("Get the number of values between the minimum and maximum values to evaluate.")]
+      HRESULT StepCount([out,retval]long* pCountValues);
+
+      [propput,helpstring("Set the evaluator for the variable to use.")]
+      HRESULT IEvaluator([in]IDispatch* iEvaluator);
+      [propget,helpstring("Get's the evaluator the variable is using. Don't forget to release the returned Interface at some point.")]
+      HRESULT IEvaluator([out,retval]IDispatch** iEvaluator);
+
+      [propput,helpstring("Sets the index of the tab the variable was created on")]
+      HRESULT TabIndex([in]long tabIndex);
+      [propget,helpstring("Gets the index of the tab the variable was created on")]
+      HRESULT TabIndex([out,retval]long* tabIndex);
+
+      [propget,helpstring("Gets the minimum value of the variable")]
+      HRESULT MinValue([out,retval]double*);
+
+      [propget,helpstring("Gets the maximum value of the variable")]
+      HRESULT MaxValue([out,retval]double*);
+
+      [propget,helpstring("Get the window handle of the control.")]
+      HRESULT HWND([out,retval]HWND* hwndDialog);
+
+      [propget,helpstring("Return true if the first argument is less than the second (less depends on the start and end value of the variable, if start > end, then less is backwards from the traditional sense)")]
+      HRESULT IsLess([in]double firstValue,[in]double secondValue,[out,retval]short* theAnswer);
+
+      HRESULT Start();
+
+      HRESULT Step();
+
+      HRESULT CopyFrom(IVariable* theSource);
+
+      HRESULT SetHwnds(HWND hwndOwner,HWND hwndTabControl);
+
+      HRESULT InitializeDomain();
+
+      HRESULT Edit();
+
+   };
+
+
+   [uuid(8CAEFDC2-55E6-11d3-8365-006008BD5BC3),helpstring("Variable Class"),control]
+   coclass Variable {
+      [default] interface IVariable;
+   };
+
+};

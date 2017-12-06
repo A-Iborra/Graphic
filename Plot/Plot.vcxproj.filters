@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{35a93410-4669-4f96-ab43-1fe9918d879b}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Implementation">
+      <UniqueIdentifier>{8a23b109-4152-41f7-95c7-449687a95432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files">
+      <UniqueIdentifier>{e19e15de-b8de-4cfb-bf46-afa0ec8f800a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\IPlot Interface">
+      <UniqueIdentifier>{d410d412-a717-4e9d-9608-41b56bbe96c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\IBasePlot Interface">
+      <UniqueIdentifier>{ea856be6-2f86-4e63-8d90-9ae54826b46b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\handlers">
+      <UniqueIdentifier>{1038b6e5-5420-4f36-8e24-079623a33590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9598bc7e-2539-4c14-938a-c53aea985f8c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{0dc9e03c-8511-4c5a-80b9-af8981d7d41f}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="balls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BasePlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blocks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicSegment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PLOT.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Plotter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stacks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="typeHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphicSegment.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphicSegmentAction.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewObjectEx.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDispatch.cpp">
+      <Filter>Source Files\COM Interface Files\IPlot Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlot.cpp">
+      <Filter>Source Files\COM Interface Files\IPlot Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlot_data.cpp">
+      <Filter>Source Files\COM Interface Files\IPlot Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IBasePlot.cpp">
+      <Filter>Source Files\COM Interface Files\IBasePlot Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="colorHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="dimensionHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="PlotHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="sampleGraphicHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PlotControl.def">
+      <Filter>Source Files\COM Implementation</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BasePlot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicSegment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Plot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Plot.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Plot.odl">
+      <Filter>Source Files\COM Implementation</Filter>
+    </Midl>
+  </ItemGroup>
+</Project>

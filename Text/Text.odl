@@ -1,0 +1,262 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFDCE-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Text.hlp"),
+   helpstring("G System, Text Type Library"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library Text { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("Properties.tlb");
+   importlib("GSystem.tlb");
+   importlib("GraphicControl.tlb");
+   importlib("OpenGLImplementation.tlb");
+   importlib("DataSet.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
+   importlib("Plot.tlb");
+
+   enum TextPropertiesID {
+      textPropertyText = 0,
+      textPropertyLength = 1,
+      textPropertyFormat = 2,
+      textPropertyFont = 3,
+      textPropertySizeProperty = 4,
+      textPropertySize = 5,
+      textPropertySizeUnits = 6,
+      textPropertyPosition = 7,
+      textPropertyPositionX = 8,
+      textPropertyPositionY = 9,
+      textPropertyPositionZ = 10,
+      textPropertyWindowPosition = 11,
+      textPropertyDirectionForward = 12,
+      textPropertyDirectionForwardX = 13,
+      textPropertyDirectionForwardY = 14,
+      textPropertyDirectionForwardZ = 15,
+      textPropertyDirectionUp = 16,
+      textPropertyDirectionUpX = 17,
+      textPropertyDirectionUpY = 18,
+      textPropertyDirectionUpZ = 19,
+      textPropertyColor = 20,
+      textPropertyLineWeight = 21,
+      textPropertySegmentiD = 22,
+      textPropertyActionTable = 23,
+      textPropertyCoordinatePlane = 24,
+      textPropertyFlipHorizontal = 25,
+      textPropertyFlipVertical = 26,
+      textPropertyMinX = 27,
+      textPropertyMinY = 28,
+      textPropertyMinZ = 29,
+      textPropertyMaxX = 30,
+      textPropertyMaxY = 31,
+      textPropertyMaxZ = 32,
+      textPropertyPartOfWorldDomain = 33,
+      textPropertyDescription = 34,
+      textpropertyPartOfMainGraphic = 35,
+      textPropertyShowContentPropertyPage = 36,
+      textPropertyEnablePositionSettings = 37,
+      textPropertyTextNotify = 38,
+      textPropertyPositionString = 39,
+      textPropertyRender = 40 };
+
+   enum TextMethodsID {
+      textMethodInitialize = 101,
+      textMethodGetTextList = 102,
+      textMethodPrepData = 103,
+      textMethodDraw = 104,
+      textMethodRedraw = 105,
+      textMethodErase = 106,
+      textMethodAdviseGSystemStatusBar = 107,
+      textMethodPrepText = 108,
+      textMethodEditProperties = 109  };
+
+   interface ITextNotify;
+
+   [  uuid(8CAEFDCF-55E6-11d3-8365-006008BD5BC3),
+      helpstring("The Text Interface"),
+      pointer_default(unique)
+   ] 
+   interface IText : IDispatch {
+
+     [propput,id(textPropertyText),helpstring("")] HRESULT Text([in] BSTR setText);
+     [propget,id(textPropertyText),helpstring("")] HRESULT Text([out,retval] BSTR *getText);
+
+     [propput,id(textPropertyRender),helpstring("To draw text in OpenGL, by rendering the data as if it where a plot, set this property to true (best for 3-D views)")] 
+         HRESULT TextRender([in] boolean);
+     [propget,id(textPropertyRender),helpstring("")] HRESULT TextRender([out,retval] boolean *);
+
+     [propput,id(textPropertyFormat),helpstring("")] HRESULT Format([in] long setTextFormat);
+     [propget,id(textPropertyFormat),helpstring("")] HRESULT Format([out,retval] long * getTextFormat);
+
+     [propput,id(textPropertyFont),helpstring("")] HRESULT Font([in] BSTR fontName);
+     [propget,id(textPropertyFont),helpstring("")] HRESULT Font([out,retval] BSTR *fontName);
+
+     [propput,hidden,id(textPropertySizeProperty),helpstring("")] HRESULT SizeProperty([in] IGProperty *pPropertySize,[in] IGProperty* pPropertySizeUnits);
+
+     [propput,id(textPropertySize),helpstring("")] HRESULT Size([in]double pSize);
+     [propget,id(textPropertySize),helpstring("")] HRESULT Size([out,retval]double *pSize);
+
+     [propput,id(textPropertySizeUnits),helpstring("")] HRESULT SizeUnits([in]enum TextSizeUnits sizeUnits);
+     [propget,id(textPropertySizeUnits),helpstring("")] HRESULT SizeUnits([out,retval]enum TextSizeUnits *pSizeUnits);
+
+     [propput,id(textPropertyPosition),helpstring("")] HRESULT Position([in]SAFEARRAY(BSTR) pStringArrayContainingPosition);
+     [propget,id(textPropertyPosition),helpstring("")] HRESULT Position([out,retval]SAFEARRAY(BSTR) *ppStringArrayContainingPosition);
+
+     [propput,id(textPropertyPositionString),helpstring("")] HRESULT PositionString([in]BSTR pStringContainingPosition);
+     [propget,id(textPropertyPositionString),helpstring("")] HRESULT PositionString([out,retval]BSTR *ppStringContainingPosition);
+
+     [propput,id(textPropertyPositionX),helpstring("")] HRESULT PositionX([in]double scalarValue);
+     [propget,id(textPropertyPositionX),helpstring("")] HRESULT PositionX([out,retval]double *pScalarValue);
+
+     [propput,id(textPropertyPositionY),helpstring("")] HRESULT PositionY([in]double scalarValue);
+     [propget,id(textPropertyPositionY),helpstring("")] HRESULT PositionY([out,retval]double *pScalarValue);
+
+     [propput,id(textPropertyPositionZ),helpstring("")] HRESULT PositionZ([in]double scalarValue);
+     [propget,id(textPropertyPositionZ),helpstring("")] HRESULT PositionZ([out,retval]double *pScalarValue);
+
+     [propput,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([in] POINTL *putWindowPoint);
+     [propget,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([out,retval] POINTL *getWindowPoint);
+
+     [propput,id(textPropertyDirectionForward),helpstring("")] HRESULT DirectionForward([in]SAFEARRAY(double) direction);
+     [propget,id(textPropertyDirectionForward),helpstring("")] HRESULT DirectionForward([out,retval] SAFEARRAY(double) *pDirection);
+
+     [propput,id(textPropertyDirectionForwardX),helpstring("")] HRESULT DirectionForwardX([in]double directionX);
+     [propget,id(textPropertyDirectionForwardX),helpstring("")] HRESULT DirectionForwardX([out,retval] double *pDirectionX);
+
+     [propput,id(textPropertyDirectionForwardY),helpstring("")] HRESULT DirectionForwardY([in]double directionY);
+     [propget,id(textPropertyDirectionForwardY),helpstring("")] HRESULT DirectionForwardY([out,retval] double *pDirectionY);
+
+     [propput,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([in]double directionZ);
+     [propget,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([out,retval] double *pDirectionZ);
+
+     [propput,id(textPropertyDirectionUp),helpstring("")] HRESULT DirectionUp([in]SAFEARRAY(double) direction);
+     [propget,id(textPropertyDirectionUp),helpstring("")] HRESULT DirectionUp([out,retval] SAFEARRAY(double) *pDirection);
+
+     [propput,id(textPropertyDirectionUpX),helpstring("")] HRESULT DirectionUpX([in]double directionX);
+     [propget,id(textPropertyDirectionUpX),helpstring("")] HRESULT DirectionUpX([out,retval] double *pDirectionX);
+
+     [propput,id(textPropertyDirectionUpY),helpstring("")] HRESULT DirectionUpY([in]double directionY);
+     [propget,id(textPropertyDirectionUpY),helpstring("")] HRESULT DirectionUpY([out,retval] double *pDirectionY);
+
+     [propput,id(textPropertyDirectionUpZ),helpstring("")] HRESULT DirectionUpZ([in]double directionZ);
+     [propget,id(textPropertyDirectionUpZ),helpstring("")] HRESULT DirectionUpZ([out,retval] double *pDirectionZ);
+
+     [propput,id(textPropertyColor),helpstring("")] HRESULT Color([in]SAFEARRAY(double) color);
+     [propget,id(textPropertyColor),helpstring("")] HRESULT Color([out,retval]SAFEARRAY(double) *pColor);
+
+     [propput,id(textPropertyLineWeight),helpstring("")] HRESULT LineWeight([in]double lineWeight);
+     [propget,id(textPropertyLineWeight),helpstring("")] HRESULT LineWeight([out,retval]double *pLineWeight);
+
+     [propget,id(textPropertySegmentID),helpstring("")] HRESULT SegmentID([out,retval] long *pID);
+
+     [propget,id(textPropertyActionTable),helpstring("")] HRESULT ActionTable([out,retval] IGraphicSegmentAction**);
+
+     [propput,id(textPropertyCoordinatePlane),helpstring("")] HRESULT CoordinatePlane([in] enum CoordinatePlane);
+     [propget,id(textPropertyCoordinatePlane),helpstring("")] HRESULT CoordinatePlane([out,retval] enum CoordinatePlane*);
+
+     [propput,id(textPropertyFlipHorizontal),helpstring("")] HRESULT FlipHorizontal([in]VARIANT_BOOL);
+     [propget,id(textPropertyFlipHorizontal),helpstring("")] HRESULT FlipHorizontal([out,retval]VARIANT_BOOL *);
+
+     [propput,id(textPropertyFlipVertical),helpstring("")] HRESULT FlipVertical([in]VARIANT_BOOL);
+     [propget,id(textPropertyFlipVertical),helpstring("")] HRESULT FlipVertical([out,retval]VARIANT_BOOL *);
+
+     [propget,id(textPropertyMinX),helpstring("")] HRESULT minX([out,retval] double*);
+     [propget,id(textPropertyMinY),helpstring("")] HRESULT minY([out,retval] double*);
+     [propget,id(textPropertyMinZ),helpstring("")] HRESULT minZ([out,retval] double*);
+
+     [propget,id(textPropertyMaxX),helpstring("")] HRESULT maxX([out,retval] double*);
+     [propget,id(textPropertyMaxY),helpstring("")] HRESULT maxY([out,retval] double*);
+     [propget,id(textPropertyMaxZ),helpstring("")] HRESULT maxZ([out,retval] double*);
+
+     [propput,id(textPropertyPartOfWorldDomain),helpstring("")] HRESULT PartOfWorldDomain([in]VARIANT_BOOL bIsPart);
+     [propget,id(textPropertyPartOfWorldDomain),helpstring("")] HRESULT PartOfWorldDomain([out,retval]VARIANT_BOOL *pbIsPart);
+
+     [propput,id(textPropertyDescription),helpstring("")] HRESULT Description([in]BSTR textDescription);
+     [propget,id(textPropertyDescription),helpstring("")] HRESULT Description([out,retval]BSTR *pTextDescription);
+
+     [propput,id(textPropertyPartOfMainGraphic),helpstring("")] HRESULT PartOfMainGraphic([in]VARIANT_BOOL boolFalseToPreventDrawingOnMainGraphic);
+     [propget,id(textPropertyPartOfMainGraphic),helpstring("")] HRESULT PartOfMainGraphic([out,retval]VARIANT_BOOL* pBoolFalseToPreventDrawingOnMainGraphic);
+
+     [propget,id(1001),hidden] HRESULT SegmentCount([in]long *);
+     [hidden] HRESULT GetSegments([in]long *);
+
+     [helpstring("Set the property that supplies the color of text."),id(101)] 
+     HRESULT TextColorProperty([in]IGProperty* pIPropertyTextColor);
+
+     [propput,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property pages")]
+     HRESULT ShowContentPropertyPage([in]VARIANT_BOOL bShow);
+     [propget,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property pages")]
+     HRESULT ShowContentPropertyPage([out,retval]VARIANT_BOOL *pbShow);
+
+     [propput,id(textPropertyEnablePositionSettings),helpstring("Enable or disable the absolute positioning settings on the text's property settings dialog")]
+     HRESULT EnablePositionSettings([in]VARIANT_BOOL bEnable);
+     [propget,id(textPropertyEnablePositionSettings),helpstring("Enable or disable the absolute positioning settings on the text's property settings dialog")]
+     HRESULT EnablePositionSettings([out,retval]VARIANT_BOOL *pbEnable);
+
+     [propput,id(textPropertyTextNotify),helpstring("")]
+     HRESULT TextNotify(ITextNotify* pITextNotify);
+
+     [id(102)] HRESULT Initialize(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropOpenGLRendering,char *text,struct DataPoint *position);
+
+     [id(103)] HRESULT PrepData();
+
+     [id(104)] HRESULT Draw();
+
+     [id(105)] HRESULT Erase();
+
+     [id(106)] HRESULT Redraw();
+
+     [id(107),helpstring("Provide an implementation of IGSystemStatusBar to this method - the interface is not AddRef()ed")]
+     HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
+
+     [id(108),helpstring("Edit the text properties")]
+     HRESULT EditProperties();
+
+     [id(109),helpstring("Copy the text and all of it's properties from another text object")]
+     HRESULT CopyFrom(IText* pIText_Source);
+
+     [propget,id(110),helpstring("Retrieve the bounding box (in GDI Coordinates), of the text. Not valid until after PrepText is called.")]
+     HRESULT GDIBoundingBox([out,retval] RECT *);
+
+     [propput,id(110),helpstring("Set the bounding box (in GDI Coordinates), of the text. Should be set after PrepText is called because this will override where Prep text puts it.")]
+     HRESULT GDIBoundingBox([in] RECT *);
+
+
+     [id(111),helpstring("Move the text one line height above where it is")]
+     HRESULT LineUp();
+
+     [propget,id(112),helpstring("Retrieve a pointer to the text dataset")]
+     HRESULT DataSet([out,retval] IDataSet **);
+
+
+   };
+
+   [  uuid(8CAEFDD1-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Text Notify Interface, implement in owner's of text and call put_TextNotify(ITextNotify) on IText")
+   ]
+   interface ITextNotify : IUnknown {
+
+      HRESULT DeleteText(IText *);
+
+   };
+   
+
+   [
+      uuid(8CAEFDD0-55E6-11d3-8365-006008BD5BC3),
+      helpstring("G System Text Class"),
+      control
+   ]
+   coclass Text {
+      [default] interface IText;
+   };
+
+};

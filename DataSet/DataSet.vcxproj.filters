@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{8548ad22-852a-47c4-a3bc-2ec1c2bad123}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Files">
+      <UniqueIdentifier>{748d667a-9b62-40a1-afed-d1b37c157fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\IDataSet Interface">
+      <UniqueIdentifier>{05e6cbd9-30db-4491-810a-071854cd4752}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{42d690f1-d152-4d7d-bbae-b10500a9d7de}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{4ded3ae3-0b38-4bca-90db-9566b6ac060d}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DataSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDataSet.cpp">
+      <Filter>Source Files\COM Files\IDataSet Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DataSet.def">
+      <Filter>Source Files\COM Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="DataSet.odl">
+      <Filter>Source Files\COM Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DataSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

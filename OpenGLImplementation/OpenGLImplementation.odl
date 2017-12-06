@@ -1,0 +1,189 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD96-55E6-11d3-8365-006008BD5BC3),
+   helpfile(""),
+   helpstring("GSystems OpenGLImplementation Object"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+
+library OpenGLImplementor { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("GSystem.tlb");
+   importlib("DataSet.tlb");
+   importlib("Properties.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
+
+   [  uuid(8CAEFD97-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystem OpenGLImplementation Interface")
+   ] 
+   interface IOpenGLImplementation : IDispatch {
+
+// Actions ? 
+
+      HRESULT Initialize(IEvaluator *pIEvaluator);
+
+      HRESULT Start();
+
+      HRESULT Stop();
+
+      HRESULT SetBaseWindow(HWND);
+
+      HRESULT SetTargetWindow(HWND);
+      HRESULT ResetTargetWindow();
+   
+      HRESULT PrintSetup();
+      HRESULT PrintFinish();
+
+// Graphics State ? 
+
+      HRESULT SetViewProperties(
+                            [optional,defaultvalue(0)] IGProperty *pPropPlotView,         
+                            [optional,defaultvalue(0)] IGProperty *pPropRotationPhi,      
+                            [optional,defaultvalue(0)] IGProperty *pPropRotationTheta,    
+                            [optional,defaultvalue(0)] IGProperty *ppropRotationSpin,     
+                            [optional,defaultvalue(0)] IGProperty *pPropLeftMargin,       
+                            [optional,defaultvalue(0)] IGProperty *pPropTopMargin,        
+                            [optional,defaultvalue(0)] IGProperty *pPropRightMargin,      
+                            [optional,defaultvalue(0)] IGProperty *pPropBottomMargin,     
+                            [optional,defaultvalue(0)] IGProperty *pPropMarginUnits,      
+                            [optional,defaultvalue(0)] IGProperty *pPropStretchToMargins);
+
+      HRESULT UnSetViewProperties();
+
+      HRESULT Set2D(IDataSet *masterDataset,long margins,char directionRight,char directionUp);
+
+      HRESULT SetUp(IDataSet *masterdataset,
+                     [optional,defaultvalue(0)] IGProperty *pPropPlotView,
+                     [optional,defaultvalue(0)] IGProperty *pPropRotationPhi,
+                     [optional,defaultvalue(0)] IGProperty *pPropRotationTheta,
+                     [optional,defaultvalue(0)] IGProperty *ppropRotationSpin,
+                     [optional,defaultvalue(0)] IGProperty *pPropLeftMargin,
+                     [optional,defaultvalue(0)] IGProperty *pPropTopMargin,
+                     [optional,defaultvalue(0)] IGProperty *pPropRightMargin,
+                     [optional,defaultvalue(0)] IGProperty *pPropBottomMargin,
+                     [optional,defaultvalue(0)] IGProperty *pPropMarginUnits,
+                     [optional,defaultvalue(0)] IGProperty *pPropStretchToMargins);
+
+      HRESULT IsInitialized(VARIANT_BOOL *bIsInitialized);
+
+      HRESULT Translate(struct DataPoint*);
+      HRESULT Rotate(char axis,double angle);
+      HRESULT Scale(struct DataPoint*);
+
+      HRESULT SetLighting(
+               IGProperty *pPropLightEnabled[],
+               IGProperty *pPropAmbientLight[],
+               IGProperty *pPropDiffuseLight[],
+               IGProperty *pPropSpecularLight[],
+               IGProperty *pPropLightPos[],
+               IGProperty *pPropCountLights,
+               IGProperty *pPropShinyness);
+
+      [helpstring("Save the matrix transformations state so that it can be Pop()ed after setting a new target window, or simply later restored.")]
+      HRESULT Push();
+
+      [helpstring("Pop the saved matrix transformations state after setting a new target window or after causing the state to change on a temporary basis.")]
+      HRESULT Pop();
+
+      [propput] HRESULT ViewPort([in]int *fourElementViewPortArray);
+      [propget] HRESULT ViewPort([out,retval]int *fourElementViewPortArray);
+
+      [propget] HRESULT SupportedLightCount([out,retval]long *pSupportedLightCount);
+
+// Utilities ?
+
+      HRESULT PixelsToUnits(char direction,double inPixels,double *answer);
+      HRESULT UnitsToPixels(char direction,double inUnits,double *answer);
+      HRESULT DataToWindow(struct DataPoint *dpSource,enum UnitOfMeasure units,struct DataPoint *dpTarget);
+      HRESULT WindowToData(struct DataPoint *dpSource,struct DataPoint *dpTarget);
+      HRESULT DataListToWindow(struct DataList* dpSources,struct DataList* dpTargets);
+
+      [helpstring("Given a point in world coordinates, find the pixel coordinates of the point.")]
+      HRESULT PixelPoint(struct DataPoint *dpBeginning,struct DataPoint *dpAnswer);
+
+      [helpstring("Given two points in world coordinates, find the vector (in pixels), that moves from one point to the other.")]
+      HRESULT PixelVector(struct DataPoint *dpBeginning,struct DataPoint *dpEnding,struct DataPoint *dpAnswer);
+
+      [helpstring("Provide an implementation of IGSystemStatusBar to this method - the interface is not AddRef()ed")]
+      HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
+
+      [helpstring("Get the pixels in the OpenGL frame buffer within the bounded (pixel) coordinates. The caller must allocate the storage location in pResult")]
+      HRESULT GetPixels(long x1,long y1,long x2,long y2,BYTE *pResult);
+
+// Window State ?
+ 
+      [propget] 
+      HRESULT HDC(HDC *getHDC);
+      [propget]
+      HRESULT HWND(HWND *getHWND);
+      [propget]
+      HRESULT MousePositionClient(POINT *ptMouse);
+
+// Data State ?
+ 
+      HRESULT GetExtents(double *minx,double *miny,double *minz,double *maxx,double *maxy,double *maxz);
+
+// Drawing ?
+
+      HRESULT Erase([optional,defaultvalue(0)]IGProperty *pPropBackgroundColor);
+      HRESULT ResetDepth();
+      HRESULT NewLine(struct DataPoint* p);
+      HRESULT NewPolygon(struct DataPoint* p);
+      HRESULT Vertex(struct DataPoint* p);
+      HRESULT BeginSurface(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
+      HRESULT EndSurface(long segmentID);
+      HRESULT BeginWireframe(long segmentID,IGProperty* pPropLineColor,IGProperty* pPropLineWeight);
+      HRESULT EndWireframe(long segmentID);
+      HRESULT BeginSolids(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
+      HRESULT EndSolids(long segmentID);
+
+      HRESULT ClipPlane(struct DataPoint *dpStartLine,struct DataPoint *dpEndLine,struct DataPoint *dpCorner1,struct DataPoint *dpCorner2);
+
+      [propget] HRESULT BackgroundColor([out,retval]IGProperty** pIPropertyBackgroundColor);
+      [propget] HRESULT ViewTheta([out,retval]double* pViewTheta);
+      [propget] HRESULT ViewPhi([out,retval]double* pViewPhi);
+      [propget] HRESULT ViewSpin([out,retval]double *pViewSpin);
+
+      HRESULT Flush();
+
+      HRESULT SetColor(IGProperty*);
+      HRESULT SetLineWeight(IGProperty*);
+      HRESULT Normal3dv(double *normal);
+
+// Selection 
+
+      HRESULT GetPickBoxHits(POINT *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
+
+// Segments ? 
+
+      HRESULT OpenSegment(long segmentID,IGProperty* pPropLineColor,IGProperty* pPropLineWeight);
+      HRESULT RedrawSegment(long segmentID);
+      HRESULT CloseSegment(long segmentID,unsigned short drawOnClose);
+      HRESULT NewSegments(long numberToMake,long *firstInList);
+      HRESULT StartSegment(long segmentID);
+      HRESULT EndSegment();
+      HRESULT PlaySegment(long segmentID);
+      HRESULT DeleteSegment(long segmentID);
+
+   };
+
+   [
+      uuid(8CAEFD98-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystem OpenGLImplementor Class"),
+      control
+   ]
+   coclass OpenGLImplementor {
+      [default] interface IOpenGLImplementation;
+   };
+
+};

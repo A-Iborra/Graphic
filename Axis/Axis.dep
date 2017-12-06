@@ -1,0 +1,222 @@
+# Microsoft Developer Studio Generated Dependency File, included by Axis.mak
+
+.\IAxis.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IAxis_Text.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\AxisControl.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.c"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.c"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.c"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.c"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IDispatch.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IGraphicSegmentAction.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IPropertiesClient.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IPropertyPageClient.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\IUnknown.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\Axis.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.c"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"plot_i.c"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\AxisHandler.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\AxisPlot.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\colorHandler.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+..\Utils\mathUtils.cpp : \
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\positionHandler.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\styleHandler.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	
+
+.\textHandler.cpp : \
+	".\Axis.h"\
+	{$(INCLUDE)}"Axis_i.h"\
+	{$(INCLUDE)}"DataSet_i.h"\
+	{$(INCLUDE)}"Evaluator_i.h"\
+	{$(INCLUDE)}"GraphicControl_i.h"\
+	{$(INCLUDE)}"GSystem_i.h"\
+	{$(INCLUDE)}"OpenGLImplementation_i.h"\
+	{$(INCLUDE)}"Plot_i.h"\
+	{$(INCLUDE)}"Properties_i.h"\
+	{$(INCLUDE)}"Text_i.h"\
+	{$(INCLUDE)}"Variable_i.h"\
+	

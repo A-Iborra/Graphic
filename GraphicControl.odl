@@ -1,0 +1,341 @@
+/*
+
+                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
+
+*/
+
+import "ocidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD70-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Graphic.hlp"),
+   helpstring("GSystems Graphic Control"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library Graphic { 
+
+   import "GSystem\GSystem.odl";
+
+   enum GraphicPropertiesID {
+      gcPropName = 0,
+      gcPropSize = 1,
+      gcPropPosition = 2,
+      gcPropPlotView = 3,
+      gcPropPlotType = 4,
+
+      gcPropViewPhi = 5,
+      gcPropViewTheta = 6,
+      gcPropViewSpin = 7,
+
+      gcPropLightOn = 11,
+      gcPropLightPosition = 12,
+
+      gcPropBackgroundColor = 21,
+      gcPropLeftMargin = 23,
+      gcPropTopMargin = 24,
+      gcPropRightMargin = 25,
+      gcPropBottomMargin = 26,
+      gcPropMargins = 27,
+
+      gcPropFloor = 31,
+      gcPropCeiling = 32,
+
+      gcPropAxis = 50,
+      gcPropPlot = 51,
+      gcPropFunction = 52,
+      gcPropText = 53,
+      
+      gcPropShowFunctions = 60,
+
+      gcPropAutoPlotViewDetection = 71,
+      gcPropPickBoxSize = 72,
+      gcPropUseStatusBar = 73,
+      gcPropUseGraphicsCursor = 74,
+      gcPropDenyUserPropertySettings = 75 };
+
+   enum GraphicMethodsID {
+      gcMethodClearAllData = 100,
+      gcMethodPrepareForData = 101,
+      gcMethodTakeDataString = 102,
+      gcMethodTakeDataArray = 103,
+      gcMethodTakeFile = 104,
+      gcMethodTakeDataSet = 105,
+      gcMethodFinishedWithData = 106,
+      gcMethodPrepareForDataSets = 107,
+      gcMethodDraw = 108,
+      gcMethodSetProperties = 120,
+      gcMethodAddAxis = 121,
+      gcMethodAddText = 122,
+      gcMethodAddTextInteractive = 123,
+      gcMethodRemoveText = 124,
+      gcMethodRemoveAllText = 125,
+      gcMethodAddFunction = 126,
+      gcMethodAddFunctionInteractive = 127,
+      gcMethodRemoveFunction = 128,
+      gcMethodRemoveAllFunctions = 129,
+      gcMethodAddPlot = 130,
+      gcMethodRemovePlot = 131,
+      gcMethodRemoveAllPlots = 132,
+      gcMethodSynchronise = 133
+      };
+
+   enum PlotViews {
+      gcPlotView2D = 0x00000001,
+      gcPlotView3D = 0x00000002 };
+
+   enum PlotTypes {	
+      gcPlotTypeNone = 0x00000000,
+      gcPlotTypeNatural = 0x00010001,
+      gcPlotTypeSurface = 0x00020000,
+      gcPlotTypeWireFrame = 0x00040000,
+      gcPlotTypeStacks = 0x00080000,
+      gcPlotTypeBlocks = 0x00100000,
+      gcPlotTypeBalls = 0x00200000,
+      gcPlotTypePie = 0x00080002,
+      gcPlotTypeContour = 0x00020004,
+      gcPlotTypeQuads = 0x00040008,
+      gcPlotTypeTriangles = 0x00080010
+      };
+
+   [  uuid(8CAEFD71-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystems Graphic Control (G), Events Interface"),
+   ]
+   dispinterface IGSGraphicEvents {
+      properties:
+
+      methods:
+
+      [id(1)] HRESULT Clicked();
+
+   };
+
+   [  uuid(8CAEFD72-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystems Graphic Control (G), Automation Interface"),
+      dual,oleautomation,
+      pointer_default(unique)
+   ] 
+   interface IGSGraphic : IDispatch {
+
+      // Properties
+
+      [propput,id(gcPropSize),helpstring("Size the graphic")]
+      HRESULT Size( [in] long cx,[in] long cy);
+
+      [propput,id(gcPropPosition),helpstring("Position the graphic")]
+      HRESULT Position( [in] long x,[in] long y);
+
+      [propput,id(gcPropPlotView),helpstring("Sets the view (2-D or 3-D) of the Graphic Control, From the enum PlotViews")]
+      HRESULT PlotView([in] enum PlotViews plotView);
+      [propget,id(gcPropPlotView),helpstring("Gets the view (2-D or 3-D) of the Graphic Control, From the enum PlotViews")]
+      HRESULT PlotView([out,retval] enum PlotViews* plotView);
+
+      [propput,id(gcPropPlotType),helpstring("Sets the plot type of the Graphic Control, From the enum PlotTypes")]
+      HRESULT PlotType([in] enum PlotTypes plotType);
+      [propget,id(gcPropPlotType),helpstring("Gets the plot type of the Graphic Control, From the enum PlotTypes")]
+      HRESULT PlotType([out,retval] enum PlotTypes* plotType);
+
+      [propput,id(gcPropFloor),helpstring("Sets the value to use as minimum Z when data does not supply a Z value")]
+      HRESULT Floor([in] double floorZValue);
+      [propget,id(gcPropFloor),helpstring("Gets the value in use as the minimum Z value when data does not supply a Z value")]
+      HRESULT Floor([out,retval] double *pFloorZValue);
+
+      [propput,id(gcPropCeiling),helpstring("Sets the value to use as maximum Z when data does not supply a Z value")]
+      HRESULT Ceiling([in] double ceilingZValue);
+      [propget,id(gcPropCeiling),helpstring("Gets the value in use as the maximum Z value when data does not supply a Z value")]
+      HRESULT Ceiling([out,retval] double *pCeilingZValue);
+
+      [propput,id(gcPropViewPhi),helpstring("One of two angles which determines the view of the graphic is Theta - an angle of elevation above the X-Y plane. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewPhi([in] float phiAngle);
+      [propget,id(gcPropViewPhi),helpstring("One of two angles which determines the view of the graphic is Theta - an angle of elevation above the X-Y plane. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewPhi([out,retval] float *pPhiAngle);
+
+      [propput,id(gcPropViewTheta),helpstring("One of two angles which determines the view of the graphic is Phi - an angle of spin around the z-axis. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewTheta([in] float thetaAngle);
+      [propget,id(gcPropviewTheta),helpstring("One of two angles which determines the view of the graphic is Phi - an angle of spin around the z-axis. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewTheta([out,retval] float *pThetaAngle);
+
+      [propput,id(gcPropViewSpin),helpstring("After the view is determined by Phi and Theta, this angle will spin the view about the vector from the viewer to the origin - tilting the view. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewSpin([in] float spinAngle);
+      [propget,id(gcPropViewSpin),helpstring("After the view is determined by Phi and Theta, this angle will spin the view about the vector from the viewer to the origin - tilting the view. This property is the value, in degrees, of this angle.")]
+      HRESULT ViewSpin([out,retval] float *pSpinAngle);
+
+
+/* Properties: Lighting properties */
+
+      [propput,id(gcPropLightOn),helpstring("Whether a specific light # (1-8) is enabled (turned on).")]
+      HRESULT LightOn([in]long lightNumber,[in]VARIANT_BOOL setIsEnabled);
+      [propget,id(gcPropLightOn),helpstring("Whether a specific light # (1-8) is enabled (turned on).")]
+      HRESULT LightOn([in]long lightNumber,[out,retval]VARIANT_BOOL *isEnabled);
+      
+      [propput,id(gcPropLightPosition),helpstring("Specifies the 3-D position of a light - using the same data range as that embodied by the data you have sent to the Control.")]
+      HRESULT LightPosition([in]long lightNumber,[in]VARIANT *);
+      [propget,id(gcPropLightPosition),helpstring("Specifies the 3-D position of a light - using the same data range as that embodied by the data you have sent to the Control.")]
+      HRESULT LightPosition([in]long lightNumber,[out,retval]VARIANT *);
+
+      [propput,id(gcPropBackgroundColor),helpstring("Sets the background color of the graphic given a windows color index")]
+      HRESULT BackgroundColor([in] long colorValue);
+      [propget,id(gcPropBackgroundColor),helpstring("Retrieves the background color of the graphic (as a windows color index)")]
+      HRESULT BackgroundColor([out,retval] long *pColorValue);
+
+      [propput,id(gcPropLeftMargin),helpstring("Sets the left margin (in pixels)")]
+      HRESULT LeftMargin([in] long leftMargin);
+      [propget,id(gcPropLeftMargin),helpstring("Retrieves the left margin (in pixels)")]
+      HRESULT LeftMargin([out,retval] long *pLeftMargin);
+
+      [propput,id(gcPropTopMargin),helpstring("Sets the top margin (in pixels)")]
+      HRESULT TopMargin([in] long topMargin);
+      [propget,id(gcPropTopMargin),helpstring("Retrieves the top margin (in pixels)")]
+      HRESULT TopMargin([out,retval] long *pTopMargin);
+
+      [propput,id(gcPropRightMargin),helpstring("Sets the right margin (in pixels)")]
+      HRESULT RightMargin([in] long rightMargin);
+      [propget,id(gcPropRightMargin),helpstring("Retrieves the right margin (in pixels)")]
+      HRESULT RightMargin([out,retval] long *pRightMargin);
+
+      [propput,id(gcPropBottomMargin),helpstring("Sets the bottom margin (in pixels)")]
+      HRESULT BottomMargin([in] long bottomMargin);
+      [propget,id(gcPropBottomMargin),helpstring("Retrieves the bottom margin (in pixels)")]
+      HRESULT BottomMargin([out,retval] long *pBottomMargin);
+
+      [propput,id(gcPropMargins),helpstring("Sets all margins (left, top, right, bottom) (in pixels)")]
+      HRESULT Margins([in] long leftMargin,[in] long topMargin, [in] long rightMargin, [in] long bottomMargin);
+
+/* Properties: Other objects */
+
+      [propget,id(gcPropAxis),helpstring("Retrieves a axis object, specify 'X','Y','Z', or the single character name of an axis you've created, or receive a NULL object\n\nPlease Release() the returned object at some point.")]
+      HRESULT Axis([in]BSTR axisType,[out,retval]IDispatch **axisObject);
+
+      [propget,id(gcPropPlot),helpstring("Retrieves a plot object, specify the # of the plot (plots are created in sequential order starting at 1). NULL is returned if not found.\n\nPlease Release() the returned object at some point.")]
+      HRESULT Plot([in]long plotNumber,[out,retval]IDispatch **plotObject);
+
+      [propget,id(gcPropFunction),helpstring("Retrieves a function object, specify the expression of the function. Null is returned if not found.\n\nPlease Release() the returned object at some point.")]
+      HRESULT Function([in]BSTR functionExpression,[out,retval]IDispatch **functionObject);
+
+      [propget,id(gcPropText),helpstring("Retrieves a text object, specify the content of the text. Null is returned if not found.\n\nPlease Release() the returned object at some point.")]
+      HRESULT Text([in]BSTR text,[out,retval]IDispatch **textObject);
+
+/* Properties: Other objects control */
+
+      [propput,id(gcPropShowFunctions),helpstring("Hide or show the function specifications. You cannot show them unless at least one function has been defined.")]
+      HRESULT ShowFunctions([in]VARIANT_BOOL setShowing);
+      [propget,id(gcPropShowFunctions),helpstring("Hide or show the function specifications. You cannot show them unless at least one function has been defined.")]
+      HRESULT ShowFunctions([out,retval]VARIANT_BOOL *pShowing);
+
+/* Properties: Other categories */
+
+      [propput,id(gcPropAutoPlotViewDetection),helpstring("Allows (or prevents) the graphic to set it's plotView to 3D if it detects 3D data")]
+      HRESULT AutoPlotViewDetection([in] VARIANT_BOOL );
+      [propget,id(gcPropAutoPlotViewDetection),helpstring("Allows (or prevents) the graphic to set it's plotView to 3D if it detects 3D data")]
+      HRESULT AutoPlotViewDetection([out,retval] VARIANT_BOOL *);
+
+      [propput,id(gcPropPickBoxSize),helpstring("Sets the size (in pixels) of the Pick box - this is the size of the area around the mouse pointer that the graphic detects elements (for example, text), in.")]
+      HRESULT PickBoxSize([in] long newSize);
+      [propget,id(gcPropPickBoxSize),helpstring("Sets the size (in pixels) of the Pick box - this is the size of the area around the mouse pointer that the graphic detects elements (for example, text), in.")]
+      HRESULT PickBoxSize([out,retval] long *pGetSize);
+
+      [propput,id(gcPropUseStatusBar),helpstring("Turns the use of the status bar on and off")]
+      HRESULT UseStatusBar([in] VARIANT_BOOL);
+      [propget,id(gcPropUseStatusBar),helpstring("Turns the use of the status bar on and off")]
+      HRESULT UseStatusBar([out,retval] VARIANT_BOOL *);
+
+      [propput,id(gcPropUseGraphicsCursor),helpstring("Turns the use of the 3-D graphics cursor on and off")]
+      HRESULT UseGraphicsCursor([in]VARIANT_BOOL);
+      [propget,id(gcPropUseGraphicsCursor),helpstring("Turns the use of the 3-D graphics cursor on and off")]
+      HRESULT UseGraphicsCursor([out,retval] VARIANT_BOOL *);
+
+      [propput,id(gcPropDenyUserPropertySettings),helpstring("Set this value to true to prevent the user from seeing the Graphic Control's property settings dialog during runtime")]
+      HRESULT DenyUserPropertySettings([in] VARIANT_BOOL);
+      [propget,id(gcPropDenyUserPropertySettings),helpstring("Set this value to true to prevent the user from seeing the Graphic Control's property settings dialog during runtime")]
+      HRESULT DenyUserPropertySettings([out,retval] VARIANT_BOOL *);
+
+/* Methods: */
+
+      [id(gcMethodClearAllData),helpstring("Call clear all the data (in preparation for sending data) for all plots.")] 
+      HRESULT ClearAllData(); 
+
+      [id(gcMethodPrepareForData),helpstring("Call PrepareForData to prepare the Graphic to recieve data, pass 0 for all plots, or a specific plot number.")] 
+      HRESULT PrepareForData( [in] long plotNumber ); 
+
+      [id(gcMethodTakeDataString),helpstring("Call TakeData with a string of numbers x, y , and (optionally), z, separated by ' '.")] 
+      HRESULT TakeDataString( [in] BSTR stringOfNumbers, [in] long plotNumber); 
+
+      [id(gcMethodTakeDataArray),helpstring("Pass a 2-dimensional array. Dimension 1 contains the rows, dimension 2, columns. Each row is one X and (n-1) Y's (for 2-D graphics), or X and Y, and (n - 2) Z-Values (for 3-D graphics). n = # columns")] 
+      HRESULT TakeDataArray([in] SAFEARRAY(double)* pArray,[in] long plotNumber); 
+
+      [id(gcMethodTakeFile),helpstring("Call TakeFile with the name of an input file containing x, y, and (optionally), z values.")] 
+      HRESULT TakeFile( [in] BSTR fileName,[in] long plotNumber); 
+ 
+      [id(gcMethodTakeDataSet),helpstring("TakeDataSet")]
+      HRESULT TakeDataSet([in] long ds,[in] long plotNumber);
+
+      [id(gcMethodFinishedWithData),helpstring("FinishedWithData")] 
+      HRESULT FinishedWithData( [in] long plotNumber );
+
+      [id(gcMethodPrepareForDataSets),helpstring("PrepareForDataSets")]
+      HRESULT PrepareForDataSets();
+
+      [id(gcMethodDraw),helpstring("PlotData")] 
+      HRESULT Draw([in] long plotNumber ); 
+
+      [id(gcMethodSetProperties),helpstring("Set the properties")]
+      HRESULT SetProperties();
+
+      [id(gcMethodAddAxis),helpstring("Provides an additional axis")]
+      HRESULT AddAxis([in]char type,[in]IDispatch *axisObject);
+
+      [id(gcMethodAddText),helpstring("Add passed Text at the passed (window) points")]
+      HRESULT AddText([in]BSTR bstrText,[out,retval]IDispatch **pText);
+
+      [id(gcMethodAddTextInteractive),helpstring("Add text interactively (with the GSystems Graphic Control's dialogs). This uses the Graphic Control's interface to add the text.")]
+      HRESULT AddTextInteractive([out,retval,optional,defaultvalue(0)]IDispatch **pText);
+
+      [id(gcMethodRemoveText),helpstring("Remove the text given the provided object interface")]
+      HRESULT RemoveText([in]IDispatch *pText);
+
+      [id(gcMethodRemoveAllText),helpstring("Removes all text defined on the graphic")]
+      HRESULT RemoveAllText();
+
+      [id(gcMethodAddFunction),helpstring("Add a function with the expression, returns an interface to the function. Functions are initially created invisible. Use the ShowFunctions property to make it visible.")]
+      HRESULT AddFunction([in] BSTR expression,[out,retval,optional,defaultvalue(0)]IDispatch **pFunction);
+
+      [id(gcMethodAddFunctionInteractive),helpstring("Add a function interactively (with the GSystems Graphic Control's dialogs). Functions are initially created invisible. Use the ShowFunctions property to make it visible.")]
+      HRESULT AddFunctionInteractive([out,retval,optional,defaultvalue(0)]IDispatch **pFunction);
+
+      [id(gcMethodRemoveFunction),helpstring("Remove a function given the provided object interface")]
+      HRESULT RemoveFunction([in]IDispatch *pFunction);
+
+      [id(gcMethodRemoveAllFunctions),helpstring("Removes all functions defined in the graphic")]
+      HRESULT RemoveAllFunctions();
+
+      [id(gcMethodAddPlot),helpstring("Add a plot with the given id number return it's dispatch interface")]
+      HRESULT AddPlot([in]long id, [out,retval]IDispatch **pPlot);
+
+      [id(gcMethodRemovePlot),helpstring("Remove a plot given the id number")]
+      HRESULT RemovePlot([in]long idNumber);
+
+      [id(gcMethodRemoveAllPlots),helpstring("Removes all plots defined in the graphic")]
+      HRESULT RemoveAllPlots();
+
+      [id(gcMethodSynchronise),helpstring("Synchronize with the graphic by waiting until drawing is over")]
+      HRESULT Synchronise();
+
+   };
+
+   [
+      uuid(8CAEFD73-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystems Graphic Class G"),
+      control
+   ]
+   coclass GSystemGraphic {
+      [default] interface IGSGraphic;
+      [default,source] interface IGSGraphicEvents;
+      interface IOleInPlaceSite;
+      interface IOleClientSite;
+      interface ISpecifyPropertyPages;
+   };
+
+};

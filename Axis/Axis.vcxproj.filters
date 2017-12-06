@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{f827fcde-4e48-4b00-a03f-df1fa427e8dc}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM files">
+      <UniqueIdentifier>{68233df6-32ad-4f96-9345-5307a8753f3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM files\IAxis Interface">
+      <UniqueIdentifier>{a3cb9212-ab3b-4690-83e9-dcb533f9a347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Properties Handlers">
+      <UniqueIdentifier>{7a3fdb78-d128-47c2-8e2e-964563db0734}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{898d085e-8e25-440d-b0f7-0eec4f3b1ceb}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{696d8289-e33e-4960-830c-dc85a62cb201}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Axis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AxisHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AxisPlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AxisControl.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDispatch.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphicSegmentAction.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM files</Filter>
+    </ClCompile>
+    <ClCompile Include="IAxis.cpp">
+      <Filter>Source Files\COM files\IAxis Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IAxis_Text.cpp">
+      <Filter>Source Files\COM files\IAxis Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="colorHandler.cpp">
+      <Filter>Source Files\Properties Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="positionHandler.cpp">
+      <Filter>Source Files\Properties Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="styleHandler.cpp">
+      <Filter>Source Files\Properties Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="textHandler.cpp">
+      <Filter>Source Files\Properties Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Axis.def">
+      <Filter>Source Files\COM files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Axis.odl">
+      <Filter>Source Files\COM files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Axis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AXIS.RC">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

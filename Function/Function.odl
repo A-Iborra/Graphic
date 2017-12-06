@@ -1,0 +1,285 @@
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+#include <olectl.h>
+
+#ifdef FUNCTION_SAMPLE
+   [uuid(FE4DFCE3-7E68-4008-9949-36B257B9E46A),helpfile("FunctioNater.hlp"),
+   helpstring("GSystems Sample FunctioNater Control"), lcid(0x00000000), version(1.0)]
+   library FunctioNaterSample {
+
+#else
+   [uuid(8CAEFD83-55E6-11d3-8365-006008BD5BC3),
+   helpfile("FunctioNater.hlp"),
+   helpstring("GSystems FunctioNater Control"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control]
+   library FunctioNater {
+
+#endif
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   enum functionEventID {
+      functionEventID_UndefinedVariable = 1,
+      functionEventID_UndefinedFunction = 2,
+      functionEventID_Clear = 3,
+      functionEventID_Started = 10,
+      functionEventID_Paused = 11,
+      functionEventID_Resumed = 12,      
+      functionEventID_Stopped = 13,
+      functionEventID_TakeValues = 20,
+      functionEventID_TakeResults = 21,
+      functionEventID_Finished = 22,
+      functionEventID_DivideByZero = 23,
+      functionEventID_InvalidArgument = 24,
+      functionEventID_Parsed = 25
+   };
+
+   module FunctionModule { };
+
+   [uuid(77B23910-57D1-405b-972D-333325B629BB),helpstring("FunctioNater Events Interface")]
+   dispinterface IGSFunctioNaterEvents {
+  
+      properties:
+      methods:
+
+      [id(functionEventID_UndefinedVariable),
+         helpstring("While parsing the expression, the FunctioNater sends this event when it finds a variable not defined to the FunctioNater. If you define a variable (Define...Variable) ,return ...RC_Handled, or let the FunctioNator do it (return ...RC_NotHandled) ") ] 
+      HRESULT UndefinedVariable([in]BSTR variableName);
+
+      [id(functionEventID_UndefinedFunction),
+         helpstring("While parsing the expression, the FunctioNater sends this event when it finds a function not previously defined to the FunctioNater") ]
+      HRESULT  UndefinedFunction([in]BSTR functionName);
+
+      [id(functionEventID_Clear),
+         helpstring("The FunctioNater sends this event before evaluation of the expression. This is a good point to clear your \"dataspace\" as fresh data will soon be coming.")]
+      HRESULT Clear();
+
+      [id(functionEventID_Parsed),
+         helpstring("The FunctioNater sends this event when it is finished parsing the expression so that you will know the expression is ready to be evaluated.")]
+      HRESULT Parsed();
+
+      [id(functionEventID_Started),
+         helpstring("The FunctioNater sends this event after it has determined the approximate number of values the expression will produce. Specifically note that this event comes after the Undefined... events")]
+      HRESULT Started([in]long cntExpectedResults);
+
+      [id(functionEventID_Paused),
+         helpstring("The user or software client has caused the FunctioNater to pause.")]
+      HRESULT Paused();
+
+      [id(functionEventID_Resumed),
+         helpstring("The user or software client has caused the FunctioNater to resume.")]
+      HRESULT Resumed();
+
+      [id(functionEventID_Stopped),
+         helpstring("The user or software client has caused the FunctioNater to stop.")]
+      HRESULT Stopped();
+
+      [id(functionEventID_TakeValues),
+         helpstring("This event supplies the client with the data, passing the iteration Number, the number of values in the array of variable names and the array of variable values (including the result value).")]
+      HRESULT TakeValues([in]long iterationNo,[in]long valueCount,[in]SAFEARRAY(BSTR)* pNamesArrayOfStrings,[in]SAFEARRAY(double)* pValuesArrayOfDoubles);
+
+      [id(functionEventID_TakeResults),
+         helpstring("This event supplies the client with the data, passing the iteration Number and a parseable result string containing variable=value pairs.")]
+      HRESULT TakeResults([in]long iterationNo,[in]BSTR bstrResults);
+
+      [id(functionEventID_Finished),
+         helpstring("The FunctioNater is finished evaluating the expression.")]
+      HRESULT Finished();
+
+      [id(functionEventID_DivideByZero),
+         helpstring("Sent whenever a zero occurs as the divisor in some expression")]
+      HRESULT DivideByZero();
+
+      [id(functionEventID_InvalidArgument),
+         helpstring("Sent whenever an invalid argument occurs in a function or expression, such as sqrt(-1)")]
+      HRESULT InvalidArgument([in]BSTR bstrFunctionName,[in]double invalidValue);
+
+   };
+
+   [uuid(8CAEFD85-55E6-11d3-8365-006008BD5BC3),object,dual,pointer_default(unique),helpstring("FunctioNater Interface")] 
+   interface IGSFunctioNater : IDispatch {
+
+      [propput,id(0),
+         helpstring("Sets the expression the FuncioNater will evaluate. When setting the expression, the system will parse it for variable names - expect UndefinedVariable() events.")] 
+      HRESULT Expression([in]BSTR strExpression);
+      [propget,id(0),
+         helpstring("Retrieves the expression the FuncioNater will evaluate. When setting the expression, the system will parse it for variable names - expect UndefinedVariable() events.\n\nCall SysFreeString() on the returned value at some point.")] 
+      HRESULT Expression([out,retval]BSTR *pstrExpression);
+
+      [propput,id(1),
+         helpstring("Specifies the text appearing above the expression entry field - if visible. Set this text to \"\" to hide the label and reduce the overall size of the FunctioNater control.")]
+       HRESULT ExpressionLabel([in]BSTR strExpressionLabel);
+      [propget,id(1),
+         helpstring("Specifies the text appearing above the expression entry field - if visible. Set this text to \"\" to hide the label and reduce the overall size of the FunctioNater control.")]
+      HRESULT ExpressionLabel([out,retval]BSTR *pstrExpressionLabel);
+
+      [propput,id(2),
+         helpstring("Specifies the text appearing above the results display field - if visible. Set this text to \"\" to hide the label and reduce the overall size of the FunctioNater control.")]
+      HRESULT ResultsLabel([in]BSTR strResultsLabel);
+      [propget,id(2),
+         helpstring("Specifies the text appearing above the results display field - if visible. Set this text to \"\" to hide the label and reduce the overall size of the FunctioNater control.")]
+      HRESULT ResultsLabel([out,retval]BSTR* pstrResultsLabel);
+
+      [propput,id(3),
+         helpstring("Allow the user to access the property pages of the FunctioNater at run-time. This will allow users to enter any expression and related variable definitions which may not be desirable in the context of your specific application")]
+      HRESULT AllowPropertySettings([in]VARIANT_BOOL allowPropertySettings);
+      [propget,id(3),
+         helpstring("Allow the user to access the property pages of the FunctioNater at run-time. This will allow users to enter any expression and related variable definitions which may not be desirable in the context of your specific application")]
+      HRESULT AllowPropertySettings([out,retval]VARIANT_BOOL* pAllowPropertySettings);
+
+      [propput,id(4),
+         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components. Run-time setting of these components will cause the FunctioNater to resize which may obstruct other parts of the window.")]
+      HRESULT AllowControlVisibilitySettings([in]VARIANT_BOOL allowControlVisibilitySettings);
+      [propget,id(4),
+         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components. Run-time setting of these components will cause the FunctioNater to resize which may obstruct other parts of the window.")]
+      HRESULT AllowControlVisibilitySettings([out,retval]VARIANT_BOOL* pAllowControlVisibilitySettings);
+
+      [propput,id(5),
+         helpstring("Turn on or off the visibility of the variables related user interface component. With this on, a tab control will show with one tab for each variable defined. If you want to prevent access to the variable definitions, set this property to FALSE.")]
+      HRESULT ShowVariables([in]VARIANT_BOOL showVariables);
+      [propget,id(5),
+         helpstring("Turn on or off the visibility of the variables related user interface component. With this on, a tab control will show with one tab for each variable defined. If you want to prevent access to the variable definitions, set this property to FALSE.")]
+      HRESULT ShowVariables([out,retval]VARIANT_BOOL* pShowVariables);
+
+      [propput,id(6),
+         helpstring("Turn on or off the visibility of all of the control buttons. If you want to manage the execution timing of the FunctioNater from code, set this to FALSE. Note: when this is FALSE, ShowStart, ShowResume, ShowPause, and ShowStop are intrinsicly FALSE.")]
+      HRESULT ShowControls([in]VARIANT_BOOL showControls);
+      [propget,id(6),
+         helpstring("Turn on or off the visibility of all of the control buttons. If you want to manage the execution timing of the FunctioNater from code, set this to FALSE. Note: when this is FALSE, ShowStart, ShowResume, ShowPause, and ShowStop are intrinsicly FALSE.")]
+      HRESULT ShowControls([out,retval]VARIANT_BOOL* pShowControls);
+
+      [propput,id(7),
+         helpstring("Turn on or off the visibility of the Start button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowStart([in]VARIANT_BOOL showStart);
+      [propget,id(7),
+         helpstring("Turn on or off the visibility of the Start button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowStart([out,retval]VARIANT_BOOL* pShowStart);
+
+      [propput,id(8),
+         helpstring("Turn on or off the visibility of the Pause button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowPause([in]VARIANT_BOOL showPause);
+      [propget,id(8),
+         helpstring("Turn on or off the visibility of the Pause button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowPause([out,retval]VARIANT_BOOL* pShowPause);
+
+      [propput,id(9),
+         helpstring("Turn on or off the visibility of the Resume button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowResume([in]VARIANT_BOOL showResume);
+      [propget,id(9),
+         helpstring("Turn on or off the visibility of the Resume button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowResume([out,retval]VARIANT_BOOL* pShowResume);
+
+      [propput,id(10),
+         helpstring("Turn on or off the visibility of the Stop button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowStop([in]VARIANT_BOOL showStop);
+      [propget,id(10),
+         helpstring("Turn on or off the visibility of the Stop button. If ShowControls is FALSE, setting this property to TRUE will still not show the button.")]
+      HRESULT ShowStop([out,retval]VARIANT_BOOL* pShowStop);
+
+      [propput,id(11),
+         helpstring("Turn on or off the visibility of the results display field - a disabled edit control in which each calculated result is displayed during expression evaluation")]
+      HRESULT ShowResults([in]VARIANT_BOOL showResults);
+      [propget,id(11),
+         helpstring("Turn on or off the visibility of the results display field - a disabled edit control in which each calculated result is displayed during expression evaluation")]
+      HRESULT ShowResults([out,retval]VARIANT_BOOL* pShowResults);
+
+      [propput,id(12),
+         helpstring("Turn on or off the visibility of the expression entry field. If the field is not displayed, the user cannot enter any new expression which could invalidate the variable(s) you've defined through code.")]
+      HRESULT ShowExpression([in]VARIANT_BOOL showExpression);
+      [propget,id(12),
+         helpstring("Turn on or off the visibility of the expression entry field. If the field is not displayed, the user cannot enter any new expression which could invalidate the variable(s) you've defined through code.")]
+      HRESULT ShowExpression([out,retval]VARIANT_BOOL* pShowExpression);
+
+      [propput,id(20),
+         helpstring("A string value that represents (when evaluated) the default minimum value for any independent variables the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultMinValue([in]BSTR defaultMin);
+      [propget,id(20),
+         helpstring("A string value that represents (when evaluated) the default minimum value for any independent variables the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultMinValue([out,retval]BSTR* defaultMin);
+
+      [propput,id(21),
+         helpstring("A string value that represents (when evaluated) the default maximum value for any independent variables the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultMaxValue([in]BSTR defaultMax);
+      [propget,id(21),
+         helpstring("A string value that represents (when evaluated) the default minimum value for any independent variables the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultMaxValue([out,retval]BSTR* defaultMax);
+
+      [propput,id(22),
+         helpstring("The default number of iterations the FunctioNater should consider when traversing the range of any variables that the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultStepCount([in]long defaultStepCount);
+      [propget,id(22),
+         helpstring("The default number of iterations the FunctioNater should consider when traversing the range of any variables that the FunctioNater creates - which it will do if an UndefinedVariable event does not result in the definition of the variable.")]
+      HRESULT DefaultStepCount([out,retval]long* defaultStepCount);
+
+      [id(100),
+         helpstring("Define an independent variable - one that has a value over a range from a minimum value to the maximum value. The range is represented by two strings which contain expressions that should evaluate to numbers. The # of steps over the range is provided.")]
+      HRESULT DefineIndependentVariable(BSTR variableName,BSTR minValue,BSTR maxValue,long stepCount);
+      [id(101),
+         helpstring("Define a simple variable - one that has a name and a value. The value provided is a variant which may include any type of number or a string which should evaluate to a number")]
+      HRESULT DefineSimpleVariable(BSTR variableName,VARIANT strValue);
+
+      [id(110),
+         helpstring("Undefine a variable. You may want to do this if you want to ensure that you recieve UndefinedVariable() events when the expression is parsed, if for example, you want control over the definition of each variable.")]
+      HRESULT UndefineVariable(BSTR variableName);
+
+      [id(200),
+         helpstring("Begin evaluation. You will recieve - in order - any necessary UndefinedVariable() events, a Clear() event, a Started() event, many TakeValues() and TakeResults() events (and possibly DivideByZero() and InvalidArgumentEvents()) and a Finished() event.")]
+       HRESULT Start();
+
+      [id(201),
+         helpstring("Pauses evaluation. Evaluation happens on a separate thread so your application is active while the system is evaluation occurs. You should not close the application (or delete the FunctioNater) while in the \"Paused\" state. Sends a Paused() event.")]
+      HRESULT Pause();
+      [id(202),
+         helpstring("Resumes a Paused evaluation. This will cause a Resumed() event to be provided to the client.")]
+      HRESULT Resume();
+      [id(203),
+         helpstring("Stops evaluation. This will cause a Stopped() event followed by a Finished() event.")]
+      HRESULT Stop();
+
+      [propput,id(DISPID_ENABLED)] HRESULT Enabled([in]VARIANT_BOOL vbool);
+      [propget,id(DISPID_ENABLED)] HRESULT Enabled([out,retval] VARIANT_BOOL*pbool);
+
+      [id(250),
+         helpstring("Names a file that the FunctioNater should save it's internal data to. Helpful if you want to save any settings the user may have made.")]
+      HRESULT PersistTo(BSTR strSaveTo);
+
+      [id(251),
+         helpstring("Specifies the file that the FunctioNater can restore it's internal data from. Helpful if you want to save any settings the user may have made.")]
+      HRESULT PersistFrom(BSTR strRestoreFrom);
+
+      [id(300),hidden,
+         helpstring("ParseExpression causes the FunctioNater control to run through the expression to determine the names of any variables used in it. Note that the expression is automatically parsed when it is defined.")]
+      HRESULT parseExpression(); 
+
+      [helpstring("Edit the function's properties")]
+      HRESULT EditProperties();
+   };
+
+
+#ifdef FUNCTION_SAMPLE
+
+   [uuid(ACF6D075-7A0C-4d5a-BF66-2B9C7CA77253),helpstring("Function Sample Class Function"),control]
+   coclass GSystemFunctioNaterSample {
+
+#else
+
+   [uuid(8CAEFD86-55E6-11d3-8365-006008BD5BC3),helpstring("Function Class Function"),control]
+   coclass GSystemFunctioNater {
+
+#endif
+
+      [default] interface IGSFunctioNater;
+      [default,source] dispinterface IGSFunctioNaterEvents;
+
+      interface IDispatch;
+      interface IPersistStreamInit;
+      interface IPersistPropertyBag;
+      interface IPersistPropertyBag2;
+   };
+
+};

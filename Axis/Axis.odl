@@ -1,0 +1,247 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD90-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Axis.hlp"),
+   helpstring("GSystems Axis Object"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library Axis { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("Properties.tlb");
+   importlib("GSystem.tlb");
+   importlib("GraphicControl.tlb");
+   importlib("OpenGLImplementation.tlb");
+   importlib("DataSet.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
+   importlib("Plot.tlb");
+
+   enum AxisPropertiesID {
+      axisPropertyType = 0,
+      axisPropertyDrawText = 1,
+      axisPropertySegmentID = 2,
+      axisPropertyActionTable = 3,
+      axisPropertyParentWindow = 4,
+      axisPropertyLabelText = 5,
+      axisPropertyRepresentativeText = 6,
+      axisPropertyStartPoint = 7,
+      axisPropertyStartPointX = 8,
+      axisPropertyStartPointY = 9,
+      axisPropertyStartPointZ = 10,
+      axisPropertyEndPoint = 11,
+      axisPropertyEndPointX = 12,
+      axisPropertyEndPointY = 13,
+      axisPropertyEndPointZ = 14,
+      axisPropertyTickCount = 15,
+      axisPropertyTickSize = 16,
+      axisPropertyTickPercentAbove = 17,
+      axisPropertyTickPrecision = 18,
+      axisPropertyGridLinesPerTick = 19,
+      axispropertyLineWeight = 20,
+      axisPropertyLineColor = 21,
+      axisPropertyDefinesDomain = 22 };
+
+   enum AxisMethodsID {
+      axisMethodInitialize = 101,
+      axisMethodGetTextList,
+      axisMethodGetDataSet,
+      axisMethodPrepData,
+      axisMethodDraw,
+      axisMethodDrawLabels,
+      axisMethodRedraw,
+      axisMethodErase,
+      axisMethodAdviseGSystemStatusBar,
+      axisMethodPrepText,
+      axisMethodEditProperties };
+
+
+   [  uuid(8CAEFD91-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystems Axis, Automation Interface"),
+      pointer_default(unique)
+   ] 
+   interface IAxis : IDispatch {
+
+      // Properties 
+
+      [propget,id(axisPropertyType),helpstring("Returns the single character type of the axis (x,y, or z)")]
+      HRESULT Type([out,retval]char* pType);
+
+      /* Text Properties */
+
+      [propput,id(axisPropertyDrawText),helpstring("Turn on or off the display of text")]
+      HRESULT DrawText([in] VARIANT_BOOL);
+
+      [propget,id(axisPropertyDrawText),helpstring("Turn on or off the display of text")]
+      HRESULT DrawText([out,retval] VARIANT_BOOL *);
+
+      [propput,id(axisPropertyLabelText),helpstring("The text for the label")]
+      HRESULT LabelText([in] BSTR bstrLabel);
+
+      [propget,id(axisPropertyLabelText),helpstring("The text for the label")]
+      HRESULT LabelText([out,retval] BSTR* pbstrLabel);
+
+      [propget,id(axisPropertyRepresentativeText),helpstring("A text object whose properties will dictate the properties of all tick labels.")]
+      HRESULT RepresentativeText([out,retval]IDispatch **pText);
+
+      [propput,id(axisPropertyTickPrecision),helpstring("The precision that determines the # of decimal places in the tick value labels, in percentage of the total range of the data the axis represents.")]
+      HRESULT TickLabelPrecision([in] double pctDomain);
+      [propget,id(axisPropertyTickPrecision),helpstring("The precision that determines the # of decimal places in the tick value labels, in percentage of the total range of the data the axis represents.")]
+      HRESULT TickLabelPrecision([out,retval] double *pPctDomain);
+
+      /* Other Properties */
+
+      [propget,id(axisPropertySegmentID),helpstring("")] HRESULT SegmentID([out,retval] long *pID);
+
+      [propget,id(axisPropertyActionTable),helpstring("")] HRESULT ActionTable([out,retval] IGraphicSegmentAction **pIGraphicSegmentAction);
+
+      [propget,id(1001),hidden] HRESULT SegmentCount([out,retval]long *);
+      [hidden] HRESULT GetSegments([in]long *);
+
+      /* Data Properties */
+
+         // Start point
+
+      [propput,id(axisPropertyStartPoint),helpstring("Set the (x,y,z) coordinates of the starting point of the axis. The array of points contains string expressions.")]
+      HRESULT StartPoint([in]SAFEARRAY(BSTR) pStartPoint);
+      [propget,id(axisPropertyStartPoint),helpstring("Retrieve the (x,y,z) coordinates of the starting point of the axis. NOT intended for an environment that cannot retrieve an array (VB ?), Use StartPointX, ...Y, ...Z instead.")]
+      HRESULT StartPoint([out,retval]SAFEARRAY(BSTR) *ppStartPoint);
+
+      [propput,id(axisPropertyStartPointX),helpstring("Set the X coordinate of the starting point of the axis.")]
+      HRESULT StartPointX(double startPointX);
+      [propget,id(axisPropertyStartPointX),helpstring("Retrieve the X coordinate of the starting point of the axis.")]
+      HRESULT StartPointX([out,retval]double *pStartPointX);
+
+      [propput,id(axisPropertyStartPointY),helpstring("Set the Y coordinate of the starting point of the axis.")]
+      HRESULT StartPointY(double startPointY);
+      [propget,id(axisPropertyStartPointY),helpstring("Retrieve the Y coordinate of the starting point of the axis.")]
+      HRESULT StartPointY([out,retval]double *pStartPointY);
+
+      [propput,id(axisPropertyStartPointZ),helpstring("Set the Z coordinate of the starting point of the axis.")]
+      HRESULT StartPointZ(double startPointZ);
+      [propget,id(axisPropertyStartPointZ),helpstring("Retrieve the Z coordinate of the starting point of the axis.")]
+      HRESULT StartPointZ([out,retval]double *pStartPointZ);
+
+
+         // End point
+
+      [propput,id(axisPropertyEndPoint),helpstring("Set the (x,y,z) coordinates of the ending point of the axis. The array of points contains string expressions")]
+      HRESULT EndPoint([in]SAFEARRAY(BSTR) pEndPoint);
+      [propget,id(axisPropertyEndPoint),helpstring("Retrieve the (x,y,z) coordinates of the ending point of the axis. NOT intended for an environment that cannot retrieve an array (VB ?), Use EndPointX, ...Y, ...Z instead.")]
+      HRESULT EndPoint([out,retval]SAFEARRAY(BSTR) *ppEndPoint);
+
+      [propput,id(axisPropertyEndPointX),helpstring("Set the X coordinate of the ending point of the axis (passing a double value).")]
+      HRESULT EndPointX(double EndPointX);
+      [propget,id(axisPropertyEndPointX),helpstring("Retrieve the X coordinate of the ending point of the axis (retreiving a double value).")]
+      HRESULT EndPointX([out,retval]double *pEndPointX);
+
+      [propput,id(axisPropertyEndPointY),helpstring("Set the Y coordinate of the ending point of the axis (passing a double value).")]
+      HRESULT EndPointY(double EndPointY);
+      [propget,id(axisPropertyEndPointY),helpstring("Retrieve the Y coordinate of the ending point of the axis (retreiving a double value).")]
+      HRESULT EndPointY([out,retval]double *pEndPointY);
+
+      [propput,id(axisPropertyEndPointZ),helpstring("Set the Z coordinate of the ending point of the axis (passing a double value).")]
+      HRESULT EndPointZ(double EndPointZ);
+      [propget,id(axisPropertyEndPointZ),helpstring("Retrieve the Z coordinate of the ending point of the axis (retrieving a double value).")]
+      HRESULT EndPointZ([out,retval]double *pEndPointZ);
+
+
+      [propput,id(axisPropertyDefinesDomain),helpstring("Set this property to TRUE to set the Graphic Control's domain based on the value of the start- and end-point of the axis.")]
+      HRESULT DefinesDomain([in]VARIANT_BOOL);
+      [propget,id(axisPropertyDefinesDomain),helpstring("Set this property to TRUE to set the Graphic Control's domain based on the value of the start- and end-point of the axis.")]
+      HRESULT DefinesDomain([out,retval]VARIANT_BOOL*);
+
+      /* Appearance Properties */
+
+      [propput,id(axisPropertyLineWeight),helpstring("Sets the weight of the line. A value from 1 to 10 (thickest) is used.")]
+      HRESULT LineWeight([in]long lineWeight);
+      [propget,id(axisPropertyLineWeight),helpstring("Sets the weight of the line. A value from 1 to 10 (thickest) is used.")]
+      HRESULT LineWeight([out,retval]long *lineWeight);
+
+      [propput,id(axisPropertyLineColor),helpstring("Sets the color (using an RGB triplet with values between 0.0 and 1.0) of the line.")]
+      HRESULT LineColor([in]SAFEARRAY(double) rgbColor);
+      [propget,id(axisPropertyLineColor),helpstring("Sets the color (using an RGB triplet with values between 0.0 and 1.0) of the line.")]
+      HRESULT LineColor([out,retval]SAFEARRAY(double) *pRgbColor);
+      
+      [propput,id(axisPropertyTickCount),helpstring("Sets the # of ticks created (equally spaced) across the length of the axis")]
+      HRESULT TickCount([in]long tickCount);
+      [propget,id(axisPropertyTickCount),helpstring("Sets the # of ticks created (equally spaced) across the length of the axis")]
+      HRESULT TickCount([out,retval]long *pTickCount);
+
+      [propput,id(axisPropertyTickSize),helpstring("Sets the length of each tick mark. This size is specified in a percentage of the domain representing the complimentary domain.")]
+      HRESULT TickSize([in]double size);
+      [propget,id(axisPropertyTickSize),helpstring("Sets the length of each tick mark. This size is specified in a percentage of the domain representing the complimentary domain.")]
+      HRESULT TickSize([out,retval]double *pSize);
+
+      [propput,id(axisPropertyTickPercentAbove),helpstring("Sets the percentage of the tick that is above the axis")]
+      HRESULT TickPercentAbove([in]double percentAbove);
+      [propget,id(axisPropertyTickPercentAbove),helpstring("Sets the percentage of the tick that is above the axis")]
+      HRESULT TickPercentAbove([out,retval]double *pPercentAbove);
+
+      [propput,id(axisPropertyGridLinesPerTick),helpstring("Sets the number of grid lines (lines parallel to complementary axis of length equal to complimentary domain) for each space between tick points. Specify 0 for no grid lines.")]
+      HRESULT GridLinesPerTick([in]long gridLines);
+      [propget,id(axisPropertyGridLinesPerTick),helpstring("Sets the number of grid lines (lines parallel to complementary axis of length equal to complimentary domain) for each space between tick points. Specify 0 for no grid lines.")]
+      HRESULT GridLinesPerTick([out,retval]long *pGridLines);
+
+      // Methods
+
+      [id(axisMethodInitialize),helpstring("Sets the type (x,y,or z),the IDataSet and the IOpenGLImplementation interface for the Axis. Call this method soon after creating the object. The passed interfaces ARE AddRef()ed.")]
+      HRESULT Initialize([in]HWND hwndOwner,[in]char type,[in]IAxis *pXAxis,[in]IAxis *pYAxis,[in]IAxis *pZAxis,
+                              [in] IGProperty* pIPropertyPlotView, [in] IGProperty *pIPropertyPlotSubType,
+                              [in] IGProperty* pPropertyFloor,[in] IGProperty *pPropertyCeiling,
+                              [in] IGProperty* pPropertyOpenGLText,
+                              [in] IDataSet* pIDomainDataSet,[in] IOpenGLImplementation*,[in] IEvaluator*);
+
+      [propget,id(axisMethodGetDataSet),helpstring("Retrieve a pointer to the axis dataset")]
+      HRESULT DataSet([out,retval] IDataSet **);
+
+      /* Text Methods */
+
+      [id(axisMethodPrepText)]
+      HRESULT PrepText();
+
+      [id(axisMethodGetTextList)]
+      HRESULT GetTextList([out,retval] void **getList);
+
+      [id(axisMethodPrepData)]
+      HRESULT PrepData();
+
+      [id(axisMethodDraw)]
+      HRESULT Draw();
+
+      [id(axisMethodDrawLabels)]
+      HRESULT DrawLabels();
+
+      [id(axisMethodRedraw)]
+      HRESULT Redraw();
+
+      [id(axisMethodErase)]
+      HRESULT Erase();
+
+      [id(axisMethodAdviseGSystemStatusBar),helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
+      HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
+
+      [id(axisMethodEditProperties),helpstring("Edit the axis properties")]
+      HRESULT ShowProperties();
+
+   };
+
+
+   [
+      uuid(8CAEFD92-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystem Class Axis"),
+      control
+   ]
+   coclass GSystemAxis {
+      [default] interface IAxis;
+   };
+
+};

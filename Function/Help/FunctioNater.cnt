@@ -1,0 +1,26 @@
+1 About the GSystems FunctioNater Control
+2 Welcome to the GSystems FunctioNater Control=About the GSystems FunctioNater Control
+2 Various modes of implementation=Various modes of implementation
+2 About InnoVisioNate=About the Company
+1 Part 0 - What is the GSystems FunctioNater Control?
+2 The GSystems FunctioNater Control=Part 0 - What is the GSystems FunctioNater Control?
+1 Part I - Instantiating a GSystems FunctioNater Control
+2 The FunctioNater control is an ActiveX Control=Part I - Instantiating a GSystems FunctioNater Control
+2 Setting the properties of the GSystems FunctioNater Control=Setting the properties of the GSystems FunctioNater Control
+1 Part II - Providing access to the FunctioNater Control
+2 There are 2 ways to access to control=Part II - Providing access to the FunctioNater Control
+2 Using the built-in user interface mechanism=Using the built-in user interface mechanism
+3 The user defines the expression's domain=The user defines the expression's domain
+2 Manipulating the FunctioNater Control programmatically=Manipulating the FunctioNater Control programmatically
+1 Part III -Evaluating the expression
+2 Parsing the expression=Parsing the expression
+2 Evaluating the expression=Evaluating the expression
+3 The evaluation process=The evaluation process
+1 Part IV - Interface reference information
+2 Introduction=Part IV - Interface reference information
+2 The IGSFunctioNater Interface=The IGSFunctioNater Interface
+3 The Properties of the FunctioNater Control=The Properties of the FunctioNater Control
+3 The Methods of the FunctioNater Control=The Methods of the FunctioNater Control
+2 The FunctioNater Control's Events interface=The FunctioNater Control's Events interface
+1 Epilogue
+2 Thanks !=Epilogue

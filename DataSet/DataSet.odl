@@ -1,0 +1,130 @@
+
+import "oaidl.idl";
+import "objidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFDA1-55E6-11d3-8365-006008BD5BC3),
+   helpfile("DataSet.hlp"),
+   helpstring("G Graphic DataSet Type Library"), 
+   lcid(0x00000000), 
+   version(1.0)
+] 
+library DataSet { 
+
+   importlib(STDOLE_TLB);
+   importlib(STDTYPE_TLB);
+
+   importlib("Properties.tlb");
+   importlib("GSystem.tlb");
+
+   [  uuid(8CAEFDA2-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystem DataSet Interface"),
+      pointer_default(unique)
+   ] 
+   interface IDataSet : IUnknown {
+
+     [propput] HRESULT maxX([in] double maxVal);
+     [propget] HRESULT maxX([out,retval] double *getVal);
+     [propput] HRESULT maxY([in] double maxVal);
+     [propget] HRESULT maxY([out,retval] double *getVal);
+     [propput] HRESULT maxZ([in] double maxVal);
+     [propget] HRESULT maxZ([out,retval] double *getVal);
+     [propput] HRESULT minX([in] double minVal);
+     [propget] HRESULT minX([out,retval] double *getVal);
+     [propput] HRESULT minY([in] double minVal);
+     [propget] HRESULT minY([out,retval] double *getVal);
+     [propput] HRESULT minZ([in] double minVal);
+     [propget] HRESULT minZ([out,retval] double *getVal);
+
+     [propput] HRESULT floor([in]IGProperty *);
+
+     [propput] HRESULT ceiling([in]IGProperty *);
+
+     [propget] HRESULT top([out,retval] struct DataList **getTop);
+     [propget] HRESULT bottom([out,retval] struct DataList **getBottom);
+
+     [propget] HRESULT countPoints([out,retval]long *pCount);
+
+     [propput] HRESULT DataArity([in] enum DataArity );
+     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+
+     HRESULT peek([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
+     HRESULT peekInt([in] int item, [out,retval] struct DataList **getItem);
+
+     HRESULT peekGDI([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
+
+     HRESULT get(struct DataList *afterItem,struct DataPoint *data,struct DataList **nextItem);
+     HRESULT set(struct DataList *item,struct DataPoint *data);
+
+     HRESULT pushString(char *valueString);
+
+     HRESULT pushDataPoint(struct DataPoint *point);
+
+     HRESULT popDataPoint(struct DataPoint *point);
+
+     HRESULT ReSet();
+
+     HRESULT insert(struct DataList *insertBefore,struct DataPoint *data);
+
+     HRESULT addXYZ(double *x,double *y,double *z);
+
+     HRESULT addMovePoint();
+
+     HRESULT makeUnitSize();
+
+     HRESULT ResetLimits(struct DataPoint *);
+
+     HRESULT SetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+     HRESULT SetDomainXYZ(double *xmin,double *ymin,double *zmin,double *xmax,double *ymax,double *zmax);
+
+     HRESULT GetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+     HRESULT IncludeDomain(IDataSet* pTheOtherDataSet);
+
+     [propget] HRESULT IsIncludedDomain([in]IDataSet*pOtherDataSet,[out,retval]boolean *);
+
+     HRESULT RemoveIncludedDomain(IDataSet* pTheOtherDataSet);
+
+     HRESULT SetColorRGB(double *red,double *green,double *blue);
+
+     HRESULT Scale(struct DataPoint* scaleVector);
+
+     HRESULT Translate(struct DataPoint* translate);
+
+     HRESULT TranslateGDI(POINT *ptGDI);
+
+     HRESULT Rotate(char axis,double degrees);
+
+     HRESULT RotateVector(double angle,struct DataPoint *v);
+
+     HRESULT Move(struct DataPoint* toPoint);
+
+     HRESULT Shear(char axis,double ratio);
+
+     HRESULT GenerateBoundingBox(IDataSet* pIDataSetBoundingBox);
+
+     HRESULT GenerateGDICoordinates(IUnknown *castablePtrToIOpenGLImplementation);
+
+     HRESULT PushExtents();
+      
+     HRESULT PopExtents();
+
+     HRESULT Evaluate(BSTR expression,double *result);
+
+     HRESULT GetDomainGDI(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+   };
+
+   [
+      uuid(8CAEFDA3-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystem Class DataSet"),
+      control
+   ]
+   coclass DataSet {
+      [default] interface IDataSet;
+   };
+
+};

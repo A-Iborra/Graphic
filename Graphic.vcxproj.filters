@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e2063e51-7033-48c5-9545-6a12e499f0ea}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Implementation Files">
+      <UniqueIdentifier>{9855b0a4-442c-42f4-b505-61e4111d1f1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files">
+      <UniqueIdentifier>{d99e324c-57d7-4640-82f0-4b5433c30ff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\COM Container Interface Files">
+      <UniqueIdentifier>{a5883dca-6cc5-4784-9bbf-e05df54243ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\IGraphic Interface">
+      <UniqueIdentifier>{7c409945-c304-4835-932d-401c9a4a8ad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Static files">
+      <UniqueIdentifier>{fe9f90b1-3bc0-4ce4-845b-4c9d44b54571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window Handlers">
+      <UniqueIdentifier>{df911e8b-2603-4245-bd95-ac1fdc600d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{cc0e8604-9a02-41c1-9ebd-99ad1ad649e2}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{3f34111d-0036-460c-80ea-fdffa28e4f84}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Graphic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicDrawing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicInit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicPick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IAdviseSink.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDataObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGsystemStatusBar.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleControl.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceActiveObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlotNotify.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IProvideClassInfo.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IRunnableObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ITextNotify.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewObjectEx.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainedFunction.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainedObject.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainedObjectIOleClentSite.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainedObjectIOleClientSite_IDispatch.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainedObjectIOleInPlaceSite.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphic.cpp">
+      <Filter>Source Files\COM Interface Files\IGraphic Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphic_data.cpp">
+      <Filter>Source Files\COM Interface Files\IGraphic Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="IGraphic_Properties.cpp">
+      <Filter>Source Files\COM Interface Files\IGraphic Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="dataSourcesHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="functionHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicNotebook.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="lightingHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="plotHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="posSizeHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="sampleGraphicHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="statusBarHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="styleHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ISpecifyPropertyPages.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPage.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="backgroundHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="axisHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Graphic.def">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="GraphicControl.odl">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ContainedFunction.h">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainedObject.h">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="G.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="graphic.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,93 @@
+#include "GraphicGUID.h"
+
+#include <olectl.h>
+
+[ 
+   uuid(LIBID_Graphic),
+   helpfile("Graphic.hlp"),
+   helpstring("G Graphic Control Type Library"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library Graphic { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   [  dllname("c:\prj\lib\Graphic.dll")
+   ] 
+   module GraphicControl { };
+
+   [  uuid(IID_IG),
+      helpstring("Graphic Control (G), Automation Interface"),
+	  dual,
+      pointer_default(unique)
+   ] 
+   interface IG : IDispatch {
+
+      [ propput,
+        helpstring("Sets the name of the Graphic Control")
+	  ]
+      HRESULT Name([in] BSTR newName);
+
+      [ propget,
+        helpstring("Retrieves the name of the Graphic Control")
+	  ]
+      HRESULT Name([out,retval] BSTR *n);
+
+
+      [  id(11),
+         helpstring("Call PrepareForData to prepare the Graphic to recieve data, pass 0 for all plots, or a specific plot number.")
+      ] 
+      HRESULT PrepareForData( [in] long plotNumber ); 
+
+      [  id(12),
+         helpstring("Call TakeData with a string of numbers x, y , and (optionally), z, separated by ' '.")
+      ] 
+      HRESULT TakeData( [in] BSTR stringOfNumbers, [in] long plotNumber); 
+ 
+      [  id(13),
+         helpstring("Call TakeFile with the name of an input file containing x, y, and (optionally), z values.")
+      ] 
+      HRESULT TakeFile( [in] BSTR fileName,[in] long plotNumber); 
+ 
+      [  id(14),
+         helpstring("FinishedWithData")
+      ] 
+      HRESULT FinishedWithData( [in] long plotNumber );
+
+      [  id(15),
+         helpstring("PrepareForDataSets")
+      ]
+      HRESULT PrepareForDataSets();
+
+      [  id(16),
+         helpstring("TakeDataSet")
+      ]
+      HRESULT TakeDataSet([in] long ds,[in] long plotNumber);
+
+      [  id(17),
+         helpstring("PlotData")
+      ] 
+      HRESULT PlotData( [in] long plotNumber, [in] long forceThread ); 
+
+      [  id(18),
+         helpstring("Provide a function to evaluate in the form y[or z] = f(x[,y]),x = x0 to xlast step dx [,y = y0 to ylast step dy]")
+      ]
+      HRESULT CreateFunction( [in] BSTR function);
+
+   };
+
+
+   [
+      uuid(CLSID_G),
+      helpstring("Graphic Class G"),
+      control
+   ]
+   coclass G {
+      [default] interface IG;
+   };
+
+
+};

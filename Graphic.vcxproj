@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EE1DA30A-DBA4-4719-AB5F-F01AB28C0524}</ProjectGuid>
+    <RootNamespace>Graphic</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\Common\Compiler Options.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+    <Import Project="..\Common\Compiler Options.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.24720.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;_WIN32_DCOM;WIN32;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>./Graphic.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;Axis.lib;Evaluator.lib;DataSet.lib;Plot.lib;Property.lib;Properties.lib;Resource.lib;StatusLine.lib;Segment.lib;Text.lib;ViewSet.lib;OpenGl32.lib;glaux.lib;glu32.lib;odbc32.lib;odbccp32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ModuleDefinitionFile>.\Graphic.def</ModuleDefinitionFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>./Graphic.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>./Graphic.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>regsvr32 /s /c "$(TargetPath)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;__MKTYPLIB__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DefaultCharType>Ascii</DefaultCharType>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WIN32_DCOM;_DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>./Graphic.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>./</AssemblerListingLocation>
+      <ObjectFileName>./</ObjectFileName>
+      <ProgramDataBaseFileName>./</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>..\;..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>comctl32.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ManifestFile />
+      <ModuleDefinitionFile>.\Graphic.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>..\lib\Graphic.pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>..\lib\Graphic.lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <Bscmake>
+      <OutputFile>./Graphic.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>regsvr32 /s /c "$(TargetPath)"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="axisHandler.cpp" />
+    <ClCompile Include="backgroundHandler.cpp" />
+    <ClCompile Include="IPropertyPage.cpp" />
+    <ClCompile Include="ISpecifyPropertyPages.cpp" />
+    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
+    <ClCompile Include="\Common\Utils\mathUtils.cpp" />
+    <ClCompile Include="\Common\Utils\registryUtils.cpp" />
+    <ClCompile Include="\Common\Utils\Utils.cpp" />
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
+    <ClCompile Include="COMImplementation.cpp" />
+    <ClCompile Include="ContainedFunction.cpp" />
+    <ClCompile Include="ContainedObject.cpp" />
+    <ClCompile Include="ContainedObjectIOleClentSite.cpp" />
+    <ClCompile Include="ContainedObjectIOleClientSite_IDispatch.cpp" />
+    <ClCompile Include="ContainedObjectIOleInPlaceSite.cpp" />
+    <ClCompile Include="dataSourcesHandler.cpp" />
+    <ClCompile Include="functionHandler.cpp" />
+    <ClCompile Include="Graphic.cpp" />
+    <ClCompile Include="GraphicDrawing.cpp" />
+    <ClCompile Include="GraphicHandler.cpp" />
+    <ClCompile Include="GraphicInit.cpp" />
+    <ClCompile Include="GraphicNotebook.cpp" />
+    <ClCompile Include="GraphicPick.cpp" />
+    <ClCompile Include="IAdviseSink.cpp" />
+    <ClCompile Include="IDataObject.cpp" />
+    <ClCompile Include="IGraphic.cpp" />
+    <ClCompile Include="IGraphic_data.cpp" />
+    <ClCompile Include="IGraphic_Properties.cpp" />
+    <ClCompile Include="IGsystemStatusBar.cpp" />
+    <ClCompile Include="IOleControl.cpp" />
+    <ClCompile Include="IOleInPlaceActiveObject.cpp" />
+    <ClCompile Include="IOleInPlaceObject.cpp" />
+    <ClCompile Include="IOleObject.cpp" />
+    <ClCompile Include="IPlotNotify.cpp" />
+    <ClCompile Include="IPropertiesClient.cpp" />
+    <ClCompile Include="IPropertyPageClient.cpp" />
+    <ClCompile Include="IProvideClassInfo.cpp" />
+    <ClCompile Include="IRunnableObject.cpp" />
+    <ClCompile Include="ITextNotify.cpp" />
+    <ClCompile Include="IUnknown.cpp" />
+    <ClCompile Include="IViewObjectEx.cpp" />
+    <ClCompile Include="lightingHandler.cpp" />
+    <ClCompile Include="plotHandler.cpp" />
+    <ClCompile Include="posSizeHandler.cpp" />
+    <ClCompile Include="sampleGraphicHandler.cpp" />
+    <ClCompile Include="statusBarHandler.cpp" />
+    <ClCompile Include="styleHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Graphic.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="GraphicControl.odl">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Win32</TargetEnvironment>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\;..\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Win32</TargetEnvironment>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ContainedFunction.h" />
+    <ClInclude Include="ContainedObject.h" />
+    <ClInclude Include="graphic.h" />
+    <ClInclude Include="include\Graphic_resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="G.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="graphic.rc">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OUTDIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

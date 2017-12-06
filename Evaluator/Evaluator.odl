@@ -1,0 +1,100 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFDC9-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Evaluator.hlp"),
+   helpstring("G System Evaluator"), 
+   lcid(0x00000000), 
+   version(1.0)
+] 
+library Evaluator { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("Variable.tlb");
+
+   enum evaluatorErrorMessage {
+      evaluatorError = 0x0400 + 4000
+   };
+
+   enum evaluatorEvents {
+      evaluatorEventStarted = 1,
+      evaluatorEventTakeResultString = 2,
+      evaluatorEventUnknownVariable = 3,
+      evaluatorEventUnknownFunction = 4,
+      evaluatorEventMathError = 5,
+      evaluatorEventFinished = 6,
+      evaluatorEventClear = 7,
+      evaluatorEventDivideByZero = 8,
+      evaluatorEventInvalidArgument = 9
+   };
+
+   enum evaluatorErrors {
+      evaluatorErrorVariableUndefined = 1,
+      evaluatorErrorFunctionUndefined = 2,
+      evaluatorErrorBadFunction = 3,
+      evaluatorErrorBadDelimiter = 4
+   };
+
+   [uuid(8CAEFDCA-55E6-11d3-8365-006008BD5BC3),helpstring("Evaluator Automation Interface"),dual,pointer_default(unique)] 
+   interface IEvaluator : IDispatch {
+
+      [propget,helpstring("Retrieve the value of the expression")]
+      HRESULT Eval([in]BSTR theExpression,[out,retval]double* theValue);
+
+      [helpstring("Evaluate_szExpression will evaluate the first valid expression out of the input string but will not change the input string even if there are valid expressions following the first one.")]
+      HRESULT Evaluate_szExpression([in]char *expression,[out,retval]double *);
+
+      HRESULT Evaluate_szFunction([in]char *theFunction);
+
+      [helpstring("Consume_szExpression will \"eat\" the first valid expression out of the input string and will change that string such that the next valid expression is first in the string.")]
+      HRESULT Consume_szExpression([in]char *expression,[out,retval]double *);
+
+      HRESULT UndefineVariable([in]IVariable* v);
+
+      HRESULT DefineVariable([in]IVariable* v);
+
+      HRESULT UndefineAllVariables();
+
+      HRESULT IsVariable([in]BSTR bstrVariableName,BOOL* isKnown);
+
+      HRESULT Terminate();
+      HRESULT Suspend();
+      HRESULT Resume();
+
+      HRESULT IsBusy();
+
+      HRESULT Evaluate_bstrExpression([in]BSTR bstrExpression,[out,retval]double* theValue);
+
+   };
+
+
+   [uuid(8CAEFDCB-55E6-11d3-8365-006008BD5BC3),helpstring("Evaluator Events Interface"),dual]
+   interface IEvaluatorEvents : IDispatch {
+
+      [id(evaluatorEventStarted)] HRESULT Started(long expectedIterations);
+      [id(evaluatorEventTakeResultString)] HRESULT TakeResultString([in]long iterationCount,[in]char* pszVarNames,[in]char* pszResults);
+      [id(evaluatorEventUnknownVariable)] HRESULT UnknownVariable([in]BSTR variableName);
+      [id(evaluatorEventUnknownFunction)] HRESULT UnknownFunction([in]BSTR functionName);
+      [id(evaluatorEventMathError)] HRESULT MathError([in]BSTR functionName,[in]double argument);
+      [id(evaluatorEventFinished)] HRESULT Finished();
+      [id(evaluatorEventDivideByZero)] HRESULT DivideByZero();
+      [id(evaluatorEventInvalidArgument)] HRESULT InvalidArgument([in]BSTR functionName,[in]double invalidValue);
+
+   };
+
+
+   [  uuid(8CAEFDCC-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Evaluator Object"),
+      control
+   ]
+   coclass Evaluator {
+      [default] interface IEvaluator;
+      [default, source] interface IEvaluatorEvents;
+   };
+
+};

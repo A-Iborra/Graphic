@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{e3505b37-065a-4068-ae3b-2e8ddfd107ed}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files">
+      <UniqueIdentifier>{be747254-fc43-4637-ac75-2f1ba37a81ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\IOpenGLImplementation">
+      <UniqueIdentifier>{d3d80b00-396e-4559-bb1c-2443946dd40d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Implementation Files">
+      <UniqueIdentifier>{19ad4427-3709-4d37-994c-b98bf7ba1378}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{cf9ff557-7bce-43f9-bff4-fd6f8d65095e}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{4f66fc6c-1a7d-42ea-81f3-a49c2bbe0d23}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="openglImplementationHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLImplementor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlotWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleControl.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceActiveObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleObject.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IProvideClassInfo.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewObjectEx.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOpenGLImplementation.cpp">
+      <Filter>Source Files\COM Interface Files\IOpenGLImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="IOpenGLImplementation_Segments.cpp">
+      <Filter>Source Files\COM Interface Files\IOpenGLImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OpenGLImplementation.def">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="OpenGLImplementation.odl">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OpenGLImplementor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OpenGLImplementation.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

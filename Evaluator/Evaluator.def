@@ -1,0 +1,5 @@
+
+EXPORTS
+     DllGetClassObject   = gsEvaluator_DllGetClassObject     PRIVATE
+     DllRegisterServer   = gsEvaluator_DllRegisterServer     PRIVATE
+     DllUnregisterServer = gsEvaluator_DllUnregisterServer   PRIVATE

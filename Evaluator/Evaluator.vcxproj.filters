@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{29ae42bd-8ef7-498e-9d02-358e07c5519c}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;hpj;bat;for;f90</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Implementation">
+      <UniqueIdentifier>{eedab266-f3c1-4716-86ff-42384ef9096b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface files">
+      <UniqueIdentifier>{b4d1758d-68e5-469f-a1a5-c1c642f55f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9cc77942-5080-4d11-bce8-eb3d0c84c3f1}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{b29a7e0b-aba2-42b4-b251-3f5cb48941b6}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="evaluateFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Evaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="dllMain.cpp">
+      <Filter>Source Files\COM Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPoint.cpp">
+      <Filter>Source Files\COM Interface files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPointContainer.cpp">
+      <Filter>Source Files\COM Interface files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumConnectionPoints.cpp">
+      <Filter>Source Files\COM Interface files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumerateConnections.cpp">
+      <Filter>Source Files\COM Interface files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEvaluator.cpp">
+      <Filter>Source Files\COM Interface files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\VList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Evaluator.def">
+      <Filter>Source Files\COM Implementation</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Evaluator.odl">
+      <Filter>Source Files\COM Implementation</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Evaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Evaluator.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

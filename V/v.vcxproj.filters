@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="COM Files">
+      <UniqueIdentifier>{23bba0b5-f1c0-4760-8347-9d4243e81476}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllMain.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyClient.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IVariable.cpp">
+      <Filter>COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="V.cpp" />
+    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
+    <ClCompile Include="\Common\Utils\mathUtils.cpp" />
+    <ClCompile Include="\Common\Utils\registryUtils.cpp" />
+    <ClCompile Include="\Common\Utils\Utils.cpp" />
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="V.def">
+      <Filter>COM Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Variable.odl">
+      <Filter>COM Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="V.H" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="V.RC" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{7ad8d5f3-8628-4f35-aac9-8f4dd4d8d679}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Implementation Files">
+      <UniqueIdentifier>{5c894ba2-884a-4d2c-a391-42559a6dead2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files">
+      <UniqueIdentifier>{ec83df72-38eb-4390-846e-f50779d61056}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Interface Files\IViewSet Interface">
+      <UniqueIdentifier>{1623aabd-64ad-48c5-a064-274ced3c9141}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Static Files">
+      <UniqueIdentifier>{c6ebf5be-8e8e-4c4e-b185-5db0e2454cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{e829b752-7cc7-4423-97d6-10ef20d5be6c}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{106937d2-4723-4957-a19e-2a150d150f20}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ViewSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewSet.cpp">
+      <Filter>Source Files\COM Interface Files\IViewSet Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ViewSet.def">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="viewSet.odl">
+      <Filter>Source Files\COM Implementation Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ViewSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VIEWSET.RC">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

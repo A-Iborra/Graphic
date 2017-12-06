@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{12a6ecfa-6bdf-4ade-a1a4-f9d5e8455ab8}</UniqueIdentifier>
+      <Extensions>*.cpp</Extensions>
+    </Filter>
+    <Filter Include="Source Files\COM Files">
+      <UniqueIdentifier>{1427e49b-9765-4308-afb8-c17b028bb5b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\Contained Evaluator">
+      <UniqueIdentifier>{8e6143c4-57fc-431c-bcfc-35b0f4cadf66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\Contained Evaluator\Evaluator Events">
+      <UniqueIdentifier>{c648c486-05a7-4545-bd3a-a1960b6c1437}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\Function Events">
+      <UniqueIdentifier>{865d7a64-613c-417f-836d-0a185be00135}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\IFunction interface">
+      <UniqueIdentifier>{b611964a-38ee-4b70-b49d-c10751c71c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{78c9c24e-132a-4c15-89a6-bb78cf39c876}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{371b1269-c687-4987-9ab8-736a53e33192}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="IEvaluatorEvents.cpp">
+      <Filter>Source Files\COM Files\Contained Evaluator\Evaluator Events</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectedEvaluator.cpp">
+      <Filter>Source Files\COM Files\Contained Evaluator</Filter>
+    </ClCompile>
+    <ClCompile Include="IGSFunctioNaterEvents.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="IFunction.cpp">
+      <Filter>Source Files\COM Files\IFunction interface</Filter>
+    </ClCompile>
+    <ClCompile Include="COMImplementation.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPoint.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPointContainer.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDataObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumConnectionPoints.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumerateConnections.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleControl.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceActiveObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IProvideClassInfo.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IQuickActivate.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IRunnableObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="defineFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Function.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="functionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="propertiesHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
+    <ClCompile Include="\Common\Utils\mathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\registryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\VList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ConnectedEvaluator.h">
+      <Filter>Source Files\COM Files\Contained Evaluator</Filter>
+    </ClInclude>
+    <ClInclude Include="IGSFunctioNaterEvents.h">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\h\UTILS.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\h\VList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="Function.odl">
+      <Filter>Source Files\COM Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="buildDate" />
+    <CustomBuild Include="Evaluator.tlb" />
+    <CustomBuild Include="Function.def" />
+    <CustomBuild Include="Function.tlb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Function.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

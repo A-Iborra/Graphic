@@ -1,0 +1,321 @@
+
+import "oaidl.idl";
+//import "objidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD76-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Plot.hlp"),
+   helpstring("G System, Plot Type Library"), 
+   lcid(0x00000000), 
+   version(1.0)
+] 
+library Plot { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("Properties.tlb");
+   importlib("GSystem.tlb");
+   importlib("GraphicControl.tlb");
+   importlib("OpenGLImplementation.tlb");
+   importlib("DataSet.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
+
+   module PlotModule { };
+
+   [  uuid(8CAEFD7D-55E6-11d3-8365-006008BD5BC3),
+      helpstring(""),
+      pointer_default(unique)
+   ] 
+   interface IGraphicSegmentAction : IUnknown {
+
+      [helpstring("Return S_OK to notify the caller that you can handle mouse movement (such as when the user is dragging the mouse after selecting this object), S_FALSE otherwise")]
+      HRESULT Selector();
+      HRESULT Unselector();
+      HRESULT MenuRequest();
+      HRESULT LeftMouse();
+      HRESULT RightMouse();
+      [helpstring("After receiving a call to Selector and if you return S_OK from that call, you will recieve this call if the user is moving the mouse with the button still down from that selection")]
+      HRESULT MouseMove(POINT* ptMouse);
+      HRESULT MouseRelease();
+
+   };
+
+   [  uuid(8CAEFD7B-55E6-11d3-8365-006008BD5BC3),
+      helpstring(""),
+      pointer_default(unique)
+   ] 
+   interface IGraphicSegment : IUnknown {
+
+     HRESULT Initialize(IOpenGLImplementation *openGLImplementation,IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight);
+
+     [propget,helpstring("")]
+     HRESULT SegmentID([out,retval] long* getID);
+
+     [propput,helpstring("")]
+     HRESULT ActionTable([in] IGraphicSegmentAction *);
+     [propget,helpstring("")]
+     HRESULT ActionTable([out,retval] IGraphicSegmentAction **);
+
+     [propput,helpstring("")]
+     HRESULT ColorProperty([in]IGProperty* pIColor);
+     [propget,helpstring("")]
+     HRESULT ColorProperty([out,retval]IGProperty**);
+
+     [propput,helpstring("")]
+     HRESULT LineWeight([in] IGProperty* pIPropertyLineWeightInPixels);
+     [propget,helpstring("")]
+     HRESULT LineWeight([out,retval] IGProperty** ppIPropertyLineWeightInPixels);
+
+     HRESULT Create([out,retval]long *segmentID);
+     HRESULT Open();
+     HRESULT Close(USHORT drawOnClose);
+     HRESULT Redraw();
+     HRESULT Destroy();
+
+   };
+
+   [  uuid(8CAEFD77-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Base Plot Automation Interface"),
+      pointer_default(unique)
+   ] 
+   interface IBasePlot : IUnknown {
+
+     [propput,helpstring("")]
+     HRESULT DataSet([in] IDataSet *dataSet);
+     [propget,helpstring("")]
+     HRESULT DataSet([out,retval] IDataSet **dataSet);
+
+     [propget,helpstring("")]
+     HRESULT SegmentID([out,retval] long* getID);
+
+     [propput,helpstring("")]
+     HRESULT ActionTable([in] IGraphicSegmentAction *);
+     [propget,helpstring("")]
+     HRESULT ActionTable([out,retval] IGraphicSegmentAction **);
+
+     [propput,helpstring("")]
+     HRESULT PlotView([in] enum PlotViews newPlotView);
+     [propget,helpstring("")]
+     HRESULT PlotView([out,retval] enum PlotViews *getPlotView);
+
+     [propput,helpstring("")]
+     HRESULT PlotType([in] enum PlotTypes newPlotSubTppe);
+     [propget,helpstring("")]
+     HRESULT PlotType([out,retval] enum PlotTypes *getPlotSubType);
+
+     [propput,helpstring("")]
+     HRESULT ColorProperty([in] IGProperty* pIPropertyColor);
+     [propget,helpstring("")]
+     HRESULT ColorProperty([out,retval] IGProperty** ppIPropertyColor);
+
+     [propput,helpstring("")]
+     HRESULT LineWeight([in] IGProperty* pIPropertyLineWeightInPixels);
+     [propget,helpstring("")]
+     HRESULT LineWeight([out,retval] IGProperty** ppIPropertyLineWeightInPixels);
+
+     [propget,hidden]
+     HRESULT SegmentCount([out,retval] long *pCount);
+
+     [hidden]
+     HRESULT GetSegments([in]long *pSegmentArray);
+
+     HRESULT Create([out,retval]long *segmentID);
+     HRESULT Destroy();
+
+     HRESULT Initialize(IDataSet *pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
+                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,IGProperty *pIPropertyFloor,IGProperty *pIPropertyCeiling);
+
+     HRESULT Erase();
+
+     HRESULT AddText(void *text,char *name,int idNumber);
+     HRESULT RemoveText(void *t);
+
+     HRESULT StubPlot();
+     HRESULT Draw();
+     HRESULT Redraw();
+
+     HRESULT DrawPolygon();
+
+     HRESULT DrawGDI();
+
+     HRESULT RemoveFromWorldDomain();
+
+     HRESULT GetDomainGDI(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+   };
+
+   interface IPlot;
+
+   [  uuid(8CAEFD7A-65E6-11d3-8365-006008BD5BC3),
+      helpstring("Plot Notify Interface, implement in owner's of plot and call put_PlotNotify(IPlotNotify) on IPlot")
+   ]
+   interface IPlotNotify : IUnknown {
+
+      HRESULT DeletePlot(IPlot *);
+
+   };
+   
+   [  uuid(8CAEFD78-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Plot Automation Interface"),
+      pointer_default(unique)
+   ] 
+   interface IPlot : IDispatch {
+
+     [propput,helpstring("")] 
+     HRESULT Name([in]BSTR plotName);
+     [propget,helpstring("")] 
+     HRESULT Name([out,retval]BSTR *plotName);
+
+     [propput,helpstring("")]
+     HRESULT OkToPlot([in] long okToPlot);
+     [propget,helpstring("")]
+     HRESULT OkToPlot([out,retval] long *okToPlot);
+
+     [propput,helpstring("")]
+     HRESULT AutoPlotViewDetection([in] long autoTypeDetection);
+     [propget,helpstring("")]
+     HRESULT AutoPlotViewDetection([out,retval] long *autoTypeDetection);
+
+     [propput,helpstring("")]
+     HRESULT OverrideOwnerPlotView([in]VARIANT_BOOL overrideOwnerPlotView);
+     [propget,helpstring("")]
+     HRESULT OverrideOwnerPlotView([out,retval]VARIANT_BOOL *pOverrideOwnerPlotView);
+
+     [propput,helpstring("")]
+     HRESULT OverrideOwnerPlotType([in]VARIANT_BOOL overrideOwnerPlotType);
+     [propget,helpstring("")]
+     HRESULT OverrideOwnerPlotType([out,retval]VARIANT_BOOL *pOverrideOwnerPlotType);
+
+     [propput,helpstring("")]
+     HRESULT PlotViewProperty([in]IGProperty *pPlotTypeProperty);
+     [propget,helpstring("")]
+     HRESULT PlotViewProperty([out,retval]IGProperty **ppPlotTypeProperty);
+
+     [propput,helpstring("")]
+     HRESULT PlotTypeProperty([in]IGProperty *pPlotsubTypeProperty);
+     [propget,helpstring("")]
+     HRESULT PlotTypeProperty([out,retval]IGProperty **ppPlotSubTypeProperty);
+
+     [propget,helpstring("")]
+     HRESULT SegmentID([out,retval] long* getID);
+
+     [propput,helpstring("")]
+     HRESULT ActionTable([in] IGraphicSegmentAction *);
+     [propget,helpstring("")]
+     HRESULT ActionTable([out,retval] IGraphicSegmentAction **);
+
+     [propput,helpstring("")]
+     HRESULT DataSet([in] IDataSet *dataSet);
+     [propget,helpstring("")]
+     HRESULT DataSet([out,retval] IDataSet **dataSet);
+
+     [propput,helpstring("")]
+     HRESULT PlotNotify([in] IPlotNotify *setIPlotNotify);
+     [propget,helpstring("")]
+     HRESULT PlotNotify([out,retval] IPlotNotify **getIPlotNotify);
+
+     [propput,helpstring("")] 
+     HRESULT Color([in]SAFEARRAY(double) color);
+     [propget,helpstring("")] 
+     HRESULT Color([out,retval]SAFEARRAY(double) *pColor);
+
+     [propput,helpstring("")]
+     HRESULT ColorProperty([in] IGProperty* pIPropertyColor);
+     [propget,helpstring("")]
+     HRESULT ColorProperty([out,retval] IGProperty** ppIPropertyColor);
+
+     [propput,helpstring("")]
+     HRESULT LineWeight([in] IGProperty* pIPropertyLineWeightInPixels);
+     [propget,helpstring("")]
+     HRESULT LineWeight([out,retval] IGProperty** ppIPropertyLineWeightInPixels);
+
+     [propput,helpstring("")] 
+     HRESULT ParentWindow([in]HWND hwndParent);
+
+     [propget,hidden]
+     HRESULT SegmentCount([out,retval] long *pCount);
+
+     [hidden]
+     HRESULT GetSegments([in]long *pSegmentArray);
+
+     HRESULT Initialize(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
+                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                           IGProperty *parentPropertyPlotType,
+                           IGProperty *parentPropertyPlotSubType,
+                           IGProperty *parentPropertyBackgroundColor,
+                           IGProperty *parentPropertyTheta,
+                           IGProperty *parentPropertyPhi,
+                           IGProperty *parentPropertySpin,
+                           IGProperty *parentPropertyFloor,
+                           IGProperty *parentPropertyCeiling,
+                           IGProperty *parentPropertyCountLights,
+                           IGProperty **parentPropertiesLightOn,
+                           IGProperty **parentPropertiesAmbientLight,
+                           IGProperty **parentPropertiesDiffuseLight,
+                           IGProperty **parentPropertiesSpecularLight,
+                           IGProperty **parentPropertiesLightPosition);
+
+     HRESULT PrepareForData();
+
+     HRESULT TakeDataPoint(struct DataPoint *);
+     HRESULT TakeDataString(BSTR inputData);
+
+     HRESULT ResetData();
+
+     HRESULT LastPoint(struct DataPoint *);
+
+     HRESULT StubPlot();
+
+     HRESULT AddText(void *text,char *name,int idNumber);
+
+     HRESULT RemoveText(void *t);
+
+     HRESULT PrepData();
+
+     HRESULT Draw();
+
+     HRESULT Redraw();
+
+     HRESULT Erase();
+
+     HRESULT Plotter(long cntPlots,IPlot*** thePlotList);
+
+     HRESULT PlotList(long cntPlots,IPlot*** thePlotList,long* theThreadHandle);
+
+     [helpstring("Edit the plot's properties")]
+     HRESULT EditProperties();
+
+     [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
+     HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
+
+   };
+
+   [
+      uuid(8CAEFD7C-55E6-11d3-8365-006008BD5BC3),
+      helpstring("G System Graphic Segment Class")
+   ]
+   coclass GraphicSegment {
+      [default] interface IGraphicSegment;
+   };
+
+   [
+      uuid(8CAEFD79-55E6-11d3-8365-006008BD5BC3),
+      helpstring("G System Plot Class")
+   ]
+   coclass Plot {
+      [default] interface IPlot;
+   };
+
+   [
+      uuid(8CAEFD7A-55E6-11d3-8365-006008BD5BC3),
+      helpstring("G System BasePlot Class")
+   ]
+   coclass BasePlot {
+      [default] interface IBasePlot;
+   };
+
+};

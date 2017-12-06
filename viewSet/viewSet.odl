@@ -1,0 +1,65 @@
+
+import "oaidl.idl";
+
+#include <olectl.h>
+
+[ 
+   uuid(8CAEFD7E-55E6-11d3-8365-006008BD5BC3),
+   helpfile("Graphic.hlp"),
+   helpstring("G Graphic Control ViewSet Library"), 
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library ViewSet { 
+
+   importlib(STDOLE_TLB); 
+   importlib(STDTYPE_TLB);
+
+   importlib("GSystem.tlb");
+   importlib("GraphicControl.tlb");
+   importlib("Properties.tlb");
+   importlib("DataSet.tlb");
+   importlib("Plot.tlb");
+   importlib("Axis.tlb");
+   importlib("OpenGLImplementation.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
+
+   [  uuid(8CAEFD7F-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Graphic ViewSet Control (G), Interface")
+   ] 
+   interface IViewSet : IUnknown {
+
+      [helpstring("Call Initialize with the Parent IOpenGlImplemention, Parent IEvaluator, IGProperty for the plot type, and an IGProperty ptr for each of the Phi and Theta angles (double)")]
+      HRESULT Initialize(HWND hwndOwner,
+                  IOpenGLImplementation *pIOpenGLImplementation,
+                  IEvaluator *pIEvaluator,
+                  IGProperty *parentPlotView,
+                  IGProperty *parentTheta,
+                  IGProperty *parentPhi,
+                  IGProperty *parentSpin,
+                  IGProperty *parentFloor,
+                  IGProperty *parentCeiling,
+                  IDataSet* pIDataSet,
+                  IAxis* pIAxis_X,
+                  IAxis* pIAxis_Y,
+                  IAxis* pIAxis_Z);
+
+      [propput,helpstring("")] HRESULT ParentWindow([in]HWND hwndParent);
+
+      [helpstring("Call to activate the settings page")]
+      HRESULT Properties();
+
+   };
+
+   [
+      uuid(8CAEFD80-55E6-11d3-8365-006008BD5BC3),
+      helpstring("Graphic ViewSet Class"),
+      control
+   ]
+   coclass ViewSet {
+      [default] interface IViewSet;
+   };
+
+};
