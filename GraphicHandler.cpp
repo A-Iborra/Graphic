@@ -14,7 +14,6 @@
 #include <math.h>
 
 #include "Graphic_resource.h"
-#include "macros.h"
 #include "utils.h"
 
 #include "ContainedFunction.h"

@@ -11,7 +11,6 @@
 #include "utils.h"
 
 #include "Graphic.h"
-#include "macros.h"
 #include "list.cpp"
 
 #define ENABLE_WINDOWS(enabled) {                                                        \

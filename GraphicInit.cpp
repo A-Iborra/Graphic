@@ -21,7 +21,6 @@
 
 #include "ContainedFunction.h"
 #include "Graphic.h"
-#include "macros.h"
 
 #include "axis_i.c"
 

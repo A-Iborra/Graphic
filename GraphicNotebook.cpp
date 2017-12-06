@@ -20,7 +20,6 @@
 #include "utils.h"
 
 #include "Graphic.h"
-#include "macros.h"
 #include "list.cpp"
  
    LRESULT CALLBACK G::textHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
