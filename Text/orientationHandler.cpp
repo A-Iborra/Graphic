@@ -21,14 +21,86 @@
 
 
    LRESULT CALLBACK Text::orientationHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   Text *p = (Text *)GetWindowLong(hwnd,GWL_USERDATA);
+
+   Text *p = (Text *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch ( msg ) {
  
    case WM_INITDIALOG: {
+
       PROPSHEETPAGE *pPage = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+
       p = (Text *)pPage -> lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,(long)p);
+
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+
+      p -> hwndOrientation = hwnd;
+
+      switch ( p -> coordinatePlane ) {
+      case CoordinatePlane_XY:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_XYPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_XZ:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_XZPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_YX:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_YXPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_YZ:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_YZPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_ZX:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_ZXPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_ZY:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_ZYPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      case CoordinatePlane_screen:
+         SendDlgItemMessage(hwnd,IDDI_TEXT_SCREENPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         break;
+      }
+
+      if ( p -> flipVertical ) 
+         SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_TB,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+
+      if ( p -> flipHorizontal ) 
+         SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_LR,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+
+      SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETSEL,(WPARAM)FALSE,MAKELPARAM(0,100));
+      SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)static_cast<long>(100.0 * (1.0 - p -> planeHeight)));
+
+      char szTemp[32];
+      sprintf(szTemp,"%5.2f",p -> dpStart.x);
+      SetDlgItemText(hwnd,IDDI_TEXT_XCOORDINATE,szTemp);
+      sprintf(szTemp,"%5.2f",p -> dpStart.y);
+      SetDlgItemText(hwnd,IDDI_TEXT_YCOORDINATE,szTemp);
+      sprintf(szTemp,"%5.2f",p -> dpStart.y);
+      SetDlgItemText(hwnd,IDDI_TEXT_ZCOORDINATE,szTemp);
+
+      EnableWindow(GetDlgItem(hwnd,IDDI_TEXT_XCOORDINATE),p -> enablePositionSettings);
+      EnableWindow(GetDlgItem(hwnd,IDDI_TEXT_YCOORDINATE),p -> enablePositionSettings);
+      EnableWindow(GetDlgItem(hwnd,IDDI_TEXT_ZCOORDINATE),p -> enablePositionSettings);
+
+      TextFormat format;
+      p -> propertyFormat -> get_longValue(reinterpret_cast<long*>(&format));
+
+      if ( format & TEXT_COORDINATES_FROM_TOP ) 
+         SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_FROM_TOP,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+      else {
+         if ( format & TEXT_COORDINATES_FROM_CENTER )
+            SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_FROM_CENTER,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         else
+            SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_FROM_BOTTOM,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+      }
+      if ( format & TEXT_FORMAT_CENTER )
+         SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_CENTER,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+      else {
+         if ( format & TEXT_FORMAT_RIGHT )
+            SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_RIGHT,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         else
+            SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_LEFT,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+      }
+
       }
       return LRESULT(TRUE);
  

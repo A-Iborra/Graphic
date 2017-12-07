@@ -1,26 +1,21 @@
 
 #pragma once
 
-#include <ocidl.h>
 
-#include <list>
+#include <windows.h>
+#include <commctrl.h>
 
-#include "Graphics.h"
-#include "List.h"
+#include "Graphic_resource.h"
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
 #include "DataSet_i.h"
-
 #include "Variable_i.h"
 #include "Evaluator_i.h"
-
 #include "OpenGLImplementation_i.h"
-
 #include "Plot_i.h"
 #include "Axis_i.h"
 #include "ViewSet_i.h"
-
 #include "OpenGLImplementation_i.h"
 #include "Text_i.h"
 #include "Function_i.h"
@@ -28,6 +23,8 @@
 #include "GraphicControl_i.h"
 
 #include "ContainedFunction.h"
+
+#include "List.h"
 
   struct graphicCursor;
 
@@ -547,7 +544,6 @@
      int initWindows();
 
      IPlot* newPlot(long plotID);
-     int editPlot(IPlot* pIPlot);
 
      IGSFunctioNater* newFunction();
      void deleteFunction(IGSFunctioNater*);
@@ -555,7 +551,6 @@
      int unConnectFunction(IGSFunctioNater* pIFunction);
 
      IText* newText();
-     int editText(IText* pIText);
 
      int render(long sourceID);
      static unsigned __stdcall threadRender(void *);
@@ -670,10 +665,11 @@ MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesFunctions,0x8CAEFE87,0x55E6
 #define PLOT_CLIENT_YBOTTOM    100
 
 #define PICK_WINDOW_SIZE         5
-#define HIT_TABLE_SIZE          32
+#define HIT_TABLE_SIZE         128
 
 #define STANDARD_STATUS_TEXT_WIDTH  1
 
+#define SUPPORTED_LIGHT_COUNT  8
 
 #ifdef _DEBUG
 #define DEBUG_TONE   Beep(1000,100);

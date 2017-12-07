@@ -260,6 +260,19 @@
 
    if ( cntObjects ) {
 
+      IGSFunctioNater *p = (IGSFunctioNater *)NULL;
+      while ( p = pParent -> functionList.GetFirst() ) {
+         pParent -> deleteFunction(p);
+         pParent -> functionList.Remove(p);
+      }
+
+      ContainedFunction *pf = (ContainedFunction *)NULL;
+      while ( pf = pParent -> containedFunctionList.GetNext(pf) ) {
+         ShowWindow(pf -> HWNDSite(),SW_HIDE);
+         delete pf;
+         pParent -> containedFunctionList.Remove(pf);
+      }
+
       for ( long k = 0; k < cntObjects; k++ )
          pParent -> newFunction();
 
@@ -273,11 +286,13 @@
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
-      ContainedFunction *pf = (ContainedFunction *)NULL;
+      pf = (ContainedFunction *)NULL;
       while ( pf = pParent -> containedFunctionList.GetNext(pf) )
          ShowWindow(pf -> HWNDSite(),SW_HIDE);
+
       SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
-      pf = pParent -> containedFunctionList.Get(reinterpret_cast<long>(pParent -> functionList.GetFirst()));
+
+      pf = pParent -> containedFunctionList.Get((long)pParent -> functionList.GetFirst());
       if ( pf )
          ShowWindow(pf -> HWNDSite(),SW_SHOW);
 
@@ -359,6 +374,8 @@
          delete [] pText;
       }
    }
+
+   pParent -> render(0);
 
    return S_OK;
    }

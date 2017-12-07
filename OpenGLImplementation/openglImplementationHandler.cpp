@@ -566,8 +566,13 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_GETPICKBOXHITS: {
       strCall_GetPickBoxHits *ps = reinterpret_cast<strCall_GetPickBoxHits*>(wParam);
+      try {
       ps -> returnValue = p -> plotWindow -> getPickBoxHits(ps -> ptl,ps -> pickWindowSize,ps -> hitTable,ps -> hitTableSize,
                                                                ps -> pCallLists,ps -> hitTableHits);
+      } catch ( std::exception ex ) {
+         printf("hello world");
+MessageBox(NULL,ex.what(),"",MB_OK);
+      }
       }
       break;
 

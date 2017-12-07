@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <Windows.h>
 #include <ocidl.h>
 #include <stddef.h>
 
@@ -358,6 +359,9 @@
      IGProperty *propertyDescription;
      IGProperty *propertyPartOfMainGraphic;
 
+     IGProperty *propertyContent;
+     IGProperty *propertyOpenGLRendering;
+
      long renderText(HDC hdc = (HDC)NULL,char *theText = (char*)NULL);
      long renderGlyph(HDC hdc,char c,DataPoint& startPosition);
      int drawSample();
@@ -386,4 +390,5 @@
 #define RANGE 1000.0
 #define RANGEOVER2 500.0
 
-  extern ITypeInfo *pITypeInfo;
+extern ITypeInfo *pITypeInfo;
+extern HMODULE hModule;

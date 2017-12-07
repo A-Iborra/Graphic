@@ -41,7 +41,7 @@
    dp[1].x = 0.0;
    dp[1].y = 0.0;
    dp[1].z = 0.0;
-   propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<byte *>(dp));
+   propertyDataExtents -> put_binaryValue(sizeof(dp),(BYTE *)dp);
  
    propertyLineColor -> put_binaryValue(sizeof(fvBlack),(BYTE*)fvBlack);
  
@@ -71,7 +71,7 @@
    propertyLineJoin -> put_longValue(1L);
    propertyPlotView -> put_longValue((LONG)gcPlotView2D);
    propertyPlotType -> put_longValue((LONG)gcPlotTypeNone);
-
+   propertyLineWeight -> put_longValue((LONG)DEFAULT_LINE_WEIGHT);
    propertyCustomColors -> put_binaryValue(9 * sizeof(double),(BYTE*)dm);
    propertyPropertiesPosition -> put_binaryValue(4 * sizeof(long),(BYTE*)lv);
 

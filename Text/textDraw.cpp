@@ -111,6 +111,7 @@
       memset(&logicalFont,0,sizeof(LOGFONT));
       
       createFont(&logicalFont);
+
       hOriginalFont = (HFONT)SelectObject(hdc,hFont);
 
       TEXTMETRIC tm;
@@ -438,6 +439,7 @@ dxScale = 1.0;
    HDC hdc = GetDC(hwndOwner);
 
    createFont(&logicalFont);
+
    hOriginalFont = (HFONT)SelectObject(hdc,hFont);
 
    DataPoint minPoint,maxPoint;

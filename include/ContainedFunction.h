@@ -14,10 +14,10 @@
 
      STDMETHOD(QueryInterface)(REFIID riid,void **ppv);
 
-  private:
-
      STDMETHOD_ (ULONG, AddRef)();
      STDMETHOD_ (ULONG, Release)();
+
+  private:
 
      STDMETHOD(GetTypeInfoCount)(UINT *pctinfo);
      STDMETHOD(GetTypeInfo)(UINT itinfo, LCID lcid, ITypeInfo **pptinfo);

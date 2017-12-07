@@ -1,10 +1,7 @@
 
-#include <windows.h>
-#include <commctrl.h>
-
 #include "Graphic.h"
 
-#include "Graphic_resource.h"
+#include <stdio.h>
 
    static int holdUpdates = FALSE;
 
@@ -21,6 +18,8 @@
       p = (G *)pPage -> lParam;
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+
+      p -> hwndBackgroundSettings = hwnd;
 
       holdUpdates = TRUE;
 
@@ -40,9 +39,9 @@
       float fv[4];                                                                                    \
       BYTE *pb = (BYTE *)fv;                                                                          \
       p -> propertyBackgroundColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);                 \
-      sprintf(szTemp,"%4.1f",fv[0]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_RED,szTemp);           \
-      sprintf(szTemp,"%4.1f",fv[1]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_GREEN,szTemp);         \
-      sprintf(szTemp,"%4.1f",fv[2]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_BLUE,szTemp);          \
+      sprintf(szTemp,"%3.1f",fv[0]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_RED,szTemp);           \
+      sprintf(szTemp,"%3.1f",fv[1]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_GREEN,szTemp);         \
+      sprintf(szTemp,"%3.1f",fv[2]); SetDlgItemText(hwnd,IDDI_LIGHT_BACKGROUND_BLUE,szTemp);          \
       }
  
  
@@ -66,49 +65,53 @@
       return LRESULT(FALSE);
 
    case WM_NOTIFY: {
-       NM_UPDOWN *pn = (NM_UPDOWN *)lParam;
-       if ( pn -> hdr.code != UDN_DELTAPOS ) break;
-       if ( pn -> hdr.idFrom >= (unsigned int)IDDI_LIGHT_BACKGROUND_RED_SPIN && pn -> hdr.idFrom <= (unsigned int)IDDI_LIGHT_BACKGROUND_BLUE_SPIN ) {
-          int k = pn -> hdr.idFrom - IDDI_LIGHT_BACKGROUND_RED_SPIN;
-          HWND hwndEdit;
-          char szTemp[32];
-          float x;
-          switch ( k ) {
-          case 0:
-             hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_RED);
-             break;
-          case 1:
-             hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_GREEN);
-             break;
-          case 2:
-             hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_BLUE);
-             break;
-          }
-          GetWindowText(hwndEdit,szTemp,32);
-          x = (float)atof(szTemp);
-          x += (float)pn -> iDelta * 0.1f;
-          if ( x >= 0.0f && x <= 1.0 ) {
-             sprintf(szTemp,"%3.1f",x);
-             SetWindowText(hwndEdit,szTemp);
-             GET_VALUES()
-             RECT rect,rect2;
-             long cx,cy;
-             GetWindowRect(GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_BACKGROUND),&rect);
-             GetWindowRect(hwnd,&rect2);
-             cx = rect.right - rect.left;
-             cy = rect.bottom - rect.top;
-             rect.left = rect.left - rect2.left;
-             rect.top = rect.top - rect2.top;
-             rect.right = rect.left + cx;
-             rect.bottom = rect.top + cy;
-             InvalidateRect(hwnd,&rect,TRUE);
-          }
-          return LRESULT(FALSE);
-       }
+      if ( holdUpdates )
+         break;
+      NM_UPDOWN *pn = (NM_UPDOWN *)lParam;
+      if ( pn -> hdr.code != UDN_DELTAPOS ) break;
+      if ( pn -> hdr.idFrom >= (unsigned int)IDDI_LIGHT_BACKGROUND_RED_SPIN && pn -> hdr.idFrom <= (unsigned int)IDDI_LIGHT_BACKGROUND_BLUE_SPIN ) {
+         int k = pn -> hdr.idFrom - IDDI_LIGHT_BACKGROUND_RED_SPIN;
+         HWND hwndEdit;
+         char szTemp[32];
+         float x;
+         switch ( k ) {
+         case 0:
+            hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_RED);
+            break;
+         case 1:
+            hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_GREEN);
+            break;
+         case 2:
+            hwndEdit = GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_BLUE);
+            break;
+         }
+         GetWindowText(hwndEdit,szTemp,32);
+         x = (float)atof(szTemp);
+         x += (float)pn -> iDelta * 0.1f;
+         if ( x >= 0.0f && x <= 1.0 ) {
+            sprintf(szTemp,"%3.1f",x);
+            SetWindowText(hwndEdit,szTemp);
+            GET_VALUES()
+            RECT rect,rect2;
+            long cx,cy;
+            GetWindowRect(GetDlgItem(hwnd,IDDI_LIGHT_BACKGROUND_BACKGROUND),&rect);
+            GetWindowRect(hwnd,&rect2);
+            cx = rect.right - rect.left;
+            cy = rect.bottom - rect.top;
+            rect.left = rect.left - rect2.left;
+            rect.top = rect.top - rect2.top;
+            rect.right = rect.left + cx;
+            rect.bottom = rect.top + cy;
+            InvalidateRect(hwnd,&rect,TRUE);
+         }
+         return LRESULT(FALSE);
+      }
       }
       break;
  
    case WM_COMMAND: {
+      if ( holdUpdates )
+         break;
       int notifyCode = HIWORD(wParam);
       switch ( LOWORD(wParam) ) {
       case IDNI_GRAPHIC_OK:
@@ -205,3 +208,62 @@
    return LRESULT(FALSE);
    }
  
+
+
+   LRESULT CALLBACK G::patchPainterProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+
+   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
+   switch ( msg ) {
+   case WM_PAINT: {
+      PAINTSTRUCT ps;
+      HBRUSH hb;
+      HDC hdc;
+      IGProperty *pp = NULL;
+      int k = SendMessage(GetDlgItem(p -> hwndLightingSettings,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+      while ( TRUE ) {
+         if ( hwnd == GetDlgItem(p -> hwndLightingSettings,IDDI_LIGHT_AMBIENT_BACKGROUND) ) {
+            pp = p -> ppPropertyAmbientLight[k];
+            break;
+         }
+         if ( hwnd == GetDlgItem(p -> hwndLightingSettings,IDDI_LIGHT_DIFFUSE_BACKGROUND) ) {
+            pp = p -> ppPropertyDiffuseLight[k];
+            break;
+         }
+         if ( hwnd == GetDlgItem(p -> hwndLightingSettings,IDDI_LIGHT_SPECULAR_BACKGROUND) ) {
+            pp = p -> ppPropertySpecularLight[k]; 
+            break;
+         }
+         if ( hwnd == GetDlgItem(p -> hwndBackgroundSettings,IDDI_LIGHT_BACKGROUND_BACKGROUND) ) {
+            pp = p -> propertyBackgroundColor;
+            break;
+         }
+         return LRESULT(FALSE);
+      }
+      float fv[4];
+      BYTE *pb = (BYTE *)fv;
+      pp -> get_binaryValue(sizeof(fv),(BYTE**)&pb);
+      BYTE vb[3];
+      COLORREF cr;
+      vb[0] = (BYTE)(255.0f*fv[0]);
+      vb[1] = (BYTE)(255.0f*fv[1]);
+      vb[2] = (BYTE)(255.0f*fv[2]);
+ 
+      cr = RGB(vb[0],vb[1],vb[2]);
+      hb = CreateSolidBrush(cr);
+ 
+      hdc = BeginPaint(hwnd,&ps);
+      FillRect(hdc,&ps.rcPaint,hb);
+
+      EndPaint(hwnd,&ps);
+ 
+      }
+      return LRESULT(FALSE);
+ 
+   default:
+      break;
+   }
+
+   return CallWindowProc(G::defaultPatchPainter,hwnd,msg,wParam,lParam);
+   }
+

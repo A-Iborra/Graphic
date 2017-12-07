@@ -159,41 +159,17 @@
    QueryInterface(IID_IGSystemStatusBar,reinterpret_cast<void**>(&pIGSystemStatusBar));
    pIGSystemStatusBar -> Release();
 
-   CoCreateInstance(CLSID_InnoVisioNateProperties,
-                         NULL,//pIUnknownThis,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IGProperties,
-                         reinterpret_cast<void **>(&pIGProperties));
+   CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
  
-   CoGetClassObject(CLSID_Plot,
-                    CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,
-                    NULL,
-                    IID_IClassFactory,
-                    reinterpret_cast<void **>(&pPlot_IClassFactory));
+   CoGetClassObject(CLSID_Plot,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pPlot_IClassFactory));
 
-   CoGetClassObject(CLSID_GSystemFunctioNater,
-                    CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,
-                    NULL,
-                    IID_IClassFactory,
-                    reinterpret_cast<void **>(&pFunction_IClassFactory));
+   CoGetClassObject(CLSID_GSystemFunctioNater,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pFunction_IClassFactory));
 
-   CoCreateInstance(CLSID_DataSet,
-                         pIUnknownOuter,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IDataSet,
-                         reinterpret_cast<void **>(&pIDataSetMaster));
+   CoCreateInstance(CLSID_DataSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSetMaster));
 
-   CoCreateInstance(CLSID_OpenGLImplementor,
-                         pIUnknownThis,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IOpenGLImplementation,
-                         reinterpret_cast<void **>(&pIOpenGLImplementation));
+   CoCreateInstance(CLSID_OpenGLImplementor,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOpenGLImplementation,reinterpret_cast<void **>(&pIOpenGLImplementation));
 
-   CoCreateInstance(CLSID_Evaluator,
-                         pIUnknownThis,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IEvaluator,
-                         reinterpret_cast<void **>(&pIEvaluator));
+   CoCreateInstance(CLSID_Evaluator,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IEvaluator,reinterpret_cast<void **>(&pIEvaluator));
 
    pIOpenGLImplementation -> Initialize(pIEvaluator);
 
@@ -546,31 +522,44 @@
  
  
    IGSFunctioNater* G::newFunction() {
+
    long functionID = functionList.Count() + 1;
-   IGSFunctioNater* pIFunction = (IGSFunctioNater*)NULL;
+
+   IGSFunctioNater *pIFunction = (IGSFunctioNater*)NULL;
+
    pFunction_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IGSFunctioNater,reinterpret_cast<void **>(&pIFunction));
+
    functionList.Add(pIFunction,NULL,functionID);
+
    if ( hwndFrame ) {
-      RECT rect;  
+
       connectFunction(pIFunction);
+
       pIFunction -> put_ShowExpression(TRUE);
       pIFunction -> put_ShowControls(TRUE);
       pIFunction -> put_AllowControlVisibilitySettings(FALSE);
       pIFunction -> put_ShowResults(TRUE);
       pIFunction -> put_ShowVariables(TRUE);
       pIFunction -> put_AllowPropertySettings(TRUE);
+
+      RECT rect;  
+
       GetWindowRect(hwndFrame,&rect);
+
       SendMessage(hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+
    } else {
+
       cachedFunctionList.Add(pIFunction,NULL,functionID);
       pIFunction -> AddRef();
+
    }
 
    return pIFunction;
    }
 
 
-   void G::deleteFunction(IGSFunctioNater* pIFunction) {
+   void G::deleteFunction(IGSFunctioNater *pIFunction) {
 
    unConnectFunction(pIFunction);
 
@@ -620,11 +609,12 @@
    }
 
 
-   int G::connectFunction(IGSFunctioNater* pIFunction) {
+   int G::connectFunction(IGSFunctioNater *pIFunction) {
 
    TC_ITEM tie;
    int item;
    char szFunction[32];
+
    sprintf(szFunction,"F%d",functionList.IndexOf(pIFunction));
 
    memset(&tie,0,sizeof(TC_ITEM));
@@ -654,9 +644,10 @@
 
    pContainedFunction -> connectEvents();
 
-   containedFunctionList.Add(pContainedFunction,NULL,reinterpret_cast<long>(pIFunction));
+   containedFunctionList.Add(pContainedFunction,NULL,(long)pIFunction);
 
    pIOleObject -> Release();
+
    pIOleClientSite -> Release();
 
    return 1;

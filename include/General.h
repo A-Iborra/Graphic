@@ -22,6 +22,8 @@
 #define NAME_SIZE                    128
 #define IND_VAR_SIZE                  32
 
+#define DEFAULT_LINE_WEIGHT            2
+
 #define MAX_QUEUE_BUFFER_SIZE      63488
 
 #define G_UTILITY_STRING_SIZE        256

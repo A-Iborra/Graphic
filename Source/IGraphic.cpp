@@ -91,12 +91,13 @@
    t -> Draw();
    IUnknown* pIUnknownText;
    t -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownText));
-   pIGProperties -> ShowProperties(hwndFrame,pIUnknownText);
+   pIGProperties -> ShowProperties(hwndGraphic,pIUnknownText);
    pIUnknownText -> Release();
 
    t -> Draw();
    if ( pText ) 
       t -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(pText));
+
    return S_OK;
    }
  

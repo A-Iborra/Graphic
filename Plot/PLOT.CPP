@@ -123,6 +123,7 @@
 
    pIProperties -> Add(L"line color",&propertyLineColor);
    pIProperties -> Add(L"line weight",&propertyLineWeight);
+   propertyLineWeight -> put_type(TYPE_LONG);
 
    pIProperties -> Add(L"top surface color",&propertyTopSurfaceColor);
  

@@ -31,13 +31,13 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
+      p -> hwndFunctionSettings = hwnd;
+
       char szTemp[32];
       sprintf(szTemp,"There are %ld functions defined",p -> functionList.Count());
       SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_COUNT),szTemp);
 
       RECT rect;
-
-      p -> hwndFunctionSettings = hwnd;
 
       GetClientRect(GetDlgItem(p -> hwndFunctionSettings,IDDI_GRAPHIC_PLOTS_GRAPHIC),&rect);
 

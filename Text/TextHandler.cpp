@@ -19,22 +19,22 @@
 
 
    LRESULT EXPENTRY Text::handler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2) {
-   Text *p = (Text *)GetWindowLong(hwnd,GWL_USERDATA);
+
+   Text *p = (Text *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch (msg) {
    case WM_CREATE: {
       CREATESTRUCT *pc = (CREATESTRUCT *)mp2;
-      SetWindowLong(hwnd,GWL_USERDATA,(LONG)pc -> lpCreateParams);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)pc -> lpCreateParams);
       }
       return LRESULT(FALSE);
  
    case WM_COMMAND: {
-      USHORT commandName = LOWORD(mp1);
-      switch ( commandName ) {
+      switch ( LOWORD(mp1) ) {
       case IDMI_TEXT_PROPERTIES: {
          IUnknown* pIUnknown;
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-         p -> pIProperties -> EditProperties(hwnd,L"Text",pIUnknown);
+         p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();       
          }
          return LRESULT(TRUE);

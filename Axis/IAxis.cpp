@@ -722,10 +722,10 @@
    }
 
 
-   HRESULT Axis::ShowProperties() {
+   HRESULT Axis::ShowProperties(HWND hwndParent) {
    IUnknown *pUnknown;
-   QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pUnknown));
-   pIGProperties -> ShowProperties(NULL,pUnknown);
+   QueryInterface(IID_IUnknown,(void **)&pUnknown);
+   pIGProperties -> ShowProperties(hwndParent,pUnknown);
    pUnknown -> Release();
    return S_OK;
    }

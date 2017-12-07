@@ -286,6 +286,10 @@
 
 #define IDDIALOG_GRAPHIC_STYLE                                             7250
 #define IDDI_GRAPHIC_STYLE_SAMPLE                                          7260
+#define IDDI_GRAPHIC_SUB_STYLE_NATURAL                                     7261
+#define IDDI_GRAPHIC_SUB_STYLE_WIREFRAME                                   7262
+#define IDDI_GRAPHIC_SUB_STYLE_SURFACE                                     7263
+#define IDDI_GRAPHIC_SUB_STYLE_STACKS                                      7264
                                                                            
 #define IDDIALOG_GRAPHIC_TEXT_SETTINGS                                     7300
 
@@ -554,10 +558,12 @@
 #define IDDI_TEXT_DESCRIPTION                                             12111
 
 #define IDDIALOG_TEXT_STYLE                                               12200
+#define IDDI_TEXT_RENDEROPENGL                                            12205
 #define IDDI_TEXT_FONTLIST                                                12210
 #define IDDI_TEXT_FONTSTYLELIST                                           12220
 #define IDDI_TEXT_FONTSIZE                                                12230
-#define IDDI_TEXT_FONTSIZEUNITSLIST                                       12231
+#define IDDI_TEXT_FONTSIZE_SPINNER                                        12231
+#define IDDI_TEXT_FONTSIZEUNITSLIST                                       12232
 
 #define IDDIALOG_TEXT_ORIENTATION                                         12300
 #define IDDI_TEXT_XYPLANE                                                 12311

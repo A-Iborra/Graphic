@@ -28,11 +28,11 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
+      p -> hwndPlotSettings = hwnd;
+
       char szTemp[32];
       sprintf(szTemp,"There are %ld plots on this graphic",p -> plotList.Count());
       SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_COUNT),szTemp);
-
-      p -> hwndPlotSettings = hwnd;
 
       RECT rect;
 

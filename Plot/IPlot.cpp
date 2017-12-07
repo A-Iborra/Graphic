@@ -42,8 +42,13 @@
       pIProperties -> Include(propertyLineColor);
    }
 
-   if ( pPropLineWeight )
+   if ( pPropLineWeight ) {
+      if ( propertyLineWeight ) {
+         pIProperties -> Remove(L"line weight");
+         propertyLineWeight -> Release();
+      }
       propertyLineWeight = pPropLineWeight;
+   }
 
    pOwnerPropertyPlotView = parentPlotView;
    if ( ! pOwnerPropertyPlotView )

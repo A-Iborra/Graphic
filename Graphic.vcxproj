@@ -162,7 +162,7 @@
     <ClCompile Include="Source\GraphicDrawing.cpp" />
     <ClCompile Include="Source\GraphicHandler.cpp" />
     <ClCompile Include="Source\GraphicInit.cpp" />
-    <ClCompile Include="Source\GraphicNotebook.cpp" />
+    <ClCompile Include="Source\textHandler.cpp" />
     <ClCompile Include="Source\GraphicPick.cpp" />
     <ClCompile Include="Source\IAdviseSink.cpp" />
     <ClCompile Include="Source\IDataObject.cpp" />

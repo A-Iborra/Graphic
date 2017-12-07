@@ -20,6 +20,8 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
+      p -> hwndAxisSettings = hwnd;
+
       p -> propertyRenderOpenGLAxisText -> setWindowChecked(GetDlgItem(hwnd,IDDI_GRAPHIC_AXIIS_USE_OPENGL));
 
       BSTR bstrLabel;
@@ -54,7 +56,7 @@
          break;
 
       case IDDI_GRAPHIC_AXIIS_XAXIS_EDIT: {
-         p -> xaxis -> ShowProperties();
+         p -> xaxis -> ShowProperties(hwnd);
          BSTR bstrLabel;
          p -> xaxis -> get_LabelText(&bstrLabel);
          SetDlgItemTextW(hwnd,IDDI_GRAPHIC_AXIIS_XAXIS_TEXT,bstrLabel);
@@ -63,7 +65,7 @@
          break;
 
       case IDDI_GRAPHIC_AXIIS_YAXIS_EDIT: {
-         p -> yaxis -> ShowProperties();
+         p -> yaxis -> ShowProperties(hwnd);
          BSTR bstrLabel;
          p -> yaxis -> get_LabelText(&bstrLabel);
          SetDlgItemTextW(hwnd,IDDI_GRAPHIC_AXIIS_YAXIS_TEXT,bstrLabel);
@@ -72,7 +74,7 @@
          break;
 
       case IDDI_GRAPHIC_AXIIS_ZAXIS_EDIT: {
-         p -> zaxis -> ShowProperties();
+         p -> zaxis -> ShowProperties(hwnd);
          BSTR bstrLabel;
          p -> zaxis -> get_LabelText(&bstrLabel);
          SetDlgItemTextW(hwnd,IDDI_GRAPHIC_AXIIS_ZAXIS_TEXT,bstrLabel);

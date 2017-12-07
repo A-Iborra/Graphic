@@ -32,58 +32,62 @@
 
    HWND hwndCreated = NULL;
 
+   PROPSHEETPAGE propSheetPage = {0};
+
+   propSheetPage.lParam = (LPARAM)pParent;
+
    if ( CLSID_GSystemGraphicPropertiesPosSize == theCLSID ) {
       if ( ! pParent -> hwndAppearanceSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(0,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndAppearanceSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_SIZEPOS),(HWND)hwndParent,(DLGPROC)G::posSizeHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndAppearanceSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesStyle == theCLSID ) {
       if ( ! pParent -> hwndStyleSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(1,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndStyleSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_STYLE),(HWND)hwndParent,(DLGPROC)G::styleHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndStyleSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesBackground == theCLSID ) {
       if ( ! pParent -> hwndBackgroundSettings ) 
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(2,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndBackgroundSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_BACKGROUND),(HWND)hwndParent,(DLGPROC)G::backgroundHandler,(LPARAM)&propSheetPage); 
       SetWindowPos(pParent -> hwndBackgroundSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesText == theCLSID ) {
       if ( ! pParent -> hwndTextSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(3,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndTextSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_TEXT_SETTINGS),(HWND)hwndParent,(DLGPROC)G::textHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndTextSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesLighting == theCLSID ) {
       if ( ! pParent -> hwndLightingSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(4,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndLightingSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_LIGHTING),(HWND)hwndParent,(DLGPROC)G::lightingHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndLightingSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesAxis == theCLSID ) {
       if ( ! pParent -> hwndAxisSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(5,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndAxisSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_AXIIS),(HWND)hwndParent,(DLGPROC)G::axisHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndAxisSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesPlot == theCLSID ) {
       if ( ! pParent -> hwndPlotSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(6,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndPlotSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_PLOTS),(HWND)hwndParent,(DLGPROC)G::plotHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndPlotSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
 
    if ( CLSID_GSystemGraphicPropertiesFunctions == theCLSID ) {
       if ( ! pParent -> hwndFunctionSettings )
-         pParent -> pIPropertyPageClient -> CreatePropertyPage(7,hwndParent,const_cast<RECT *>(pRect),doModal,&hwndCreated);
+         pParent -> hwndFunctionSettings = CreateDialogParam(hModule,MAKEINTRESOURCE(IDDIALOG_GRAPHIC_FUNCTIONS),(HWND)hwndParent,(DLGPROC)G::functionHandler,(LPARAM)&propSheetPage);
       SetWindowPos(pParent -> hwndFunctionSettings,HWND_TOP,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,SWP_SHOWWINDOW);
       return S_OK;
    }
@@ -266,18 +270,6 @@
 
 
    HRESULT G::_IPropertyPage::Move(const RECT *prc) {
-
-#if 0
-   if ( CLSID_PhabletSignaturePadPropertyPage == theCLSID )
-      SetWindowPos(pParent -> hwndPropertyPage,HWND_TOP,prc -> left,prc -> top, prc -> right - prc -> left,prc -> bottom - prc -> top,0L);
-
-   if ( CLSID_PhabletSignaturePadRuntimePropertyPage == theCLSID )
-      SetWindowPos(pParent -> hwndRuntimePropertyPage,HWND_TOP,prc -> left,prc -> top, prc -> right - prc -> left,prc -> bottom - prc -> top,0L);
-
-   if ( CLSID_PhabletSignaturePadDocumentationPropertyPage == theCLSID )
-      SetWindowPos(pParent -> hwndDocumentationPropertyPage,HWND_TOP,prc -> left,prc -> top, prc -> right - prc -> left,prc -> bottom - prc -> top,0L);
-#endif
-
    return S_OK;
    }
 
@@ -288,30 +280,6 @@
 
 
    HRESULT G::_IPropertyPage::Apply() {
-
-#if 0
-   pParent -> fire_PropertyChanged();
-
-   if ( ! okayToSave )
-      return S_OK;
-
-   okayToSave = false;
-
-   PSHNOTIFY notify = {0};
-
-   notify.hdr.code = PSN_APPLY;
-   notify.lParam = 1L;
-
-//   if ( CLSID_PhabletSignaturePadPropertyPage == theCLSID ) 
-      SendMessage(pParent -> hwndPropertyPage,WM_NOTIFY,0L,(LPARAM)&notify);
-
-//   if ( CLSID_PhabletSignaturePadRuntimePropertyPage == theCLSID ) 
-      SendMessage(pParent -> hwndRuntimePropertyPage,WM_NOTIFY,0L,(LPARAM)&notify);
-
-//   if ( CLSID_PhabletSignaturePadDocumentationPropertyPage == theCLSID ) 
-      SendMessage(pParent -> hwndDocumentationPropertyPage,WM_NOTIFY,0L,(LPARAM)&notify);
-#endif
-
    return S_OK;
    }
 
@@ -324,26 +292,3 @@
    HRESULT G::_IPropertyPage::TranslateAccelerator(MSG* pMsg) {
    return S_FALSE;
    }
-
-#if 0
-
-//
-//NTC: 02-08-2012. This is a total bullshit hack that is necessary because the MS documentation
-// cannot bother to say anywhere how on earth to tell if the user pressed OK, or Cancel - as if
-// nobody would ever want to know this absolutely obvious thing to need to know !?!
-//
-   LRESULT CALLBACK G::propertySheetFrameHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   if ( msg == WM_COMMAND ) {
-      switch ( LOWORD(wParam ) ) {
-      case IDOK:
-         okayToSave = true;
-         break;
-      case IDCANCEL:
-         okayToSave = false;
-         break;
-      }
-   }
-   return CallWindowProc(nativePropertySheetFrameHandler,hwnd,msg,wParam,lParam);
-   }
-   
-#endif

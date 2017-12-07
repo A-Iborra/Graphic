@@ -162,7 +162,6 @@
     <ClCompile Include="IText.cpp" />
     <ClCompile Include="IUnknown.cpp" />
     <ClCompile Include="orientationHandler.cpp" />
-    <ClCompile Include="sampleHandler.cpp" />
     <ClCompile Include="styleHandler.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="TextControl.cpp" />

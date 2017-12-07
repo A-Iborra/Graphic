@@ -229,8 +229,8 @@ library Axis {
       [id(axisMethodAdviseGSystemStatusBar),helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
       HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
 
-      [id(axisMethodEditProperties),helpstring("Edit the axis properties")]
-      HRESULT ShowProperties();
+      [id(axisMethodEditProperties),helpstring("Edit the axis properties. hwndParent can be NULL")]
+      HRESULT ShowProperties(HWND hwndParent);
 
    };
 

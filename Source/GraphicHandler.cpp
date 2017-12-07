@@ -7,28 +7,20 @@
 #include <windows.h>
 #include <commctrl.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <process.h>
-#include <math.h>
-
 #include "Graphic_resource.h"
 #include "utils.h"
-
-#include "ContainedFunction.h"
 #include "Graphic.h"
 
    LRESULT CALLBACK G::graphicHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
-   G *p = (G *)GetWindowLong(hwnd,GWL_USERDATA);
+   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch (msg) {
  
    case WM_CREATE: {
       CREATESTRUCT *cp = (CREATESTRUCT *)lParam;
       p = (G *)cp -> lpCreateParams;
-      SetWindowLong(hwnd,GWL_USERDATA,(long)p);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
       }
       return LRESULT(FALSE);
  
@@ -48,13 +40,13 @@
       TRACKMOUSEEVENT tme = {0};
       tme.cbSize = sizeof(TRACKMOUSEEVENT);
       tme.dwFlags = TME_QUERY;
-      _TrackMouseEvent(&tme);
+      TrackMouseEvent(&tme);
 
       if ( ! tme.dwFlags ) {
          tme.dwFlags = TME_LEAVE;
          tme.hwndTrack = hwnd;
          tme.dwHoverTime = HOVER_DEFAULT;
-         _TrackMouseEvent(&tme);
+         TrackMouseEvent(&tme);
       }
 
       p -> eraseGraphicCursor();
@@ -304,11 +296,10 @@
 
       case IDMI_GRAPHIC_PRINT: 
          if ( S_OK == p -> pIOpenGLImplementation -> PrintSetup() ) {
-//           p -> render(0);
-//           p -> pIOpenGLImplementation -> PrintFinish();
+           p -> render(0);
+           p -> pIOpenGLImplementation -> PrintFinish();
          }
- 
-         return LRESULT(TRUE);
+          return LRESULT(TRUE);
  
       case IDMI_GRAPHIC_ERASE:
          p -> erase();
@@ -319,7 +310,7 @@
          return LRESULT(TRUE);
  
       case IDMI_GRAPHIC_CANCEL:
-         p -> stop();//reinterpret_cast<void *>(p));
+         p -> stop();
          return LRESULT(TRUE);
  
       case IDMI_GRAPHIC_VIEW_2D:
@@ -370,7 +361,7 @@
       case IDMI_GRAPHIC_PROPERTIES: {
          IUnknown *pIUnknownThis;
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
-         p -> pIGProperties -> ShowProperties(p -> hwndOwner,pIUnknownThis);
+         p -> pIGProperties -> ShowProperties(p -> hwndGraphic,pIUnknownThis);
          pIUnknownThis -> Release();
          }
          return LRESULT(TRUE);
@@ -384,11 +375,6 @@
          return LRESULT(TRUE);
  
       case IDMI_GRAPHIC_TEXT: {
-         POINT ptMouse;
-         RECT rect;
-         GetCursorPos(&ptMouse);
-         GetWindowRect(hwnd,&rect);
-         POINTL ptlMouse = {ptMouse.x - rect.left,ptMouse.y - rect.top};
          p -> AddTextInteractive();
          }
          return LRESULT(TRUE);
@@ -416,13 +402,14 @@
  
  
    LRESULT CALLBACK G::graphicFrameHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   G *p = (G *)GetWindowLong(hwnd,GWL_USERDATA);
+
+   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch (msg) {
 
    case WM_CREATE: {
       CREATESTRUCT *cp = (CREATESTRUCT *)lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,(long)cp -> lpCreateParams);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)cp -> lpCreateParams);
       }
       return LRESULT(FALSE);
  

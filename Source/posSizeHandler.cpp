@@ -26,6 +26,8 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
+      p -> hwndAppearanceSettings = hwnd;
+
       long k;
       char unitsArray[][32] = UNITS_ARRAY;
 
@@ -35,8 +37,6 @@
       SendMessage(hwndTemp,CB_RESETCONTENT,0L,0L);
       while ( *unitsArray[k] ) 
          SendMessage(hwndTemp,CB_ADDSTRING,0,(LPARAM)unitsArray[k++]);
-
-      p -> hwndAppearanceSettings = hwnd;
 
       p -> propertyPlotMarginUnits -> setWindowItemComboBoxSelection(p -> hwndAppearanceSettings,IDDI_GRAPHIC_SIZE_MARGINUNITS);
       p -> propertyPlotTopMargin -> setWindowItemText(p -> hwndAppearanceSettings,IDDI_GRAPHIC_SIZE_TOPMARGIN);

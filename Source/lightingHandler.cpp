@@ -4,14 +4,10 @@
 
 */
 
-#include <windows.h>
-#include <commctrl.h>
-
-#include "Graphic_resource.h"
-#include "utils.h"
-
 #include "Graphic.h"
+
 #include "list.cpp"
+#include "utils.h"
 
 #define ENABLE_WINDOWS(enabled) {                                                        \
          EnableWindow(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_RED),enabled);                  \
@@ -128,15 +124,17 @@
  
    LRESULT CALLBACK G::lightingHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
-   G *p = (G *)GetWindowLong(hwnd,GWL_USERDATA);
+   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
    switch ( msg ) {
 
    case WM_INITDIALOG: {
 
-      PROPSHEETPAGE *pPage = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+      PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
       p = (G *)pPage -> lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,(long)p);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+
+      p -> hwndLightingSettings = hwnd;
 
       holdUpdates = TRUE;
  
@@ -175,8 +173,6 @@
       si.nPage = 1;
       SendDlgItemMessage(hwnd,IDDI_CHOOSE_LIGHT_NO,SBM_SETSCROLLINFO,(WPARAM)TRUE,(LPARAM)&si);
       SendDlgItemMessage(hwnd,IDDI_CHOOSE_LIGHT_NO,SBM_ENABLE_ARROWS,(WPARAM)ESB_DISABLE_UP,0L);
-
-      p -> hwndLightingSettings = hwnd;
 
       p -> ppPropertyLightOn[0] -> setWindowItemChecked(p -> hwndLightingSettings,IDDI_LIGHT_ENABLED);
 

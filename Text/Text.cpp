@@ -13,8 +13,8 @@
 #include <math.h>
 #include <process.h>
 
-#include <gl\gl.h>
-#include <gl\glu.h>
+//#include <gl\gl.h>
+//#include <gl\glu.h>
 
 #include "general.h"
 #include "Graphic_resource.h"
@@ -127,7 +127,8 @@
    propertyPropertiesPosition -> put_size(4 * sizeof(long));
 
    pIProperties -> Add(L"line weight",&propertyLineWeight);
- 
+   propertyLineWeight -> put_type(TYPE_LONG);
+
    pIProperties -> Add(L"text format",&propertyFormat);
    pIProperties -> Add(L"position string",&propertyPositionString);
    pIProperties -> Add(L"positionX",&propertyPositionX);
@@ -154,6 +155,12 @@
    propertyDescription -> put_type(TYPE_STRING);
 
    pIProperties -> Add(L"part of main graphic",&propertyPartOfMainGraphic);
+
+   pIProperties -> Add(L"content",&propertyContent);
+   propertyContent -> put_type(TYPE_STRING);
+
+   pIProperties -> Add(L"opengl rendering",&propertyOpenGLRendering);
+   pIProperties -> DirectAccess(L"opengl rendering",TYPE_BOOL,(void *)&doOpenGLRendering,sizeof(doOpenGLRendering));
 
    propertyFormat -> directAccess(TYPE_LONG,reinterpret_cast<void*>(&format),sizeof(format));
 
@@ -316,5 +323,7 @@
    strcpy(pLogFont -> lfFaceName,szFace);
    pLogFont -> lfCharSet = DEFAULT_CHARSET;
    hFont = CreateFontIndirect(pLogFont);
+   if ( hwndSample )
+      SendMessage(hwndSample,WM_SETFONT,(WPARAM)hFont,(LPARAM)TRUE);
    return 1;
    }
