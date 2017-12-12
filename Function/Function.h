@@ -11,6 +11,8 @@
 
 #include <list>
 
+#define MULTITHREADED_EVALUATOR
+
 #include "GSystem_i.h"
 
 #include "list.h"
@@ -22,6 +24,10 @@
 #include "Variable_i.h"
 #include "Evaluator_i.h"
 #include "Function_i.h"
+
+#include "DataSet_i.h"
+#include "OpenGLImplementation_i.h"
+#include "Plot_i.h"
 
    class Function;
 
@@ -111,6 +117,13 @@
      STDMETHOD(parseExpression)();
 
      STDMETHOD(EditProperties)();
+
+     STDMETHOD(put_IPlot)(void *);
+     STDMETHOD(get_IPlot)(void **);
+
+     STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
+
+     STDMETHOD(get_AnyControlVisible)(VARIANT_BOOL* pbAnyVisible);
 
 //     IOleObject 
 
@@ -407,6 +420,10 @@
      IAdviseSink *pAdviseSink;
      IOleInPlaceSite *pIOleInPlaceSite;
      IPropertyNotifySink *pIPropertyNotifySink;
+     IPlot *pIPlot;
+
+     void (__stdcall *pWhenChangedCallback)(void *);
+     void *pWhenChangedCallbackArg;
 
      DWORD adviseSink_dwAspect,adviseSink_advf;
 
@@ -420,12 +437,13 @@
      int controlSpacing;
      HWND hwndSpecDialog,hwndVariables,hwndVariablesTab,hwndErrors,hwndProperties,hwndPropertiesVisibility;
      short allowUserProperties,allowUserPropertiesControls,userMode,enteringData,stopAllProcessing,askedForInPlaceObject;
+     short isDesignMode;
      COLORREF backgroundColor,foregroundColor;
 
      union {
-         short visibleItems[8];
+         short visibleItems[9];
          struct {
-            short expressionVisible,resultsVisible,variablesVisible,controlsVisible,startVisible,pauseVisible,resumeVisible,stopVisible;
+            short expressionVisible,resultsVisible,variablesVisible,controlsVisible,startVisible,pauseVisible,resumeVisible,stopVisible,plotPropertiesVisible;
          };
      };
 
@@ -451,6 +469,7 @@
      IGProperty* pIPropertyPauseVisible;
      IGProperty* pIPropertyResumeVisible;
      IGProperty* pIPropertyStopVisible;
+     IGProperty* pIPropertyPlotPropertiesVisible;
      IGProperty* pIPropertyVariables;
      IGProperty* pIPropertyManuallyAddedVariables;
 

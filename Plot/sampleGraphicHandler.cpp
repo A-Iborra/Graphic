@@ -13,31 +13,29 @@
 
 #include "Plot.h"
 
-
    LRESULT CALLBACK Plot::sampleGraphicHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   Plot *p = reinterpret_cast<Plot *>(GetWindowLong(hwnd,GWL_USERDATA));
- 
+
+   Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
    switch ( msg ) {
  
    case WM_PAINT: {
       PAINTSTRUCT ps;
       BeginPaint(hwnd,&ps);
       EndPaint(hwnd,&ps);
-      if ( ! p ) return (LRESULT)0;
-      LRESULT rc = p -> defaultStaticWindowHandler(hwnd,msg,wParam,lParam);
       p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
       p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
                                              p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
       p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
-                                                 p -> pOwnerPropertiesAmbientLight,
-                                                 p -> pOwnerPropertiesDiffuseLight,
-                                                 p -> pOwnerPropertiesSpecularLight,
-                                                 p -> pOwnerPropertiesLightPosition,
-                                                 p -> pOwnerPropertyCountLights,NULL);
+                                                   p -> pOwnerPropertiesAmbientLight,
+                                                   p -> pOwnerPropertiesDiffuseLight,
+                                                   p -> pOwnerPropertiesSpecularLight,
+                                                   p -> pOwnerPropertiesLightPosition,
+                                                   p -> pOwnerPropertyCountLights,NULL);
       p -> pIOpenGLImplementation -> Erase(p -> pOwnerPropertyBackgroundColor);
       p -> Draw();
-      p -> pIOpenGLImplementation -> ResetTargetWindow();
-      return rc;
+      p -> pIOpenGLImplementation -> Flush();
+      return (LRESULT)FALSE;
       }
  
  

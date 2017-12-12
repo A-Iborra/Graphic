@@ -77,7 +77,6 @@
      hwndDimensionSettings(NULL),
      hwndTypeSettings(NULL),
      hwndColorSettings(NULL),
-     hwndSample(NULL),
      hMainMenu(NULL),
      hMenu(NULL),
 
@@ -91,11 +90,7 @@
 
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
  
-   CoCreateInstance(CLSID_InnoVisioNateProperties,
-                         pIUnknownThis,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IUnknown,
-                         reinterpret_cast<void **>(&pIUnknownProperties));
+   CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
  
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&pIProperties));
  
@@ -183,15 +178,6 @@
 
    hMenu = GetSubMenu(hMainMenu,0);
 
-   hwndSample = CreateWindowEx(WS_EX_CLIENTEDGE,"STATIC","",WS_VISIBLE | WS_CHILD,0,0,100,100,hwndObjectWindow,NULL,hModule,NULL);
-
-   SetWindowLongPtr(hwndSample,GWLP_USERDATA,(ULONG_PTR)this);
-
-   if ( defaultStaticWindowHandler )
-      SetWindowLongPtr(hwndSample,GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
-   else
-      defaultStaticWindowHandler = (WNDPROC)SetWindowLongPtr(hwndSample,GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
-
    return;
    }
 
@@ -204,11 +190,7 @@
    if ( pIProperties )
       pIProperties -> Release();
 
-   //NTC: 11-30-2017 I'm commenting this out because the override calling the defaultStaticWindowHandler is throwing a trap
-
-#if 0
    DestroyWindow(hwndObjectWindow);
-#endif
 
    if ( hwndDimensionSettings)
       DestroyWindow(hwndDimensionSettings);

@@ -10,12 +10,14 @@
 
 #include "Plot.h"
 
-
    LRESULT CALLBACK Plot::typeHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+
    Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch ( msg ) {
+
    case WM_INITDIALOG: {
+
       PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
       p = (Plot *)pPage -> lParam;
 
@@ -50,21 +52,46 @@
       EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_WIREFRAME),p -> overrideOwnerType ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_QUADS),p -> overrideOwnerType ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_TRIANGLES),p -> overrideOwnerType ? TRUE : FALSE);
-      }
 
-      return LRESULT(0);
-
-   case WM_PAINT: {
-      SetParent(p -> hwndSample,p -> hwndTypeSettings);
       RECT rect,rectParent;
-      GetWindowRect(p -> hwndTypeSettings,&rectParent);
+      GetWindowRect(hwnd,&rectParent);
       long cx = 400;
       long cy = 400;
-      GetWindowRect(GetDlgItem(p -> hwndTypeSettings,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),&rect);
-      SetWindowPos(p -> hwndSample,HWND_TOP,rect.left - rectParent.left + 8,rect.top - rectParent.top + 8,
-                                          cx - 2 * (rect.left - rectParent.left) - 16,cy - (rect.top - rectParent.top) - 16,SWP_SHOWWINDOW);
+      GetWindowRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),&rect);
+
+      SetWindowPos(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),HWND_TOP,rect.left - rectParent.left + 8,rect.top - rectParent.top + 8,
+                                       cx - 2 * (rect.left - rectParent.left) - 16,cy - (rect.top - rectParent.top) - 16,SWP_SHOWWINDOW);
+
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_USERDATA,(ULONG_PTR)p);
+
+      if ( defaultStaticWindowHandler )
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+      else
+         defaultStaticWindowHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+
+
       }
-      break;
+      return LRESULT(0);
+
+   //case WM_SHOWWINDOW: {
+
+   //   if ( (BOOL)wParam ) {
+
+   //      p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION));
+
+   //      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
+   //                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
+
+   //      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
+   //                                                   p -> pOwnerPropertiesAmbientLight,
+   //                                                   p -> pOwnerPropertiesDiffuseLight,
+   //                                                   p -> pOwnerPropertiesSpecularLight,
+   //                                                   p -> pOwnerPropertiesLightPosition,
+   //                                                   p -> pOwnerPropertyCountLights,NULL);
+   //   }
+
+   //   }
+   //   break;
 
    case WM_COMMAND: {
 
@@ -112,7 +139,9 @@
       }
 
       else switch ( controlID ) {
+
       case IDDI_PLOT_TYPE_OVERRIDE_OWNER: {
+
          PlotTypes pType;
 
          p -> propertyOverrideOwnerType -> getWindowChecked((HWND)lParam);
@@ -144,7 +173,8 @@
          break;
       }
 
-      InvalidateRect(p -> hwndSample,NULL,TRUE);
+      InvalidateRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),NULL,TRUE);
+
       return LRESULT(0);
       }
 

@@ -37,9 +37,7 @@
 
      STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation*,IEvaluator*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IDataSet*,IAxis*,IAxis*,IAxis*);
 
-     STDMETHOD(put_ParentWindow)(HWND);
-
-     STDMETHOD(Properties)();
+     STDMETHOD(Properties)(void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
 
 //      IPropertiesClient
 
@@ -79,7 +77,6 @@
 
      IDataSet* pIDataSet;
      IAxis* pIAxis_X,*pIAxis_Y,*pIAxis_Z;
-     IText* pIText_X,*pIText_Y,*pIText_Z;
 
      IUnknown *pIUnknownOuter;
      IUnknown *pIUnknownProperties;
@@ -91,6 +88,9 @@
 
      IOpenGLImplementation *pIOpenGLImplementation;
      IEvaluator *pIEvaluator;
+
+     void (__stdcall *pPostDialogClientCallback)(void *) {NULL};
+     void *pPostDialogClientCallbackArg {NULL};
 
      unsigned int refCount;
 

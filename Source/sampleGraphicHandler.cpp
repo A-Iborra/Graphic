@@ -31,13 +31,19 @@
       if ( ! p ) break;
       RECT oldMargins;
       memcpy(&oldMargins,&p -> margins,sizeof(RECT));
+
+      HWND hwndOldTarget = p -> pIOpenGLImplementation -> TargetHWND();
+
       p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
+
       p -> margins.left = 8;
       p -> margins.top = 8;
       p -> margins.right = 8;
       p -> margins.bottom = 8;
       p -> render(0);
-      p -> pIOpenGLImplementation -> ResetTargetWindow();
+
+      p -> pIOpenGLImplementation -> SetTargetWindow(hwndOldTarget);
+
       memcpy(&p -> margins,&oldMargins,sizeof(RECT));
       }
       return LRESULT(FALSE);

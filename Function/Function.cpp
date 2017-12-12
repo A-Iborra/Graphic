@@ -10,7 +10,6 @@
 
 #include "Graphic_resource.h"
 #include "gmessage.h"
-//#include "GSystemsProperties.h"
 #include "Properties_i.h"
 
 #include "Function.h"
@@ -43,6 +42,7 @@
        allowUserProperties(false),
        allowUserPropertiesControls(false),
        askedForInPlaceObject(false),
+       isDesignMode(false),
 
        pVariableList(NULL),
        pManuallyAddedVariables(NULL),
@@ -62,6 +62,8 @@
        pIOleInPlaceSite(NULL),
        pIOleInPlaceActiveObject(NULL),
        pIPropertyNotifySink(NULL),
+
+       pIPlot(NULL),
 
        pOleAdviseHolder(NULL),
        pDataAdviseHolder(NULL),
@@ -107,6 +109,7 @@
        pauseVisible(FALSE),
        resumeVisible(FALSE),
        stopVisible(FALSE),
+       plotPropertiesVisible(FALSE),
        enteringData(FALSE),
        stopAllProcessing(FALSE),
 
@@ -114,6 +117,9 @@
        freezeEvents(0),
        backgroundColor(0),
        foregroundColor(0),
+
+       pWhenChangedCallback(NULL),
+       pWhenChangedCallbackArg(NULL),
 
        refCount(0)
  
@@ -208,6 +214,8 @@
    iProperties -> Add(L"rect",NULL);
    iProperties -> DirectAccess(L"rect",TYPE_BINARY,&rectDialog,sizeof(RECT));
 
+   iProperties -> Add(L"plot properties visible",&pIPropertyPlotPropertiesVisible);
+
    pIPropertyPropertiesVisible -> directAccess(TYPE_BOOL,&allowUserProperties,sizeof(allowUserProperties));
    pIPropertyPropertiesControlVisibility -> directAccess(TYPE_BOOL,&allowUserPropertiesControls,sizeof(allowUserPropertiesControls));
 
@@ -219,6 +227,7 @@
    pIPropertyPauseVisible -> directAccess(TYPE_BOOL,&pauseVisible,sizeof(pauseVisible));
    pIPropertyResumeVisible -> directAccess(TYPE_BOOL,&resumeVisible,sizeof(resumeVisible));
    pIPropertyStopVisible -> directAccess(TYPE_BOOL,&stopVisible,sizeof(stopVisible));
+   pIPropertyPlotPropertiesVisible -> directAccess(TYPE_BOOL,&plotPropertiesVisible,sizeof(plotPropertiesVisible));
 
    pIPropertyExpressionLabel -> directAccess(TYPE_SZSTRING,expressionLabel,sizeof(expressionLabel));
    pIPropertyResultsLabel -> directAccess(TYPE_SZSTRING,resultsLabel,sizeof(resultsLabel));
@@ -326,6 +335,7 @@
       return 0;
 
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_FUNCTION_SPEC),RT_DIALOG));
+
    hwndSpecDialog = CreateDialogIndirectParam(hModule,dt,hwndOwner,(DLGPROC)functionDialogHandler,(LPARAM)this);
 
    dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_FUNCTION_VARIABLES),RT_DIALOG));
@@ -358,16 +368,22 @@
    GetWindowRect(hwndSpecDialog,&rectDialog);
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),&rectLabel1);
    subtractRect(&rectLabel1,&rectDialog,&rectLabel1);
+
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),&rectExpression);
    subtractRect(&rectExpression,&rectDialog,&rectExpression);
+
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),&rectLabel2);
    subtractRect(&rectLabel2,&rectDialog,&rectLabel2);
+
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),&rectResults);
    subtractRect(&rectResults,&rectDialog,&rectResults);
+
    GetWindowRect(hwndVariables,&rectVariables);
    subtractRect(&rectVariables,&rectDialog,&rectVariables);
+
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),&rectControls);
    subtractRect(&rectControls,&rectDialog,&rectControls);
+
    GetWindowRect(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES),&rectProperties);
    subtractRect(&rectProperties,&rectDialog,&rectProperties);
 
@@ -380,6 +396,7 @@
    pIPropertyExpression -> setWindowItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY);
 
    pVariableList -> SetHwnds(hwndVariablesTab,hwndVariablesTab);
+
    pManuallyAddedVariables -> SetHwnds(hwndVariablesTab,hwndVariablesTab);
 
    Loaded();
@@ -485,6 +502,8 @@
    else
       anyControlVisible = true;
 
+   long startButtonLeft = rectControls.left - deltax;
+
    SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),HWND_TOP,rectControls.left - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
 
    if ( ! controlsVisible || ! pauseVisible ) 
@@ -514,6 +533,17 @@
 
    SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),HWND_TOP,rectControls.left + 3 * (rectControls.right - rectControls.left) - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
 
+   long stopButtonBottom = rectControls.top - deltay + rectControls.bottom - rectControls.top;
+
+   if ( ! controlsVisible || ! plotPropertiesVisible ) 
+      deltax += rectControls.right - rectControls.left;
+   else {
+      deltax -= controlSpacing;
+      anyControlVisible = true;
+   }
+
+   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,startButtonLeft,stopButtonBottom + controlSpacing,0,0,SWP_NOSIZE);
+
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),expressionVisible && expressionLabel[0] ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),expressionVisible ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),resultsVisible ? SW_SHOW : SW_HIDE);
@@ -524,13 +554,21 @@
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),controlsVisible && pauseVisible ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),controlsVisible && resumeVisible ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),controlsVisible && stopVisible ? SW_SHOW : SW_HIDE);
+   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),controlsVisible && plotPropertiesVisible ? SW_SHOW : SW_HIDE);
 
    if ( anyControlVisible )
       resultingHeight += 2 * (rectControls.bottom - rectControls.top);
    else
       resultingHeight += 12;
 
-   if ( 12 == resultingHeight ) resultingHeight = 64;
+   if ( plotPropertiesVisible )
+      resultingHeight += rectControls.bottom - rectControls.top + controlSpacing;
+
+   //if ( plotPropertiesVisible && ! variablesVisible )
+      resultingHeight += 12;
+
+   if ( 12 == resultingHeight ) 
+      resultingHeight = 64;
 
    rectDialog.right = rectDialog.left + cx;
    rectDialog.bottom = rectDialog.top + resultingHeight;

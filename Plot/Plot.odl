@@ -1,6 +1,5 @@
 
 import "oaidl.idl";
-//import "objidl.idl";
 
 #include <olectl.h>
 
@@ -257,7 +256,8 @@ library Plot {
                            IGProperty **parentPropertiesAmbientLight,
                            IGProperty **parentPropertiesDiffuseLight,
                            IGProperty **parentPropertiesSpecularLight,
-                           IGProperty **parentPropertiesLightPosition);
+                           IGProperty **parentPropertiesLightPosition,
+                           [in] void (*pCallback)(void *),[in] void *pArg);
 
      HRESULT PrepareForData();
 

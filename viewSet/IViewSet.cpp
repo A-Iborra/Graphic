@@ -49,38 +49,21 @@
    pIOpenGLImplementation -> AddRef();
 
    pIDataSet -> AddRef();
+
    pIAxis_X -> AddRef();
    pIAxis_Y -> AddRef();
    pIAxis_Z -> AddRef();
  
    iProperties -> Include(parentPropertyPlotView);
 
-   pIText_X -> Initialize(hwndOwner,pIOpenGLImp,pIEvaluator,pIDataSet,parentPropertyFloor,parentPropertyCeiling,NULL,NULL,NULL);
-   pIText_Y -> Initialize(hwndOwner,pIOpenGLImp,pIEvaluator,pIDataSet,parentPropertyFloor,parentPropertyCeiling,NULL,NULL,NULL);
-   pIText_Z -> Initialize(hwndOwner,pIOpenGLImp,pIEvaluator,pIDataSet,parentPropertyFloor,parentPropertyCeiling,NULL,NULL,NULL);
-
-   pIText_X -> put_PartOfWorldDomain(FALSE);
-   pIText_Y -> put_PartOfWorldDomain(FALSE);
-   pIText_Z -> put_PartOfWorldDomain(FALSE);
-
-   pIText_X -> put_CoordinatePlane(CoordinatePlane_XY);
-   pIText_Y -> put_CoordinatePlane(CoordinatePlane_YX);
-   pIText_Z -> put_CoordinatePlane(CoordinatePlane_YZ);
-
    return S_OK;
    }
 
 
-   HRESULT ViewSet::put_ParentWindow(HWND hwndP) {
-   hwndGraphicContainer = hwndP;
-   return S_OK;
-   }
-
-
-   HRESULT ViewSet::Properties() {
-   IGProperties *pIGProperties;
-   QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&pIGProperties));
-   pIGProperties -> EditProperties(hwndGraphicContainer,L"View");
-   pIGProperties -> Release();
+   HRESULT ViewSet::Properties(void (__stdcall *pWhenDoneCallback)(void *),void *pArg) {
+   pPostDialogClientCallback = pWhenDoneCallback;
+   pPostDialogClientCallbackArg = pArg;
+   initWindows();
+   ShowWindow(hwndViewSet,SW_SHOW);
    return S_OK;
    }

@@ -230,8 +230,6 @@
  
    pParent -> propertyCustomColors -> put_binaryValue(128,NULL);
  
-   pParent -> propertyPropertiesPosition -> put_binaryValue(4 * sizeof(long),NULL);
- 
    DataPoint dp[2];
    dp[0].x = 0.0;
    dp[0].y = 0.0;
@@ -258,6 +256,8 @@
 
    pParent -> propertyFunctions -> get_storedObjectCount(&cntObjects);
 
+   VARIANT_BOOL anyFunctionControlVisible = VARIANT_FALSE;
+
    if ( cntObjects ) {
 
       IGSFunctioNater *p = (IGSFunctioNater *)NULL;
@@ -269,12 +269,12 @@
       ContainedFunction *pf = (ContainedFunction *)NULL;
       while ( pf = pParent -> containedFunctionList.GetNext(pf) ) {
          ShowWindow(pf -> HWNDSite(),SW_HIDE);
-         delete pf;
          pParent -> containedFunctionList.Remove(pf);
+         delete pf;
       }
 
       for ( long k = 0; k < cntObjects; k++ )
-         pParent -> newFunction();
+         pParent -> newFunction(true);
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
@@ -286,6 +286,15 @@
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
+      f = (IGSFunctioNater *)NULL;
+      while ( f = pParent -> functionList.GetNext(f) ) {
+         f -> get_AnyControlVisible(&anyFunctionControlVisible);
+         if ( anyFunctionControlVisible ) {
+            pParent -> connectFunction(f,false,true);
+            break;
+         }
+      }
+
       pf = (ContainedFunction *)NULL;
       while ( pf = pParent -> containedFunctionList.GetNext(pf) )
          ShowWindow(pf -> HWNDSite(),SW_HIDE);
@@ -293,8 +302,11 @@
       SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
 
       pf = pParent -> containedFunctionList.Get((long)pParent -> functionList.GetFirst());
-      if ( pf )
-         ShowWindow(pf -> HWNDSite(),SW_SHOW);
+      if ( pf ) {
+         pf -> pFunction() -> get_AnyControlVisible(&anyFunctionControlVisible);
+         if ( anyFunctionControlVisible )
+            ShowWindow(pf -> HWNDSite(),SW_SHOW);
+      }
 
    }
 
@@ -375,7 +387,12 @@
       }
    }
 
-   pParent -> render(0);
+   if ( pParent -> hwndFrame ) {
+      RECT rect;
+      GetWindowRect(pParent -> hwndFrame,&rect);
+      SendMessage(pParent -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+      pParent -> render(0);
+   }
 
    return S_OK;
    }

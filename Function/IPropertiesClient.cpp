@@ -93,6 +93,7 @@
    pauseVisible = TRUE;
    resumeVisible = TRUE;
    stopVisible = TRUE;
+   plotPropertiesVisible = TRUE;
 
    strcpy(expressionLabel,"Specify some expression here");
    strcpy(resultsLabel,"results:");
@@ -102,6 +103,7 @@
  
  
    HRESULT Function::Loaded() {
+
    long cntObjects;
 
    IVariable *v;
@@ -112,6 +114,7 @@
       pManuallyAddedVariables -> Remove(v,&currentShowingVariable);
 
    pIPropertyManuallyAddedVariables -> get_storedObjectCount(&cntObjects);
+
    if ( cntObjects ) {
 
       for ( long k = 0; k < cntObjects; k++ )
@@ -148,6 +151,7 @@
       parseExpression();
 
    pIPropertyVariables -> get_storedObjectCount(&cntObjects);
+
    if ( cntObjects ) {
 
       pIPropertyVariables -> clearStorageObjects();

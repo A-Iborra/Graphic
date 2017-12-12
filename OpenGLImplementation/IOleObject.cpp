@@ -90,7 +90,7 @@
    case OLEIVERB_PROPERTIES: {
       IUnknown* pIUnknown;
       QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-      pIProperties -> EditProperties(hwndParent,L"OpenGL Implementation",pIUnknown);
+      pIProperties -> ShowProperties(hwndParent,pIUnknown);
       pIUnknown -> Release();
       }
       break;

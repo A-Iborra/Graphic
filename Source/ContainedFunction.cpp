@@ -13,8 +13,9 @@
 #include "Graphic.h"
 
 
-   ContainedFunction::ContainedFunction(G* pp,long pID,HWND hwndT,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
+   ContainedFunction::ContainedFunction(G* pp,long pID,HWND hwndT,IGSFunctioNater *pIFunction,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
       plotID(pID),
+      pIGSFunctioNater(pIFunction),
       ContainedObject(pp,hwndT,pIUnknownObject,riidEventsInterface) {};
 
 
@@ -107,7 +108,17 @@
    }
 
    HRESULT ContainedFunction::Started(long expectedValues) {
+
    pParent -> PrepareForData(plotID);
+
+   IGSFunctioNater *pIFunction = NULL;
+
+   pIUnknownObject -> QueryInterface(IID_IGSFunctioNater,(void **)&pIFunction);
+
+   pIFunction -> put_IPlot((void *)pParent -> plotList.Get(plotID));
+
+   pIFunction -> Release();
+
    return S_OK;
    }
 

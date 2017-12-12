@@ -37,20 +37,24 @@
 
    case WM_SIZE: {
 
-      if ( ! p ) break;
+      if ( ! p )
+         break;
+
       long x = 0,y = 0,cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
-      if ( cx == 0 || cy == 0 ) break;
+      if ( cx == 0 || cy == 0 )
+         break;
 
       SetWindowPos(GetDlgItem(hwnd,IDDI_DATASOURCES_TAB),HWND_TOP,0,0,cx - 8,cy - 8,SWP_NOMOVE);
 
-      if ( p -> functionList.Count() > 0 ) {
+      if ( 0 < p -> functionList.Count() ) {
 
          SIZEL sizeFunction;
 
          {
          IOleObject* pIOleObject_Function;
-         int item = SendMessage(p->hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
+         int item = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
          p -> functionList.GetByIndex(item) -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject_Function));
+         VARIANT_BOOL anyControlVisible;
          pIOleObject_Function -> GetExtent(DVASPECT_CONTENT,&sizeFunction);
          hiMetricToPixel(&sizeFunction,&sizeFunction);
          pIOleObject_Function -> Release();
@@ -59,7 +63,7 @@
          cx -= sizeFunction.cx + 52;
          x += sizeFunction.cx + 52;
 
-         SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizeFunction.cx + 16,min(cy - 74,sizeFunction.cy + 16),SWP_SHOWWINDOW);
+         SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizeFunction.cx + 16,min(cy - 74,sizeFunction.cy + 16),0L);
 
          ContainedFunction* pContainedFunction = (ContainedFunction*)NULL;
          while ( pContainedFunction = p -> containedFunctionList.GetNext(pContainedFunction) ) 

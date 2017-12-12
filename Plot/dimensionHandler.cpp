@@ -10,12 +10,14 @@
 
 #include "Plot.h"
 
+   bool isSampleInUse = false;
 
    LRESULT CALLBACK Plot::dimensionHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch ( msg ) {
+
    case WM_INITDIALOG: {
 
       PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
@@ -26,30 +28,14 @@
 
       p -> hwndDimensionSettings = hwnd;
 
-      //if ( p -> hwndParentWindow ) {
-      //   RECT rectParent;
-      //   RECT rectThis;
-      //   long cx,cy;
-      //   GetWindowRect(p -> hwndParentWindow,&rectParent);
-      //   GetWindowRect(p -> hwndDimensionSettings,&rectThis);
-      //   p -> rectPropertiesPosition.left += rectParent.left;
-      //   p -> rectPropertiesPosition.top += rectParent.top;
-      //   p -> rectPropertiesPosition.left = max(0,p -> rectPropertiesPosition.left);
-      //   p -> rectPropertiesPosition.top = max(0,p -> rectPropertiesPosition.top);
-      //   cx = GetSystemMetrics(SM_CXSCREEN);
-      //   cy = GetSystemMetrics(SM_CYSCREEN);
-      //   p -> rectPropertiesPosition.left = min(p -> rectPropertiesPosition.left,cx - (rectThis.right - rectThis.left));
-      //   p -> rectPropertiesPosition.top = min(p -> rectPropertiesPosition.top,cy - (rectThis.bottom - rectThis.top));
-      //   SetWindowPos(GetParent(hwnd),HWND_TOP,max(0,p -> rectPropertiesPosition.left),max(0,p -> rectPropertiesPosition.top),0,0,SWP_NOSIZE);
-      //}
-
       PlotViews parentPlotView;
+
       p -> pOwnerPropertyPlotView -> get_longValue((long*)&parentPlotView);
 
       if ( gcPlotView3D == parentPlotView ) 
-         SetDlgItemText(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_OVERRIDE_OWNER,"Override the owner's 3-D transformation settings?");
+         SetDlgItemText(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_OVERRIDE_OWNER,"Override the global 3-D transformation settings?");
       else
-         SetDlgItemText(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_OVERRIDE_OWNER,"Override the owner's 2-D transformation settings?");
+         SetDlgItemText(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_OVERRIDE_OWNER,"Override the global 2-D transformation settings?");
 
       SendMessage(GetDlgItem(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_OVERRIDE_OWNER),BM_SETCHECK,p -> overrideOwnerView ? BST_CHECKED : BST_UNCHECKED,0L);
 
@@ -66,20 +52,44 @@
          EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_2D),FALSE);
       }
 
+      RECT rect,rectParent;
+      GetWindowRect(hwnd,&rectParent);
+      long cx = 400;
+      long cy = 400;
+      GetWindowRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),&rect);
+
+      SetWindowPos(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),HWND_TOP,rect.left - rectParent.left + 8,rect.top - rectParent.top + 8,
+                                       cx - 2 * (rect.left - rectParent.left) - 16,cy - (rect.top - rectParent.top) - 16,SWP_SHOWWINDOW);
+
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_USERDATA,(ULONG_PTR)p);
+
+      if ( defaultStaticWindowHandler )
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+      else
+         defaultStaticWindowHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+
       }
       return LRESULT(0);
 
-   case WM_PAINT: {
-      SetParent(p -> hwndSample,p -> hwndDimensionSettings);
-      RECT rect,rectParent;
-      GetWindowRect(p -> hwndDimensionSettings,&rectParent);
-      long cx = 400;
-      long cy = 400;
-      GetWindowRect(GetDlgItem(p -> hwndDimensionSettings,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),&rect);
-      SetWindowPos(p -> hwndSample,HWND_TOP,rect.left - rectParent.left + 8,rect.top - rectParent.top + 8,
-                                          cx - 2 * (rect.left - rectParent.left) - 16,cy - (rect.top - rectParent.top) - 16,SWP_SHOWWINDOW);
-      }
-      break;
+   //case WM_SHOWWINDOW: {
+
+   //   if ( (BOOL)wParam && 0 == lParam ) {
+
+   //      p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION));
+
+   //      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
+   //                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
+
+   //      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
+   //                                                   p -> pOwnerPropertiesAmbientLight,
+   //                                                   p -> pOwnerPropertiesDiffuseLight,
+   //                                                   p -> pOwnerPropertiesSpecularLight,
+   //                                                   p -> pOwnerPropertiesLightPosition,
+   //                                                   p -> pOwnerPropertyCountLights,NULL);
+   //   }
+
+   //   }
+   //   break;
 
    case WM_COMMAND: {
       int controlID = LOWORD(wParam);
@@ -110,11 +120,12 @@
             p -> plotView = gcPlotView2D;
          break;
       }
+
+      InvalidateRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),NULL,TRUE);
+
       }
-      InvalidateRect(p -> hwndSample,NULL,TRUE);
       return LRESULT(0);
- 
- 
+
    default:
       break;
    }

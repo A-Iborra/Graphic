@@ -10,8 +10,7 @@
 #include <vector>
 
 #include "Function.h"
-//#include "List.cpp"
-
+#include "Graphic_resource.h"
 
 #ifdef MULTITHREADED_EVALUATOR
 #define UNMARSHALL_INTERFACE                                                                                             \
@@ -390,6 +389,8 @@
  
    void Function::fire_Finished() {
    STANDARD_NOARGUMENT_EVENT(functionEventID_Finished)
+   if ( hwndSpecDialog )
+      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),pIPlot ? TRUE : FALSE);
    return;
    }
 

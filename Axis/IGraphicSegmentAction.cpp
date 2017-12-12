@@ -10,13 +10,15 @@
 #include "Axis.h"
 
    HRESULT Axis::LeftMouse() {
-   if ( selected ) return MenuRequest();
+   if ( selected ) 
+      return MenuRequest();
    return S_OK;  
    }
  
  
    HRESULT Axis::RightMouse() {
-   if ( !selected ) return Selector();
+   if ( ! selected ) 
+      return Selector();
    return S_OK;
    }
  
@@ -30,7 +32,8 @@
  
  
    HRESULT Axis::Unselector() {
-   if ( selected ) return Selector();
+   if ( selected ) 
+      return Selector();
    return S_OK;
    }
  

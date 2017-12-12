@@ -51,9 +51,6 @@
     <ClCompile Include="stacks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="typeHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="COMImplementation.cpp">
       <Filter>Source Files\COM Implementation</Filter>
     </ClCompile>
@@ -113,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="\Common\Utils\VariantUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="typeHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -68,6 +68,7 @@
    boolean bIsIncluded;
 
    pIPlot -> get_DataSet(&pIDataSetPlot);
+
    pIDataSetDomain -> get_IsIncludedDomain(pIDataSetPlot,&bIsIncluded);
    if ( bIsIncluded )
       pIDataSetDomain -> RemoveIncludedDomain(pIDataSetPlot);
@@ -413,7 +414,7 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
 
                t -> CopyFrom(pRepresentativeText);
 
@@ -540,7 +541,7 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
 
                t -> CopyFrom(pRepresentativeText);
 
@@ -669,7 +670,7 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
 
                t -> CopyFrom(pRepresentativeText);
 

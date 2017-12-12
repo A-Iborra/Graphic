@@ -4,21 +4,14 @@ import "ocidl.idl";
 
 #include <olectl.h>
 
-#ifdef FUNCTION_SAMPLE
-   [uuid(FE4DFCE3-7E68-4008-9949-36B257B9E46A),helpfile("FunctioNater.hlp"),
-   helpstring("GSystems Sample FunctioNater Control"), lcid(0x00000000), version(1.0)]
-   library FunctioNaterSample {
-
-#else
    [uuid(8CAEFD83-55E6-11d3-8365-006008BD5BC3),
    helpfile("FunctioNater.hlp"),
    helpstring("GSystems FunctioNater Control"), 
    lcid(0x00000000), 
    version(1.0),
    control]
-   library FunctioNater {
 
-#endif
+   library FunctioNater {
 
    importlib(STDOLE_TLB); 
    importlib(STDTYPE_TLB);
@@ -133,10 +126,10 @@ import "ocidl.idl";
       HRESULT AllowPropertySettings([out,retval]VARIANT_BOOL* pAllowPropertySettings);
 
       [propput,id(4),
-         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components. Run-time setting of these components will cause the FunctioNater to resize which may obstruct other parts of the window.")]
+         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components.")]
       HRESULT AllowControlVisibilitySettings([in]VARIANT_BOOL allowControlVisibilitySettings);
       [propget,id(4),
-         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components. Run-time setting of these components will cause the FunctioNater to resize which may obstruct other parts of the window.")]
+         helpstring("Allow the user (at run-time) to have access to the property page which governs the visibility of the user-interface components.")]
       HRESULT AllowControlVisibilitySettings([out,retval]VARIANT_BOOL* pAllowControlVisibilitySettings);
 
       [propput,id(5),
@@ -258,6 +251,17 @@ import "ocidl.idl";
 
       [helpstring("Edit the function's properties")]
       HRESULT EditProperties();
+
+      [helpstring("Set the Function's IPlot interface. A typical client (of this object) should create an IPlot when the function starts producing data, it should then provide the interface to the function")]
+      [propput,id(400)] HRESULT IPlot([in] void *pIPlot);
+      [propget,id(400)] HRESULT IPlot([out,retval] void **ppIPlot);
+
+      [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
+      [propput,id(401)] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
+
+      [helpstring("Returns whether any of the Controls for the function are visible, so that if not, the client does not have to display the function settings in it's UI")]
+      [propget,id(402)] HRESULT AnyControlVisible([out,retval] VARIANT_BOOL *pAnyVisible);
+
    };
 
 

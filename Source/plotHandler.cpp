@@ -44,21 +44,19 @@
 
       MapWindowPoints(GetDlgItem(p -> hwndPlotSettings,IDDI_GRAPHIC_PLOTS_GRAPHIC),p -> hwndPlotSettings,(POINT *)&rect,2);
     
-      hwndPlotSettingsGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,
-                                               "G-plotSettingsGraphic",
-                                               "",
-                                               WS_VISIBLE | WS_CHILD,
-                                               rect.left,rect.top,rect.right - rect.left,rect.bottom - rect.top,
-                                               p -> hwndPlotSettings,NULL,hModule,(void *)p);
+      hwndPlotSettingsGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_VISIBLE | WS_CHILD,
+                                                         rect.left,rect.top,rect.right - rect.left,rect.bottom - rect.top,p -> hwndPlotSettings,NULL,hModule,(void *)p);
+
       }
       return LRESULT(FALSE);
  
    case WM_PAINT: {
       PAINTSTRUCT ps;
       BeginPaint(hwnd,&ps);
+      HWND hwndOldTarget = p -> pIOpenGLImplementation -> TargetHWND();
       p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_GRAPHIC));
       p -> stubDraw();
-      p -> pIOpenGLImplementation -> ResetTargetWindow();
+      p -> pIOpenGLImplementation -> SetTargetWindow(hwndOldTarget);
       EndPaint(hwnd,&ps);
       }
       break;

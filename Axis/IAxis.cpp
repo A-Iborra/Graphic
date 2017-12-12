@@ -565,7 +565,7 @@
 
    HRESULT Axis::Initialize(HWND ho,char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
                               IGProperty* pPlotSubType,IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropOpenGLText,
-                              IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev) {
+                              IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *),void *pChangedArg) {
 
    hwndOwner = ho;
    type = axisType;
@@ -573,6 +573,10 @@
    pXAxis = pX;
    pYAxis = pY;
    pZAxis = pZ;
+
+   pWhenChangedCallback = pChangedCallback;
+
+   pWhenChangedCallbackArg = pChangedArg;
 
    pParentPropertyPlotView = pPlotView;
 
@@ -601,7 +605,7 @@
    CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
  
    pIPlot -> Initialize(pIDataSetDomain,pIOpenGLImplementation,pIEvaluator,propertyLineColor,propertyLineWeight,pParentPropertyPlotView,propertyPlotType,
-                           NULL,NULL,NULL,NULL,NULL,pPropFloor,pPropCeiling,NULL,NULL,NULL,NULL,NULL);
+                           NULL,NULL,NULL,NULL,NULL,pPropFloor,pPropCeiling,NULL,NULL,NULL,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
  
    pIPlot -> put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
 
@@ -609,13 +613,13 @@
 
    pIPlot -> put_OverrideOwnerPlotType(FALSE);
 
-   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL);
+   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
 
    initWindows();
  
    InitNew();
 
-   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL);
+   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
 
    switch ( axisType ) {
    case 'X':

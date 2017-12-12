@@ -23,14 +23,18 @@
  
  
    HRESULT Plot::MenuRequest() {
+
    POINT ptlMouse;
+
    GetCursorPos(&ptlMouse);
-   if ( ! pIPlotNotify ) {
+
+   if ( ! pIPlotNotify )
       EnableMenuItem(hMenu,IDMI_PLOT_DELETE,MF_BYCOMMAND | MF_GRAYED);
-   } else {
+   else
       EnableMenuItem(hMenu,IDMI_PLOT_DELETE,MF_BYCOMMAND | MF_ENABLED);
-   }
+
    TrackPopupMenu(hMenu,TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptlMouse.x,ptlMouse.y,0,hwndObjectWindow,NULL);
+
    return 1;
    }
  

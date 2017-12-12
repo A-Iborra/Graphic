@@ -89,7 +89,7 @@
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <PreprocessorDefinitions>_DEBUG;N_FUNCTION_SAMPLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
       <RedirectOutputAndErrors>NUL</RedirectOutputAndErrors>
       <DefaultCharType>Ascii</DefaultCharType>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -255,6 +255,7 @@
   <ItemGroup>
     <ClInclude Include="..\h\UTILS.H" />
     <ClInclude Include="..\h\VList.h" />
+    <ClInclude Include="..\include\Graphic_resource.h" />
     <ClInclude Include="ConnectedEvaluator.h" />
     <ClInclude Include="Function.h" />
     <ClInclude Include="IGSFunctioNaterEvents.h" />

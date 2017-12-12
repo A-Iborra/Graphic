@@ -84,7 +84,7 @@
  
       STDMETHOD(setViewPort)(int*);
 
-      STDMETHOD(getPickBoxHits)(POINT *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
+      STDMETHOD(getPickBoxHits)(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
 
    private:
  
@@ -166,6 +166,8 @@
 
       STDMETHOD(SetBaseWindow)(HWND);
       STDMETHOD(SetTargetWindow)(HWND hwnd);
+      //HDC __stdcall TargetDC();
+      HWND __stdcall TargetHWND();
       STDMETHOD(ResetTargetWindow)();
       STDMETHOD(PrintSetup());
       STDMETHOD(PrintFinish());
@@ -270,7 +272,7 @@
       STDMETHOD(Normal3dv)(double *normal);
  
 // Selection ? 
-      STDMETHOD(GetPickBoxHits)(POINT *,long,unsigned int *,long,long *,unsigned int *);
+      STDMETHOD(GetPickBoxHits)(POINTL *,long,unsigned int *,long,long *,unsigned int *);
  
 // Segments ? 
       STDMETHOD(OpenSegment)(long segmentID,IGProperty* pPropColor,IGProperty* pPropLineWeight);
@@ -580,7 +582,7 @@
 #define WM_OPENGLIMPLEMENTATION_ENDSOLID                 WM_USER + 75
 
    struct strCall_GetPickBoxHits {
-      POINT *ptl;
+      POINTL *ptl;
       long pickWindowSize;
       unsigned int *hitTable;
       long hitTableSize;

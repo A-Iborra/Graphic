@@ -112,28 +112,40 @@
  
  
    STDMETHODIMP Function::GetExtent(DWORD dwDrawAspect,SIZEL *pSizel) {
+
    if ( ! ( dwDrawAspect & DVASPECT_CONTENT) )
       return E_NOTIMPL;
-   if ( resultingHeight ) containerSize.cy = resultingHeight;
-   if ( containerSize.cx <= 0 ) containerSize.cx = CONTAINERSIZE_CX;
+
+   resize(containerSize.cy);
+
+   if ( resultingHeight ) 
+      containerSize.cy = resultingHeight;
+
+   if ( containerSize.cx <= 0 ) 
+      containerSize.cx = CONTAINERSIZE_CX;
+
    memcpy(pSizel,&containerSize,sizeof(SIZEL));
    pixelsToHiMetric(pSizel,pSizel);
    return S_OK;
    }
  
  
-   STDMETHODIMP Function::DoVerb(LONG iVerb,LPMSG,IOleClientSite *ipc,LONG,HWND hwndParent,LPCRECT lprcPosRect) {
+   STDMETHODIMP Function::DoVerb(LONG iVerb,LPMSG,IOleClientSite *ipc,LONG,HWND hwndParent,LPCRECT prc) {
    switch ( iVerb ) {
    case OLEIVERB_PROPERTIES: {
       IUnknown* pIUnknown;
       QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-      iProperties -> EditProperties(hwndParent,L"Function",pIUnknown);
+      iProperties -> ShowProperties(hwndParent,pIUnknown);
       pIUnknown -> Release();
       }
       break;
    case OLEIVERB_SHOW:
-      if ( ! hwndSpecDialog ) initWindows();
-      ShowWindow(hwndSpecDialog,SW_SHOW);
+      if ( ! hwndSpecDialog ) 
+         initWindows();
+      if ( ! anyVisible() )
+         return S_OK;
+      SetObjectRects(prc,NULL);
+      SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
       break;
    case OLEIVERB_HIDE:
       ShowWindow(hwndSpecDialog,SW_HIDE);
@@ -141,16 +153,8 @@
    case OLEIVERB_UIACTIVATE:
       return E_NOTIMPL;
    case OLEIVERB_INPLACEACTIVATE:
-/*
-      if ( ! anyVisible() ) {
-         containerSize.cy = 0;
-         ShowWindow(hwndParent,SW_HIDE);
-         ShowWindow(hwndSpecDialog,SW_HIDE);
-         pAdviseSink -> OnViewChange(DVASPECT_CONTENT,-1);
-      } else {
-*/
-         SetObjectRects(lprcPosRect,NULL);
-//      }
+      SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
+      SetObjectRects(prc,NULL);
       pIOleInPlaceSite -> OnInPlaceActivate();
       break;
    default:

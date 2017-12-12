@@ -16,6 +16,9 @@
 
 
   STDMETHODIMP Text::SetClientSite(IOleClientSite *pcs) {
+
+Beep(2000,100);
+
   Text *p = static_cast<Text *>(this);
 
   if ( !pcs ) return E_INVALIDARG;
@@ -30,7 +33,9 @@
   p -> pIOleClientSite -> QueryInterface(IID_IDispatch,(void **)&p -> pAmbientDispatch);
   p -> pIOleClientSite -> QueryInterface(IID_IOleInPlaceSite,(void **)&p -> pIOleInPlaceSite);
 
-  pIOleInPlaceSite -> GetWindow(&p -> hwndOwner);
+   HWND hwndParent;
+
+  pIOleInPlaceSite -> GetWindow(&hwndParent);
 
   return S_OK;
   }

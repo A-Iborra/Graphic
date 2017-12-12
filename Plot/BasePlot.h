@@ -87,6 +87,9 @@
      IDataSet* pIDataSet;
      IDataSet* pIDataSetDomain;
 
+     void (__stdcall *pWhenChangedCallback)(void *);
+     void *pWhenChangedCallbackArg;
+
      PlotViews plotView;
      long plotType;
      USHORT externalDataSet,eraseMode;

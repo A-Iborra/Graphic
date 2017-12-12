@@ -23,6 +23,7 @@
    G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch ( msg ) {
+
    case WM_INITDIALOG: {
 
       PROPSHEETPAGE *pPage = reinterpret_cast<PROPSHEETPAGE *>(lParam);
@@ -69,6 +70,11 @@
          SendDlgItemMessage(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
       }
 
+      if ( p -> isRunning )
+         ShowWindow(GetDlgItem(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS),SW_HIDE);
+      else
+         p -> propertyAllowUserFunctionControlVisibilityAccess -> setWindowItemChecked(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS);
+
       }
       return LRESULT(FALSE);
  
@@ -91,7 +97,7 @@
       case IDDI_GRAPHIC_FUNCTIONS_ADD: {
          IGSFunctioNater* pFunction;
          IUnknown* pIUnknown;
-         pFunction = p -> newFunction();
+         pFunction = p -> newFunction(true);
          pFunction -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> pIGProperties -> ShowProperties(p -> hwndOwner,pIUnknown);
          pIUnknown -> Release();
@@ -155,7 +161,7 @@
                IGSFunctioNater* pf = reinterpret_cast<IGSFunctioNater*>(lvItem.lParam);
                IUnknown* pIUnknown;
                pf -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-               p -> pIGProperties -> ShowProperties(p -> hwndOwner,pIUnknown);
+               p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
                lvItem.mask = LVIF_TEXT;
                lvItem.pszText = szTemp;
                bstr = SysAllocStringLen(NULL,MAX_PROPERTY_SIZE);
@@ -216,6 +222,10 @@
             }
          }
          }   
+         break;
+
+      case IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS:
+         p -> propertyAllowUserFunctionControlVisibilityAccess -> getWindowItemChecked(hwnd,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS);
          break;
 
       case IDDI_GRAPHIC_FUNCTIONS_LIST:

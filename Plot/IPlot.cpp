@@ -31,7 +31,7 @@
                                  IGProperty **ppAmbientLight,
                                  IGProperty **ppDiffuseLight,
                                  IGProperty **ppSpecularLight,
-                                 IGProperty **ppLightPos) {
+                                 IGProperty **ppLightPos,void (__stdcall *pCallback)(void *),void *pCallbarkArg) {
  
    if ( pPropColor ) {
       if ( propertyLineColor ) {
@@ -49,6 +49,13 @@
       }
       propertyLineWeight = pPropLineWeight;
    }
+
+   pWhenChangedCallback = pCallback;
+   pWhenChangedCallbackArg = pCallbarkArg;
+
+   BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentFloor,parentCeiling);
+
+   InitNew();
 
    pOwnerPropertyPlotView = parentPlotView;
    if ( ! pOwnerPropertyPlotView )
@@ -71,11 +78,9 @@
    pOwnerPropertiesSpecularLight = ppSpecularLight;
    pOwnerPropertiesLightPosition = ppLightPos;
 
-   BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentFloor,parentCeiling);
-
    put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
  
-   InitNew();
+   //InitNew();
  
    return S_OK;
    }
@@ -300,8 +305,10 @@
    STDMETHODIMP Plot::EditProperties() {
    IUnknown *pUnknown;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pUnknown));
-   pIProperties -> EditProperties(NULL,L"Plot",pUnknown);
+   pIProperties -> ShowProperties(NULL,pUnknown);
    pUnknown -> Release();
+   if ( pWhenChangedCallback )
+      pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
 
@@ -314,5 +321,3 @@
    pIGSystemStatusBar = p;
    return S_OK;
    }
-
-

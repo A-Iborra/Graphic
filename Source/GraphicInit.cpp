@@ -87,7 +87,9 @@
       defaultStatusBarHandler = (WNDPROC)SetWindowLong(hwndStatusBar,GWL_WNDPROC,(long)statusBarHandler);
 
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDNOTEBOOK_GRAPHIC_DATASOURCES),RT_DIALOG));
+
    hwndDataSourcesDialog = CreateDialogIndirectParam(hModule,dt,hwndFrame,(DLGPROC)dataSourcesHandler,(LPARAM)this);
+
    SetWindowLong(hwndDataSourcesDialog,GWL_STYLE,(GetWindowLong(hwndDataSourcesDialog,GWL_STYLE) & ~ WS_CAPTION) & ~ WS_VISIBLE);
 
    hwndDataSourcesTab = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_TAB);
@@ -107,7 +109,7 @@
    IGSFunctioNater* pIFunction = (IGSFunctioNater*)NULL;
 
    while ( pIFunction = cachedFunctionList.GetFirst() ) {
-      connectFunction(pIFunction);
+      connectFunction(pIFunction,false,false);
       pIFunction -> put_ShowVariables(TRUE);
       pIFunction -> put_ShowExpression(TRUE);
       pIFunction -> put_ShowControls(TRUE);
@@ -127,12 +129,6 @@
 
    pIOpenGLImplementation -> SetBaseWindow(hwndGraphic);
 
-#if 0
-   xaxis -> put_ParentWindow(hwndGraphic);
-   yaxis -> put_ParentWindow(hwndGraphic);
-   zaxis -> put_ParentWindow(hwndGraphic);
-#endif
-
    long plotView = 0L;
    propertyPlotView -> get_longValue(&plotView);
    if ( zaxis && gcPlotView2D == plotView ) {
@@ -140,9 +136,6 @@
       zaxis -> get_DataSet(&pIDataSet);
       pIDataSetMaster -> RemoveIncludedDomain(pIDataSet);
    }
-
-   if ( pIViewSet )
-      pIViewSet -> put_ParentWindow(hwndGraphic);
 
    pIOpenGLImplementation -> SetViewProperties(
       propertyPlotView,
@@ -156,9 +149,12 @@
       propertyPlotMarginUnits,
       propertyPlotMarginsStretchAll);
 
-   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator);
-   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator);
-   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator);
+   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
+   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
+   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
 
    pIViewSet -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,
                               propertyPlotView,

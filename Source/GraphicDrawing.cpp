@@ -123,7 +123,7 @@
    while ( ax = p -> axisList.GetNext(ax) )
       ax -> Draw();
 
-   if ( p -> plotList.Count() > 0 ) {
+   if ( 0 < p -> plotList.Count() ) {
       IPlot** pIPlots = reinterpret_cast<IPlot **>(CoTaskMemAlloc(p -> plotList.Count() * sizeof(IPlot*)));
       int n = p -> plotList.Count();
       for ( int k = 0; k < n; k++ )
@@ -212,7 +212,7 @@
    int G::erase() {
    if ( pIOpenGLImplementation ) {
       pIOpenGLImplementation -> Erase(propertyBackgroundColor);
-      pIOpenGLImplementation -> Flush();
+      //pIOpenGLImplementation -> Flush();
    }
    eraseBackground();
    eraseGraphicCursor();

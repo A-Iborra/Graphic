@@ -52,7 +52,6 @@
        pIGSystemStatusBar(0),
        pITextNotify(0),
 
-       hwndOwner(0),
        hwndFrame(0),
        hwndSample(0),
        hwndStyle(0),
@@ -61,6 +60,9 @@
 
        hMainMenu(0),
        hMenu(0),
+
+       pWhenChangedCallback(NULL),
+       pWhenChangedCallbackArg(NULL),
 
        hFont(0),
        hOriginalFont(0),

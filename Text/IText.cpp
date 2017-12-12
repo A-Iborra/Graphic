@@ -55,7 +55,7 @@
 
 
    HRESULT Text::Initialize(HWND ho,IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
-                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition) {
+                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,void (__stdcall *pWhenChanged)(void *),void *pWhenChangedArg) {
  
    hwndOwner = ho;
 
@@ -67,7 +67,10 @@
 
    if ( pIDataSetWorld ) 
       pIDataSetWorld -> AddRef();
- 
+
+   pWhenChangedCallback = pWhenChanged;
+   pWhenChangedCallbackArg = pWhenChangedArg;
+
    if ( pPropRenderUsingOpenGL ) {
       short v;
       pPropRenderUsingOpenGL -> get_boolValue(&v);
@@ -823,8 +826,10 @@
    STDMETHODIMP Text::EditProperties() {
    IUnknown *pUnknown;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pUnknown));
-   pIProperties -> EditProperties(NULL,L"Text",pUnknown);
+   pIProperties -> ShowProperties(NULL,pUnknown);
    pUnknown -> Release();
+   if ( pWhenChangedCallback )
+      pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
 

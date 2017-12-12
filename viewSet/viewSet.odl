@@ -46,10 +46,10 @@ library ViewSet {
                   IAxis* pIAxis_Y,
                   IAxis* pIAxis_Z);
 
-      [propput,helpstring("")] HRESULT ParentWindow([in]HWND hwndParent);
+     // [propput,helpstring("")] HRESULT ParentWindow([in]HWND hwndParent);
 
-      [helpstring("Call to activate the settings page")]
-      HRESULT Properties();
+      [helpstring("Call to activate the view settings page")]
+      HRESULT Properties([in] void (*pWhenDoneCallback)(void *),[in] void *pArg);
 
    };
 

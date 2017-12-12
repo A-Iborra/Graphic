@@ -41,6 +41,7 @@
    zMin = DBL_MAX;
    pBoundingBox = new boundingBox(&xMin,&yMin,&zMin,&xMax,&yMax,&zMax);
    currentColor[0] = currentColor[1] = currentColor[2] = 0.0;
+   memset(szEquations,0,sizeof(szEquations));
    return;
    }
  
@@ -79,7 +80,7 @@
    zMin = (d.z < zMin) ? d.z : zMin;
 
 #if 1
-   char szNumber[6][32];
+   char szNumber[6][64];
 
    if ( -DBL_MAX == xMin || DBL_MAX == xMin/* || fabs(xMin - DBL_MAX) > 10.0 */)
       sprintf(szNumber[0],"INF");

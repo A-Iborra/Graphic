@@ -180,6 +180,9 @@
     <ClCompile Include="Source\IPropertyPageClient.cpp">
       <Filter>Source Files\COM Interface Files\Properties COM Interface Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\graphicCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphic.def">

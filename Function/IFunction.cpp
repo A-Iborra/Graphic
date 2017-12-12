@@ -122,7 +122,8 @@
    return S_OK;
    }
    HRESULT Function::get_AllowControlVisibilitySettings(VARIANT_BOOL* pbAllowControlVisibilitySettings) {
-   if ( ! pbAllowControlVisibilitySettings ) return E_POINTER;
+   if ( ! pbAllowControlVisibilitySettings ) 
+      return E_POINTER;
    *pbAllowControlVisibilitySettings = allowUserPropertiesControls;
    return S_OK;
    }
@@ -514,7 +515,34 @@
    STDMETHODIMP Function::EditProperties() {
    IUnknown *pUnknown;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pUnknown));
-   iProperties -> EditProperties(NULL,L"Function",pUnknown);
+   iProperties -> ShowProperties(NULL,pUnknown);
    pUnknown -> Release();
+   if ( pWhenChangedCallback )
+      pWhenChangedCallback(pWhenChangedCallbackArg);
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::put_IPlot(void *pvIPlot) {
+   pIPlot = (IPlot *)pvIPlot;
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::get_IPlot(void **ppvIPlot) {
+   if ( ! ppvIPlot )
+      return E_POINTER;
+   *ppvIPlot = (void *)pIPlot;
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::put_OnChangeCallback(void (__stdcall *pCallback)(void *),void *pArg) {
+   pWhenChangedCallback = pCallback;
+   pWhenChangedCallbackArg = pArg;
+   return S_OK;
+   }
+
+   HRESULT Function::get_AnyControlVisible(VARIANT_BOOL* pbAnyVisible) {
+   if ( ! pbAnyVisible )
+      return E_POINTER;
+   *pbAnyVisible = anyVisible() ? TRUE : FALSE;
    return S_OK;
    }

@@ -6,6 +6,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <stdio.h>
 
 #include "Graphic_resource.h"
 #include "utils.h"
@@ -14,6 +15,14 @@
    LRESULT CALLBACK G::graphicHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
+   bool isOpenGLActive = true;
+
+   if ( WM_MOUSEFIRST <= msg && msg <= WM_MOUSELAST ) {
+      HWND hwndCurrent = p -> pIOpenGLImplementation -> TargetHWND();
+      if ( ! ( hwnd == hwndCurrent ) )
+         isOpenGLActive = false;
+   }
  
    switch (msg) {
  
@@ -26,6 +35,8 @@
  
 
    case WM_MOUSELEAVE:
+      if ( ! isOpenGLActive )
+         break;
       p -> eraseGraphicCursor();
       if ( ! ( -1L == p -> ptlZoomFloat.x ) ) {
          HDC hdc;
@@ -36,6 +47,9 @@
 
 
    case WM_MOUSEMOVE: {
+
+      if ( ! isOpenGLActive )
+         break;
 
       TRACKMOUSEEVENT tme = {0};
       tme.cbSize = sizeof(TRACKMOUSEEVENT);
@@ -87,7 +101,6 @@
 
       } else {
  
-         POINT pts = {LOWORD(lParam),HIWORD(lParam)};
          POINTL ptl = {LOWORD(lParam),HIWORD(lParam)};
 
          DataPoint dp[2];
@@ -99,7 +112,7 @@
 
          p -> hitTableHits = 0;
 
-         p -> drawGraphicCursor(&ptl,p -> doPickBox(&pts));
+         p -> drawGraphicCursor(&ptl,p -> doPickBox(&ptl));
  
       }
       }
@@ -108,13 +121,18 @@
  
 
    case WM_RBUTTONDOWN: {
-      POINT ptl = {LOWORD(lParam),HIWORD(lParam)};
+      if ( ! isOpenGLActive )
+         break;
+      POINTL ptl = {LOWORD(lParam),HIWORD(lParam)};
       p -> eraseGraphicCursor();
       p -> rightMouseClickPosition = ptl;
       if ( ! p -> pick(&ptl,processMenus,FALSE) ) {
          p -> ptlMouseBeforeMenu.x = ptl.x;
          p -> ptlMouseBeforeMenu.y = ptl.y;
-         ClientToScreen(hwnd,&ptl);
+         POINT pt{ptl.x,ptl.y};
+         ClientToScreen(hwnd,&pt);
+         ptl.x = pt.x;
+         ptl.y = pt.y;
          TrackPopupMenu(p -> hwndMenuPlot(),TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptl.x,ptl.y,0,hwnd,NULL);
       }
       }
@@ -123,7 +141,10 @@
  
    case WM_LBUTTONDOWN: {
 
-      POINT ptl = {LOWORD(lParam),HIWORD(lParam)};
+      if ( ! isOpenGLActive )
+         break;
+
+      POINTL ptl = {LOWORD(lParam),HIWORD(lParam)};
  
       p -> eraseGraphicCursor();
 
@@ -141,6 +162,9 @@
  
    case WM_LBUTTONUP:
  
+      if ( ! isOpenGLActive )
+         break;
+
       p -> eraseGraphicCursor();
 
       if ( p -> pSelectedGraphicSegmentAction ) {
@@ -324,26 +348,25 @@
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_VIEW_SET:
-         p -> pIViewSet -> Properties();
+         p -> pIViewSet -> Properties(G::someObjectChanged,(void *)p);
          return LRESULT(TRUE);
 
-/* 
-      case IDMI_GRAPHIC_SUB_STYLE_SURFACE:
+      case IDDI_GRAPHIC_SUB_STYLE_SURFACE:
          p -> put_PlotType(gcPlotTypeSurface);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMENU_GRAPHIC_STYLE_3D,lParam);
+         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
  
-      case IDMI_GRAPHIC_SUB_STYLE_WIREFRAME:
+      case IDDI_GRAPHIC_SUB_STYLE_WIREFRAME:
          p -> put_PlotType(gcPlotTypeWireFrame);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMENU_GRAPHIC_STYLE_3D,lParam);
+         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
  
-      case IDMI_GRAPHIC_SUB_STYLE_NATURAL:
+      case IDDI_GRAPHIC_SUB_STYLE_NATURAL:
          p -> put_PlotType(gcPlotTypeNatural);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMENU_GRAPHIC_STYLE_3D,lParam);
+         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
  
-      case IDMI_GRAPHIC_SUB_STYLE_STACKS:
+      case IDDI_GRAPHIC_SUB_STYLE_STACKS:
          p -> put_PlotType(gcPlotTypeStacks);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMENU_GRAPHIC_STYLE_3D,lParam);
-*/ 
+         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
+
       case IDMI_GRAPHIC_ZOOM_FULL: {
  
 /*
@@ -363,6 +386,9 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
          p -> pIGProperties -> ShowProperties(p -> hwndGraphic,pIUnknownThis);
          pIUnknownThis -> Release();
+         RECT rect;
+         GetWindowRect(p -> hwndFrame,&rect);
+         graphicFrameHandler(p -> hwndFrame,WM_SIZE,0L,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
          }
          return LRESULT(TRUE);
  
@@ -415,38 +441,106 @@
  
    case WM_SIZE: {
 
-      if ( ! p ) break;
+      if ( ! p )
+         break;
 
       long x = 0,y = 0,cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
+
       long cxDataSourcesAdjust = 0;
 
       if ( cx == 0 || cy == 0 ) break;
  
-      if ( p -> showFunctions && p -> containedFunctionList.Count() > 0 ) {
+      if ( p -> showFunctions && 0 < p -> functionList.Count() ) {
 
-         SIZEL sizeFunction;
+         bool anyFunctionVisible = false;
+ 
+         SIZEL sizeFunction{0,0};
 
          IOleObject* pIOleObject_Function;
-         p -> functionList.GetByIndex(0) -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject_Function));
-         pIOleObject_Function -> GetExtent(DVASPECT_CONTENT,&sizeFunction);
-         pIOleObject_Function -> Release();
+         IGSFunctioNater *pIFunction = NULL;
 
-         hiMetricToPixel(&sizeFunction,&sizeFunction);
-         cxDataSourcesAdjust = sizeFunction.cx + 52;
-         cx -= cxDataSourcesAdjust;
-         x += sizeFunction.cx + 52;
+         while ( pIFunction = p -> functionList.GetNext(pIFunction) ) {
 
-         if ( p -> showStatusBar ) {
-            RECT rectStatusBar;
-            GetWindowRect(p -> hwndStatusBar,&rectStatusBar);
-            SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy - (rectStatusBar.bottom - rectStatusBar.top),SWP_SHOWWINDOW);
+            char szFunction[32];
+            char szTabText[32];
+
+            sprintf(szFunction,"F%d",p -> functionList.IndexOf(pIFunction) + 1);
+
+            TC_ITEM tie{0};
+
+            long countTabs = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L);
+
+            tie.mask = TCIF_TEXT;
+            tie.cchTextMax = 32;
+            tie.pszText = szTabText;
+            
+            long tabIndex = -1L;
+
+            for ( long k = 0; k < countTabs; k++ ) {
+               SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEM,k,(LPARAM)&tie);
+               if ( 0 == strcmp(tie.pszText,szFunction) ) {
+                  tabIndex = k;
+                  break;
+               }
+            }
+
+            VARIANT_BOOL isAnyControlVisible;
+
+            pIFunction -> get_AnyControlVisible(&isAnyControlVisible);
+
+            if ( ! isAnyControlVisible ) {
+               if ( ! ( -1L == tabIndex ) ) {
+                  SendMessage(p -> hwndDataSourcesFunctions,TCM_SETCURSEL,max(0,tabIndex - 1L),0L);
+                  SendMessage(p -> hwndDataSourcesFunctions,TCM_DELETEITEM,(WPARAM)tabIndex,0L);
+               }
+               continue;
+            }
+
+            anyFunctionVisible = true;
+
+            SIZEL sizeThisFunction{0,0};
+
+            pIFunction -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject_Function));
+
+            pIOleObject_Function -> GetExtent(DVASPECT_CONTENT,&sizeThisFunction);
+
+            if ( sizeFunction.cx < sizeThisFunction.cx )
+               sizeFunction.cx = sizeThisFunction.cx;
+
+            if ( sizeFunction.cy < sizeThisFunction.cy )
+               sizeFunction.cy = sizeThisFunction.cy;
+
+            pIOleObject_Function -> Release();
+
+            if ( -1 == tabIndex )
+               p -> connectFunction(pIFunction,false,true);
+
+         }
+
+         if ( anyFunctionVisible ) {
+
+            hiMetricToPixel(&sizeFunction,&sizeFunction);
+            cxDataSourcesAdjust = sizeFunction.cx + 52;
+            cx -= cxDataSourcesAdjust;
+            x += sizeFunction.cx + 52;
+
+            if ( p -> showStatusBar ) {
+               RECT rectStatusBar;
+               GetWindowRect(p -> hwndStatusBar,&rectStatusBar);
+               SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy - (rectStatusBar.bottom - rectStatusBar.top),SWP_SHOWWINDOW);
+            } else
+               SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy,SWP_SHOWWINDOW);
+
+            ContainedFunction *pf = (ContainedFunction *)NULL;
+            while ( pf = p -> containedFunctionList.GetNext(pf) ) 
+               pf -> ReSize();
+
          } else
-            SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy,SWP_SHOWWINDOW);
-         ContainedFunction *pf = (ContainedFunction *)NULL;
-         while ( pf = p -> containedFunctionList.GetNext(pf) ) 
-            pf -> ReSize();
-      }
-      else 
+
+            ShowWindow(p -> hwndDataSourcesDialog,SW_HIDE);
+
+      } else 
+
          ShowWindow(p -> hwndDataSourcesDialog,SW_HIDE);
  
       if ( p -> showStatusBar ) {

@@ -84,13 +84,23 @@
       }
       p -> plotWindow = NULL; // <-- this is set so that the constructor for the new plotWindow won't try to copy from this object's data.
       p -> plotWindow = new PlotWindow(p -> hwndBase,p,p -> pIEvaluator);
-      p -> plotWindowList.insert(p -> plotWindowList.end(),p -> plotWindow);//Add(p -> plotWindow,NULL,reinterpret_cast<long>(p -> hwndBase));
+      p -> plotWindowList.push_back(p -> plotWindow);//Add(p -> plotWindow,NULL,reinterpret_cast<long>(p -> hwndBase));
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_SETTARGETWINDOW: {
       p -> plotWindow -> saveState();
       HWND hwndNew = (HWND)wParam;
+      std::list<PlotWindow *> toDelete;
+      for ( PlotWindow *pw : p -> plotWindowList ) {
+         if ( IsWindow(pw -> hwnd) )
+            continue;
+         toDelete.push_back(pw);
+      }
+      for ( PlotWindow *pw : toDelete ) {
+         p -> plotWindowList.remove(pw);
+         delete pw;
+      }
       PlotWindow* pwTemp = NULL;
       for ( PlotWindow *pw : p -> plotWindowList ) {
          if ( pw -> hwnd == hwndNew ) {
@@ -103,10 +113,22 @@
          p -> plotWindowList.push_back(pwTemp);
       }
       p -> plotWindow = pwTemp;
+      p -> plotWindow -> restoreState();
+      wglMakeCurrent(p -> plotWindow -> deviceContext,p -> plotWindow -> renderingContext);
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_RESETTARGETWINDOW: {
+      std::list<PlotWindow *> toDelete;
+      for ( PlotWindow *pw : p -> plotWindowList ) {
+         if ( IsWindow(pw -> hwnd) )
+            continue;
+         toDelete.push_back(pw);
+      }
+      for ( PlotWindow *pw : toDelete ) {
+         p -> plotWindowList.remove(pw);
+         delete pw;
+      }
       PlotWindow *pwTemp = NULL;
       if ( p -> plotWindowList.size() ) {
          pwTemp = p -> plotWindowList.back();
@@ -157,11 +179,7 @@
 
    case WM_OPENGLIMPLEMENTATION_SETLIGHTING: {
       strCall_SetLighting *ps = reinterpret_cast<strCall_SetLighting*>(wParam);
-      p -> plotWindow -> setLighting(ps -> pPropLightEnabled,
-                           ps -> pPropAmbientLight,
-                           ps -> pPropDiffuseLight,
-                           ps -> pPropSpecularLight,
-                           ps -> pPropLightPos,ps -> pPropCountLights,ps -> pPropShinyness);
+      p -> plotWindow -> setLighting(ps -> pPropLightEnabled,ps -> pPropAmbientLight,ps -> pPropDiffuseLight,ps -> pPropSpecularLight,ps -> pPropLightPos,ps -> pPropCountLights,ps -> pPropShinyness);
       delete ps;
       }
       break;
@@ -232,19 +250,17 @@
       pm -> extentsYMax = p -> plotWindow -> extentsYMax;
       pm -> extentsZMax = p -> plotWindow -> extentsZMax;
 
-      p -> matrixList.insert(p -> matrixList.end(),pm);
+      p -> matrixList.push_back(pm);
 
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_POP: {
 
-      transformationMatrixes* pm = NULL;
-
       if ( ! p -> matrixList.size() ) 
          break;
 
-      pm = p -> matrixList.back();
+      transformationMatrixes* pm = p -> matrixList.back();
 
       p -> matrixList.remove(pm);
 
@@ -281,7 +297,8 @@
       break;
 
    case WM_OPENGLIMPLEMENTATION_FLUSH:
-      glFlush();
+      //glFlush();
+      glFinish();
       break;
 
    case WM_OPENGLIMPLEMENTATION_NEWLINE: {
@@ -645,19 +662,13 @@ MessageBox(NULL,ex.what(),"",MB_OK);
     
       case UNIT_PERCENT: {
     
-// //      double modelMatrix[16],projectionMatrix[16];
          double win0x,win0y,win0z;
          double win1x,win1y,win1z;
-// //      int viewport[4];
     
          ps -> pdpTarget -> x = p -> plotWindow -> extentsXMin + (p -> plotWindow -> extentsXMax - p -> plotWindow -> extentsXMin)*ps -> dpSource.x/100.0;
          ps -> pdpTarget -> y = p -> plotWindow -> extentsYMin + (p -> plotWindow -> extentsYMax - p -> plotWindow -> extentsYMin)*ps -> dpSource.y/100.0;
          ps -> pdpTarget -> z = p -> plotWindow -> extentsZMin + (p -> plotWindow -> extentsZMax - p -> plotWindow -> extentsZMin)*ps -> dpSource.z/100.0;
-
-// //      glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-// //      glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
-// //      glGetIntegerv(GL_VIEWPORT,viewport);
-    
+   
          gluProject(p -> plotWindow -> extentsXMin,p -> plotWindow -> extentsYMin,p -> plotWindow -> extentsZMin,p -> plotWindow -> modelMatrix,p -> plotWindow -> projectionMatrix,p -> plotWindow -> viewPort,&win0x,&win0y,&win0z);
          gluProject(ps -> pdpTarget -> x,ps -> pdpTarget -> y,ps -> pdpTarget -> z,p -> plotWindow -> modelMatrix,p -> plotWindow -> projectionMatrix,p -> plotWindow -> viewPort,&win1x,&win1y,&win1z);
     
@@ -895,6 +906,8 @@ MessageBox(NULL,ex.what(),"",MB_OK);
       long rowSize = 4 * sizeof(GLfloat) * cx;
 
       BYTE *pSwap = new BYTE[cy * rowSize];
+
+      memset(pSwap,0,cy * rowSize);
 
       glReadPixels(ps -> x1,p -> plotWindow -> windowCY - ps -> y2,cx,cy,GL_RGBA,GL_FLOAT,pSwap);
 

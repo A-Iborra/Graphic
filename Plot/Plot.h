@@ -27,7 +27,9 @@
 
 //      IPlot
 
-     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty **,IGProperty **,IGProperty **,IGProperty **,IGProperty **);
+     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,
+                           IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty **,IGProperty **,IGProperty **,IGProperty **,IGProperty **,
+                              void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
 
      STDMETHOD(PrepareForData)();
      STDMETHOD(TakeDataPoint)(DataPoint*);
@@ -154,10 +156,11 @@
      __declspec(dllexport) static HANDLE PlotData(List<Plot> *pList);
 
      static int pCount;
+
      int pID;
 
      HANDLE plotThread;
-     HWND hwndParentWindow,hwndObjectWindow,hwndSample;
+     HWND hwndParentWindow,hwndObjectWindow;
      HWND hwndDimensionSettings,hwndTypeSettings,hwndColorSettings;
      HMENU hMainMenu,hMenu;
      BSTR bstrName;
@@ -261,6 +264,8 @@
   extern char szModuleName[1024];
   extern BSTR wstrModuleName;
   extern ITypeInfo *pITypeInfo;
+
+  extern bool isSampleInUse;
 
 #define DECLARE_PLANE \
    DataPoint homePoint,firstPoint,secondPoint,thirdPoint,fourthPoint,v[4]; \

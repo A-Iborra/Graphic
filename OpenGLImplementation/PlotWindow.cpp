@@ -168,6 +168,7 @@ glGetError();
 OPENGL_ERROR_CHECK
 
    if ( tm ) {
+
       memcpy(tm -> projectionMatrix,projectionMatrix,sizeof(tm -> projectionMatrix));
       memcpy(tm -> modelMatrix,modelMatrix,sizeof(tm -> modelMatrix));
 
@@ -201,6 +202,7 @@ OPENGL_ERROR_CHECK
 glGetError();
 
    if ( tm ) {
+
       memcpy(projectionMatrix,tm -> projectionMatrix,sizeof(tm -> projectionMatrix));
       memcpy(modelMatrix,tm -> modelMatrix,sizeof(tm -> modelMatrix));
 
@@ -226,6 +228,8 @@ glGetError();
 
 
    }
+
+//glPixelStorei(GL_PACK_ALIGNMENT,1);
 
    glViewport((GLint)viewPort[0],(GLint)viewPort[1],(GLsizei)viewPort[2],(GLsizei)viewPort[3]);
 
@@ -907,7 +911,7 @@ OPENGL_ERROR_CHECK
    }
 
 
-   HRESULT PlotWindow::getPickBoxHits(POINT *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
+   HRESULT PlotWindow::getPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *pHitTable,long hitTableSize,long *pCallLists,unsigned int *pHitTableHits) {
 
    if ( lineMode || polygonMode ) return S_FALSE;
 
@@ -916,20 +920,32 @@ OPENGL_ERROR_CHECK
    x = (double)ptl -> x;
    y = (double)windowCY - (double)ptl -> y;
  
-   if ( (long)x < viewPort[0] ) return S_FALSE;
-   if ( (long)x > (viewPort[0] + viewPort[2]) ) return S_FALSE;
-   if ( (long)y < viewPort[1] ) return S_FALSE;
-   if ( (long)y > (viewPort[1] + viewPort[3]) ) return S_FALSE;
- 
-   memset(hitTable,0,hitTableSize * sizeof(unsigned int));
+   if ( ptl -> x < viewPort[0] )
+      return S_FALSE;
 
-   *hitTableHits = 0;
+   if ( ptl -> x > (viewPort[0] + viewPort[2]) )
+      return S_FALSE;
+
+   if ( (long)y < viewPort[1] )
+      return S_FALSE;
+
+   if ( (long)y > (viewPort[1] + viewPort[3]) )
+      return S_FALSE;
+
+   long plotView = (long)gcPlotView2D; 
+
+   if ( pSaved_PlotView )
+      pSaved_PlotView -> get_longValue(&plotView);
+
+   memset(pHitTable,0,hitTableSize * sizeof(unsigned int));
+
+   *pHitTableHits = 0;
  
    glMatrixMode(GL_PROJECTION);
 
    glPushMatrix();
 
-   glSelectBuffer(hitTableSize,hitTable);
+   glSelectBuffer(hitTableSize,pHitTable);
 
    glRenderMode(GL_SELECT);
  
@@ -941,15 +957,19 @@ OPENGL_ERROR_CHECK
 
    gluPickMatrix(x,y,pickWindowSize,pickWindowSize,viewPort);
 
-   glOrtho(extentsXMin,extentsXMax,extentsYMin,extentsYMax,extentsZMin,extentsZMax);
+   if ( gcPlotView3D == plotView )
+      glOrtho(-2.0,2.0,-2.0,2.0,-4.0,4.0);
+   else
+      glOrtho(extentsXMin,extentsXMax,extentsYMin,extentsYMax,extentsZMin,extentsZMax);
 
    long *pList = pCallLists;
+
    while ( *pList ) {
       glLoadName(*pList);
       glCallList(*pList++);
    }
 
-   *hitTableHits = glRenderMode(GL_RENDER);
+   *pHitTableHits = glRenderMode(GL_RENDER);
 
    glMatrixMode(GL_PROJECTION);
 

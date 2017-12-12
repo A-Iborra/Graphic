@@ -8,12 +8,6 @@
     <Filter Include="Source Files\COM Files">
       <UniqueIdentifier>{1427e49b-9765-4308-afb8-c17b028bb5b5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\COM Files\Contained Evaluator">
-      <UniqueIdentifier>{8e6143c4-57fc-431c-bcfc-35b0f4cadf66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\COM Files\Contained Evaluator\Evaluator Events">
-      <UniqueIdentifier>{c648c486-05a7-4545-bd3a-a1960b6c1437}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\COM Files\Function Events">
       <UniqueIdentifier>{865d7a64-613c-417f-836d-0a185be00135}</UniqueIdentifier>
     </Filter>
@@ -27,13 +21,19 @@
     <Filter Include="Resource Files">
       <UniqueIdentifier>{371b1269-c687-4987-9ab8-736a53e33192}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\COM Files\Connected Evaluator">
+      <UniqueIdentifier>{8e6143c4-57fc-431c-bcfc-35b0f4cadf66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\Connected Evaluator\Evaluator Events">
+      <UniqueIdentifier>{c648c486-05a7-4545-bd3a-a1960b6c1437}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IEvaluatorEvents.cpp">
-      <Filter>Source Files\COM Files\Contained Evaluator\Evaluator Events</Filter>
+      <Filter>Source Files\COM Files\Connected Evaluator\Evaluator Events</Filter>
     </ClCompile>
     <ClCompile Include="ConnectedEvaluator.cpp">
-      <Filter>Source Files\COM Files\Contained Evaluator</Filter>
+      <Filter>Source Files\COM Files\Connected Evaluator</Filter>
     </ClCompile>
     <ClCompile Include="IGSFunctioNaterEvents.cpp">
       <Filter>Source Files\COM Files\Function Events</Filter>
@@ -123,7 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConnectedEvaluator.h">
-      <Filter>Source Files\COM Files\Contained Evaluator</Filter>
+      <Filter>Source Files\COM Files\Connected Evaluator</Filter>
     </ClInclude>
     <ClInclude Include="IGSFunctioNaterEvents.h">
       <Filter>Source Files\COM Files\Function Events</Filter>
@@ -135,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\h\VList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Graphic_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

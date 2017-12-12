@@ -13,19 +13,16 @@
 #include "Function.h"
 #include "list.cpp"
 
-#ifdef FUNCTION_SAMPLE
-
-   extern bool trialExpired;
-
-#endif
-
    LRESULT EXPENTRY Function::functionDialogHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    Function *p = (Function *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
  
    switch (msg) {
-   case WM_INITDIALOG:
-      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)lParam);
+   case WM_INITDIALOG: {
+      p = (Function *)lParam;
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
+      }
       return LRESULT(1);
 
    case WM_DESTROY:
@@ -54,12 +51,7 @@
       break;
 
    case WM_PAINT: {
-//{
-//PAINTSTRUCT ps;
-//BeginPaint(hwnd,&ps);
-//EndPaint(hwnd,&ps);
-//break;
-//}
+
       if ( ! p ) break;
 
       if ( p -> currentShowingVariable ) {
@@ -172,6 +164,8 @@
          }
       }
 
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
+
       EndPaint(hwnd,&ps);
       }
       return LRESULT(TRUE);
@@ -227,12 +221,8 @@
          switch ( notifyCode ) {
          case EN_CHANGE:
             if ( ! p -> enteringData && ! p -> stopAllProcessing ) {
-               if ( p -> defineFunction() ) { 
-#ifdef FUNCTION_SAMPLE
-                  if ( ! trialExpired )
-#endif
+               if ( p -> defineFunction() ) 
                   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_START),TRUE);
-               }
             }
             return LRESULT(FALSE);
  
@@ -245,6 +235,9 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> iProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
+         p -> resize(p -> containerSize.cx);
+         if ( p -> pWhenChangedCallback )
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          break;
 
@@ -265,6 +258,12 @@
          p -> Stop();
          return LRESULT(TRUE);
 
+      case IDDI_FUNCTION_PLOT_PROPERTIES: {
+         if ( p -> pIPlot )
+            p -> pIPlot -> EditProperties();
+         }
+         return LRESULT(TRUE);
+   
       }
       }
       break;

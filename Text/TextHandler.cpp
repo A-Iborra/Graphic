@@ -36,6 +36,8 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();       
+         if ( p -> pWhenChangedCallback ) 
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          return LRESULT(TRUE);
  
@@ -46,6 +48,8 @@
             pIText -> Release();
             p -> pITextNotify -> DeleteText(pIText);
          }
+         if ( p -> pWhenChangedCallback ) 
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          return LRESULT(TRUE);
  

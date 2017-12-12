@@ -82,6 +82,14 @@ Sleep(10);
    return S_OK;
    }
  
+
+   //HDC OpenGLImplementor::TargetDC() {
+   //return GetDC(plotWindow -> hwnd);
+   //}
+ 
+   HWND OpenGLImplementor::TargetHWND() {
+   return plotWindow -> hwnd;
+   }
  
    HRESULT OpenGLImplementor::ResetTargetWindow() {
    PlotWindow *pwTemp = plotWindowList.size() ? plotWindowList.back() : NULL;//GetLast();
@@ -102,7 +110,10 @@ Sleep(10);
                                      IGProperty *pPropBottomMargin,
                                      IGProperty *pPropMarginUnits,
                                      IGProperty *pPropStretchToMargins) {
-   if ( ! plotWindow ) return E_UNEXPECTED;
+
+   if ( ! plotWindow )
+      return E_UNEXPECTED;
+
    strCall_SetViewProperties *pstr = new strCall_SetViewProperties();
    pstr -> pPropPlotView = pPropPlotView;
    pstr -> pPropRotationTheta = pPropRotationTheta;
@@ -114,7 +125,9 @@ Sleep(10);
    pstr -> pPropBottomMargin = pPropBottomMargin;
    pstr -> pPropMarginUnits = pPropMarginUnits;
    pstr -> pPropStretchToMargins = pPropStretchToMargins;
+
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETVIEWPROPERTIES,pstr)
+
    return S_OK;
    }
 
@@ -149,7 +162,8 @@ Sleep(10);
                                      IGProperty *pPropBottomMargin,
                                      IGProperty *pPropMarginUnits,
                                      IGProperty *pPropStretchToMargins) {
-   if ( ! plotWindow ) return E_UNEXPECTED;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
    strCall_Setup *pstr = new strCall_Setup();
    pstr -> masterDataSet = masterDataSet;
    pstr -> pPropPlotView = pPropPlotView;
@@ -230,15 +244,18 @@ Sleep(10);
  
  
    HRESULT OpenGLImplementor::Push() {
-   if ( ! plotWindow ) return E_UNEXPECTED;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_PUSH,0L)
    return S_OK;
    }
 
 
    HRESULT OpenGLImplementor::Pop() {
-   if ( ! plotWindow ) return E_UNEXPECTED;
-   if ( matrixList.size() < 1 ) return E_UNEXPECTED;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+   if ( 0 == matrixList.size() )
+      return E_UNEXPECTED;
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_POP,0L)
    return S_OK;
    }
@@ -334,7 +351,96 @@ Sleep(10);
  
  
    HRESULT OpenGLImplementor::Flush() {
+
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_FLUSH,0L)
+
+return S_OK;
+
+   RECT rc;
+
+   GetWindowRect(plotWindow -> hwnd,&rc);
+
+   long cx = rc.right - rc.left;
+   long cy = rc.bottom - rc.top;
+
+   long pixelCount = cx * cy;
+
+   float *pPixelsFloat = new float[4 * pixelCount];
+
+   memset(pPixelsFloat,0,4 * pixelCount * sizeof(float));
+
+   GetPixels(0,0,cx,cy,(BYTE *)pPixelsFloat);
+
+   float *pf = pPixelsFloat;
+
+   BYTE *pPixels = new BYTE[4 * pixelCount];
+
+   memset(pPixels,0,4 * pixelCount * sizeof(BYTE));
+
+   BYTE *b = pPixels;
+
+   for ( long j = 0; j < cy; j++ ) {
+      for ( long k = 0; k < cx; k++ ) {
+         b[2] = (BYTE)(255.0 * pf[0]);
+         b[1] = (BYTE)(255.0 * pf[1]);
+         b[0] = (BYTE)(255.0 * pf[2]);
+         b[3] = (BYTE)(255.0 * pf[3]);
+         pf += 4;
+         b += 4;
+      }
+   }   
+
+   BITMAP bitmap = {0};
+
+   HBITMAP hbmReference = CreateCompatibleBitmap(plotWindow -> deviceContext,cx,cy);
+
+   GetObject(hbmReference,sizeof(BITMAP),&bitmap);
+
+   DeleteObject(hbmReference);
+
+   BITMAPINFO bitmapInfo = {0};
+
+   bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+
+   bitmapInfo.bmiHeader.biBitCount = bitmap.bmBitsPixel;
+   bitmapInfo.bmiHeader.biHeight = -bitmap.bmHeight;
+   bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
+   bitmapInfo.bmiHeader.biPlanes = 1;
+   bitmapInfo.bmiHeader.biCompression = BI_RGB;
+   bitmapInfo.bmiHeader.biSizeImage = -bitmap.bmHeight * ((bitmap.bmWidth * bitmap.bmPlanes * bitmap.bmBitsPixel + 31) & ~31) / 8;
+
+   BITMAPV5HEADER bmV5 = {0};
+
+   bmV5.bV5Size = sizeof(BITMAPV5HEADER);
+   bmV5.bV5BitCount = bitmap.bmBitsPixel;
+   bmV5.bV5Compression = BI_RGB;
+   bmV5.bV5Planes = 1;
+   bmV5.bV5Height = -bitmap.bmHeight;
+   bmV5.bV5Width = bitmap.bmWidth;
+   bmV5.bV5SizeImage = -bitmap.bmHeight * ((bitmap.bmWidth * bitmap.bmPlanes * bitmap.bmBitsPixel + 31) & ~31) / 8;
+
+   HDC hdcReference = GetDC(HWND_DESKTOP);
+
+   HBITMAP hbmOpenGL = CreateDIBitmap(hdcReference,(BITMAPINFOHEADER *)&bmV5,CBM_INIT,pPixels,&bitmapInfo,DIB_RGB_COLORS);
+
+   ReleaseDC(HWND_DESKTOP,hdcReference);
+
+   HDC hdcOpenGL = CreateCompatibleDC(plotWindow -> deviceContext);
+
+   HGDIOBJ oldBitmap = SelectObject(hdcOpenGL,hbmOpenGL);
+
+   BitBlt(plotWindow -> deviceContext,0,0,cx,cy,hdcOpenGL,0,0,SRCAND);
+
+   SelectObject(hdcOpenGL,oldBitmap);
+
+   delete [] pPixelsFloat;
+
+   delete [] pPixels;
+
+   DeleteDC(hdcOpenGL);
+
+   DeleteObject(hbmOpenGL);
+
    return S_OK;
    }
  
@@ -714,7 +820,7 @@ Sleep(10);
    }
 
 
-   HRESULT OpenGLImplementor::GetPickBoxHits(POINT *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
+   HRESULT OpenGLImplementor::GetPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
    strCall_GetPickBoxHits *ps = new strCall_GetPickBoxHits();
    ps -> ptl = ptl;
    ps -> pickWindowSize = pickWindowSize;

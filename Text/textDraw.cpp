@@ -773,7 +773,7 @@ dxScale = 1.0;
 
    pIDataSet -> Release();
 
-   pIOpenGLImplementation -> ResetTargetWindow();
+   //pIOpenGLImplementation -> ResetTargetWindow();
 
    pIDataSetWorld = pIDataSetWorld_Old;
 

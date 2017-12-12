@@ -13,7 +13,7 @@
 
    unsigned int __stdcall Plot::plotter(void *pObject) {
  
-   Plot* pThis = reinterpret_cast<Plot*>(pObject);
+   Plot* pThis = (Plot *)pObject;
  
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;
@@ -33,22 +33,22 @@
  
       p -> get_OkToPlot(&okToPlot);
 
-      if ( ! okToPlot ) //|| ! p -> haveAnyData )
+      if ( ! okToPlot )
          continue;
 
       p -> Create(&segmentID);
 
-      if ( p -> overrideOwnerType ) 
-         p -> propertyPlotType -> get_longValue(&plotTypes);
-      else
+      //if ( p -> overrideOwnerType ) 
+      //   p -> propertyPlotType -> get_longValue(&plotTypes);
+      //else
          p -> pOwnerPropertyPlotType -> get_longValue(&plotTypes);
 
-      if ( p -> overrideOwnerView ) {
-         p -> propertyPlotView -> get_longValue(reinterpret_cast<long*>(&view));
-         p -> pIOpenGLImplementation -> Push();
-         p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> propertyPlotView,p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
-      } else      
-         p -> pOwnerPropertyPlotView -> get_longValue(reinterpret_cast<long*>(&view));
+      //if ( p -> overrideOwnerView ) {
+      //   p -> propertyPlotView -> get_longValue((long *)&view);
+      //   p -> pIOpenGLImplementation -> Push();
+      //   p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> propertyPlotView,p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
+      //} else      
+         p -> pOwnerPropertyPlotView -> get_longValue((long *)&view);
 
       for ( int typeIndex = 0; allTypes[typeIndex]; typeIndex++ ) {
 
@@ -259,9 +259,11 @@
  
    }
  
-   for ( int k = 0; k < pThis -> currentPlotCount; k++ ) (pThis -> pIPlots[k]) -> Release();
+   for ( int k = 0; k < pThis -> currentPlotCount; k++ ) 
+      (pThis -> pIPlots[k]) -> Release();
  
    CoTaskMemFree(pThis -> pIPlots);
+
    pThis -> currentPlotCount = 0;
  
    return TRUE;

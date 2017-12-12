@@ -161,6 +161,7 @@
    #define IDDI_FUNCTION_EXPRESSION_LABEL                                  4111
    #define IDDI_FUNCTION_RESULT_LABEL                                      4112
    #define IDDI_FUNCTION_LISTVIEW                                          4113
+   #define IDDI_FUNCTION_PLOT_PROPERTIES                                   4114
 
    #define IDDI_FUNCTION_SAVEPREP                                          4121
    #define IDDI_FUNCTION_SAVE                                              4122
@@ -197,7 +198,7 @@
    #define IDDI_FUNCTION_PROPERTIES_VARIABLE_EDIT                          5107
    #define IDDI_FUNCTION_PROPERTIES_ALLVARIABLES_EDIT                      5108
    #define IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES                        5109
-   #define IDDI_FUNCTION_PROPERTIES_ALLOWVISIBILITYPROPERTIES              5110
+   #define IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS                       5110
 
 #define IDDIALOG_FUNCTION_PROPERTIES_VISIBILITY                            5120
 
@@ -209,6 +210,7 @@
    #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE                       5132
    #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME                      5133
    #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP                        5134
+   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS                   5135
 
 #define IDDIALOG_VARIABLE                                                  6100
 #define IDDI_VARIABLE_VALUE_VARIABLE                                       6105
@@ -348,6 +350,7 @@
 #define IDDI_GRAPHIC_FUNCTIONS_EDIT                                        7820
 #define IDDI_GRAPHIC_FUNCTIONS_DELETE                                      7830
 #define IDDI_GRAPHIC_FUNCTIONS_LIST                                        7840
+#define IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS                            7850
 
 #define IDDIALOG_GRAPHIC_AXIIS                                             7900
 #define IDDI_GRAPHIC_AXIIS_USE_OPENGL                                      7901

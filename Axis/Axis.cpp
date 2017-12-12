@@ -59,6 +59,9 @@
      tickPctAbove(0.0),
      drawAxisLabel(false),
 
+     pWhenChangedCallback(NULL),
+     pWhenChangedCallbackArg(NULL),
+
      hwndObjectWindow(0),
      hMainMenu(0),
      hMenu(0),

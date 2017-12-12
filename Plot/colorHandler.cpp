@@ -14,50 +14,7 @@
 
 #include "plot.h"
 
-   static int holdUpdates = FALSE;
- 
-   LRESULT CALLBACK Plot::colorHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM lParam) {
-
-   Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
-
-   switch ( msg ) {
-
-   case WM_INITDIALOG: {
-
-      PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
-
-      p = (Plot *)pPage -> lParam;
-
-      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-
-      p -> hwndColorSettings = hwnd;
-
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
-      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
- 
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_TOP_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_BOTTOM_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
- 
-      if ( ! Plot::defaultPatchPainter ) 
-         Plot::defaultPatchPainter = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
-      else
-         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
-
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_TOP_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
-
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_BOTTOM_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
- 
-      holdUpdates = TRUE;
- 
-#define GET_VALUES() {                                                                 \
+ #define GET_VALUES() {                                                                \
       float v[] = {0.0f,0.0f,0.0f,0.0f};                                               \
       char szTemp[32];                                                                 \
                                                                                        \
@@ -119,6 +76,66 @@
                                                                                        \
       }
                                                                     
+
+   static int holdUpdates = FALSE;
+
+   LRESULT CALLBACK Plot::colorHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+
+   Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
+   switch ( msg ) {
+
+   case WM_INITDIALOG: {
+
+      PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
+
+      p = (Plot *)pPage -> lParam;
+
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+
+      p -> hwndColorSettings = hwnd;
+
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_LINE_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_TOP_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_RED_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+      SendDlgItemMessage(hwnd,IDDI_PLOT_COLOR_BOTTOM_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
+ 
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_TOP_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_BOTTOM_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
+ 
+      if ( ! Plot::defaultPatchPainter ) 
+         Plot::defaultPatchPainter = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
+      else
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
+
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_TOP_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
+
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_COLOR_BOTTOM_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)Plot::patchPainterProc);
+ 
+      RECT rect,rectParent;
+      GetWindowRect(hwnd,&rectParent);
+      long cx = 300;
+      long cy = 300;
+      GetWindowRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),&rect);
+
+      SetWindowPos(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),HWND_TOP,rect.left - rectParent.left + 8,rect.top - rectParent.top + 8,
+                                       cx - 2 * (rect.left - rectParent.left) - 16,cy - (rect.top - rectParent.top) - 16,SWP_SHOWWINDOW);
+
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_USERDATA,(ULONG_PTR)p);
+
+      if ( defaultStaticWindowHandler )
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+      else
+         defaultStaticWindowHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),GWLP_WNDPROC,(ULONG_PTR)&Plot::sampleGraphicHandler);
+
+      holdUpdates = TRUE;
+
       LOAD_VALUES();
  
       holdUpdates = FALSE;
@@ -126,6 +143,26 @@
       }
       return LRESULT(FALSE);
  
+   //case WM_SHOWWINDOW: {
+
+   //   if ( (BOOL)wParam ) {
+
+   //      p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION));
+
+   //      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
+   //                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
+
+   //      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
+   //                                                   p -> pOwnerPropertiesAmbientLight,
+   //                                                   p -> pOwnerPropertiesDiffuseLight,
+   //                                                   p -> pOwnerPropertiesSpecularLight,
+   //                                                   p -> pOwnerPropertiesLightPosition,
+   //                                                   p -> pOwnerPropertyCountLights,NULL);
+   //   }
+
+   //   }
+   //   break;
+
    case WM_NOTIFY: { 
       if ( holdUpdates )
          break;
@@ -193,15 +230,17 @@
              rect.bottom = rect.top + cy;
              InvalidateRect(hwnd,&rect,TRUE);
          }
-         return LRESULT(FALSE);
+         
       }
  
+      InvalidateRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),NULL,TRUE);
+
       }
       break;
 
    case WM_COMMAND: {
-      int notifyCode = HIWORD(mp1);
-      switch ( LOWORD(mp1) ) {
+      int notifyCode = HIWORD(wParam);
+      switch ( LOWORD(wParam) ) {
       case IDDI_PLOT_COLOR_LINE_CHOOSE:
       case IDDI_PLOT_COLOR_TOP_CHOOSE:
       case IDDI_PLOT_COLOR_BOTTOM_CHOOSE: {
@@ -209,7 +248,7 @@
          IGProperty *pp;
          HWND hwndBackground;
  
-         switch ( LOWORD(mp1) ) {
+         switch ( LOWORD(wParam) ) {
          case IDDI_PLOT_COLOR_LINE_CHOOSE:
             pp = p -> propertyLineColor;
             hwndBackground = GetDlgItem(hwnd,IDDI_PLOT_COLOR_LINE_BACKGROUND);
@@ -262,7 +301,7 @@
             InvalidateRect(hwnd,&rect,TRUE);
          }
          }
-         return LRESULT(0);
+         break;
 
       case IDDI_PLOT_COLOR_LINE_RED:
       case IDDI_PLOT_COLOR_LINE_GREEN:
@@ -277,7 +316,7 @@
          case EN_CHANGE: {
             if ( ! holdUpdates ) {
                HWND hwndBackground;
-               switch ( LOWORD(mp1) ) {
+               switch ( LOWORD(wParam) ) {
                case IDDI_PLOT_COLOR_LINE_RED:
                case IDDI_PLOT_COLOR_LINE_GREEN:
                case IDDI_PLOT_COLOR_LINE_BLUE:
@@ -317,14 +356,17 @@
          }   
 
          }
-         return LRESULT(0);
+         break;
  
       default:
          break;
       }
+
+      InvalidateRect(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION),NULL,TRUE);
+
       }
       return LRESULT(FALSE);
- 
+
  
    default:
       break;

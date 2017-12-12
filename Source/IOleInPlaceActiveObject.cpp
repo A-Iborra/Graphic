@@ -10,7 +10,7 @@
 
 
   STDMETHODIMP G::TranslateAccelerator(LPMSG) { 
-  return S_OK;   
+  return S_FALSE;   
   }
 
   STDMETHODIMP G::OnFrameWindowActivate(BOOL) {

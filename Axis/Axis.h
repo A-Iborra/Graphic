@@ -125,7 +125,9 @@
 
    // Methods
 
-     STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*);
+     STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,IGProperty*,
+                              IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *),void *pWhenChangedArg);
+
      STDMETHOD(get_DataSet)(IDataSet **);
 
       /* Text Methods */
@@ -173,6 +175,9 @@
      double phi,theta;
 
      USHORT selected,expectingCommands;
+
+     void (__stdcall *pWhenChangedCallback)(void *);
+     void *pWhenChangedCallbackArg;
 
      IPlot *pIPlot;
 

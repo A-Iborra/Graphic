@@ -38,6 +38,9 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> pIProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
          pIUnknown -> Release();
+         if ( p -> pWhenChangedCallback ) {
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+         }
          }
          return LRESULT(TRUE);
  
@@ -47,6 +50,9 @@
             p -> QueryInterface(IID_IPlot,reinterpret_cast<void **>(&pIPlot));
             pIPlot -> Release();
             p -> pIPlotNotify -> DeletePlot(pIPlot);
+         }
+         if ( p -> pWhenChangedCallback ) {
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          }
          break;

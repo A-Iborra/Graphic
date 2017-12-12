@@ -11,21 +11,22 @@
 #include "list.cpp"
 
    BasePlot::BasePlot() : 
-   pIDataSet(NULL),
-   pIDataSetDomain(NULL),
-   pIGraphicSegment(NULL),
-   pIOpenGLImplementation(NULL),
-   pIEvaluator(NULL),
-   pPropertyLastDrawLineWeight(NULL),
-   externalDataSet(FALSE),
-   eraseMode(FALSE),
-   refCount(0) {
-   CoCreateInstance(CLSID_InnoVisioNateProperty,
-                         NULL,
-                         CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                         IID_IGProperty,
-                         reinterpret_cast<void **>(&pPropertyLastDrawLineWeight));
+      pIDataSet(NULL),
+      pIDataSetDomain(NULL),
+      pIGraphicSegment(NULL),
+      pIOpenGLImplementation(NULL),
+      pWhenChangedCallback(NULL),
+      pWhenChangedCallbackArg(NULL),
+      pIEvaluator(NULL),
+      pPropertyLastDrawLineWeight(NULL),
+      externalDataSet(FALSE),
+      eraseMode(FALSE),
+      refCount(0) {
+
+   CoCreateInstance(CLSID_InnoVisioNateProperty,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperty,reinterpret_cast<void **>(&pPropertyLastDrawLineWeight));
+
    pPropertyLastDrawLineWeight -> put_type(TYPE_LONG);
+
    return;
    }
  
@@ -92,7 +93,8 @@
  
 
    HRESULT BasePlot::PlotData(IDataSet *ds) {
-   DataList *item = reinterpret_cast<DataList*>(NULL);
+
+   DataList *item = NULL;
  
    pIGraphicSegment -> Open();
  

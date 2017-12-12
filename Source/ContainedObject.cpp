@@ -84,9 +84,41 @@
    
 
    void ContainedObject::ReSize() {
+
    RECT rect;
+
    GetWindowRect(hwndTab,&rect);
+
    SetWindowPos(hwndSite,HWND_TOP,2,24,rect.right - rect.left - 4,rect.bottom - rect.top - 26,0L);
+
+   IOleObject *pIOleObject_Object = NULL;
+
+   pIUnknownObject -> QueryInterface(IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Object));
+
+   if ( ! pIOleObject_Object )
+      return;
+
+   RECT rcParent;
+
+   GetWindowRect(hwndSite,&rect);
+   GetWindowRect(GetParent(hwndTab),&rcParent);
+
+   long cx = rect.right - rect.left;
+   long cy = rect.bottom - rect.left;
+
+   rect.left = 0;
+   rect.top = 0;
+   rect.right = cx;
+   rect.bottom = cy;
+
+   pIOleObject_Object -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndTab,&rect);
+
+   pIOleObject_Object -> Release();
+
+   ShowWindow(hwndTab,SW_SHOW);
+
+   ShowWindow(hwndSite,SW_SHOW);
+
    return;
    }
 

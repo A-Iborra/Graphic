@@ -20,10 +20,22 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "viewSet", "viewSet\viewSet.vcxproj", "{AAD87998-8D9A-49C1-B9A9-47A8D45A9348}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Function", "Function\Function.vcxproj", "{48BE3931-C070-4CE0-AD68-5D9DE25D05DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5AAB213B-9936-4ABD-8B81-FFBFA666047C} = {5AAB213B-9936-4ABD-8B81-FFBFA666047C}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Evaluator", "Evaluator\Evaluator.vcxproj", "{F7487200-B128-4F1B-A3E9-8B4B14362C22}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7DE741AF-29F3-4644-AA79-A5B01FC0AD88} = {7DE741AF-29F3-4644-AA79-A5B01FC0AD88}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "v", "V\v.vcxproj", "{5AAB213B-9936-4ABD-8B81-FFBFA666047C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F7487200-B128-4F1B-A3E9-8B4B14362C22} = {F7487200-B128-4F1B-A3E9-8B4B14362C22}
+		{7DE741AF-29F3-4644-AA79-A5B01FC0AD88} = {7DE741AF-29F3-4644-AA79-A5B01FC0AD88}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Properties", "..\Properties\Properties.vcxproj", "{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -144,6 +156,18 @@ Global
 		{5AAB213B-9936-4ABD-8B81-FFBFA666047C}.Release|x64.ActiveCfg = Release|Win32
 		{5AAB213B-9936-4ABD-8B81-FFBFA666047C}.Release|x86.ActiveCfg = Release|Win32
 		{5AAB213B-9936-4ABD-8B81-FFBFA666047C}.Release|x86.Build.0 = Release|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Debug|x64.ActiveCfg = Debug|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Debug|x64.Build.0 = Debug|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Debug|x86.ActiveCfg = Debug|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Debug|x86.Build.0 = Debug|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Evaluation Release|x64.ActiveCfg = Release|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Evaluation Release|x64.Build.0 = Release|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Evaluation Release|x86.ActiveCfg = Release|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Evaluation Release|x86.Build.0 = Release|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Release|x64.ActiveCfg = Release|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Release|x64.Build.0 = Release|x64
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Release|x86.ActiveCfg = Release|Win32
+		{82D353A9-BA4B-4F14-98EB-FA7290DE4B39}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -150,7 +150,8 @@
 
      STDMETHOD(put_TextNotify)(ITextNotify *);
 
-     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty*,IGProperty*,IGProperty *,char *text,DataPoint *position);
+     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty*,
+                              IGProperty*,IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *),void *pWhenChangedArg);
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
@@ -286,6 +287,9 @@
 
      IOpenGLImplementation *pIOpenGLImplementation;
      IEvaluator *pIEvaluator;
+
+     void (__stdcall *pWhenChangedCallback)(void *);
+     void *pWhenChangedCallbackArg;
 
      IBasePlot *pIBasePlot;
      IBasePlot *pIBasePlotBoundingBox;

@@ -39,7 +39,10 @@ library OpenGLImplementor {
       HRESULT SetBaseWindow(HWND);
 
       HRESULT SetTargetWindow(HWND);
+      //HDC TargetDC();
+      HWND TargetHWND();
       HRESULT ResetTargetWindow();
+
    
       HRESULT PrintSetup();
       HRESULT PrintFinish();
@@ -162,7 +165,7 @@ library OpenGLImplementor {
 
 // Selection 
 
-      HRESULT GetPickBoxHits(POINT *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
+      HRESULT GetPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
 
 // Segments ? 
 

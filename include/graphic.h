@@ -413,7 +413,7 @@
 
      POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlMouseBeforeMenu,ptlLastMouse;
      BOOL trackedMouse;
-     POINT rightMouseClickPosition;
+     POINTL rightMouseClickPosition;
      float zLevel;
 
      static WNDPROC defaultPatchPainter;
@@ -453,6 +453,7 @@
 
      BOOL autoClear,autoPlotViewDetection,showStatusBar,useGraphicsCursor;
      BOOL showMargins,stretchToMargins,showFunctions;
+     BOOL allowUserFunctionControlVisibilityAccess;
      BOOL denyUserPropertySettings;
      BOOL isRunning;
 
@@ -494,6 +495,7 @@
      IGProperty* propertyShowStatusBar;
      IGProperty* propertyUseGraphicsCursor;
      IGProperty* propertyShowMargins;
+     IGProperty* propertyAllowUserFunctionControlVisibilityAccess;
 
      IGProperty* propertyPlotMarginUnits;
      IGProperty* propertyPlotLeftMargin,*propertyPlotRightMargin;
@@ -515,7 +517,6 @@
      IGProperty* propertyAmbientReference;
      IGProperty* propertyShinyness;
 
-     IGProperty* propertyPropertiesPosition;
      IGProperty* propertyPrintProperties;
  
      IGProperty* propertyDataExtents;
@@ -545,9 +546,9 @@
 
      IPlot* newPlot(long plotID);
 
-     IGSFunctioNater* newFunction();
+     IGSFunctioNater* newFunction(bool deferVisibility);
      void deleteFunction(IGSFunctioNater*);
-     int connectFunction(IGSFunctioNater* pIFunction);
+     int connectFunction(IGSFunctioNater* pIFunction,bool deferVisibility,bool doVisibilityOnly);
      int unConnectFunction(IGSFunctioNater* pIFunction);
 
      IText* newText();
@@ -555,8 +556,11 @@
      int render(long sourceID);
      static unsigned __stdcall threadRender(void *);
 
-     int pick(POINT *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread);
-     int doPickBox(POINT *ptl);
+     int pick(POINTL *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread);
+     int doPickBox(POINTL *ptl);
+     void savePickBox(HDC hdc,POINTL *pt);
+     void erasePickBox(HDC hdcTarget);
+     void drawPickBox(HDC hdc,POINTL *pt);
      int statusPosition();
      int drawGraphicCursor(POINTL *pPtlPickBox,int doPickBox);
      int eraseGraphicCursor();
@@ -569,6 +573,8 @@
      HBITMAP pickBoxBitmap {NULL};
 
      int getSegments(long **pSegments);
+
+     static void __stdcall someObjectChanged(void *);
 
      static LRESULT CALLBACK graphicFrameHandler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK graphicHandler(HWND,UINT,WPARAM,LPARAM);

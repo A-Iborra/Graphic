@@ -155,21 +155,18 @@
 
    Function* f = (Function*)theFunction;
 
-#ifdef MULTITHREADED_EVALUATOR
-#endif
-
    if ( S_FALSE != f -> evaluator -> IsBusy() )
       return 0;
 
    f -> defineFunction();
+
    f -> fire_Clear();   
+
    IVariable* v = (IVariable *)NULL;
    while ( v = f -> pManuallyAddedVariables -> GetNext(v) ) 
       f -> evaluator -> DefineVariable(v);
-   f -> evaluator -> Evaluate_szFunction(f -> expression);
 
-#ifdef MULTITHREADED_EVALUATOR
-#endif
+   f -> evaluator -> Evaluate_szFunction(f -> expression);
 
    return 0;
    }

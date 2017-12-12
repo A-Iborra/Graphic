@@ -20,7 +20,7 @@
 #include "list.cpp"
 
 
-   int G::doPickBox(POINT *pt) {
+   int G::doPickBox(POINTL *ptl) {
  
    if ( hitTable ) 
       return FALSE;
@@ -33,9 +33,14 @@
 
    hitTable = new unsigned int[HIT_TABLE_SIZE];
  
+   hitTableHits = 0;
+
    if ( pCallLists ) {
-      pIOpenGLImplementation -> GetPickBoxHits(pt,pickBoxSize.cx,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits);
+
+      pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits);
+
       delete [] pCallLists;
+
    }
 
    delete [] hitTable;
@@ -49,27 +54,10 @@
    }
  
  
-   int G::pick(POINT *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread) {
+   int G::pick(POINTL *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread) {
  
-   if ( hitTable ) return FALSE;
- 
-   if ( 0 && ptlPickBox.x > -1L ) {
- 
-      HDC hdc;
-      pIOpenGLImplementation -> get_HDC(&hdc);
- 
-      SetROP2(hdc,R2_NOTXORPEN);
- 
-      MoveToEx(hdc,ptlPickBox.x - pickBoxSize.cx,ptlPickBox.y - pickBoxSize.cy,(POINT *)NULL); 
-      LineTo(hdc,ptlPickBox.x + pickBoxSize.cx,ptlPickBox.y - pickBoxSize.cy);
-      LineTo(hdc,ptlPickBox.x + pickBoxSize.cx,ptlPickBox.y + pickBoxSize.cy);
-      LineTo(hdc,ptlPickBox.x - pickBoxSize.cx,ptlPickBox.y + pickBoxSize.cy);
-      LineTo(hdc,ptlPickBox.x - pickBoxSize.cx,ptlPickBox.y - pickBoxSize.cy);
- 
-      ptlPickBox.x = -1L;
-      ptlPickBox.y = -1L;
- 
-   }
+   if ( hitTable ) 
+      return FALSE;
 
    long *pCallLists = NULL;
 
@@ -264,7 +252,8 @@ actionFunction((void*)this);
  
  
    unsigned int __stdcall G::processMenus(void *arg) {
-   G *p = reinterpret_cast<G *>(arg);
+
+   G *p = (G *)arg;
    IPlot *pPlot;
    unsigned int *pTable,hitID,nNamesThisHit;
    List<unsigned int> hitList;
@@ -276,6 +265,7 @@ actionFunction((void*)this);
    for ( unsigned int k = 0; k < p -> hitTableHits; k++ ) {
  
       nNamesThisHit = *pTable;
+
       pTable++;
       pTable++;
       pTable++;
@@ -290,7 +280,7 @@ actionFunction((void*)this);
  
          if ( hitList.Get((int)hitID) ) continue;
  
-         IAxis *pAxis = reinterpret_cast<IAxis *>(NULL);
+         IAxis *pAxis = NULL;
          while ( pAxis = p -> axisList.GetNext(pAxis) ) {
             pAxis -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
@@ -302,7 +292,7 @@ actionFunction((void*)this);
  
          if ( found ) continue;
  
-         pPlot = reinterpret_cast<IPlot *>(NULL);
+         pPlot = NULL;
          while ( pPlot = p -> plotList.GetNext(pPlot) ) {
             pPlot -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
@@ -314,7 +304,7 @@ actionFunction((void*)this);
  
          if ( found ) continue;
  
-         pAxis = reinterpret_cast<IAxis *>(NULL);
+         pAxis = NULL;
          List<IText> *pTextList;
          while ( pAxis = p -> axisList.GetNext(pAxis) ) {
             pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
@@ -373,7 +363,7 @@ actionFunction((void*)this);
          continue;
       } 
  
-      IAxis *pAxis = reinterpret_cast<IAxis *>(NULL);
+      IAxis *pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          pAxis -> get_SegmentID(&segID);
          if ( segID == objectID ) break;
@@ -392,7 +382,7 @@ actionFunction((void*)this);
          continue;
       }
   
-      pAxis = reinterpret_cast<IAxis *>(NULL);
+      pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          List<IText> *pTextList;
          pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
@@ -414,7 +404,7 @@ actionFunction((void*)this);
          }
       }
  
-      IText* pIText = reinterpret_cast<IText*>(NULL);
+      IText* pIText = NULL;
       while ( pIText = p -> textList.GetNext(pIText) ) {
          pIText -> get_SegmentID(&segID);
          if ( segID == objectID ) break;
@@ -441,4 +431,17 @@ actionFunction((void*)this);
    p -> hitTableHits = 0;
  
    return FALSE;
+   }
+
+
+   void G::someObjectChanged(void *pArg) {
+   G *p = (G *)pArg;
+   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+   if ( p -> hwndFrame ) {
+      RECT rect;
+      GetWindowRect(p -> hwndFrame,&rect);
+      SendMessage(p -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+   } else
+      p -> render(0);
+   return;
    }

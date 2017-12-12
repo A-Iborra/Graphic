@@ -33,11 +33,13 @@
       p -> pIPropertyPauseVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE);
       p -> pIPropertyResumeVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME);
       p -> pIPropertyStopVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP);
+      p -> pIPropertyPlotPropertiesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS);
 
       EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),p -> controlsVisible);
       EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),p -> controlsVisible);
       EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),p -> controlsVisible);
       EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),p -> controlsVisible);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),p -> controlsVisible);
 
       SetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE,GetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE) & ~WS_CAPTION);
 
@@ -70,10 +72,16 @@
       p -> pIPropertyExpression -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY);
       p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_EXPRESSION_LABEL);
       p -> pIPropertyResultsLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_RESULT_LABEL);
-      p -> pIPropertyPropertiesControlVisibility -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWVISIBILITYPROPERTIES);
+
+      if ( p -> isDesignMode ) {
+         p -> pIPropertyPropertiesVisible -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
+         p -> pIPropertyPropertiesControlVisibility -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
+      } else {
+         ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES),SW_HIDE);
+         ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS),SW_HIDE);
+      }
 
       SetWindowLongPtr(p -> hwndProperties,GWL_STYLE,GetWindowLongPtr(p -> hwndProperties,GWL_STYLE) & ~WS_CAPTION);
-
 
       }
       return LRESULT(1);
@@ -152,8 +160,12 @@
             return LRESULT(0);
          }
 
-      case IDDI_FUNCTION_PROPERTIES_ALLOWVISIBILITYPROPERTIES:
-         p -> pIPropertyPropertiesControlVisibility -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWVISIBILITYPROPERTIES);
+      case IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES:
+         p -> pIPropertyPropertiesVisible -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
+         break;
+
+      case IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS:
+         p -> pIPropertyPropertiesControlVisibility -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
          break;
 
       case IDDI_FUNCTION_PROPERTIES_VARIABLE_EDIT: {
@@ -201,6 +213,7 @@
          EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),isVisible);
          EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),isVisible);
          EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),isVisible);
+         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),isVisible);
          }
          break;
 
@@ -218,6 +231,10 @@
 
       case IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP :
          p -> pIPropertyStopVisible -> getWindowItemChecked(hwnd,controlID);
+         break;
+
+      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS :
+         p -> pIPropertyPlotPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
          break;
 
       }

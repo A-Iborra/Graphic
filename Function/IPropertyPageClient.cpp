@@ -5,6 +5,7 @@
 */
 #include <windows.h>
 #include <CommCtrl.h>
+#include <olectl.h>
 
 #include "general.h"
 #include "Graphic_resource.h"
@@ -75,9 +76,38 @@
    }
 
    HRESULT Function::get_PropertyPageCount(long *pCount) {
+
    if ( ! pCount )
       return E_POINTER;
-   *pCount = 2;
+
+   IDispatch* pIDispatch = (IDispatch *)NULL;
+
+   isDesignMode = true;
+
+   if ( pIOleClientSite && SUCCEEDED(pIOleClientSite -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(&pIDispatch))) ) {
+
+      VARIANT varUserMode;
+
+      DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
+
+      varUserMode.vt = VT_BOOL;
+
+      VariantClear(&varUserMode);
+
+      pIDispatch -> Invoke(DISPID_AMBIENT_USERMODE,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varUserMode,NULL,NULL);
+
+      pIDispatch -> Release();
+
+      if ( varUserMode.bVal ) 
+         isDesignMode = 0;
+
+   }
+
+   if ( isDesignMode || allowUserPropertiesControls )
+      *pCount = 2;
+   else
+      *pCount = 1;
+
    return S_OK;
    }
 
@@ -93,6 +123,9 @@
    pPropSheetPages[0].pszTitle = "Function";
    pPropSheetPages[0].lParam = (LPARAM)this;
    pPropSheetPages[0].pfnCallback = NULL;
+
+   if ( ! isDesignMode && ! allowUserPropertiesControls )
+      return S_OK;
 
    pPropSheetPages[1].dwFlags = PSP_USETITLE;
    pPropSheetPages[1].dwSize = sizeof(PROPSHEETPAGE);

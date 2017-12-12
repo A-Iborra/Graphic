@@ -6,6 +6,8 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <OleCtl.h>
+
 #include <stdio.h>
 
 #include "utils.h"
@@ -46,6 +48,24 @@
                             VARIANT *pvarResult,
                             EXCEPINFO *pexcepinfo, 
                             UINT *puArgErr) { 
+
+   if ( DISPATCH_PROPERTYGET == wFlags ) {
+
+      switch ( dispidMember ) {
+
+      case DISPID_AMBIENT_USERMODE:
+
+         pvarResult -> vt = VT_BOOL;
+         pvarResult -> boolVal = isRunning;
+
+         return S_OK;
+
+      default:
+         break;
+      }
+
+   }
+
    IDispatch *ppv;
    QueryInterface(IID_IDispatch,reinterpret_cast<void**>(&ppv));
    HRESULT hr = pITypeInfo_IG -> Invoke(ppv,dispidMember,wFlags,pdispparams,pvarResult,pexcepinfo,puArgErr);
@@ -63,7 +83,8 @@
    IAxis *pIAxis;
    pAxis -> QueryInterface(IID_IAxis,reinterpret_cast<void**>(&pIAxis));
    axisList.Add(pIAxis);
-   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator);
+   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,
+                           propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
    return S_OK;
    }
 
@@ -131,7 +152,7 @@
 
    STDMETHODIMP G::AddFunction(BSTR expression,IDispatch **pFunction) {
 
-   IGSFunctioNater *f = newFunction();
+   IGSFunctioNater *f = newFunction(false);
 
    f -> put_Expression(expression);
 
@@ -150,7 +171,7 @@
 
    STDMETHODIMP G::AddFunctionInteractive(IDispatch **pFunction) {
 
-   IGSFunctioNater *f = newFunction();
+   IGSFunctioNater *f = newFunction(false);
 
    IUnknown* pIUnknownFunction;
    f -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownFunction));

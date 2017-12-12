@@ -71,11 +71,37 @@
                             EXCEPINFO *pexcepinfo, 
                             UINT *puArgErr) { 
 
-   if ( DISPATCH_PROPERTYGET != wFlags ) return DISP_E_MEMBERNOTFOUND;
+   if ( DISPATCH_PROPERTYGET != wFlags ) 
+      return DISP_E_MEMBERNOTFOUND;
+
    switch ( dispidMember ) {
-   case DISPID_AMBIENT_USERMODE:
+
+   case DISPID_AMBIENT_USERMODE: {
+
+      VARIANT varUserMode;
+
+      DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
+
+      varUserMode.vt = VT_BOOL;
+
+      VariantClear(&varUserMode);
+
+      IDispatch *pIDispatch = NULL;
+
+      pParent -> pParent -> pParent -> QueryInterface(IID_IDispatch,(void **)&pIDispatch);
+
+      pIDispatch -> Invoke(DISPID_AMBIENT_USERMODE,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varUserMode,NULL,NULL);
+
+      pIDispatch -> Release();
+
       pvarResult -> vt = VT_BOOL;
-      pvarResult -> boolVal = TRUE;
+
+      if ( varUserMode.bVal )
+         pvarResult -> boolVal = varUserMode.bVal ? TRUE : FALSE;
+
+      return S_OK;
+
+      }
       break;
    case DISPID_AMBIENT_BACKCOLOR:
       pvarResult -> vt = VT_I4;
