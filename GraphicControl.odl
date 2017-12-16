@@ -83,24 +83,6 @@ library Graphic {
       gcMethodSynchronise = 133
       };
 
-   enum PlotViews {
-      gcPlotView2D = 0x00000001,
-      gcPlotView3D = 0x00000002 };
-
-   enum PlotTypes {	
-      gcPlotTypeNone = 0x00000000,
-      gcPlotTypeNatural = 0x00010001,
-      gcPlotTypeSurface = 0x00020000,
-      gcPlotTypeWireFrame = 0x00040000,
-      gcPlotTypeStacks = 0x00080000,
-      gcPlotTypeBlocks = 0x00100000,
-      gcPlotTypeBalls = 0x00200000,
-      gcPlotTypePie = 0x00080002,
-      gcPlotTypeContour = 0x00020004,
-      gcPlotTypeQuads = 0x00040008,
-      gcPlotTypeTriangles = 0x00080010
-      };
-
    [  uuid(8CAEFD71-55E6-11d3-8365-006008BD5BC3),
       helpstring("GSystems Graphic Control (G), Events Interface"),
    ]

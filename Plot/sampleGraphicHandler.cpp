@@ -24,17 +24,10 @@
       BeginPaint(hwnd,&ps);
       EndPaint(hwnd,&ps);
       p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
-      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
-                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
-      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
-                                                   p -> pOwnerPropertiesAmbientLight,
-                                                   p -> pOwnerPropertiesDiffuseLight,
-                                                   p -> pOwnerPropertiesSpecularLight,
-                                                   p -> pOwnerPropertiesLightPosition,
-                                                   p -> pOwnerPropertyCountLights,NULL);
+      p -> pIOpenGLImplementation -> SetUp(NULL,p -> propertyPlotView);
       p -> pIOpenGLImplementation -> Erase(p -> pOwnerPropertyBackgroundColor);
       p -> Draw();
-      p -> pIOpenGLImplementation -> Flush();
+      p -> pIOpenGLImplementation -> Finalize();
       return (LRESULT)FALSE;
       }
  

@@ -94,6 +94,10 @@
       plotView(gcPlotView2D),
       plotType(gcPlotTypeNone),
 
+      defaultPlotView(gcPlotView2D),
+      default2DPlotType((long)gcPlotTypeNatural),
+      default3DPlotType((long)gcPlotTypeWireFrame),
+
       plotCount(0),
       textCount(0),
       functionCount(0),
@@ -187,8 +191,17 @@
    pIGProperties -> Add(L"auto clear",&propertyAutoClear);
 
    pIGProperties -> Add(L"plot view",&propertyPlotView);
+   propertyPlotView -> directAccess(TYPE_LONG,&defaultPlotView,sizeof(long));
+
    pIGProperties -> Add(L"plot type",&propertyPlotType);
    pIGProperties -> Add(L"auto plotView detection",&propertyAutoPlotViewDetection);
+
+   pIGProperties -> Add(L"default 2d plot type",&propertyDefault2DPlotType);
+   pIGProperties -> Add(L"default 3d plot type",&propertyDefault3DPlotType);
+
+   propertyDefault2DPlotType -> directAccess(TYPE_LONG,&default2DPlotType,sizeof(long));
+   propertyDefault3DPlotType -> directAccess(TYPE_LONG,&default3DPlotType,sizeof(long));
+
 
    pIGProperties -> Add(L"plot width",NULL);
    pIGProperties -> Add(L"plot height",NULL);
@@ -651,7 +664,7 @@
             if ( pContainedFunction -> pFunction() == pIFunction ) {
                TC_ITEM tie = {0};
                tie.mask = TCIF_PARAM;
-               tie.lParam = (LPARAM)pContainedFunction -> HWNDSite();
+               tie.lParam = (LPARAM)pContainedFunction;// -> HWNDSite();
                SendMessage(hwndDataSourcesFunctions,TCM_SETITEM,item,(LPARAM)&tie);
                return 1;
             }
@@ -727,7 +740,8 @@
 
    pIPlot -> Initialize(pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,NULL,NULL,
                            propertyPlotView,
-                           propertyPlotType,
+                           propertyDefault2DPlotType,
+                           propertyDefault3DPlotType,
                            propertyBackgroundColor,
                            propertyViewTheta,
                            propertyViewPhi,
@@ -755,6 +769,7 @@
    pIViewObjectEx -> SetAdvise(0,0,pIAdviseSink);
 
    pIViewObjectEx -> Release();
+
    pIAdviseSink -> Release();
 
    plotList.Add(pIPlot,NULL,plotID);
@@ -807,12 +822,12 @@
    vb[1] = (BYTE)(255.0f*fv[1]);
    vb[2] = (BYTE)(255.0f*fv[2]);
 
-   HDC hdc = GetDC(hwndGraphic);
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
 
    HBRUSH hb = CreateSolidBrush(RGB(vb[0],vb[1],vb[2]));
 
    RECT rc = {0};
-   GetClientRect(hwndGraphic,&rc);
+   GetClientRect(pIOpenGLImplementation -> TargetHWND(),&rc);
 
    SelectObject(hdc,hb);
 
@@ -820,10 +835,9 @@
 
    DeleteObject(hb);
 
-   ReleaseDC(hwndGraphic,hdc);
-
    return 0;
    }
+
 
    int G::getSegments(long **pSegments) {
 
@@ -877,4 +891,19 @@
    }
 
    return cntSegments;
+   }
+
+   void G::someObjectChanged(void *pArg) {
+   G *p = (G *)pArg;
+   RECT rect;
+   GetWindowRect(p -> hwndFrame,&rect);
+   SendMessage(p -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+   return;
+   }
+
+   void G::styleHandlerSomeObjectChanged(void *pArg) {
+   G *p = (G *)pArg;
+   InvalidateRect(p -> hwndStyleSettings,NULL,TRUE);
+   return;
    }

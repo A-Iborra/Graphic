@@ -46,6 +46,8 @@
      STDMETHOD(put_DataSet)(IDataSet *newDataSet);
      STDMETHOD(get_DataSet)(IDataSet **getDataSet);
 
+     STDMETHOD(get_DataArity)(enum DataArity *);
+
      STDMETHOD(get_SegmentID)(long*);
 
      STDMETHOD(put_ActionTable)(IGraphicSegmentAction *);

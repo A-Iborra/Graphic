@@ -16,7 +16,6 @@
 #include "Plot_i.h"
 #include "Axis_i.h"
 #include "ViewSet_i.h"
-#include "OpenGLImplementation_i.h"
 #include "Text_i.h"
 #include "Function_i.h"
 
@@ -445,6 +444,11 @@
      RECT margins;
      PlotViews plotView;
      PlotTypes plotType;
+     PlotViews defaultPlotView;
+
+     long default2DPlotType;
+     long default3DPlotType;
+
      long plotCount;
      long textCount;
      long functionCount;
@@ -480,6 +484,8 @@
      IGProperty* propertyAutoClear;
 
      IGProperty* propertyPlotView;
+     IGProperty* propertyDefault2DPlotType;
+     IGProperty *propertyDefault3DPlotType;
 
      IGProperty* propertyPlotType;
 
@@ -575,6 +581,7 @@
      int getSegments(long **pSegments);
 
      static void __stdcall someObjectChanged(void *);
+     static void __stdcall styleHandlerSomeObjectChanged(void *);
 
      static LRESULT CALLBACK graphicFrameHandler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK graphicHandler(HWND,UINT,WPARAM,LPARAM);

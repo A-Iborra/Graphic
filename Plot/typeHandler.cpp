@@ -29,9 +29,9 @@
 
       if ( p -> overrideOwnerType ) {
          pType = (PlotTypes)p -> plotType;
-         EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER),p -> pOwnerPropertyPlotType ? TRUE : FALSE);
+         EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER),p -> pOwnerProperty2DPlotType ? TRUE : FALSE);
       } else
-         p -> pOwnerPropertyPlotType -> get_longValue(reinterpret_cast<long*>(&pType));
+         p -> pOwnerProperty2DPlotType -> get_longValue(reinterpret_cast<long*>(&pType));
 
       p -> propertyOverrideOwnerType -> setWindowChecked(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER));
 
@@ -148,9 +148,9 @@
 
          if ( p -> overrideOwnerType ) {
             pType = (PlotTypes)p -> plotType;
-            EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER),p -> pOwnerPropertyPlotType ? TRUE : FALSE);
+            EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER),p -> pOwnerProperty2DPlotType ? TRUE : FALSE);
          } else
-            p -> pOwnerPropertyPlotType -> get_longValue(reinterpret_cast<long*>(&pType));
+            p -> pOwnerProperty2DPlotType -> get_longValue(reinterpret_cast<long*>(&pType));
 
          SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),BM_SETCHECK,(long)gcPlotTypeNatural & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
          SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),BM_SETCHECK,(long)gcPlotTypeContour & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);

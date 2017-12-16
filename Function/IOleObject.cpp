@@ -14,10 +14,14 @@
 
    STDMETHODIMP Function::SetClientSite(IOleClientSite *pcs) {
  
-   if ( pIOleInPlaceSite ) pIOleInPlaceSite -> Release();
+   if ( pIOleInPlaceSite ) 
+      pIOleInPlaceSite -> Release();
+
    pIOleInPlaceSite = NULL;
 
-   if ( pIOleClientSite ) pIOleClientSite -> Release();
+   if ( pIOleClientSite ) 
+      pIOleClientSite -> Release();
+
    pIOleClientSite = NULL;
  
    if ( ! pcs ) {
@@ -116,16 +120,18 @@
    if ( ! ( dwDrawAspect & DVASPECT_CONTENT) )
       return E_NOTIMPL;
 
-   resize(containerSize.cy);
+   if ( ! hwndSpecDialog )
+      initWindows();
 
-   if ( resultingHeight ) 
-      containerSize.cy = resultingHeight;
+   resize(containerSize.cx);
 
    if ( containerSize.cx <= 0 ) 
       containerSize.cx = CONTAINERSIZE_CX;
 
    memcpy(pSizel,&containerSize,sizeof(SIZEL));
+
    pixelsToHiMetric(pSizel,pSizel);
+
    return S_OK;
    }
  
@@ -153,6 +159,8 @@
    case OLEIVERB_UIACTIVATE:
       return E_NOTIMPL;
    case OLEIVERB_INPLACEACTIVATE:
+      if ( ! hwndSpecDialog )
+         initWindows();
       SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
       SetObjectRects(prc,NULL);
       pIOleInPlaceSite -> OnInPlaceActivate();

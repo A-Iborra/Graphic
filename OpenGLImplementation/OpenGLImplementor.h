@@ -22,6 +22,7 @@
    class OpenGLImplementor;
  
    struct transformationMatrixes {
+      transformationMatrixes() { memset(this,0,sizeof(transformationMatrixes)); }
       double projectionMatrix[16];
       double modelMatrix[16];
       GLint viewPort[4];
@@ -79,30 +80,35 @@
                 IGProperty *pPropCountLights,
                 IGProperty *pPropShinyness);
  
-      int saveState(transformationMatrixes * = NULL);
+      int saveState();
       int restoreState(transformationMatrixes * = NULL);
  
       STDMETHOD(setViewPort)(int*);
 
       STDMETHOD(getPickBoxHits)(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
 
+      HBITMAP getMergedBackground(HWND,HDC);
+
+      HRESULT GetPixels(long x1,long y1,long x2,long y2,long cyWindow,BYTE *pResult);
+
    private:
  
-      int setRenderingContext();
+      int createRenderingContext();
  
+      void finalize();
+
+      void setOpenGLMatrices(long plotView,double phi,double theta,double spin);
+
       STDMETHOD(erase)(IGProperty *pPropBackgroundColor = NULL);
       STDMETHOD(resetDepth)();
 
       OpenGLImplementor *pParent;
       HWND hwnd;
       HDC deviceContext;
-      HGLRC renderingContext;
-      GLint viewPort[4];
-      GLdouble projectionMatrix[16],modelMatrix[16];
-      long dxleft,dytop,dxright,dybottom;
+
       bool initialized;
+      bool isRendered;
       bool lineMode,polygonMode;
-      double xScaleFactor,yScaleFactor,zScaleFactor;
 
       IEvaluator *pIEvaluator;
 
@@ -119,14 +125,17 @@
 
       IGProperty *pSaved_BackgroundColor;
 
+      static int pixelFormat;
+      static HGLRC renderingContext;
+
    protected:
 
-      long windowCX,windowCY;
-      double extentsXMin,extentsYMin,extentsXMax,extentsYMax,extentsZMin,extentsZMax;
       double xPixelsPerUnit,yPixelsPerUnit;
       float lightPosition[SUPPORTED_LIGHT_COUNT][4];
       float fvSpecularLight[SUPPORTED_LIGHT_COUNT][4],fvAmbientLight[SUPPORTED_LIGHT_COUNT][4],fvDiffuseLight[SUPPORTED_LIGHT_COUNT][4];
       long shinyness;
+
+      transformationMatrixes openGLState;
 
       friend class OpenGLImplementor;
  
@@ -166,9 +175,8 @@
 
       STDMETHOD(SetBaseWindow)(HWND);
       STDMETHOD(SetTargetWindow)(HWND hwnd);
-      //HDC __stdcall TargetDC();
+      HDC __stdcall TargetDC();
       HWND __stdcall TargetHWND();
-      STDMETHOD(ResetTargetWindow)();
       STDMETHOD(PrintSetup());
       STDMETHOD(PrintFinish());
  
@@ -243,6 +251,8 @@
       STDMETHOD(get_HWND)(HWND *getHWND);
       STDMETHOD(get_MousePositionClient)(POINT* ptMouse);
 
+      BOOL __stdcall IsRendered();
+
 // Data State ? 
       STDMETHOD(GetExtents)(double *minx,double *miny,double *minz,double *maxx,double *maxy,double *maxz);
  
@@ -278,7 +288,7 @@
       STDMETHOD(OpenSegment)(long segmentID,IGProperty* pPropColor,IGProperty* pPropLineWeight);
       STDMETHOD(RedrawSegment)(long segmentID);
       STDMETHOD(CloseSegment)(long segmentID,unsigned short drawOnClose);
-      STDMETHOD(Flush)();
+      STDMETHOD(Finalize)();
       STDMETHOD(NewSegments)(long numberToMake,long *firstInRange);
       STDMETHOD(StartSegment)(long segmentID);
       STDMETHOD(EndSegment)();
@@ -427,6 +437,8 @@
       static LRESULT __stdcall handler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
       static LRESULT __stdcall propertiesHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
+      friend class PlotWindow;
+
    };
  
     extern ITypeInfo *pITypeInfo;
@@ -451,7 +463,7 @@
    }
 #endif
 
-#if defined(_DEBUG) && 1 == 0
+#if defined(_DEBUG) 
 #define OPENGL_ERROR_CHECK    { \
    char szError[1024];                      \
    long errorCode = glGetError();           \
@@ -468,9 +480,24 @@
 #define OPENGL_ERROR_CHECK
 #endif
 
+#if defined(_DEBUG) 
+#define WINDOWS_ERROR_CHECK    { \
+   char szError[1024];                      \
+   long errorCode = GetLastError();         \
+   if ( errorCode ) {                       \
+      sprintf(szError,"Error in Windows call method '%s' (%d)\n\nOpenGL returned error %d (%x)\n\n\nDebug ?",__FILE__,__LINE__,errorCode,errorCode); \
+      errorCode = MessageBox(NULL,szError,"Windows usage exception",MB_YESNOCANCEL); \
+      if ( IDCANCEL == errorCode ) _exit(0);\
+      if ( IDYES == errorCode ) {           \
+      _asm {   int 3   }                    \
+      }                                     \
+   }                                        \
+   }
+#else
+#define OPENGL_ERROR_CHECK
+#endif
 #define WM_OPENGLIMPLEMENTATION_SETBASEWINDOW            WM_USER + 1
 #define WM_OPENGLIMPLEMENTATION_SETTARGETWINDOW          WM_USER + 2
-#define WM_OPENGLIMPLEMENTATION_RESETTARGETWINDOW        WM_USER + 3
 
 #define WM_OPENGLIMPLEMENTATION_SETLIGHTING              WM_USER + 7
 #define WM_OPENGLIMPLEMENTATION_SETCOLOR                 WM_USER + 8
@@ -478,7 +505,7 @@
 
 #define WM_OPENGLIMPLEMENTATION_ERASE                    WM_USER + 20
 #define WM_OPENGLIMPLEMENTATION_RESETDEPTH               WM_USER + 21
-#define WM_OPENGLIMPLEMENTATION_FLUSH                    WM_USER + 22
+#define WM_OPENGLIMPLEMENTATION_FINALIZE                 WM_USER + 22
 
 #define WM_OPENGLIMPLEMENTATION_TRANSLATE                WM_USER + 30
 
@@ -688,5 +715,7 @@
    };
 
 #define WM_OPENGLIMPLEMENTATION_READPIXELS               WM_USER + 108
+
+#define WM_OPENGLIMPLEMENTATION_ISRENDERED               WM_USER + 109
 
 #define WM_OPENGLIMPLEMENTATION_STOP                     WM_USER + 256

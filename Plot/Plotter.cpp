@@ -29,7 +29,7 @@
 
    for (  int plotIndex = pThis -> currentPlotCount - 1; plotIndex > -1; plotIndex-- ) {
  
-      Plot *p = static_cast<Plot*>(pThis -> pIPlots[plotIndex]);
+      Plot *p = static_cast<Plot *>(pThis -> pIPlots[plotIndex]);
  
       p -> get_OkToPlot(&okToPlot);
 
@@ -38,16 +38,16 @@
 
       p -> Create(&segmentID);
 
-      //if ( p -> overrideOwnerType ) 
-      //   p -> propertyPlotType -> get_longValue(&plotTypes);
-      //else
-         p -> pOwnerPropertyPlotType -> get_longValue(&plotTypes);
+      if ( p -> overrideOwnerType ) 
+         p -> propertyPlotType -> get_longValue(&plotTypes);
+      else
+         p -> pOwnerProperty2DPlotType -> get_longValue(&plotTypes);
 
-      //if ( p -> overrideOwnerView ) {
-      //   p -> propertyPlotView -> get_longValue((long *)&view);
+      if ( p -> overrideOwnerView ) {
+         p -> propertyPlotView -> get_longValue((long *)&view);
       //   p -> pIOpenGLImplementation -> Push();
       //   p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> propertyPlotView,p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
-      //} else      
+      } else      
          p -> pOwnerPropertyPlotView -> get_longValue((long *)&view);
 
       for ( int typeIndex = 0; allTypes[typeIndex]; typeIndex++ ) {
@@ -254,8 +254,8 @@
 
       }
 
-      if ( p -> overrideOwnerView ) 
-         p -> pIOpenGLImplementation -> Pop();
+      //if ( p -> overrideOwnerView ) 
+      //   p -> pIOpenGLImplementation -> Pop();
  
    }
  

@@ -83,7 +83,7 @@
    IAxis *pIAxis;
    pAxis -> QueryInterface(IID_IAxis,reinterpret_cast<void**>(&pIAxis));
    axisList.Add(pIAxis);
-   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,
+   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,
                            propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
    return S_OK;
    }
@@ -150,7 +150,7 @@
    }
 
 
-   STDMETHODIMP G::AddFunction(BSTR expression,IDispatch **pFunction) {
+   STDMETHODIMP G::AddFunction(BSTR expression,IDispatch **ppFunction) {
 
    IGSFunctioNater *f = newFunction(false);
 
@@ -162,14 +162,14 @@
       ShowWindow(pf -> HWNDSite(),SW_HIDE);
    pf = containedFunctionList.Get(reinterpret_cast<long>(f));
    ShowWindow(pf -> HWNDSite(),SW_SHOW);
-   if ( pFunction )
-      f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(pFunction));
+   if ( ppFunction )
+      f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppFunction));
 
    return S_OK;
    }
 
 
-   STDMETHODIMP G::AddFunctionInteractive(IDispatch **pFunction) {
+   STDMETHODIMP G::AddFunctionInteractive(IDispatch **ppFunction) {
 
    IGSFunctioNater *f = newFunction(false);
 
@@ -193,8 +193,8 @@
          ShowWindow(pf -> HWNDSite(),SW_HIDE);
       pf = containedFunctionList.Get(reinterpret_cast<long>(f));
       ShowWindow(pf -> HWNDSite(),SW_SHOW);
-      if ( pFunction )
-         f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(pFunction));
+      if ( ppFunction )
+         f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppFunction));
 
    } else {
       deleteFunction(f);

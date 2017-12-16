@@ -43,10 +43,10 @@
       piover2 = 2.0 * atan(1.0);
 
    HDC hdc = NULL;
-   if ( doOpenGLRendering )
+   //if ( doOpenGLRendering )
       pIOpenGLImplementation -> get_HDC(&hdc);
-   else
-      hdc = GetDC(hwndOwner);
+   //else
+   //   hdc = GetDC(hwndOwner);
 
    DataPoint dpMin,dpMax;
    double worldXMin,worldXMax,worldYMin,worldYMax,worldZMin,worldZMax;
@@ -60,7 +60,7 @@
    worldZMin = dpMin.z;
    worldZMax = dpMax.z;
 
-   if ( DBL_MAX == worldXMin && -DBL_MAX == worldXMax )
+   if ( ( -DBL_MAX == worldXMin && DBL_MAX == worldXMax ) || ( DBL_MAX == worldXMin && -DBL_MAX == worldXMax ) )
       return 0;
 
    double toTextDomainScaleX,toTextDomainScaleY,toTextDomainScaleZ;
@@ -411,8 +411,8 @@ dxScale = 1.0;
 
    SelectObject(hdc,hOriginalFont);
 
-   if ( ! doOpenGLRendering )
-      ReleaseDC(hwndOwner,hdc);
+   //if ( ! doOpenGLRendering )
+   //   ReleaseDC(hwndOwner,hdc);
 
    return S_OK;
    }
@@ -436,7 +436,7 @@ dxScale = 1.0;
    if ( ! pszText )
       return S_OK;
 
-   HDC hdc = GetDC(hwndOwner);
+   HDC hdc = pIOpenGLImplementation -> TargetDC();//GetDC(hwndOwner);
 
    createFont(&logicalFont);
 
@@ -468,7 +468,7 @@ dxScale = 1.0;
 
    SelectObject(hdc,hOriginalFont);
 
-   ReleaseDC(hwndOwner,hdc);
+   //ReleaseDC(hwndOwner,hdc);
 
    return S_OK;
    }

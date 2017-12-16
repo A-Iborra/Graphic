@@ -102,6 +102,8 @@
  
  
    STDMETHODIMP Function::GetExtent(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *s) {
+   if ( ! hwndSpecDialog )
+      initWindows();
    s -> cx = containerSize.cx;
    s -> cy = containerSize.cy;
    pixelsToHiMetric(s,s);

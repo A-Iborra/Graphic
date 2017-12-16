@@ -52,7 +52,7 @@
  
    STDMETHODIMP G::put_PlotType(PlotTypes setPlotType) {
    propertyPlotType -> put_longValue(setPlotType);
-   render(0);
+   //render(0);
    return S_OK;
    }
  
@@ -65,7 +65,7 @@
  
    STDMETHODIMP G::put_ViewTheta(float newTheta) {
    propertyViewTheta -> put_doubleValue((double)newTheta);
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_ViewTheta(float* pTheta) {
@@ -79,7 +79,7 @@
 
    STDMETHODIMP G::put_ViewPhi(float newPhi) {
    propertyViewPhi -> put_doubleValue((double)newPhi);
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_ViewPhi(float* pPhi) {
@@ -93,7 +93,7 @@
 
    STDMETHODIMP G::put_ViewSpin(float newSpin) {
    propertyViewSpin -> put_doubleValue((double)newSpin);
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_ViewSpin(float* pSpin) {
@@ -152,7 +152,7 @@
 
 
    STDMETHODIMP G::put_BackgroundColor(long colorIndex) {
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_BackgroundColor(long* pColorIndex) {
@@ -174,7 +174,7 @@
 
    STDMETHODIMP G::put_LeftMargin(long newMargin) {
    margins.left = newMargin;
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_LeftMargin(long* pMargin) {
@@ -185,7 +185,7 @@
 
    STDMETHODIMP G::put_TopMargin(long newMargin) {
    margins.top = newMargin;
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_TopMargin(long* pMargin) {
@@ -196,7 +196,7 @@
 
    STDMETHODIMP G::put_RightMargin(long newMargin) {
    margins.right = newMargin;
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_RightMargin(long* pMargin) {
@@ -207,7 +207,7 @@
 
    STDMETHODIMP G::put_BottomMargin(long newMargin) {
    margins.bottom = newMargin;
-   render(0);
+   //render(0);
    return S_OK;
    }
    STDMETHODIMP G::get_BottomMargin(long* pMargin) {
@@ -222,7 +222,7 @@
    margins.right = rMargin;
    margins.top = tMargin;
    margins.bottom = bMargin;
-   render(0);
+   //render(0);
    return S_OK;
    }
 

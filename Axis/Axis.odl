@@ -196,7 +196,7 @@ library Axis {
       [id(axisMethodInitialize),helpstring("Sets the type (x,y,or z),the IDataSet and the IOpenGLImplementation interface for the Axis. Call this method soon after creating the object. The passed interfaces ARE AddRef()ed.")]
 
       HRESULT Initialize([in]HWND hwndOwner,[in]char type,[in]IAxis *pXAxis,[in]IAxis *pYAxis,[in]IAxis *pZAxis,
-                              [in] IGProperty* pIPropertyPlotView, [in] IGProperty *pIPropertyPlotSubType,
+                              [in] IGProperty* pIPropertyPlotView, 
                               [in] IGProperty* pPropertyFloor,[in] IGProperty *pPropertyCeiling,
                               [in] IGProperty* pPropertyOpenGLText,
                               [in] IDataSet* pIDomainDataSet,[in] IOpenGLImplementation*,[in] IEvaluator*,[in] void (*pWhenChangedCallback)(void *),void *pWhenChangedArg);

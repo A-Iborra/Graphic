@@ -70,7 +70,7 @@
    propertyLineEnd -> put_longValue(1L);
    propertyLineJoin -> put_longValue(1L);
    propertyPlotView -> put_longValue((LONG)gcPlotView2D);
-   propertyPlotType -> put_longValue((LONG)gcPlotTypeNone);
+   propertyPlotType -> put_longValue((LONG)gcPlotTypeNatural);
    propertyLineWeight -> put_longValue((LONG)DEFAULT_LINE_WEIGHT);
    propertyCustomColors -> put_binaryValue(9 * sizeof(double),(BYTE*)dm);
    propertyPropertiesPosition -> put_binaryValue(4 * sizeof(long),(BYTE*)lv);

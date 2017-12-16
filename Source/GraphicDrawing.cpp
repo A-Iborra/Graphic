@@ -109,13 +109,7 @@
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
  
-   p -> pIOpenGLImplementation -> SetLighting(
-                  p -> ppPropertyLightOn,
-                  p -> ppPropertyAmbientLight,
-                  p -> ppPropertyDiffuseLight,
-                  p -> ppPropertySpecularLight,
-                  p -> ppPropertyLightPos,
-                  p -> propertyCountLights,p -> propertyShinyness);
+   p -> pIOpenGLImplementation -> SetLighting(p -> ppPropertyLightOn,p -> ppPropertyAmbientLight,p -> ppPropertyDiffuseLight,p -> ppPropertySpecularLight,p -> ppPropertyLightPos,p -> propertyCountLights,p -> propertyShinyness);
  
    p -> erase(); 
 
@@ -141,13 +135,15 @@
       t -> Draw();
    } 
 
-   p -> pIOpenGLImplementation -> Flush();
+   p -> pIOpenGLImplementation -> Finalize();
 
    if ( p -> showStatusBar ) {
       char szText[MAX_PROPERTY_SIZE];
       DataPoint dp[2];
       p -> pIDataSetMaster -> GetDomain(&dp[0],&dp[1]);
-      if ( dp[0].x != DBL_MAX ) {
+
+      if ( ! ( dp[0].x == -DBL_MAX ) && ! ( dp[0].y == -DBL_MAX ) && ! ( dp[0].z == -DBL_MAX ) &&
+            ! ( dp[1].x == DBL_MAX ) && ! ( dp[1].y == DBL_MAX ) && ! ( dp[1].z == DBL_MAX ) ) {
          sprintf(szText,"Extents [ (%lf,%lf,%lf) <-> (%lf,%lf,%lf) ]",dp[0].x,dp[0].y,dp[0].z,dp[1].x,dp[1].y,dp[1].z);
          p -> put_StatusText(0,szText);
       } else
@@ -210,11 +206,10 @@
  
  
    int G::erase() {
-   if ( pIOpenGLImplementation ) {
+   if ( pIOpenGLImplementation ) 
       pIOpenGLImplementation -> Erase(propertyBackgroundColor);
-      //pIOpenGLImplementation -> Flush();
-   }
-   eraseBackground();
+   else
+      eraseBackground();
    eraseGraphicCursor();
    return TRUE;
    }

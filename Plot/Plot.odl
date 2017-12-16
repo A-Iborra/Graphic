@@ -88,6 +88,8 @@ library Plot {
      [propget,helpstring("")]
      HRESULT DataSet([out,retval] IDataSet **dataSet);
 
+     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+
      [propget,helpstring("")]
      HRESULT SegmentID([out,retval] long* getID);
 
@@ -212,6 +214,8 @@ library Plot {
      [propget,helpstring("")]
      HRESULT DataSet([out,retval] IDataSet **dataSet);
 
+     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+
      [propput,helpstring("")]
      HRESULT PlotNotify([in] IPlotNotify *setIPlotNotify);
      [propget,helpstring("")]
@@ -243,8 +247,9 @@ library Plot {
 
      HRESULT Initialize(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
                            IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
-                           IGProperty *parentPropertyPlotType,
-                           IGProperty *parentPropertyPlotSubType,
+                           IGProperty *parentPropertyPlotView,
+                           IGProperty *parentPropertyDefault2DPlotSubType,
+                           IGProperty *parentPropertyDefault3DPlotSubType,
                            IGProperty *parentPropertyBackgroundColor,
                            IGProperty *parentPropertyTheta,
                            IGProperty *parentPropertyPhi,

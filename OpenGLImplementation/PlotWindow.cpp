@@ -16,15 +16,26 @@
 #include "GraphicControl_i.h"
 #include "OpenGLImplementor.h"
 
+   int PlotWindow::pixelFormat = 0;
+   HGLRC PlotWindow::renderingContext = NULL;
+
+   PIXELFORMATDESCRIPTOR pfd = {
+         sizeof(PIXELFORMATDESCRIPTOR),
+         1,
+         PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,// | PFD_GENERIC_ACCELERATED | PFD_DOUBLEBUFFER, 
+         PFD_TYPE_RGBA,   
+         24,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,PFD_MAIN_PLANE,0,0,0,0};
+
    PlotWindow::PlotWindow(HWND h,OpenGLImplementor *pp,IEvaluator *piev) :
-       deviceContext(0),
+
+       deviceContext(NULL),
        hwnd(h),
        pParent(pp),
        pIEvaluator(piev),
        initialized(false),
+       isRendered(false),
        lineMode(false),
        polygonMode(false),
-       dxleft(0),dytop(0),dxright(0),dybottom(0),
 
        pSaved_PlotView(NULL),
        pSaved_RotationTheta(NULL),
@@ -37,26 +48,25 @@
        pSaved_MarginUnits(NULL),
        pSaved_StretchToMargins(NULL),
 
-       pSaved_BackgroundColor(NULL),
+       pSaved_BackgroundColor(NULL) {
 
-       xScaleFactor(1.0),yScaleFactor(1.0),zScaleFactor(1.0) {
-
-   extentsXMin = extentsYMin = extentsZMin = DBL_MAX;
-   extentsXMax = extentsYMax = extentsZMax = -DBL_MAX;
-
-   memset(viewPort,0,sizeof(viewPort));
-   memset(projectionMatrix,0,sizeof(projectionMatrix));
-   memset(modelMatrix,0,sizeof(modelMatrix));
    memset(fvAmbientLight,0,sizeof(fvAmbientLight));
    memset(fvSpecularLight,0,sizeof(fvSpecularLight));
    memset(fvDiffuseLight,0,sizeof(fvDiffuseLight));
+   memset(&openGLState,0,sizeof(openGLState));
+
+   openGLState.extentsXMin = openGLState.extentsYMin = openGLState.extentsZMin = DBL_MAX;
+   openGLState.extentsXMax = openGLState.extentsYMax = openGLState.extentsZMax = -DBL_MAX;
+   openGLState.xScaleFactor = 1.0;
+   openGLState.yScaleFactor = 1.0;
+   openGLState.zScaleFactor = 1.0;
 
    shinyness = 25;
 
    RECT rect;
    GetWindowRect(h,&rect);
-   windowCX = rect.right - rect.left;
-   windowCY = rect.bottom - rect.top;
+   openGLState.windowCX = rect.right - rect.left;
+   openGLState.windowCY = rect.bottom - rect.top;
 
    if ( pParent ) {
 
@@ -64,9 +74,7 @@
 
       if ( ppw ) {
 
-         transformationMatrixes tm;
-
-         ppw -> saveState(&tm);
+         ppw -> saveState();
 
          pSaved_PlotView = ppw -> pSaved_PlotView;
 
@@ -85,113 +93,93 @@
 
          pSaved_BackgroundColor = ppw -> pSaved_BackgroundColor;
 
-         restoreState(&tm);
+         restoreState(&ppw -> openGLState);
 
       }
 
    }
 
-   setRenderingContext();
+   createRenderingContext();
 
    return;
    };
  
  
    PlotWindow::~PlotWindow() {
+   if ( IsWindow(hwnd) && deviceContext )
+      ReleaseDC(hwnd,deviceContext);
    unsetViewProperties();
    return;
    };
  
  
-   int PlotWindow::setRenderingContext() {
+   int PlotWindow::createRenderingContext() {
 
-   int pixelFormat;
+   isRendered = false;
 
-   PIXELFORMATDESCRIPTOR pfd = {
-       sizeof(PIXELFORMATDESCRIPTOR),
-       1,
-       PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_GENERIC_ACCELERATED | 0 * PFD_DOUBLEBUFFER, 
-       PFD_TYPE_RGBA,   
-       16,   
-       0, 0, 0,
-       0, 0, 0,
-       0,   0,   
-       0,   0, 0, 0, 0,
-       32,   
-       0,   
-       0,   
-       PFD_MAIN_PLANE,   
-       0,   
-       0, 0, 0 };
- 
    deviceContext = GetDC(hwnd);
- 
-   pixelFormat = ChoosePixelFormat(deviceContext,&pfd);
+  
+   if ( 0 == pixelFormat ) {
 
-   if ( ! pixelFormat ) {
-      pfd.dwFlags = pfd.dwFlags & ~ PFD_GENERIC_ACCELERATED;
       pixelFormat = ChoosePixelFormat(deviceContext,&pfd);
+
+      if ( ! pixelFormat ) {
+         pfd.dwFlags = pfd.dwFlags & ~ PFD_GENERIC_ACCELERATED;
+         pixelFormat = ChoosePixelFormat(deviceContext,&pfd);
+      }
+
    }
 
-/* 
-   pixelFormat = 0;
-   while ( pixelFormat < 48 ) {
-      pixelFormat++;
-      DescribePixelFormat(deviceContext,pixelFormat,sizeof(PIXELFORMATDESCRIPTOR),&pfd);
-      if ( pfd.dwFlags & PFD_GENERIC_FORMAT && ( pfd.dwFlags & PFD_GENERIC_ACCELERATED ) ) break;
-   }
-*/ 
    SetPixelFormat(deviceContext,pixelFormat,&pfd);
-/*   
-   DescribePixelFormat(deviceContext,pixelFormat,sizeof(PIXELFORMATDESCRIPTOR),&pfd);
- 
-   if ( pfd.cColorBits < 16 ) {
-      MessageBox(NULL,"Your display must be set in a higher color mode\r\nPlease re-configure your display for more colors","Note",MB_OK);
-      renderingContext = 0;
-      return FALSE;
+
+   if ( renderingContext ) {
+
+      wglDeleteContext(renderingContext);
+
+      renderingContext = NULL;
+
+      //renderingContext = wglCreateContext(deviceContext);
+
+      //wglMakeCurrent(deviceContext,renderingContext);
+
+      //return TRUE;
    }
-*/ 
+
+   if ( 0 == openGLState.windowCX || 0 == openGLState.windowCY )
+      return FALSE;
+
    renderingContext = wglCreateContext(deviceContext);
 
    wglMakeCurrent(deviceContext,renderingContext);
+WINDOWS_ERROR_CHECK
+OPENGL_ERROR_CHECK
+
+GLint bufferSize[4] = {0};
+glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
+
+//glBufferData(GL_BACK,
+   glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+OPENGL_ERROR_CHECK
+
+   glDrawBuffer(GL_BACK);
+OPENGL_ERROR_CHECK
+
+   
 
    return TRUE;
    }
  
  
-   int PlotWindow::saveState(transformationMatrixes* tm) {
+   int PlotWindow::saveState() {
 
-glGetError();
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
-   glGetIntegerv(GL_VIEWPORT,viewPort);
-OPENGL_ERROR_CHECK
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
+   glGetDoublev(GL_PROJECTION_MATRIX,openGLState.projectionMatrix);
+   glGetIntegerv(GL_VIEWPORT,openGLState.viewPort);
 
-   if ( tm ) {
-
-      memcpy(tm -> projectionMatrix,projectionMatrix,sizeof(tm -> projectionMatrix));
-      memcpy(tm -> modelMatrix,modelMatrix,sizeof(tm -> modelMatrix));
-
-      tm -> viewPortMargins[0] = viewPort[0];
-      tm -> viewPortMargins[1] = viewPort[1];
-      tm -> viewPortMargins[2] = windowCX - viewPort[2] - viewPort[0];
-      tm -> viewPortMargins[3] = windowCY - viewPort[3] - viewPort[1];
-
-      tm -> windowCX = windowCX;
-      tm -> windowCY = windowCY;
-
-      tm -> xScaleFactor = xScaleFactor;
-      tm -> yScaleFactor = yScaleFactor;
-      tm -> zScaleFactor = zScaleFactor;
-      
-      tm -> extentsXMin = extentsXMin;
-      tm -> extentsYMin = extentsYMin;
-      tm -> extentsZMin = extentsZMin;
-      tm -> extentsXMax = extentsXMax;
-      tm -> extentsYMax = extentsYMax;
-      tm -> extentsZMax = extentsZMax;
-
-   }
+   openGLState.viewPortMargins[0] = openGLState.viewPort[0];
+   openGLState.viewPortMargins[1] = openGLState.viewPort[1];
+   openGLState.viewPortMargins[2] = openGLState.windowCX - openGLState.viewPort[2] - openGLState.viewPort[0];
+   openGLState.viewPortMargins[3] = openGLState.windowCY - openGLState.viewPort[3] - openGLState.viewPort[1];
 
    return 0;
    }
@@ -199,47 +187,45 @@ OPENGL_ERROR_CHECK
  
    int PlotWindow::restoreState(transformationMatrixes* tm) {
 
-glGetError();
+   RECT rect;
+   GetWindowRect(hwnd,&rect);
+   openGLState.windowCX = rect.right - rect.left;
+   openGLState.windowCY = rect.bottom - rect.top;
+
 
    if ( tm ) {
 
-      memcpy(projectionMatrix,tm -> projectionMatrix,sizeof(tm -> projectionMatrix));
-      memcpy(modelMatrix,tm -> modelMatrix,sizeof(tm -> modelMatrix));
-
-      viewPort[0] = (long)((double)windowCX * (double)(tm -> viewPortMargins[0]) / (double)(tm -> windowCX));
-      viewPort[1] = (long)((double)windowCY * (double)(tm -> viewPortMargins[1]) / (double)(tm -> windowCY));
-
-      RECT rect;
-      GetWindowRect(hwnd,&rect);
-
-      viewPort[2] = (rect.right - rect.left) - viewPort[0] - (long)((double)(rect.right - rect.left) * (double)(tm -> viewPortMargins[2]) / (double)(tm -> windowCX));
-      viewPort[3] = (rect.bottom - rect.top) - viewPort[1] - (long)((double)(rect.bottom - rect.top) * (double)(tm -> viewPortMargins[3]) / (double)(tm -> windowCY));
-
-      xScaleFactor = tm -> xScaleFactor;
-      yScaleFactor = tm -> yScaleFactor;
-      zScaleFactor = tm -> zScaleFactor;
-      
-      extentsXMin = tm -> extentsXMin;
-      extentsYMin = tm -> extentsYMin;
-      extentsZMin = tm -> extentsZMin;
-      extentsXMax = tm -> extentsXMax;
-      extentsYMax = tm -> extentsYMax;
-      extentsZMax = tm -> extentsZMax;
-
+      openGLState.viewPortMargins[0] = (long)((double)openGLState.windowCX * (double)(tm -> viewPortMargins[0]) / (double)(tm -> windowCX));
+      openGLState.viewPortMargins[1] = (long)((double)openGLState.windowCY * (double)(tm -> viewPortMargins[1]) / (double)(tm -> windowCY));
+      openGLState.viewPortMargins[2] = (long)((double)openGLState.windowCX * (double)(tm -> viewPortMargins[2]) / (double)(tm -> windowCX));
+      openGLState.viewPortMargins[3] = (long)((double)openGLState.windowCY * (double)(tm -> viewPortMargins[3]) / (double)(tm -> windowCY));
 
    }
 
-//glPixelStorei(GL_PACK_ALIGNMENT,1);
+   openGLState.viewPort[0] = openGLState.viewPortMargins[0];
+   openGLState.viewPort[1] = openGLState.viewPortMargins[1];
+   openGLState.viewPort[2] = openGLState.windowCX - openGLState.viewPortMargins[0] - openGLState.viewPortMargins[2];
+   openGLState.viewPort[3] = openGLState.windowCY - openGLState.viewPortMargins[2] - openGLState.viewPortMargins[3];
 
-   glViewport((GLint)viewPort[0],(GLint)viewPort[1],(GLsizei)viewPort[2],(GLsizei)viewPort[3]);
+   if ( tm ) {
 
-   glMatrixMode(GL_MODELVIEW);
-   glLoadMatrixd(modelMatrix);
+      memcpy(openGLState.projectionMatrix,tm -> projectionMatrix,sizeof(tm -> projectionMatrix));
+      memcpy(openGLState.modelMatrix,tm -> modelMatrix,sizeof(tm -> modelMatrix));
 
-   glMatrixMode(GL_PROJECTION);
-   glLoadMatrixd(projectionMatrix);
+      openGLState.xScaleFactor = tm -> xScaleFactor;
+      openGLState.yScaleFactor = tm -> yScaleFactor;
+      openGLState.zScaleFactor = tm -> zScaleFactor;
+      
+      openGLState.extentsXMin = tm -> extentsXMin;
+      openGLState.extentsYMin = tm -> extentsYMin;
+      openGLState.extentsZMin = tm -> extentsZMin;
+      openGLState.extentsXMax = tm -> extentsXMax;
+      openGLState.extentsYMax = tm -> extentsYMax;
+      openGLState.extentsZMax = tm -> extentsZMax;
 
-OPENGL_ERROR_CHECK
+   }
+
+   setUp(NULL);
 
    return 0;
    }
@@ -257,6 +243,7 @@ OPENGL_ERROR_CHECK
                                IGProperty *pPropMarginUnits,
                                IGProperty *pPropStretchToMargins) {
    unsetViewProperties();
+
    if ( pPropPlotView ) {
       pPropPlotView -> AddRef();
       pSaved_PlotView = pPropPlotView;
@@ -297,6 +284,7 @@ OPENGL_ERROR_CHECK
       pPropStretchToMargins -> AddRef();
       pSaved_StretchToMargins = pPropStretchToMargins;
    }
+
    return S_OK;
    }
 
@@ -348,28 +336,31 @@ OPENGL_ERROR_CHECK
 
    HRESULT PlotWindow::set2D(IDataSet *masterDataSet,long margins,char directionRight,char directionUp) {
 
-   viewPort[0] = margins;
-   viewPort[1] = margins;
-   viewPort[2] = windowCX - 2 * margins;
-   viewPort[3] = windowCY - 2 * margins;
+   openGLState.viewPort[0] = margins;
+   openGLState.viewPort[1] = margins;
+   openGLState.viewPort[2] = openGLState.windowCX - 2 * margins;
+   openGLState.viewPort[3] = openGLState.windowCY - 2 * margins;
 
-   glViewport(viewPort[0],viewPort[1],viewPort[2],viewPort[3]);
+   glViewport(openGLState.viewPort[0],openGLState.viewPort[1],(GLsizei)openGLState.viewPort[2],(GLsizei)openGLState.viewPort[3]);
 OPENGL_ERROR_CHECK
 
    DataPoint dp[2];
    masterDataSet -> GetDomain(&dp[0],&dp[1]);
-   extentsXMin = dp[0].x;
-   extentsYMin = dp[0].y;
-   extentsZMin = dp[0].z;
-   extentsXMax = dp[1].x;
-   extentsYMax = dp[1].y;
-   extentsZMax = dp[1].z;
+   openGLState.extentsXMin = dp[0].x;
+   openGLState.extentsYMin = dp[0].y;
+   openGLState.extentsZMin = dp[0].z;
+   openGLState.extentsXMax = dp[1].x;
+   openGLState.extentsYMax = dp[1].y;
+   openGLState.extentsZMax = dp[1].z;
  
-   if ( extentsZMin == extentsZMax ) extentsZMax += 0.1 * extentsZMin;
-   if ( extentsZMin == extentsZMax ) extentsZMax = 1.0;
+   if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
+      openGLState.extentsZMax += 0.1 * openGLState.extentsZMin;
+   if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
+      openGLState.extentsZMax = 1.0;
 
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
+
 OPENGL_ERROR_CHECK
 
    switch ( directionRight ) {
@@ -394,30 +385,33 @@ OPENGL_ERROR_CHECK
       break;
    }
 
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
 
-   extentsZMin = -1.0;
-   extentsZMax = 1.0;
+   openGLState.extentsZMin = -1.0;
+   openGLState.extentsZMax = 1.0;
 
-   glOrtho(extentsXMin,extentsXMax,extentsYMin,extentsYMax,extentsZMin,extentsZMax);
+   glOrtho(openGLState.extentsXMin,openGLState.extentsXMax,openGLState.extentsYMin,openGLState.extentsYMax,openGLState.extentsZMin,openGLState.extentsZMax);
 
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
+   glGetDoublev(GL_PROJECTION_MATRIX,openGLState.projectionMatrix);
+
 OPENGL_ERROR_CHECK
 
    initialized = true;
 
-   xScaleFactor = 1.0;
-   yScaleFactor = 1.0;
-   zScaleFactor = 1.0;
+   openGLState.xScaleFactor = 1.0;
+   openGLState.yScaleFactor = 1.0;
+   openGLState.zScaleFactor = 1.0;
+
+   isRendered = false;
 
    return S_OK;
    }
 
 
-   HRESULT PlotWindow::setUp(IDataSet *masterDataSet,
+   HRESULT PlotWindow::setUp(IDataSet *pIMasterDataSet,
                              IGProperty *pPropPlotView,
                              IGProperty *pPropRotationTheta,
                              IGProperty *pPropRotationPhi,
@@ -431,17 +425,24 @@ OPENGL_ERROR_CHECK
 glGetError();
 
    RECT rect;
-   char *pszUnits;
+   char *pszUnits = NULL;
    long plotView;
    short stretchToMargins;
    double phi,theta,spin;
 
    GetWindowRect(hwnd,&rect);
  
-   windowCX = rect.right - rect.left;
-   windowCY = rect.bottom - rect.top;
+   if ( ! renderingContext || ! ( ( rect.right - rect.left ) == openGLState.windowCX ) || ! ( ( rect.bottom - rect.top ) == openGLState.windowCY) ) {
+      openGLState.windowCX = rect.right - rect.left;
+      openGLState.windowCY = rect.bottom - rect.top;
+      createRenderingContext();
+   }
+
+   openGLState.windowCX = rect.right - rect.left;
+   openGLState.windowCY = rect.bottom - rect.top;
  
-   if ( windowCX == 0 || windowCY == 0 ) return S_OK;
+   if ( openGLState.windowCX == 0 || openGLState.windowCY == 0 ) 
+      return S_OK;
  
    if ( pPropMarginUnits ) {
       long n;
@@ -516,79 +517,79 @@ glGetError();
    }
 
    if ( pPropLeftMargin ) {
-      pPropLeftMargin -> get_longValue(&dxleft);
+      pPropLeftMargin -> get_longValue(&openGLState.viewPortMargins[0]);
       if ( pszUnits )
          if ( strcmp(pszUnits,"percent") == 0 ) 
-            dxleft = (long)((double)windowCX * (double)dxleft / 100.0);
+            openGLState.viewPortMargins[0] = (long)((double)openGLState.windowCX * (double)openGLState.viewPortMargins[0] / 100.0);
       if ( ! pSaved_LeftMargin ) {
          pSaved_LeftMargin = pPropLeftMargin;
          pSaved_LeftMargin -> AddRef();
       }
    } else {
       if ( pSaved_LeftMargin ) {
-         pSaved_LeftMargin -> get_longValue(&dxleft);
+         pSaved_LeftMargin -> get_longValue(&openGLState.viewPortMargins[0]);
          if ( pszUnits )
             if ( strcmp(pszUnits,"percent") == 0 ) 
-               dxleft = (long)((double)windowCX * (double)dxleft / 100.0);         
+               openGLState.viewPortMargins[0] = (long)((double)openGLState.windowCX * (double)openGLState.viewPortMargins[0] / 100.0);         
       } else
-         dxleft = 8;
+         openGLState.viewPortMargins[0] = 8;
    }
 
    if ( pPropTopMargin ) {
-      pPropTopMargin -> get_longValue(&dytop);
+      pPropTopMargin -> get_longValue(&openGLState.viewPortMargins[3]);
       if ( pszUnits )
          if ( strcmp(pszUnits,"percent") == 0 ) 
-            dytop = (long)((double)windowCY * (double)dytop / 100.0);
+            openGLState.viewPortMargins[3] = (long)((double)openGLState.windowCY * (double)openGLState.viewPortMargins[3] / 100.0);
       if ( ! pSaved_TopMargin ) {
          pSaved_TopMargin = pPropTopMargin;
          pSaved_TopMargin -> AddRef();
       }
    } else {
       if ( pSaved_TopMargin ) {
-         pSaved_TopMargin -> get_longValue(&dytop);
+         pSaved_TopMargin -> get_longValue(&openGLState.viewPortMargins[3]);
          if ( pszUnits )
             if ( strcmp(pszUnits,"percent") == 0 ) 
-               dytop = (long)((double)windowCY * (double)dytop / 100.0);
+               openGLState.viewPortMargins[3] = (long)((double)openGLState.windowCY * (double)openGLState.viewPortMargins[3] / 100.0);
       } else 
-         dytop = 8;
+         openGLState.viewPortMargins[3] = 8;
    }
 
    if ( pPropRightMargin ) {
-      pPropRightMargin -> get_longValue(&dxright);
+      pPropRightMargin -> get_longValue(&openGLState.viewPortMargins[2]);
       if ( pszUnits )
          if ( strcmp(pszUnits,"percent") == 0 ) 
-            dxright = (long)((double)windowCX * (double)dxright / 100.0);
+            openGLState.viewPortMargins[2] = (long)((double)openGLState.windowCX * (double)openGLState.viewPortMargins[2] / 100.0);
       if ( ! pSaved_RightMargin ) {
          pSaved_RightMargin = pPropRightMargin;
          pSaved_RightMargin -> AddRef();
       }
    } else {
       if ( pSaved_RightMargin ) {
-         pSaved_RightMargin -> get_longValue(&dxright);
+         pSaved_RightMargin -> get_longValue(&openGLState.viewPortMargins[2]);
          if ( pszUnits )
             if ( strcmp(pszUnits,"percent") == 0 ) 
-               dxright = (long)((double)windowCX * (double)dxright / 100.0);
+               openGLState.viewPortMargins[2] = (long)((double)openGLState.windowCX * (double)openGLState.viewPortMargins[2] / 100.0);
       } else 
-         dxright = 8;
+         openGLState.viewPortMargins[2] = 8;
    }
 
    if ( pPropBottomMargin ) {
-      pPropBottomMargin -> get_longValue(&dybottom);
+      pPropBottomMargin -> get_longValue(&openGLState.viewPortMargins[1]);
       if ( pszUnits )
          if ( strcmp(pszUnits,"percent") == 0 ) 
-            dybottom = (long)((double)windowCY * (double)dybottom / 100.0);
+            openGLState.viewPortMargins[1] = (long)((double)openGLState.windowCY * (double)openGLState.viewPortMargins[1] / 100.0);
       if ( ! pSaved_BottomMargin ) {
          pSaved_BottomMargin = pPropBottomMargin;
          pSaved_BottomMargin -> AddRef();
       }
    } else {
       if ( pSaved_BottomMargin ) {
-         pSaved_BottomMargin -> get_longValue(&dybottom);
+         pSaved_BottomMargin -> get_longValue(&openGLState.viewPortMargins[1]);
          if ( pszUnits )
             if ( strcmp(pszUnits,"percent") == 0 ) 
-               dybottom = (long)((double)windowCY * (double)dybottom / 100.0);
+               openGLState.viewPortMargins[1] = (long)((double)openGLState.windowCY * (double)openGLState.viewPortMargins[1] / 100.0);
       } else 
-         dybottom = 8;
+         openGLState.viewPortMargins[1] = 8;
    }
 
    if ( pszUnits ) delete [] pszUnits;
@@ -606,40 +607,50 @@ glGetError();
          pPropStretchToMargins = FALSE;
    }
 
-   viewPort[0] = dxleft;
-   viewPort[1] = dybottom;
-   viewPort[2] = windowCX - dxleft - dxright;
-   viewPort[3] = windowCY - dybottom - dytop;
+   if ( pIMasterDataSet ) {
+      pIMasterDataSet -> get_minX(&openGLState.extentsXMin);
+      pIMasterDataSet -> get_minY(&openGLState.extentsYMin);
+      pIMasterDataSet -> get_minZ(&openGLState.extentsZMin);
+      pIMasterDataSet -> get_maxX(&openGLState.extentsXMax);
+      pIMasterDataSet -> get_maxY(&openGLState.extentsYMax);
+      pIMasterDataSet -> get_maxZ(&openGLState.extentsZMax);
+   }
 
-   if ( viewPort[2] < 1 ) return S_OK;
-   if ( viewPort[3] < 1 ) return S_OK;
- 
-   glViewport(viewPort[0],viewPort[1],viewPort[2],viewPort[3]);
+   setOpenGLMatrices(plotView,phi,theta,spin);
 
-   masterDataSet -> get_minX(&extentsXMin);
-   masterDataSet -> get_minY(&extentsYMin);
-   masterDataSet -> get_minZ(&extentsZMin);
-   masterDataSet -> get_maxX(&extentsXMax);
-   masterDataSet -> get_maxY(&extentsYMax);
-   masterDataSet -> get_maxZ(&extentsZMax);
- 
-   if ( extentsXMin == DBL_MAX || extentsXMax == -DBL_MAX || extentsYMin == DBL_MAX || 
-         extentsYMax == -DBL_MAX || extentsZMin == DBL_MAX || extentsZMax == -DBL_MAX ) return E_FAIL;
+   isRendered = false;
 
-   if ( extentsZMin == extentsZMax ) extentsZMax += 0.1 * extentsZMin;
-   if ( extentsZMin == extentsZMax ) extentsZMax = 1.0;
+   return S_OK;
+   }
+
+
+   void PlotWindow::setOpenGLMatrices(long plotView,double phi,double theta,double spin) {
+
+   openGLState.viewPort[0] = (GLint)openGLState.viewPortMargins[0];
+   openGLState.viewPort[1] = (GLint)openGLState.viewPortMargins[1];
+   openGLState.viewPort[2] = (GLint)(openGLState.windowCX - openGLState.viewPortMargins[0] - openGLState.viewPortMargins[2]);
+   openGLState.viewPort[3] = (GLint)(openGLState.windowCY - openGLState.viewPortMargins[1] - openGLState.viewPortMargins[3]);
+
+   glViewport(openGLState.viewPort[0],openGLState.viewPort[1],(GLsizei)openGLState.viewPort[2],(GLsizei)openGLState.viewPort[3]);
+
+   if ( openGLState.extentsXMin == DBL_MAX || openGLState.extentsXMax == -DBL_MAX || openGLState.extentsYMin == DBL_MAX || 
+         openGLState.extentsYMax == -DBL_MAX || openGLState.extentsZMin == DBL_MAX || openGLState.extentsZMax == -DBL_MAX ) 
+      return;
+
+   if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
+      openGLState.extentsZMax += 0.1 * openGLState.extentsZMin;
+   if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
+      openGLState.extentsZMax = 1.0;
 
    glMatrixMode(GL_MODELVIEW);
 
    glLoadIdentity();
 
-OPENGL_ERROR_CHECK
-
    if ( plotView == gcPlotView3D && ( phi != 90.0 || theta != 270.0 || spin != 0.0 ) ) {
 
-      xScaleFactor = 2.0 / (extentsXMax - extentsXMin);
-      yScaleFactor = 2.0 / (extentsYMax - extentsYMin);
-      zScaleFactor = 2.0 / (extentsZMax - extentsZMin);
+      openGLState.xScaleFactor = 2.0 / (openGLState.extentsXMax - openGLState.extentsXMin);
+      openGLState.yScaleFactor = 2.0 / (openGLState.extentsYMax - openGLState.extentsYMin);
+      openGLState.zScaleFactor = 2.0 / (openGLState.extentsZMax - openGLState.extentsZMin);
 
       glRotated(phi,1.0,0.0,0.0);
       glRotated(-theta,0.0,1.0,0.0);
@@ -647,19 +658,19 @@ OPENGL_ERROR_CHECK
       glRotated(-90.0,0.0,0.0,1.0);
       glRotated(spin,1.0,1.0,1.0);
 
-      glScaled(xScaleFactor,yScaleFactor,zScaleFactor);
+      glScaled(openGLState.xScaleFactor,openGLState.yScaleFactor,openGLState.zScaleFactor);
 
-      glTranslated(-extentsXMin,-extentsYMin,-extentsZMin);
+      glTranslated(-openGLState.extentsXMin,-openGLState.extentsYMin,-openGLState.extentsZMin);
 
    } else {
 
-      xScaleFactor = 1.0;
-      yScaleFactor = 1.0;
-      zScaleFactor = 1.0;
+      openGLState.xScaleFactor = 1.0;
+      openGLState.yScaleFactor = 1.0;
+      openGLState.zScaleFactor = 1.0;
 
    }
 
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
 
    glMatrixMode(GL_PROJECTION);
 
@@ -668,47 +679,47 @@ OPENGL_ERROR_CHECK
    if ( plotView == gcPlotView3D ) 
       glOrtho(-2.0,2.0,-2.0,2.0,-4.0,4.0);
    else
-      glOrtho(extentsXMin,extentsXMax,extentsYMin,extentsYMax,-1.0,1.0);//extentsZMin,extentsZMax);//-10000.0,10000.0);//-200.0 * fabs(extentsZMin),200.0 * fabs(extentsZMax));
+      glOrtho(openGLState.extentsXMin,openGLState.extentsXMax,openGLState.extentsYMin,openGLState.extentsYMax,-1.0,1.0);
 
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
+   glGetDoublev(GL_PROJECTION_MATRIX,openGLState.projectionMatrix);
 
    char szTemp[64];
 
-   if ( DBL_MAX != extentsXMin && -DBL_MAX != extentsXMin/* && fabs(extentsXMin - 1.7e–308) > 1000.0 */ ) {
-      sprintf(szTemp,"MinX = %lf",extentsXMin);
+   if ( DBL_MAX != openGLState.extentsXMin && -DBL_MAX != openGLState.extentsXMin/* && fabs(extentsXMin - 1.7e–308) > 1000.0 */ ) {
+      sprintf(szTemp,"MinX = %lf",openGLState.extentsXMin);
       eval(pIEvaluator,szTemp);
    }
-   if ( DBL_MAX != extentsXMax && -DBL_MAX != extentsXMax/* && fabs(extentsXMax - 1.7e–308) > 1000.0 */ ) {
-      sprintf(szTemp,"MaxX = %lf",extentsXMax);
+   if ( DBL_MAX != openGLState.extentsXMax && -DBL_MAX != openGLState.extentsXMax/* && fabs(extentsXMax - 1.7e–308) > 1000.0 */ ) {
+      sprintf(szTemp,"MaxX = %lf",openGLState.extentsXMax);
       eval(pIEvaluator,szTemp);
    }
-   if ( DBL_MAX != extentsYMin && -DBL_MAX != extentsYMin/* && fabs(extentsYMin - 1.7e–308) > 1000.0 */) {
-      sprintf(szTemp,"MinY = %lf",extentsYMin);
+   if ( DBL_MAX != openGLState.extentsYMin && -DBL_MAX != openGLState.extentsYMin/* && fabs(extentsYMin - 1.7e–308) > 1000.0 */) {
+      sprintf(szTemp,"MinY = %lf",openGLState.extentsYMin);
       eval(pIEvaluator,szTemp);
    }
-   if ( DBL_MAX != extentsYMax && -DBL_MAX != extentsYMax/* && fabs(extentsYMax - 1.7e–308) > 1000.0 */) {
-      sprintf(szTemp,"MaxY = %lf",extentsYMax);
+   if ( DBL_MAX != openGLState.extentsYMax && -DBL_MAX != openGLState.extentsYMax/* && fabs(extentsYMax - 1.7e–308) > 1000.0 */) {
+      sprintf(szTemp,"MaxY = %lf",openGLState.extentsYMax);
       eval(pIEvaluator,szTemp);
    }
-   if ( DBL_MAX != extentsZMin && -DBL_MAX != extentsZMin/* && fabs(extentsZMin - 1.7e–308) > 1000.0 */) {
-      sprintf(szTemp,"MinZ = %lf",extentsZMin);
+   if ( DBL_MAX != openGLState.extentsZMin && -DBL_MAX != openGLState.extentsZMin/* && fabs(extentsZMin - 1.7e–308) > 1000.0 */) {
+      sprintf(szTemp,"MinZ = %lf",openGLState.extentsZMin);
       eval(pIEvaluator,szTemp);
    }
-   if ( DBL_MAX != extentsZMax && -DBL_MAX != extentsZMax/* && fabs(extentsZMax - 1.7e–308) > 1000.0 */) {
-      sprintf(szTemp,"MaxZ = %lf",extentsZMax);
+   if ( DBL_MAX != openGLState.extentsZMax && -DBL_MAX != openGLState.extentsZMax/* && fabs(extentsZMax - 1.7e–308) > 1000.0 */) {
+      sprintf(szTemp,"MaxZ = %lf",openGLState.extentsZMax);
       eval(pIEvaluator,szTemp);
    }
 
    initialized = true;
 
-   return S_OK;
+   return;
    }
  
  
    HRESULT PlotWindow::translate(DataPoint *dp) {
    glMatrixMode(GL_MODELVIEW);
    glTranslated(dp -> x,dp -> y,dp -> z);
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
    return S_OK;
    }
 
@@ -731,7 +742,7 @@ OPENGL_ERROR_CHECK
    default:
       return E_INVALIDARG;
    }
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
+   glGetDoublev(GL_PROJECTION_MATRIX,openGLState.projectionMatrix);
    return S_OK;
    }
 
@@ -742,21 +753,21 @@ OPENGL_ERROR_CHECK
 /*
    Not saving scale factors (int xScaleFactor, etc.). Investigate later
 */
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
    return S_OK;
    }
 
 
    HRESULT PlotWindow::setViewPort(int *vp) {
-   viewPort[0] = vp[0];
-   viewPort[1] = vp[1];
-   viewPort[2] = vp[2];
-   viewPort[3] = vp[3];
-   glViewport(viewPort[0],viewPort[1],viewPort[2],viewPort[3]);
+   openGLState.viewPort[0] = vp[0];
+   openGLState.viewPort[1] = vp[1];
+   openGLState.viewPort[2] = vp[2];
+   openGLState.viewPort[3] = vp[3];
+   glViewport(openGLState.viewPort[0],openGLState.viewPort[1],(GLsizei)openGLState.viewPort[2],(GLsizei)openGLState.viewPort[3]);
    glMatrixMode(GL_MODELVIEW);
-   glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+   glGetDoublev(GL_MODELVIEW_MATRIX,openGLState.modelMatrix);
    glMatrixMode(GL_PROJECTION);
-   glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
+   glGetDoublev(GL_PROJECTION_MATRIX,openGLState.projectionMatrix);
    return S_OK;
    }
 
@@ -894,11 +905,28 @@ OPENGL_ERROR_CHECK
    }
 
    glClearColor(fv[0],fv[1],fv[2],0.0);
+OPENGL_ERROR_CHECK
+
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-   glFlush();
+OPENGL_ERROR_CHECK
 
    if ( ! pSaved_BackgroundColor )
       pSaved_BackgroundColor = pPropBackgroundColor;
+
+   BYTE vb[3];
+   vb[0] = (BYTE)(255.0f*fv[0]);
+   vb[1] = (BYTE)(255.0f*fv[1]);
+   vb[2] = (BYTE)(255.0f*fv[2]);
+
+   HBRUSH hb = CreateSolidBrush(RGB(vb[0],vb[1],vb[2]));
+
+   RECT rc = {0};
+
+   GetClientRect(hwnd,&rc);
+
+   SelectObject(deviceContext,hb);
+
+   FillRect(deviceContext,&rc,hb);
 
    return S_OK;
    }
@@ -913,23 +941,24 @@ OPENGL_ERROR_CHECK
 
    HRESULT PlotWindow::getPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *pHitTable,long hitTableSize,long *pCallLists,unsigned int *pHitTableHits) {
 
-   if ( lineMode || polygonMode ) return S_FALSE;
+   if ( lineMode || polygonMode ) 
+      return S_FALSE;
 
    double x,y;
  
    x = (double)ptl -> x;
-   y = (double)windowCY - (double)ptl -> y;
+   y = (double)openGLState.windowCY - (double)ptl -> y;
  
-   if ( ptl -> x < viewPort[0] )
+   if ( ptl -> x < openGLState.viewPort[0] )
       return S_FALSE;
 
-   if ( ptl -> x > (viewPort[0] + viewPort[2]) )
+   if ( ptl -> x > (openGLState.viewPort[0] + openGLState.viewPort[2]) )
       return S_FALSE;
 
-   if ( (long)y < viewPort[1] )
+   if ( (long)y < openGLState.viewPort[1] )
       return S_FALSE;
 
-   if ( (long)y > (viewPort[1] + viewPort[3]) )
+   if ( (long)y > (openGLState.viewPort[1] + openGLState.viewPort[3]) )
       return S_FALSE;
 
    long plotView = (long)gcPlotView2D; 
@@ -955,12 +984,12 @@ OPENGL_ERROR_CHECK
  
    glLoadIdentity();
 
-   gluPickMatrix(x,y,pickWindowSize,pickWindowSize,viewPort);
+   gluPickMatrix(x,y,pickWindowSize,pickWindowSize,openGLState.viewPort);
 
    if ( gcPlotView3D == plotView )
       glOrtho(-2.0,2.0,-2.0,2.0,-4.0,4.0);
    else
-      glOrtho(extentsXMin,extentsXMax,extentsYMin,extentsYMax,extentsZMin,extentsZMax);
+      glOrtho(openGLState.extentsXMin,openGLState.extentsXMax,openGLState.extentsYMin,openGLState.extentsYMax,openGLState.extentsZMin,openGLState.extentsZMax);
 
    long *pList = pCallLists;
 
@@ -976,4 +1005,154 @@ OPENGL_ERROR_CHECK
    glPopMatrix();
 
    return S_OK;
+   }
+
+
+   HBITMAP PlotWindow::getMergedBackground(HWND hwndTarget,HDC hdc) {
+
+   //RECT rc;
+   //GetWindowRect(hwndTarget,&rc);
+
+   //long cxWindow = rc.right - rc.left;
+   //long cyWindow = rc.bottom - rc.top;
+
+   GLint bufferSize[4] = {0};
+
+   glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
+
+   long cxBuffer = bufferSize[2];
+   long cyBuffer = bufferSize[3];
+
+   long cxWindow = cxBuffer;
+   long cyWindow = cyBuffer;
+
+   long pixelCount = cxBuffer * cyBuffer;
+
+   float *pPixelsFloat = new float[4 * pixelCount];
+
+   memset(pPixelsFloat,0,4 * pixelCount * sizeof(float));
+
+   GetPixels(0,0,cxBuffer,cyBuffer,cyBuffer,(BYTE *)pPixelsFloat);
+
+   float *pf = pPixelsFloat;
+
+   BYTE *pPixels = new BYTE[4 * pixelCount];
+
+   memset(pPixels,0,4 * pixelCount * sizeof(BYTE));
+
+   BYTE *b = pPixels;
+
+   for ( long j = 0; j < cyBuffer; j++ ) {
+      for ( long k = 0; k < cxBuffer; k++ ) {
+         b[2] = (BYTE)(255.0 * pf[0]);
+         b[1] = (BYTE)(255.0 * pf[1]);
+         b[0] = (BYTE)(255.0 * pf[2]);
+         b[3] = (BYTE)(255.0 * pf[3]);
+         pf += 4;
+         b += 4;
+      }
+   }   
+
+   BITMAP bitmap = {0};
+
+   {
+
+   HBITMAP hbmReference = CreateCompatibleBitmap(hdc,cxWindow,cyWindow);
+
+   GetObject(hbmReference,sizeof(BITMAP),&bitmap);
+
+   DeleteObject(hbmReference);
+
+   }
+
+   BITMAPINFO bitmapInfo = {0};
+
+   bitmapInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+
+   bitmapInfo.bmiHeader.biBitCount = bitmap.bmBitsPixel;
+   bitmapInfo.bmiHeader.biHeight = -bitmap.bmHeight;
+   bitmapInfo.bmiHeader.biWidth = bitmap.bmWidth;
+   bitmapInfo.bmiHeader.biPlanes = 1;
+   bitmapInfo.bmiHeader.biCompression = BI_RGB;
+   bitmapInfo.bmiHeader.biSizeImage = -bitmap.bmHeight * ((bitmap.bmWidth * bitmap.bmPlanes * bitmap.bmBitsPixel + 31) & ~31) / 8;
+   
+   HBITMAP hbmOpenGL = CreateCompatibleBitmap(hdc,cxBuffer,cyBuffer);
+
+   SetDIBits(hdc,hbmOpenGL,0,cyBuffer,(void *)pPixels,&bitmapInfo,DIB_RGB_COLORS);
+
+   HDC hdcOpenGL = CreateCompatibleDC(hdc);
+
+   HGDIOBJ oldBitmapOpenGL = SelectObject(hdcOpenGL,hbmOpenGL);
+
+   // hdcOpenGL now contains the openGL rendering, but not the GDI 
+
+   HBITMAP hbmMerged = CreateCompatibleBitmap(hdc,cxWindow,cyWindow);
+
+   {
+
+   HDC hdcMerged = CreateCompatibleDC(hdc);
+
+   HGDIOBJ oldBitmap = SelectObject(hdcMerged,hbmMerged);
+
+   BitBlt(hdcMerged,0,0,cxWindow,cyWindow,hdc,0,0,SRCCOPY);
+
+   BitBlt(hdcMerged,0*(cxWindow - cxBuffer)/2,0*(cyWindow - cyBuffer)/2,cxBuffer,cyBuffer,hdcOpenGL,0,0,SRCAND);
+
+   SelectObject(hdcMerged,oldBitmap);
+
+   DeleteDC(hdcMerged);
+
+   }
+
+   delete [] pPixelsFloat;
+
+   delete [] pPixels;
+
+   SelectObject(hdcOpenGL,oldBitmapOpenGL);
+
+   DeleteDC(hdcOpenGL);
+
+   DeleteObject(hbmOpenGL);
+
+   return hbmMerged;
+   }
+
+
+   HRESULT PlotWindow::GetPixels(long x1,long y1,long x2,long y2,long cyWindow,BYTE *pResult) {
+
+   long cx = x2 - x1;
+   long cy = y2 - y1;
+
+   long rowSize = 4 * sizeof(GLfloat) * cx;
+
+   BYTE *pSwap = new BYTE[cy * rowSize];
+
+   memset(pSwap,0,cy * rowSize);
+
+   glReadPixels(x1,cyWindow - y2,cx,cy,GL_RGBA,GL_FLOAT,pSwap);
+OPENGL_ERROR_CHECK
+
+   for ( int k = 0; k < cy; k++ ) 
+      memcpy(pResult + k * rowSize,pSwap + (cy - k - 1) * rowSize,rowSize);
+
+   delete [] pSwap;
+
+   return S_OK;
+   }
+
+
+   void PlotWindow::finalize() {
+
+   HBITMAP hbmMerged = getMergedBackground(hwnd,deviceContext);
+
+   HDC hdcSource = CreateCompatibleDC(deviceContext);
+   HGDIOBJ oldBitmap = SelectObject(hdcSource,hbmMerged);
+   BitBlt(deviceContext,0,0,openGLState.windowCX,openGLState.windowCY,hdcSource,0,0,SRCCOPY);
+   SelectObject(hdcSource,oldBitmap);
+   DeleteDC(hdcSource);
+   DeleteObject(hbmMerged);
+
+   isRendered = true;
+
+   return;
    }

@@ -22,6 +22,9 @@
       HWND hwndCurrent = p -> pIOpenGLImplementation -> TargetHWND();
       if ( ! ( hwnd == hwndCurrent ) )
          isOpenGLActive = false;
+      else 
+         if ( ! p -> pIOpenGLImplementation -> IsRendered() )
+            isOpenGLActive = false;
    }
  
    switch (msg) {
@@ -192,13 +195,14 @@
       if ( ! p ) break;
       PAINTSTRUCT ps;
       BeginPaint(hwnd,&ps);
-      p -> render(0);
+      HWND hwndCurrent = p -> pIOpenGLImplementation -> TargetHWND();
+      if ( hwndCurrent == hwnd )
+         p -> render(0);
       p -> ptlPickBox.x = -1L;
       p -> ptlPickBox.y = -1L;
       EndPaint(hwnd,&ps);
       }
       return LRESULT(FALSE);
- 
  
    case WM_INITMENUPOPUP: {
 
@@ -386,9 +390,11 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
          p -> pIGProperties -> ShowProperties(p -> hwndGraphic,pIUnknownThis);
          pIUnknownThis -> Release();
-         RECT rect;
-         GetWindowRect(p -> hwndFrame,&rect);
-         graphicFrameHandler(p -> hwndFrame,WM_SIZE,0L,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+         p -> render(0);
+         //RECT rect;
+         //GetWindowRect(p -> hwndFrame,&rect);
+         //graphicFrameHandler(p -> hwndFrame,WM_SIZE,0L,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
          }
          return LRESULT(TRUE);
  
@@ -397,6 +403,7 @@
          p -> pIViewSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownObject));
          p -> pIGProperties -> ShowProperties(hwnd,pIUnknownObject);
          pIUnknownObject -> Release();
+         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
          }
          return LRESULT(TRUE);
  
@@ -444,7 +451,8 @@
       if ( ! p )
          break;
 
-      long x = 0,y = 0,cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
+      long x = 0,y = 0;
+      long cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
 
       long cxDataSourcesAdjust = 0;
 
@@ -531,9 +539,18 @@
             } else
                SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy,SWP_SHOWWINDOW);
 
+            long currentTab = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
+
             ContainedFunction *pf = (ContainedFunction *)NULL;
-            while ( pf = p -> containedFunctionList.GetNext(pf) ) 
+            int k = 0;
+            while ( pf = p -> containedFunctionList.GetNext(pf) ) {
                pf -> ReSize();
+               if ( ! ( k == currentTab ) )
+                  pf -> Hide();
+               else
+                  pf -> Show();
+               k++;
+            }
 
          } else
 

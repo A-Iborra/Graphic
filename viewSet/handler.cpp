@@ -254,9 +254,8 @@
          break;
       if ( ! isActivated )
          break;
-      //p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
+      p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
       p -> render();
-      //p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndOwner);
       }
       return LRESULT(FALSE);
  

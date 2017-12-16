@@ -41,6 +41,7 @@
          break;
 
       long x = 0,y = 0,cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
+
       if ( cx == 0 || cy == 0 )
          break;
 
@@ -64,10 +65,6 @@
          x += sizeFunction.cx + 52;
 
          SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizeFunction.cx + 16,min(cy - 74,sizeFunction.cy + 16),0L);
-
-         ContainedFunction* pContainedFunction = (ContainedFunction*)NULL;
-         while ( pContainedFunction = p -> containedFunctionList.GetNext(pContainedFunction) ) 
-            pContainedFunction -> ReSize();
 
          SetWindowPos(GetDlgItem(hwnd,IDDI_DATASOURCES_CLEAR),HWND_TOP,8,sizeFunction.cy + 16 + 32 + 10,0,0,SWP_NOSIZE);
          SetWindowPos(GetDlgItem(hwnd,IDDI_DATASOURCES_AUTOCLEAR),HWND_TOP,60,sizeFunction.cy + 16 + 32 + 10,0,0,SWP_NOSIZE);
@@ -112,21 +109,17 @@
       tie.mask = TCIF_PARAM;
       SendMessage(pn -> hwndFrom,TCM_GETITEM,(WPARAM)k,(LPARAM)&tie);
       switch ( pn -> code ) {
-      case TCN_SELCHANGING:
-         ShowWindow((HWND)tie.lParam,SW_HIDE);
+      case TCN_SELCHANGING: 
+         ((ContainedObject *)tie.lParam) -> Hide();
          break;
  
       case TCN_SELCHANGE:
-         ShowWindow((HWND)tie.lParam,SW_SHOW);
+         ((ContainedObject *)tie.lParam) -> Show();
          break;
  
       default:
          break;
       }
- 
-      RECT rect;
-      GetWindowRect(p -> hwndDataSourcesDialog,&rect);
-      SendMessage(p -> hwndDataSourcesDialog,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
 
       }
       break;

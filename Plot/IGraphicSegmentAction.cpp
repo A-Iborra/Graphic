@@ -33,7 +33,12 @@
    else
       EnableMenuItem(hMenu,IDMI_PLOT_DELETE,MF_BYCOMMAND | MF_ENABLED);
 
-   TrackPopupMenu(hMenu,TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptlMouse.x,ptlMouse.y,0,hwndObjectWindow,NULL);
+   if ( hwndObjectWindow )
+      DestroyWindow(hwndObjectWindow);
+
+   hwndObjectWindow = CreateWindowEx(0,"p-handler","",0,0,0,0,0,HWND_DESKTOP,NULL,hModule,(void *)this);
+ 
+   TrackPopupMenuEx(hMenu,TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptlMouse.x,ptlMouse.y,hwndObjectWindow,NULL);
 
    return 1;
    }

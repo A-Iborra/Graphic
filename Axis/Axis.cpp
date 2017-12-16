@@ -31,7 +31,6 @@
      pIEvaluator(NULL),
      pIGSystemStatusBar(NULL),
      pParentPropertyPlotView(NULL),
-     pParentPropertyPlotSubType(NULL),
      pParentPropertyFloor(NULL),
      pParentPropertyCeiling(NULL),
      pParentPropertyOpenGLText(NULL),

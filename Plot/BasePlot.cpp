@@ -112,10 +112,9 @@
    pIGraphicSegment -> Close(TRUE);
  
    IText *t = NULL;
-   while ( t = textList.GetNext(t) ) t -> Draw();
- 
-   pIOpenGLImplementation -> Flush();
- 
+   while ( t = textList.GetNext(t) ) 
+      t -> Draw();
+
    return S_OK;
    }
  

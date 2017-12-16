@@ -510,5 +510,5 @@
    extern long oleMiscStatus;
 
 
-#define CONTAINERSIZE_CX   346
+#define CONTAINERSIZE_CX   256
 #define CONTAINERSIZE_CY   334

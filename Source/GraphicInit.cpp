@@ -128,6 +128,7 @@
    }
 
    pIOpenGLImplementation -> SetBaseWindow(hwndGraphic);
+   //pIOpenGLImplementation -> SetTargetWindow(hwndGraphic);
 
    long plotView = 0L;
    propertyPlotView -> get_longValue(&plotView);
@@ -149,11 +150,11 @@
       propertyPlotMarginUnits,
       propertyPlotMarginsStretchAll);
 
-   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
-   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
-   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,propertyPlotType,propertyFloor,propertyCeiling,
+   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
 
    pIViewSet -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,

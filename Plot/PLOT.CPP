@@ -39,7 +39,8 @@
      pIPlots(NULL),
      pIGSystemStatusBar(NULL),
 
-     pOwnerPropertyPlotType(NULL),
+     pOwnerProperty2DPlotType(NULL),
+     pOwnerProperty3DPlotType(NULL),
      pOwnerPropertyPlotView(NULL),
      pOwnerPropertyTheta(NULL),
      pOwnerPropertyPhi(NULL),
@@ -143,7 +144,9 @@
    pIProperties -> DirectAccess(L"name",TYPE_STRING,&bstrName,sizeof(bstrName));
    pIProperties -> DirectAccess(L"override owner view",TYPE_BOOL,&overrideOwnerView,sizeof(overrideOwnerView));
    pIProperties -> DirectAccess(L"override owner type",TYPE_BOOL,&overrideOwnerType,sizeof(overrideOwnerType));
+
    pIProperties -> DirectAccess(L"plot view",TYPE_LONG,&plotView,sizeof(enum PlotView));
+
    pIProperties -> DirectAccess(L"plot type",TYPE_LONG,&plotType,sizeof(enum PlotType));
    pIProperties -> DirectAccess(L"properties position", TYPE_BINARY,&rectPropertiesPosition,sizeof(RECT));
    pIProperties -> DirectAccess(L"plot number",TYPE_LONG,&pID,sizeof(pID));
@@ -171,8 +174,6 @@
    aClass.lpszClassName = "p-handler";
  
    RegisterClass(&aClass);
- 
-   hwndObjectWindow = CreateWindowEx(0,"p-handler","",0,0,0,0,0,HWND_DESKTOP,NULL,hModule,(void *)this);
  
    hMainMenu = LoadMenu((HINSTANCE)hModule,MAKEINTRESOURCE(IDMENU_PLOT));
 

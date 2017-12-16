@@ -148,7 +148,7 @@
       expressionLocation = dummy;
    }
  
-   if ( (c = strpbrk(expressionLocation,"=")) != NULL ) {
+   if ( (c = strchr(expressionLocation,'=')) != NULL ) {
       char *varName;
       IVariable *v;
 
@@ -216,11 +216,15 @@
       case (char)0x96 :
       case '-' : 
          c = nextChar(expression);
+         if ( ! c )
+            return value;
          replaceChar(c,expression);
          value -= plusSequence(expression);
          break;
       case '/' :
          c = nextChar(expression);
+         if ( ! c )
+            return 0.0;
          if ( c != '/' ) {
             replaceChar(c,expression);
             double divisor = starSequence(expression);
@@ -232,6 +236,8 @@
          break;
       case '*' :
          c = nextChar(expression);
+         if ( ! c )
+            return 0.0;
          if ( c == '*' ) 
             value = pow(value,starSequence(expression)); 
          else {

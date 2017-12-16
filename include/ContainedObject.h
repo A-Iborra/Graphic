@@ -19,6 +19,10 @@
 
      HWND HWNDSite() { return hwndSite; };
 
+     void Show();
+
+     void Hide();
+
    // IUnknown
 
      STDMETHOD(QueryInterface)(REFIID riid,void **ppv);

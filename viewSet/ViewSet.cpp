@@ -236,7 +236,7 @@
    //pIText_Y -> put_PartOfWorldDomain(FALSE);
    //pIText_Z -> put_PartOfWorldDomain(FALSE);
 
-   pIOpenGLImplementation -> Flush();
+   pIOpenGLImplementation -> Finalize();
 
    return 0;
    }

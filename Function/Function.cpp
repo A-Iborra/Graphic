@@ -22,6 +22,8 @@
 
 #endif
 
+   LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult);
+
    STDAPI GSystemsVariablesDllGetClassObject(HMODULE hModule,REFCLSID clsid,REFIID riid,void** ppObject);
 
    long Function::functionCount = 0;
@@ -113,7 +115,6 @@
        enteringData(FALSE),
        stopAllProcessing(FALSE),
 
-       resultingHeight(0),
        freezeEvents(0),
        backgroundColor(0),
        foregroundColor(0),
@@ -208,9 +209,6 @@
    iProperties -> Add(L"resume visible",&pIPropertyResumeVisible);
    iProperties -> Add(L"stop visible",&pIPropertyStopVisible);
 
-   iProperties -> Add(L"container size",NULL);
-   iProperties -> DirectAccess(L"container size",TYPE_BINARY,&containerSize,sizeof(SIZEL));
-
    iProperties -> Add(L"rect",NULL);
    iProperties -> DirectAccess(L"rect",TYPE_BINARY,&rectDialog,sizeof(RECT));
 
@@ -254,6 +252,9 @@
    GetHGlobalFromStream(pIStream_Marshalling,&hglMarshalling);
 
    refCount = 0;
+
+   //NTC: 12-14-2017: I am not sure why this InitNew was not in here prior to today. I have addeded it, though commented out.
+   //InitNew();
 
    return;
    };
@@ -427,11 +428,13 @@
 
    int Function::resize(long cx) {
 
-   int gapright,deltay = 0,deltax = 0;
-   int expressionLabelDeltay,resultsLabelDeltay;
-   bool anyControlVisible = false;
+   if ( ! okayToResize )
+      return 0;
 
-   resultingHeight = 0;
+   int gapright,deltay = 0,deltax = 0;
+   int expressionLabelDeltay = 0;
+   int resultsLabelDeltay = 0;
+   bool anyControlVisible = false;
 
    gapright = 8;
 
@@ -497,7 +500,7 @@
    else
       resultingHeight += rectVariables.bottom - rectVariables.top + 12;
 
-   if ( ! controlsVisible || ! startVisible ) 
+   if ( ! controlsVisible || ! startVisible )
       deltax += rectControls.right - rectControls.left;
    else
       anyControlVisible = true;
@@ -540,6 +543,7 @@
    else {
       deltax -= controlSpacing;
       anyControlVisible = true;
+      resultingHeight += 24;
    }
 
    SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,startButtonLeft,stopButtonBottom + controlSpacing,0,0,SWP_NOSIZE);
@@ -554,17 +558,12 @@
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),controlsVisible && pauseVisible ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),controlsVisible && resumeVisible ? SW_SHOW : SW_HIDE);
    ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),controlsVisible && stopVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),controlsVisible && plotPropertiesVisible ? SW_SHOW : SW_HIDE);
+
+   //CalcDimensions(hwndSpecDialog,&containerSize);
 
    if ( anyControlVisible )
       resultingHeight += 2 * (rectControls.bottom - rectControls.top);
    else
-      resultingHeight += 12;
-
-   if ( plotPropertiesVisible )
-      resultingHeight += rectControls.bottom - rectControls.top + controlSpacing;
-
-   //if ( plotPropertiesVisible && ! variablesVisible )
       resultingHeight += 12;
 
    if ( 12 == resultingHeight ) 
@@ -642,3 +641,37 @@
    return 0;
    }
 
+
+   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam);
+
+   static long maxHeight;
+   static long maxWidth;
+
+   LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult) {
+   maxHeight = 0L;
+   maxWidth = 0L;
+   EnumChildWindows(hwndParent,testDimensions,(LPARAM)hwndParent);
+   pResult -> cx = maxWidth;
+   pResult -> cy = maxHeight;
+   return 0;
+   }
+
+   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam) {
+
+   //if ( ! 1 == GetWindowLongPtr(hwndTest,GWLP_USERDATA) )
+   //   return TRUE;
+//if ( ! IsWindowVisible(hwndTest) )
+//return TRUE;
+
+Beep(2000,100);
+
+   RECT rcChild;
+   RECT rcParent;
+   GetWindowRect((HWND)lParam,&rcParent);
+   GetWindowRect(hwndTest,&rcChild);
+
+   maxHeight = max(maxHeight,rcChild.bottom - rcParent.top);
+   maxWidth = max(maxWidth,rcChild.right - rcParent.left);
+
+   return TRUE;
+   }

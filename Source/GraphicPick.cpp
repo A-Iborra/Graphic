@@ -432,16 +432,3 @@ actionFunction((void*)this);
  
    return FALSE;
    }
-
-
-   void G::someObjectChanged(void *pArg) {
-   G *p = (G *)pArg;
-   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
-   if ( p -> hwndFrame ) {
-      RECT rect;
-      GetWindowRect(p -> hwndFrame,&rect);
-      SendMessage(p -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-   } else
-      p -> render(0);
-   return;
-   }

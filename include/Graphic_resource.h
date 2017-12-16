@@ -289,9 +289,12 @@
 #define IDDIALOG_GRAPHIC_STYLE                                             7250
 #define IDDI_GRAPHIC_STYLE_SAMPLE                                          7260
 #define IDDI_GRAPHIC_SUB_STYLE_NATURAL                                     7261
-#define IDDI_GRAPHIC_SUB_STYLE_WIREFRAME                                   7262
-#define IDDI_GRAPHIC_SUB_STYLE_SURFACE                                     7263
-#define IDDI_GRAPHIC_SUB_STYLE_STACKS                                      7264
+#define IDDI_GRAPHIC_SUB_STYLE_CONTOUR                                     7262
+#define IDDI_GRAPHIC_SUB_STYLE_PIE                                         7263
+#define IDDI_GRAPHIC_SUB_STYLE_WIREFRAME                                   7264
+#define IDDI_GRAPHIC_SUB_STYLE_SURFACE                                     7265
+#define IDDI_GRAPHIC_SUB_STYLE_STACKS                                      7266
+#define IDDI_GRAPHIC_STYLE_SETVIEW                                         7267
                                                                            
 #define IDDIALOG_GRAPHIC_TEXT_SETTINGS                                     7300
 
@@ -338,11 +341,13 @@
 #define IDDI_LIGHT_BACKGROUND_BACKGROUND                                   7608
 
 #define IDDIALOG_GRAPHIC_PLOTS                                             7700
+#define IDDI_GRAPHIC_PLOTS_INSTRUCTIONS                                    7701
 #define IDDI_GRAPHIC_PLOTS_COUNT                                           7710
-#define IDDI_GRAPHIC_PLOTS_ADD                                             7720
 #define IDDI_GRAPHIC_PLOTS_EDIT                                            7730
-#define IDDI_GRAPHIC_PLOTS_DELETE                                          7740
 #define IDDI_GRAPHIC_PLOTS_GRAPHIC                                         7750
+#define IDDI_GRAPHIC_PLOTS_LIST                                            7760
+#define IDDI_GRAPHIC_PLOTS_GROUP_ARITY                                     7770
+#define IDDI_GRAPHIC_PLOTS_GROUP_PLOTTYPE                                  7780
 
 #define IDDIALOG_GRAPHIC_FUNCTIONS                                         7800
 #define IDDI_GRAPHIC_FUNCTIONS_COUNT                                       7805
@@ -611,3 +616,7 @@
 #define IDBD_SORORITY_FONT                                                30003
 
 #define IDDI_STATIC                                                          -1
+
+
+#define COLOR_ENTRY_FIELD_WIDTH     32
+#define COLOR_ENTRY_FIELD_HEIGHT    14

@@ -144,9 +144,9 @@
 
    if ( hwndSpecDialog ) {
       SetDlgItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,expression);
-      if ( containerSize.cx <= 0 ) containerSize.cx = CONTAINERSIZE_CX;
+      if ( containerSize.cx <= 0 ) 
+         containerSize.cx = CONTAINERSIZE_CX;
       resize(containerSize.cx);
-      SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,containerSize.cx,containerSize.cy,SWP_NOMOVE);
    } else
       parseExpression();
 

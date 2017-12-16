@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{55EFE10D-72F4-4864-98A5-6FFBF1412778}</ProjectGuid>
+    <ProjectGuid>{FA856695-189A-45FC-878E-674821D3B480}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <StartupObject>VB.My.MyApplication</StartupObject>
     <RootNamespace>VB</RootNamespace>
@@ -127,25 +127,8 @@
       <WrapperTool>aximp</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-    <COMReference Include="AxPhabletSignaturePad">
-      <Guid>{2FAAB00E-3D9F-4B4D-B5FE-B71B6B7BDD00}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>aximp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
     <COMReference Include="Graphic">
       <Guid>{8CAEFD70-55E6-11D3-8365-006008BD5BC3}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="PhabletSignaturePad">
-      <Guid>{2FAAB00E-3D9F-4B4D-B5FE-B71B6B7BDD00}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>

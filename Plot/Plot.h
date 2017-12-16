@@ -27,7 +27,7 @@
 
 //      IPlot
 
-     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,
+     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
                            IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty **,IGProperty **,IGProperty **,IGProperty **,IGProperty **,
                               void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
 
@@ -75,6 +75,8 @@
 
      STDMETHOD(put_DataSet)(IDataSet *newDataSet);
      STDMETHOD(get_DataSet)(IDataSet **getDataSet);
+
+     STDMETHOD(get_DataArity)(enum DataArity *);
 
      STDMETHOD(put_PlotNotify)(IPlotNotify *);
      STDMETHOD(get_PlotNotify)(IPlotNotify **);
@@ -192,7 +194,8 @@
      IUnknown *pIUnknownProperties;
 
      IGProperty *pOwnerPropertyPlotView;
-     IGProperty *pOwnerPropertyPlotType;
+     IGProperty *pOwnerProperty2DPlotType;
+     IGProperty *pOwnerProperty3DPlotType;
      IGProperty *pOwnerPropertyTheta;
      IGProperty *pOwnerPropertyPhi;
      IGProperty *pOwnerPropertySpin;

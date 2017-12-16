@@ -125,7 +125,7 @@
 
    // Methods
 
-     STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,IGProperty*,
+     STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
                               IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *),void *pWhenChangedArg);
 
      STDMETHOD(get_DataSet)(IDataSet **);
@@ -182,7 +182,6 @@
      IPlot *pIPlot;
 
      IGProperty* pParentPropertyPlotView;
-     IGProperty* pParentPropertyPlotSubType;
      IGProperty* pParentPropertyFloor;
      IGProperty* pParentPropertyCeiling;
      IGProperty* pParentPropertyOpenGLText;

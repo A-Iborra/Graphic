@@ -52,11 +52,7 @@
    IUnknown *pIUnknownThis;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
 
-   HRESULT rc = CoCreateInstance(CLSID_InnoVisioNateProperties,
-                                    pIUnknownThis,
-                                    CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                                    IID_IUnknown,
-                                    reinterpret_cast<void **>(&pIUnknownProperties));
+   HRESULT rc = CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
 
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&pIProperties));
    pIUnknownProperties -> Release();
@@ -100,14 +96,14 @@
 
    pIProperties -> Release();
 
-   transformationMatrixes* pm;
+   transformationMatrixes *pm = NULL;
    while ( matrixList.size() ) {
       pm = matrixList.back();
       matrixList.remove(pm);
       delete pm;
    }
 
-   PlotWindow *pw = (PlotWindow*)NULL;
+   PlotWindow *pw = NULL;
    while ( plotWindowList.size() ) {
       pw = plotWindowList.back();
       plotWindowList.remove(pw);
@@ -125,8 +121,7 @@
    SIZEL sizel = {100, 100};
    pIPropertySize -> get_binaryValue(sizeof(SIZEL),reinterpret_cast<unsigned char **>(&sizel));
 
-   hwndControl = CreateWindowEx(0L,"Static","Open GLImplementor",WS_CHILD | WS_BORDER | WS_VISIBLE,0,0,sizel.cx,sizel.cy,
-                              hwndParent,NULL,hModule,NULL);
+   hwndControl = CreateWindowEx(0L,"Static","Open GLImplementor",WS_CHILD | WS_BORDER | WS_VISIBLE,0,0,sizel.cx,sizel.cy,hwndParent,NULL,hModule,NULL);
 
    SetWindowLongPtr(hwndControl,GWLP_USERDATA,(ULONG_PTR)this);
 
@@ -135,8 +130,6 @@
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_OPENGL_PROPERTIES),RT_DIALOG));
 
    hwndProperties = CreateDialogIndirectParam(hModule,dt,hwndParent,(DLGPROC)propertiesHandler,(long)this);
-
-//CHECKME   pIProperties -> PutHWNDPropertyPage(L"OpenGL Implementation",(long)hwndProperties,0,0,0,0);
 
    return TRUE;
    }

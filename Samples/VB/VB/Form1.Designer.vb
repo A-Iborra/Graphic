@@ -30,17 +30,17 @@ Partial Class Form1
       'AxGSystemGraphic1
       '
       Me.AxGSystemGraphic1.Enabled = True
-      Me.AxGSystemGraphic1.Location = New System.Drawing.Point(102, 92)
+      Me.AxGSystemGraphic1.Location = New System.Drawing.Point(48, 37)
       Me.AxGSystemGraphic1.Name = "AxGSystemGraphic1"
       Me.AxGSystemGraphic1.OcxState = CType(resources.GetObject("AxGSystemGraphic1.OcxState"), System.Windows.Forms.AxHost.State)
-      Me.AxGSystemGraphic1.Size = New System.Drawing.Size(1346, 811)
+      Me.AxGSystemGraphic1.Size = New System.Drawing.Size(1102, 569)
       Me.AxGSystemGraphic1.TabIndex = 0
       '
       'Form1
       '
       Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
       Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-      Me.ClientSize = New System.Drawing.Size(2139, 1283)
+      Me.ClientSize = New System.Drawing.Size(1233, 633)
       Me.Controls.Add(Me.AxGSystemGraphic1)
       Me.Name = "Form1"
       Me.Text = "Form1"

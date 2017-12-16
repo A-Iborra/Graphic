@@ -158,7 +158,7 @@
             if ( lvItem.state && LVIS_SELECTED ) {
                char szTemp[MAX_PROPERTY_SIZE];
                BSTR bstr;
-               IGSFunctioNater* pf = reinterpret_cast<IGSFunctioNater*>(lvItem.lParam);
+               IGSFunctioNater* pf = (IGSFunctioNater *)lvItem.lParam;
                IUnknown* pIUnknown;
                pf -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
                p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);

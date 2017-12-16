@@ -59,6 +59,16 @@
 
       LOAD_VALUES();
  
+      RECT rect;
+      GetClientRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),&rect);
+      MapWindowPoints(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),hwnd,(POINT *)&rect,2);
+      HWND hwndTemp = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_VISIBLE | WS_CHILD,
+                                       rect.left,rect.top,rect.right - rect.left,rect.bottom - rect.top,hwnd,NULL,hModule,(void *)p);
+   
+      DestroyWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE));
+
+      SetWindowLongPtr(hwndTemp,GWLP_ID,IDDI_GRAPHIC_STYLE_SAMPLE);
+
       holdUpdates = FALSE;
 
       }
@@ -104,8 +114,9 @@
             rect.bottom = rect.top + cy;
             InvalidateRect(hwnd,&rect,TRUE);
          }
-         return LRESULT(FALSE);
       }
+      InvalidateRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),NULL,TRUE);
+      UpdateWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE));
       }
       break;
  
@@ -118,7 +129,7 @@
       case IDNI_GRAPHIC_APPLY: {
          GET_VALUES();
          }
-         return LRESULT(FALSE);
+         break;
  
       case IDNI_GRAPHIC_CANCEL:
          break;
@@ -165,7 +176,7 @@
          }
          p -> propertyCustomColors -> put_binaryValue(128,reinterpret_cast<byte *>(ci.lpCustColors));
          }
-         return LRESULT(FALSE);
+         break;
  
       case IDDI_LIGHT_BACKGROUND_RED:
       case IDDI_LIGHT_BACKGROUND_GREEN:
@@ -194,11 +205,13 @@
          }   
  
          }
-         return LRESULT(FALSE);
+         break;
  
       default:
          break;
       }
+      InvalidateRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),NULL,TRUE);
+      UpdateWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE));
       }
       return LRESULT(FALSE);
 

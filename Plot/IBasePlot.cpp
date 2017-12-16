@@ -81,7 +81,13 @@
    return S_OK;
    }
  
- 
+   HRESULT BasePlot::get_DataArity(DataArity *pDataArity) {
+   if ( pIDataSet )
+      return pIDataSet -> get_DataArity(pDataArity);
+   *pDataArity = DATA_ARITY_UNKNOWN;
+   return S_OK;
+   }
+
    HRESULT BasePlot::get_SegmentID(long* newID) {
    return pIGraphicSegment -> get_SegmentID(newID);
    }
@@ -310,41 +316,48 @@
    HRESULT BasePlot::Draw() {
 
    VARIANT_BOOL isInitalized;
-   pIOpenGLImplementation -> IsInitialized(&isInitalized);
-   if ( ! isInitalized ) return S_OK;
 
-   DataList *item = reinterpret_cast<DataList*>(NULL);
-   pIDataSet -> peek(item,&item);
+   pIOpenGLImplementation -> IsInitialized(&isInitalized);
+
+   if ( ! isInitalized ) 
+      return S_OK;
 
    IGProperty* propertyLineWeight;
 
    get_LineWeight(&propertyLineWeight);
 
-   propertyLineWeight -> copyTo(pPropertyLastDrawLineWeight);
+   if ( propertyLineWeight )
+      propertyLineWeight -> copyTo(pPropertyLastDrawLineWeight);
 
 //CHECKME Causing a screen refresh   pIOpenGLImplementation -> ResetDepth();
 
    pIGraphicSegment -> Open();
 
-   if ( item ) {
+   DataList *pItem = NULL;
 
-      if ( -DBL_MAX != item -> data.x ) {
-         pIOpenGLImplementation -> NewLine(&item -> data);
-         pIDataSet -> peek(item,&item);
+   pIDataSet -> peek(pItem,&pItem);
+
+   if ( pItem ) {
+
+      if ( ! ( -DBL_MAX == pItem -> data.x ) ) {
+         pIOpenGLImplementation -> NewLine(&pItem -> data);
+         pIDataSet -> peek(pItem,&pItem);
       }
 
-      while ( item ) {
-         if ( -DBL_MAX == item -> data.x ) {
-            while ( item && -DBL_MAX == item -> data.x ) pIDataSet -> peek(item,&item);
-            if ( ! item ) break;
-            pIOpenGLImplementation -> NewLine(&item -> data);
+      while ( pItem ) {
+         if ( -DBL_MAX == pItem -> data.x ) {
+            while ( pItem && -DBL_MAX == pItem -> data.x ) 
+               pIDataSet -> peek(pItem,&pItem);
+            if ( ! pItem ) 
+               break;
+            pIOpenGLImplementation -> NewLine(&pItem -> data);
          }
-         pIOpenGLImplementation -> Vertex(&item -> data);
-         pIDataSet -> peek(item,&item);
+         pIOpenGLImplementation -> Vertex(&pItem -> data);
+         pIDataSet -> peek(pItem,&pItem);
       }
 
    }
- 
+
    pIGraphicSegment -> Close(TRUE);
 
    IText *t = NULL;
@@ -352,7 +365,7 @@
    while ( t = textList.GetNext(t) ) 
       t -> Draw();
  
-   pIOpenGLImplementation -> Flush();
+//   pIOpenGLImplementation -> Flush();
  
    return S_OK;
    }
@@ -440,7 +453,7 @@
    }
 
    HRESULT BasePlot::GetDomainGDI(DataPoint *min,DataPoint *max) {
-   return pIDataSetDomain->GetDomainGDI(min,max);
+   return pIDataSetDomain -> GetDomainGDI(min,max);
    }
  
 

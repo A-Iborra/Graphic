@@ -25,7 +25,7 @@
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)pc -> lpCreateParams);
       }
       return LRESULT(FALSE);
- 
+
    case WM_COMMAND: {
 
       switch ( LOWORD(wParam) ) {
@@ -41,6 +41,8 @@
          if ( p -> pWhenChangedCallback ) {
             p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
+         p -> hwndObjectWindow = NULL;
+         DestroyWindow(hwnd);
          }
          return LRESULT(TRUE);
  
@@ -54,6 +56,8 @@
          if ( p -> pWhenChangedCallback ) {
             p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
+         p -> hwndObjectWindow = NULL;
+         DestroyWindow(hwnd);
          }
          break;
  

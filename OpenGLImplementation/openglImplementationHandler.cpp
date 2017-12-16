@@ -82,6 +82,7 @@
          p -> plotWindowList.remove(pw);
          delete pw;
       }
+      p -> plotWindowList.clear();
       p -> plotWindow = NULL; // <-- this is set so that the constructor for the new plotWindow won't try to copy from this object's data.
       p -> plotWindow = new PlotWindow(p -> hwndBase,p,p -> pIEvaluator);
       p -> plotWindowList.push_back(p -> plotWindow);//Add(p -> plotWindow,NULL,reinterpret_cast<long>(p -> hwndBase));
@@ -89,57 +90,51 @@
       break;
 
    case WM_OPENGLIMPLEMENTATION_SETTARGETWINDOW: {
-      p -> plotWindow -> saveState();
+
       HWND hwndNew = (HWND)wParam;
-      std::list<PlotWindow *> toDelete;
-      for ( PlotWindow *pw : p -> plotWindowList ) {
-         if ( IsWindow(pw -> hwnd) )
-            continue;
-         toDelete.push_back(pw);
-      }
-      for ( PlotWindow *pw : toDelete ) {
-         p -> plotWindowList.remove(pw);
-         delete pw;
-      }
-      PlotWindow* pwTemp = NULL;
+
+      PlotWindow *pwExisting = NULL;
       for ( PlotWindow *pw : p -> plotWindowList ) {
          if ( pw -> hwnd == hwndNew ) {
-            pwTemp = pw;
+            pwExisting = pw;
             break;
          }
       }
-      if ( ! pwTemp ) {
-         pwTemp = new PlotWindow(hwndNew,p,p -> pIEvaluator);
-         p -> plotWindowList.push_back(pwTemp);
-      }
-      p -> plotWindow = pwTemp;
-      p -> plotWindow -> restoreState();
-      wglMakeCurrent(p -> plotWindow -> deviceContext,p -> plotWindow -> renderingContext);
-      }
-      break;
 
-   case WM_OPENGLIMPLEMENTATION_RESETTARGETWINDOW: {
+#if 0
+   
+      if ( pwExisting ) {
+         pwExisting -> hwnd = NULL;
+         pwExisting = NULL;
+      }
+
+      pwExisting = new PlotWindow(hwndNew,p,p -> pIEvaluator);
+      p -> plotWindowList.push_back(pwExisting);
+
+#else
+      if ( ! pwExisting ) {
+         pwExisting = new PlotWindow(hwndNew,p,p -> pIEvaluator);
+         p -> plotWindowList.push_back(pwExisting);
+      } else
+         pwExisting -> createRenderingContext();
+#endif
+
+      p -> plotWindow = pwExisting;
+
+      p -> plotWindow -> restoreState();
+
       std::list<PlotWindow *> toDelete;
       for ( PlotWindow *pw : p -> plotWindowList ) {
-         if ( IsWindow(pw -> hwnd) )
+         if ( ! ( NULL == pw -> hwnd ) && IsWindow(pw -> hwnd) )
             continue;
          toDelete.push_back(pw);
       }
+
       for ( PlotWindow *pw : toDelete ) {
          p -> plotWindowList.remove(pw);
          delete pw;
       }
-      PlotWindow *pwTemp = NULL;
-      if ( p -> plotWindowList.size() ) {
-         pwTemp = p -> plotWindowList.back();
-         p -> plotWindowList.remove(pwTemp);
-         delete pwTemp;
-      }
-      if ( p -> plotWindowList.size() ) {
-         p -> plotWindow = p -> plotWindowList.back();
-         p -> plotWindow -> restoreState();
-         wglMakeCurrent(p -> plotWindow -> deviceContext,p -> plotWindow -> renderingContext);
-      }
+
       }
       break;
 
@@ -172,7 +167,7 @@
 
    case WM_OPENGLIMPLEMENTATION_SETVIEWPORT: {
       int *newViewPort = (int *)wParam;
-      memcpy(p -> plotWindow -> viewPort,newViewPort,sizeof(p -> plotWindow -> viewPort));
+      memcpy(p -> plotWindow -> openGLState.viewPort,newViewPort,sizeof(p -> plotWindow -> openGLState.viewPort));
       p -> plotWindow -> setViewPort(newViewPort);   
       }
       break;
@@ -235,20 +230,11 @@
 
       transformationMatrixes* pm = new transformationMatrixes();
 
+      memcpy(pm,&p -> plotWindow -> openGLState,sizeof(transformationMatrixes));
+
       glGetIntegerv(GL_VIEWPORT,pm -> viewPort);
       glGetDoublev(GL_MODELVIEW_MATRIX,pm -> modelMatrix);
       glGetDoublev(GL_PROJECTION_MATRIX,pm -> projectionMatrix);
-
-      pm -> xScaleFactor = p -> plotWindow -> xScaleFactor;
-      pm -> yScaleFactor = p -> plotWindow -> yScaleFactor;
-      pm -> zScaleFactor = p -> plotWindow -> zScaleFactor;
-
-      pm -> extentsXMin = p -> plotWindow -> extentsXMin;
-      pm -> extentsYMin = p -> plotWindow -> extentsYMin;
-      pm -> extentsZMin = p -> plotWindow -> extentsZMin;
-      pm -> extentsXMax = p -> plotWindow -> extentsXMax;
-      pm -> extentsYMax = p -> plotWindow -> extentsYMax;
-      pm -> extentsZMax = p -> plotWindow -> extentsZMax;
 
       p -> matrixList.push_back(pm);
 
@@ -268,24 +254,11 @@
 
       glMatrixMode(GL_PROJECTION);
       glLoadMatrixd(pm -> projectionMatrix);
-      memcpy(p -> plotWindow -> projectionMatrix,pm -> projectionMatrix,sizeof(pm -> projectionMatrix));
 
       glMatrixMode(GL_MODELVIEW);
       glLoadMatrixd(pm -> modelMatrix);
-      memcpy(p -> plotWindow -> modelMatrix,pm -> modelMatrix,sizeof(pm -> modelMatrix));
 
-      glGetIntegerv(GL_VIEWPORT,p -> plotWindow -> viewPort);
-
-      p -> plotWindow -> xScaleFactor = pm -> xScaleFactor;
-      p -> plotWindow -> yScaleFactor = pm -> yScaleFactor;
-      p -> plotWindow -> zScaleFactor = pm -> zScaleFactor;
-
-      p -> plotWindow -> extentsXMin = pm -> extentsXMin;
-      p -> plotWindow -> extentsYMin = pm -> extentsYMin;
-      p -> plotWindow -> extentsZMin = pm -> extentsZMin;
-      p -> plotWindow -> extentsXMax = pm -> extentsXMax;
-      p -> plotWindow -> extentsYMax = pm -> extentsYMax;
-      p -> plotWindow -> extentsZMax = pm -> extentsZMax;
+      memcpy(&p -> plotWindow -> openGLState,pm,sizeof(transformationMatrixes));
 
       delete pm;
 
@@ -296,18 +269,23 @@
       p -> plotWindow -> resetDepth();
       break;
 
-   case WM_OPENGLIMPLEMENTATION_FLUSH:
-      //glFlush();
-      glFinish();
+   case WM_OPENGLIMPLEMENTATION_FINALIZE:
+      if ( p -> plotWindow )
+         p -> plotWindow -> finalize();
       break;
 
    case WM_OPENGLIMPLEMENTATION_NEWLINE: {
       DataPoint *dp = reinterpret_cast<DataPoint*>(wParam);
-      if ( p -> plotWindow -> lineMode ) 
+      if ( p -> plotWindow -> lineMode ) {
          glEnd();
-      p -> plotWindow -> lineMode = true;
+         glGetError();
+//OPENGL_ERROR_CHECK
+      }
       glBegin(GL_LINE_STRIP);
+OPENGL_ERROR_CHECK
       glVertex3d(dp -> x,dp -> y,dp -> z);  
+OPENGL_ERROR_CHECK
+
       delete dp;
       }
       break;
@@ -334,7 +312,9 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_OPENSEGMENT: {
 
-      strCall_OpenSegment *ps = reinterpret_cast<strCall_OpenSegment*>(wParam);
+OPENGL_ERROR_CHECK
+
+      strCall_OpenSegment *ps = (strCall_OpenSegment *)wParam;
       
       float fvColor[] = {CLR_BLACK};
       if ( ps -> pPropColor ) {
@@ -346,17 +326,35 @@ OPENGL_ERROR_CHECK
       if ( ps -> pPropLineWeight )
          ps -> pPropLineWeight -> get_doubleValue(&lw);
 
+#if 1
       glDeleteLists(ps -> segmentID,1);
+OPENGL_ERROR_CHECK
 
-      glNewList(ps -> segmentID,GL_COMPILE);
+      glNewList(ps -> segmentID,GL_COMPILE_AND_EXECUTE);
+OPENGL_ERROR_CHECK
+#endif
 
+#if 1
       glColor3f(fvColor[0],fvColor[1],fvColor[2]);
+char szX[32];
+sprintf(szX,"%f %f %f\n",fvColor[0],fvColor[1],fvColor[2]);
+OutputDebugString(szX);
+OPENGL_ERROR_CHECK
+
       glLineWidth((float)lw);
+OPENGL_ERROR_CHECK
 
       glEnable(GL_LINE_SMOOTH);
-      glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+OPENGL_ERROR_CHECK
 
+      glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+OPENGL_ERROR_CHECK
+#endif
+
+      p -> plotWindow -> lineMode = true;
+      
       glBegin(GL_LINE_STRIP);
+OPENGL_ERROR_CHECK
 
       delete ps;
 
@@ -364,7 +362,7 @@ OPENGL_ERROR_CHECK
       break;
 
    case WM_OPENGLIMPLEMENTATION_STARTSEGMENT: {
-      long *pSegmentID = reinterpret_cast<long *>(wParam);
+      long *pSegmentID = (long *)wParam;
       glDeleteLists(*pSegmentID,1);
       glNewList(*pSegmentID,GL_COMPILE_AND_EXECUTE);
       glLoadName(*pSegmentID);
@@ -394,29 +392,35 @@ OPENGL_ERROR_CHECK
       break;
 
    case WM_OPENGLIMPLEMENTATION_PLAYSEGMENT: {
-      long *pSegmentID = reinterpret_cast<long *>(wParam);
+      long *pSegmentID = (long *)wParam;
       glCallList(*pSegmentID);
       delete pSegmentID;
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_CLOSESEGMENT: {
-      strCall_CloseSegment *ps = reinterpret_cast<strCall_CloseSegment *>(wParam);
+
+      strCall_CloseSegment *ps = (strCall_CloseSegment *)wParam;
+
       glEnd();
-//CHECKME causing erasure      glFlush();
+glGetError();
+OPENGL_ERROR_CHECK
+#if 1
       glEndList();
-      if ( ps -> drawOnClose ) {
+OPENGL_ERROR_CHECK
+      if ( ps -> drawOnClose ) 
          glCallList(ps -> segmentID);
-//CHECKME causing erasure         glFlush();
-      }
+#endif
+OPENGL_ERROR_CHECK
       p -> plotWindow -> polygonMode = false;
       p -> plotWindow -> lineMode = false;
+
       delete ps;
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_DELETESEGMENT: {
-      long *pSegmentID = reinterpret_cast<long *>(wParam);
+      long *pSegmentID = (long *)wParam;
       if ( *pSegmentID ) 
          glDeleteLists(*pSegmentID,1);
       delete pSegmentID;
@@ -425,7 +429,7 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_BEGINSURFACE: {
 
-      strCall_BeginSurface *ps = reinterpret_cast<strCall_BeginSurface*>(wParam);
+      strCall_BeginSurface *ps = (strCall_BeginSurface *)wParam;
 
       glDeleteLists(ps -> segmentID,1);
       glNewList(ps -> segmentID,GL_COMPILE);
@@ -568,9 +572,7 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_VERTEX: {
       DataPoint *dp = reinterpret_cast<DataPoint*>(wParam);
-glGetError();
       glVertex3d(dp -> x,dp -> y,dp -> z);  
-OPENGL_ERROR_CHECK
       }
       break;
 
@@ -607,7 +609,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
       glGetDoublev(GL_PROJECTION_MATRIX,pMatrix);
       glGetIntegerv(GL_VIEWPORT,vport);
    
-      double y = (double)p -> plotWindow -> windowCY - ps -> dpSource.y;
+      double y = (double)p -> plotWindow -> openGLState.windowCY - ps -> dpSource.y;
    
       if ( (int)ps -> dpSource.x < vport[0] ) {
          ps -> result = S_FALSE;
@@ -653,7 +655,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
    
          gluProject(ps -> dpSource.x,ps -> dpSource.y,ps -> dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
    
-         dpWorking.y = (double)p -> plotWindow -> windowCY - dpWorking.y;
+         dpWorking.y = (double)p -> plotWindow -> openGLState.windowCY - dpWorking.y;
    
          memcpy(ps -> pdpTarget,&dpWorking,sizeof(DataPoint));
    
@@ -665,12 +667,13 @@ MessageBox(NULL,ex.what(),"",MB_OK);
          double win0x,win0y,win0z;
          double win1x,win1y,win1z;
     
-         ps -> pdpTarget -> x = p -> plotWindow -> extentsXMin + (p -> plotWindow -> extentsXMax - p -> plotWindow -> extentsXMin)*ps -> dpSource.x/100.0;
-         ps -> pdpTarget -> y = p -> plotWindow -> extentsYMin + (p -> plotWindow -> extentsYMax - p -> plotWindow -> extentsYMin)*ps -> dpSource.y/100.0;
-         ps -> pdpTarget -> z = p -> plotWindow -> extentsZMin + (p -> plotWindow -> extentsZMax - p -> plotWindow -> extentsZMin)*ps -> dpSource.z/100.0;
+         ps -> pdpTarget -> x = p -> plotWindow -> openGLState.extentsXMin + (p -> plotWindow -> openGLState.extentsXMax - p -> plotWindow -> openGLState.extentsXMin)*ps -> dpSource.x/100.0;
+         ps -> pdpTarget -> y = p -> plotWindow -> openGLState.extentsYMin + (p -> plotWindow -> openGLState.extentsYMax - p -> plotWindow -> openGLState.extentsYMin)*ps -> dpSource.y/100.0;
+         ps -> pdpTarget -> z = p -> plotWindow -> openGLState.extentsZMin + (p -> plotWindow -> openGLState.extentsZMax - p -> plotWindow -> openGLState.extentsZMin)*ps -> dpSource.z/100.0;
    
-         gluProject(p -> plotWindow -> extentsXMin,p -> plotWindow -> extentsYMin,p -> plotWindow -> extentsZMin,p -> plotWindow -> modelMatrix,p -> plotWindow -> projectionMatrix,p -> plotWindow -> viewPort,&win0x,&win0y,&win0z);
-         gluProject(ps -> pdpTarget -> x,ps -> pdpTarget -> y,ps -> pdpTarget -> z,p -> plotWindow -> modelMatrix,p -> plotWindow -> projectionMatrix,p -> plotWindow -> viewPort,&win1x,&win1y,&win1z);
+         gluProject(p -> plotWindow -> openGLState.extentsXMin,p -> plotWindow -> openGLState.extentsYMin,p -> plotWindow -> openGLState.extentsZMin,
+                              p -> plotWindow -> openGLState.modelMatrix,p -> plotWindow -> openGLState.projectionMatrix,p -> plotWindow -> openGLState.viewPort,&win0x,&win0y,&win0z);
+         gluProject(ps -> pdpTarget -> x,ps -> pdpTarget -> y,ps -> pdpTarget -> z,p -> plotWindow -> openGLState.modelMatrix,p -> plotWindow -> openGLState.projectionMatrix,p -> plotWindow -> openGLState.viewPort,&win1x,&win1y,&win1z);
     
          ps -> pdpTarget -> x = win1x - win0x;
          ps -> pdpTarget -> y = win1y - win0y;
@@ -713,7 +716,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
    
          gluProject(pSource -> data.x,pSource -> data.y,pSource -> data.z,mMatrix,pMatrix,vport,&pTarget -> data.x,&pTarget -> data.y,&pTarget -> data.z);
    
-         pTarget -> data.y =  (double)p -> plotWindow -> windowCY - pTarget -> data.y;
+         pTarget -> data.y =  (double)p -> plotWindow -> openGLState.windowCY - pTarget -> data.y;
    
          pSource = pSource -> next;
          pTarget = pTarget -> next;
@@ -900,22 +903,26 @@ MessageBox(NULL,ex.what(),"",MB_OK);
 
       strCall_ReadPixels *ps = (strCall_ReadPixels *)wParam;
 
-      long cx = ps -> x2 - ps -> x1;
-      long cy = ps -> y2 - ps -> y1;
+//      p -> plotWindow -> GetPixels(ps -> x1,ps -> y1,ps -> x2,ps -> y2,p -> plotWindow -> openGLState.windowCY,ps -> pResult);
+      GLint bufferSize[4] = {0};
+      glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
+      
+      p -> plotWindow -> GetPixels(ps -> x1,ps -> y1,ps -> x2,ps -> y2,bufferSize[3],ps -> pResult);
 
-      long rowSize = 4 * sizeof(GLfloat) * cx;
+      }
+      break;
 
-      BYTE *pSwap = new BYTE[cy * rowSize];
+   case WM_OPENGLIMPLEMENTATION_ISRENDERED: {
 
-      memset(pSwap,0,cy * rowSize);
+      BOOL *prv = (BOOL *)wParam;
 
-      glReadPixels(ps -> x1,p -> plotWindow -> windowCY - ps -> y2,cx,cy,GL_RGBA,GL_FLOAT,pSwap);
+      if ( ! p -> plotWindow ) {
+         *prv = FALSE;
+         break;
+      }
 
-      for ( int k = 0; k < cy; k++ ) 
-         memcpy(ps -> pResult + k * rowSize,pSwap + (cy - k - 1) * rowSize,rowSize);
-
-      delete [] pSwap;
-
+      *prv = p -> plotWindow -> isRendered;
+   
       }
       break;
 

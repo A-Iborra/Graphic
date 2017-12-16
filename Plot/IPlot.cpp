@@ -19,7 +19,8 @@
                                  IGProperty* pPropColor,
                                  IGProperty* pPropLineWeight,
                                  IGProperty* parentPlotView,
-                                 IGProperty* parentPlotType,
+                                 IGProperty* parentDefault2DPlotType,
+                                 IGProperty* parentDefault3DPlotType,
                                  IGProperty *parentBackground,
                                  IGProperty *parentTheta,
                                  IGProperty *parentPhi,
@@ -61,9 +62,9 @@
    if ( ! pOwnerPropertyPlotView )
       overrideOwnerView = true;
 
-   pOwnerPropertyPlotType = parentPlotType;
+   pOwnerProperty2DPlotType = parentDefault2DPlotType;
 
-   if ( ! pOwnerPropertyPlotType )
+   if ( ! pOwnerProperty2DPlotType )
       overrideOwnerType = true;
 
    pOwnerPropertyBackgroundColor = parentBackground;
@@ -174,13 +175,13 @@
 
 
    HRESULT Plot::put_PlotTypeProperty(IGProperty *pProp) {
-   pOwnerPropertyPlotType = pProp;
+   pOwnerProperty2DPlotType = pProp;
    return S_OK;
    }
    
    HRESULT Plot::get_PlotTypeProperty(IGProperty **pProp) {
    if ( ! pProp ) return E_POINTER;
-   *pProp = pOwnerPropertyPlotType;
+   *pProp = pOwnerProperty2DPlotType;
    return S_OK;
    }
 
@@ -189,6 +190,7 @@
 
    HRESULT Plot::get_DataSet(IDataSet **getDataSet) { return BasePlot::get_DataSet(getDataSet); }
  
+   HRESULT Plot::get_DataArity(DataArity *pDataArity) { return BasePlot::get_DataArity(pDataArity); }
  
    HRESULT Plot::put_PlotNotify(IPlotNotify *setIPlotNotify) {
    if ( pIPlotNotify )

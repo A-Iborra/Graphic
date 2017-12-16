@@ -206,7 +206,6 @@
    if ( gcPlotView3D == plotView ) 
       itemCount = 12;
 
-
    HDC hdc = GetDC(hwndGraphic);
 
    HDC hdcTarget = CreateCompatibleDC(NULL);
