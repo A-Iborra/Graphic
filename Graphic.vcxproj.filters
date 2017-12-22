@@ -63,9 +63,6 @@
     <ClCompile Include="Source\GraphicPick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\statusBarHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\functionHandler.cpp">
       <Filter>Source Files\Window Handlers\Property Sheet Handlers</Filter>
     </ClCompile>
@@ -183,6 +180,18 @@
     <ClCompile Include="Source\graphicCursor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\dataSetHandler.cpp">
+      <Filter>Source Files\Window Handlers\Property Sheet Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ContainedDataSet.cpp">
+      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\statusBarHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\dataSourcesVisibility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphic.def">
@@ -195,9 +204,6 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ContainedObject.h">
-      <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Graphic_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -205,6 +211,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\graphic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\General.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ContainedObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ContainedDataSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

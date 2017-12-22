@@ -17,6 +17,8 @@
 
    unsigned int __stdcall OpenGLImplementor::runImplementationMsgQueue(void *pt) {
 
+   CoInitialize(NULL);
+
    OpenGLImplementor* p = reinterpret_cast<OpenGLImplementor*>(pt);
 
    WNDCLASS wClass;
@@ -51,6 +53,8 @@
    DestroyWindow(p -> hwndObjectWindow);
 
    p -> hwndObjectWindow = NULL;
+
+   CoUninitialize();
 
    return 0;
    }

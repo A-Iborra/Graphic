@@ -32,25 +32,24 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
-      p -> hwndFunctionSettings = hwnd;
-
       char szTemp[32];
       sprintf(szTemp,"There are %ld functions defined",p -> functionList.Count());
       SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_COUNT),szTemp);
 
       RECT rect;
 
-      GetClientRect(GetDlgItem(p -> hwndFunctionSettings,IDDI_GRAPHIC_PLOTS_GRAPHIC),&rect);
-
       LVCOLUMN lvColumn;
       LVITEM lvItem;
-      GetWindowRect(GetDlgItem(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_LIST),&rect);
+      GetWindowRect(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST),&rect);
       memset(&lvColumn,0,sizeof(LVCOLUMN));
       lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
       lvColumn.fmt = LVCFMT_LEFT;
-      lvColumn.cx = rect.right - rect.left - 4;
-      lvColumn.pszText = "expression";
-      SendDlgItemMessage(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTCOLUMN,0,(LPARAM)&lvColumn);
+      lvColumn.cx = rect.right - rect.left - 4 - 64;
+      lvColumn.pszText = "Expression";
+      SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTCOLUMN,0,(LPARAM)&lvColumn);
+      //lvColumn.cx = 64;
+      //lvColumn.pszText = "Plot";
+      //SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTCOLUMN,1,(LPARAM)&lvColumn);
       IGSFunctioNater *pIFunction = NULL;
       while ( pIFunction = p -> functionList.GetNext(pIFunction) ) {//for ( IGSFunctioNater *pIFunction : p -> functionList ) {
          memset(&lvItem,0,sizeof(LVITEM));
@@ -67,13 +66,13 @@
          lvItem.stateMask = -1;
          lvItem.pszText = pszTemp;
          lvItem.lParam = reinterpret_cast<long>(pIFunction);
-         SendDlgItemMessage(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+         SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
       }
 
       if ( p -> isRunning )
-         ShowWindow(GetDlgItem(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS),SW_HIDE);
+         ShowWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS),SW_HIDE);
       else
-         p -> propertyAllowUserFunctionControlVisibilityAccess -> setWindowItemChecked(p -> hwndFunctionSettings,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS);
+         p -> propertyAllowUserFunctionControlVisibilityAccess -> setWindowItemChecked(hwnd,IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS);
 
       }
       return LRESULT(FALSE);

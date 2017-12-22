@@ -34,9 +34,11 @@
   BOOL WINAPI DllMain(HANDLE module,ULONG flag,void *res) {
 
   switch(flag) {
+
   case DLL_PROCESS_ATTACH:
 
      hModule = reinterpret_cast<HMODULE>(module);
+
      GetModuleFileName(hModule,szModuleName,1024);
      memset(wstrModuleName,0,sizeof(wstrModuleName));
      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  

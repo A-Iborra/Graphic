@@ -12,6 +12,8 @@
 #include "utils.h"
 #include "Graphic.h"
 
+#include "List.cpp"
+
    LRESULT CALLBACK G::graphicHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -390,11 +392,9 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
          p -> pIGProperties -> ShowProperties(p -> hwndGraphic,pIUnknownThis);
          pIUnknownThis -> Release();
+         p -> setDataSourcesVisibility(NULL,NULL);
          p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
          p -> render(0);
-         //RECT rect;
-         //GetWindowRect(p -> hwndFrame,&rect);
-         //graphicFrameHandler(p -> hwndFrame,WM_SIZE,0L,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
          }
          return LRESULT(TRUE);
  
@@ -451,144 +451,7 @@
       if ( ! p )
          break;
 
-      long x = 0,y = 0;
-      long cx = (long)LOWORD(lParam),cy = (long)HIWORD(lParam);
-
-      long cxDataSourcesAdjust = 0;
-
-      if ( cx == 0 || cy == 0 ) break;
- 
-      if ( p -> showFunctions && 0 < p -> functionList.Count() ) {
-
-         bool anyFunctionVisible = false;
- 
-         SIZEL sizeFunction{0,0};
-
-         IOleObject* pIOleObject_Function;
-         IGSFunctioNater *pIFunction = NULL;
-
-         while ( pIFunction = p -> functionList.GetNext(pIFunction) ) {
-
-            char szFunction[32];
-            char szTabText[32];
-
-            sprintf(szFunction,"F%d",p -> functionList.IndexOf(pIFunction) + 1);
-
-            TC_ITEM tie{0};
-
-            long countTabs = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L);
-
-            tie.mask = TCIF_TEXT;
-            tie.cchTextMax = 32;
-            tie.pszText = szTabText;
-            
-            long tabIndex = -1L;
-
-            for ( long k = 0; k < countTabs; k++ ) {
-               SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEM,k,(LPARAM)&tie);
-               if ( 0 == strcmp(tie.pszText,szFunction) ) {
-                  tabIndex = k;
-                  break;
-               }
-            }
-
-            VARIANT_BOOL isAnyControlVisible;
-
-            pIFunction -> get_AnyControlVisible(&isAnyControlVisible);
-
-            if ( ! isAnyControlVisible ) {
-               if ( ! ( -1L == tabIndex ) ) {
-                  SendMessage(p -> hwndDataSourcesFunctions,TCM_SETCURSEL,max(0,tabIndex - 1L),0L);
-                  SendMessage(p -> hwndDataSourcesFunctions,TCM_DELETEITEM,(WPARAM)tabIndex,0L);
-               }
-               continue;
-            }
-
-            anyFunctionVisible = true;
-
-            SIZEL sizeThisFunction{0,0};
-
-            pIFunction -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject_Function));
-
-            pIOleObject_Function -> GetExtent(DVASPECT_CONTENT,&sizeThisFunction);
-
-            if ( sizeFunction.cx < sizeThisFunction.cx )
-               sizeFunction.cx = sizeThisFunction.cx;
-
-            if ( sizeFunction.cy < sizeThisFunction.cy )
-               sizeFunction.cy = sizeThisFunction.cy;
-
-            pIOleObject_Function -> Release();
-
-            if ( -1 == tabIndex )
-               p -> connectFunction(pIFunction,false,true);
-
-         }
-
-         if ( anyFunctionVisible ) {
-
-            hiMetricToPixel(&sizeFunction,&sizeFunction);
-            cxDataSourcesAdjust = sizeFunction.cx + 52;
-            cx -= cxDataSourcesAdjust;
-            x += sizeFunction.cx + 52;
-
-            if ( p -> showStatusBar ) {
-               RECT rectStatusBar;
-               GetWindowRect(p -> hwndStatusBar,&rectStatusBar);
-               SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy - (rectStatusBar.bottom - rectStatusBar.top),SWP_SHOWWINDOW);
-            } else
-               SetWindowPos(p -> hwndDataSourcesDialog,HWND_TOP,0,0,sizeFunction.cx + 52,cy,SWP_SHOWWINDOW);
-
-            long currentTab = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
-
-            ContainedFunction *pf = (ContainedFunction *)NULL;
-            int k = 0;
-            while ( pf = p -> containedFunctionList.GetNext(pf) ) {
-               pf -> ReSize();
-               if ( ! ( k == currentTab ) )
-                  pf -> Hide();
-               else
-                  pf -> Show();
-               k++;
-            }
-
-         } else
-
-            ShowWindow(p -> hwndDataSourcesDialog,SW_HIDE);
-
-      } else 
-
-         ShowWindow(p -> hwndDataSourcesDialog,SW_HIDE);
- 
-      if ( p -> showStatusBar ) {
-
-         RECT rectStatusBar;
-
-         SetWindowPos(p -> hwndStatusBar,HWND_TOP,0,0,cx + cxDataSourcesAdjust,cy,SWP_SHOWWINDOW);
-
-         GetWindowRect(p -> hwndStatusBar,&rectStatusBar);
-
-         int statusWidth = p -> statusTextWidth < 0 ? STANDARD_STATUS_TEXT_WIDTH : p -> statusTextWidth[1];
-
-         int sbWidths[2] = {cx + cxDataSourcesAdjust - statusWidth,-1};
-
-         SendMessage(p -> hwndStatusBar,SB_SETPARTS,(WPARAM)2,(LPARAM)sbWidths);
-
-         p -> rectStatusText.left = rectStatusBar.right - rectStatusBar.left - statusWidth;
-         p -> rectStatusText.right = p -> rectStatusText.left + statusWidth;
-
-         p -> rectStatusText.top = 2;
-         p -> rectStatusText.bottom = rectStatusBar.bottom - rectStatusBar.top - 4;
-
-         SetWindowPos(p -> hwndGraphic,HWND_TOP,x,y,cx,cy - (rectStatusBar.bottom - rectStatusBar.top),0L);
-
-      } else {
-
-         ShowWindow(p -> hwndStatusBar,SW_HIDE);
-
-         SetWindowPos(p -> hwndGraphic,HWND_TOP,x,y,cx,cy,0L);
-
-      }
+      p -> setDataSourcesVisibility(NULL,NULL);
 
       }
       return (LRESULT)0;

@@ -25,6 +25,12 @@ library DataSet {
    ] 
    interface IDataSet : IUnknown {
 
+     [propput] HRESULT Name([in] BSTR name);
+     [propget] HRESULT Name([out,retval] BSTR *pName);
+
+     [propput] HRESULT DataSource([in] BSTR dataSource);
+     [propget] HRESULT DataSource([out,retval] BSTR *pDataSource);
+
      [propput] HRESULT maxX([in] double maxVal);
      [propget] HRESULT maxX([out,retval] double *getVal);
      [propput] HRESULT maxY([in] double maxVal);
@@ -118,13 +124,20 @@ library DataSet {
 
    };
 
+
+   [uuid(8CAEFDA3-55E6-11d3-8365-006008BD5BC3),helpstring("DataSet Events Interface")]
+   interface IDataSetEvents : IUnknown {
+
+   };
+  
    [
-      uuid(8CAEFDA3-55E6-11d3-8365-006008BD5BC3),
+      uuid(8CAEFDA4-55E6-11d3-8365-006008BD5BC3),
       helpstring("GSystem Class DataSet"),
       control
    ]
    coclass DataSet {
       [default] interface IDataSet;
+      [default,source] interface IDataSetEvents;
    };
 
 };

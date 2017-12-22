@@ -22,7 +22,9 @@
 
       plotList(),
       functionList(),
-      cachedFunctionList(),
+
+      dataSetList(),
+      
       renderThreadList(),
       graphicCursorList(),
 
@@ -48,6 +50,8 @@
 
       pPlot_IClassFactory(NULL),
       pFunction_IClassFactory(NULL),
+      pDataSet_IClassFactory(NULL),
+
       pIViewSet(NULL),
 
       hwndFrame(NULL),
@@ -66,6 +70,7 @@
       hwndDataSourcesDialog(NULL),
       hwndDataSourcesTab(NULL),
       hwndDataSourcesFunctions(NULL),
+      hwndDataSourcesDataSets(NULL),
 
       hitTable(NULL),
       hitTableHits(0),
@@ -98,7 +103,7 @@
       default2DPlotType((long)gcPlotTypeNatural),
       default3DPlotType((long)gcPlotTypeWireFrame),
 
-      plotCount(0),
+      dataSetCount(0),
       textCount(0),
       functionCount(0),
       currentPlotSourceID(0),
@@ -125,8 +130,6 @@
 
    memset(pIPropertyPage,0,sizeof(pIPropertyPage));
 
-   //char szTemp[64];
- 
    refCount = 100;
  
    containerSize.cx = PLOT_DEFAULT_WIDTH;
@@ -162,19 +165,22 @@
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
  
    QueryInterface(IID_IGSystemStatusBar,reinterpret_cast<void**>(&pIGSystemStatusBar));
+
    pIGSystemStatusBar -> Release();
 
-   CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
+   long rc = CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
  
-   CoGetClassObject(CLSID_Plot,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pPlot_IClassFactory));
+   rc = CoGetClassObject(CLSID_Plot,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pPlot_IClassFactory));
 
-   CoGetClassObject(CLSID_GSystemFunctioNater,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pFunction_IClassFactory));
+   rc = CoGetClassObject(CLSID_DataSet,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pDataSet_IClassFactory));
 
-   CoCreateInstance(CLSID_DataSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSetMaster));
+   rc = CoGetClassObject(CLSID_GSystemFunctioNater,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pFunction_IClassFactory));
 
-   CoCreateInstance(CLSID_OpenGLImplementor,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOpenGLImplementation,reinterpret_cast<void **>(&pIOpenGLImplementation));
+   rc = CoCreateInstance(CLSID_DataSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSetMaster));
 
-   CoCreateInstance(CLSID_Evaluator,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IEvaluator,reinterpret_cast<void **>(&pIEvaluator));
+   rc = CoCreateInstance(CLSID_OpenGLImplementor,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOpenGLImplementation,reinterpret_cast<void **>(&pIOpenGLImplementation));
+
+   rc = CoCreateInstance(CLSID_Evaluator,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IEvaluator,reinterpret_cast<void **>(&pIEvaluator));
 
    pIOpenGLImplementation -> Initialize(pIEvaluator);
 
@@ -214,7 +220,6 @@
    pIGProperties -> Add(L"plot margins",&propertyPlotMargins);
    pIGProperties -> Add(L"plot margins stretch all",&propertyPlotMarginsStretchAll);
                                                                                                                                                                                     
-   pIGProperties -> Add(L"plot count",NULL);                                                                                                                            
    pIGProperties -> Add(L"text count",NULL);
    pIGProperties -> Add(L"function count",NULL);
                                                                                                                                                                                     
@@ -301,9 +306,9 @@
    }
 
    pIGProperties -> Add(L"functions",&propertyFunctions);
+   pIGProperties -> Add(L"datasets",&propertyDataSets);
    pIGProperties -> Add(L"show functions",&propertyShowFunctions);
    pIGProperties -> Add(L"allow user ability to access function control visibility",&propertyAllowUserFunctionControlVisibilityAccess);
-   pIGProperties -> Add(L"plots",&propertyPlots);
    pIGProperties -> Add(L"texts",&propertyTexts);
    pIGProperties -> Add(L"axiis",&propertyAxiis);
    propertyAxiis -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
@@ -326,7 +331,7 @@
    pIGProperties -> DirectAccess(L"plot type",TYPE_LONG,&plotType,sizeof(plotType));
    pIGProperties -> DirectAccess(L"plot width",TYPE_LONG,&containerSize.cx,sizeof(containerSize.cx));
    pIGProperties -> DirectAccess(L"plot height",TYPE_LONG,&containerSize.cy,sizeof(containerSize.cy));
-   pIGProperties -> DirectAccess(L"plot count",TYPE_LONG,&plotCount,sizeof(plotCount));
+   pIGProperties -> DirectAccess(L"dataset count",TYPE_LONG,&dataSetCount,sizeof(dataSetCount));
    pIGProperties -> DirectAccess(L"text count",TYPE_LONG,&textCount,sizeof(textCount));
    pIGProperties -> DirectAccess(L"function count",TYPE_LONG,&functionCount,sizeof(functionCount));
    pIGProperties -> DirectAccess(L"pick box size",TYPE_BINARY,&pickBoxSize,sizeof(pickBoxSize));
@@ -362,7 +367,7 @@
    axisList.Add(yaxis);
    axisList.Add(zaxis);
 
-   HRESULT rc = CoCreateInstance(CLSID_ViewSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IViewSet,reinterpret_cast<void **>(&pIViewSet));
+   rc = CoCreateInstance(CLSID_ViewSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IViewSet,reinterpret_cast<void **>(&pIViewSet));
 
    IUnknown* pIViewSet_Unknown;
    pIViewSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIViewSet_Unknown));
@@ -380,7 +385,8 @@
    pIPropertyPage[4] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesLighting);
    pIPropertyPage[5] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesAxis);
    pIPropertyPage[6] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesPlot);
-   pIPropertyPage[7] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesFunctions);
+   pIPropertyPage[7] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesDataSets);
+   pIPropertyPage[8] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesFunctions);
 
    return;
    }
@@ -417,9 +423,19 @@
       functionList.Remove(pf); 
    }
 
-   while ( pf = cachedFunctionList.GetFirst() ) {
-      pf -> Release();
-      cachedFunctionList.Remove(pf);
+   IDataSet *pds;
+   while ( pds = dataSetList.GetFirst() ) { 
+      ContainedDataSet* pContainedDataSet = containedDataSetList.Get(reinterpret_cast<long>(pds));
+      if ( pContainedDataSet ) {
+         IOleObject *pIOleObject;
+         pf -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
+         pIOleObject -> SetClientSite(NULL);
+         pf -> Release();
+         containedDataSetList.Remove(pContainedDataSet);
+         delete pContainedDataSet;
+      }
+      pds -> Release();
+      dataSetList.Remove(pds); 
    }
 
    IText *t;
@@ -474,6 +490,7 @@
    delete pIPropertyPage[5];
    delete pIPropertyPage[6];
    delete pIPropertyPage[7];
+   delete pIPropertyPage[8];
 
    return;
    }
@@ -528,152 +545,121 @@
    return;
    }
  
- 
-   IGSFunctioNater* G::newFunction(bool deferVisibility) {
 
-   long functionID = functionList.Count() + 1;
+   IDataSet * G::newDataSet(bool connectNow) {
 
-   IGSFunctioNater *pIFunction = (IGSFunctioNater*)NULL;
+   long dataSetID = (long)PlotIdBands::plotIdDataSets + dataSetList.Count() + 1;
 
-   pFunction_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IGSFunctioNater,reinterpret_cast<void **>(&pIFunction));
+   IDataSet *pIDataSet = (IDataSet *)NULL;
 
-   functionList.Add(pIFunction,NULL,functionID);
+   pDataSet_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
 
-   if ( hwndFrame ) {
+   dataSetList.Add(pIDataSet,NULL,dataSetID);
 
-      connectFunction(pIFunction,deferVisibility,false);
+   if ( connectNow ) 
+      connectDataSet(pIDataSet);
 
-      //pIFunction -> put_ShowExpression(TRUE);
-      //pIFunction -> put_ShowControls(TRUE);
-      pIFunction -> put_AllowControlVisibilitySettings(allowUserFunctionControlVisibilityAccess);
-      //pIFunction -> put_ShowResults(TRUE);
-      //pIFunction -> put_ShowVariables(TRUE);
-      //pIFunction -> put_AllowPropertySettings(TRUE);
-
-      if ( ! deferVisibility ) {
-         RECT rect;  
-         GetWindowRect(hwndFrame,&rect);
-         SendMessage(hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-      }
-
-   } else {
-
-      cachedFunctionList.Add(pIFunction,NULL,functionID);
-      pIFunction -> AddRef();
-
+   return pIDataSet;
    }
+   
+   void G::connectDataSet(IDataSet *pIDataSet) {
 
-   pIFunction -> put_OnChangeCallback(someObjectChanged,(void *)this);
+   IUnknown* pIUnknownDataSet;
+   pIDataSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownDataSet));
+   ContainedDataSet *pContainedDataSet = new ContainedDataSet(this,dataSetList.ID(pIDataSet),hwndDataSourcesDataSets,pIDataSet,pIUnknownDataSet,IID_IDataSetEvents);
+   pIUnknownDataSet -> Release();
 
-   return pIFunction;
-   }
+   IOleObject* pIOleObject;
+   IOleClientSite* pIOleClientSite;
+
+   pIDataSet -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
+
+   pContainedDataSet -> QueryInterface(IID_IOleClientSite,reinterpret_cast<void**>(&pIOleClientSite));
+
+   pIOleObject -> SetClientSite(pIOleClientSite);
+
+   pContainedDataSet -> connectEvents();
+
+   containedDataSetList.Add(pContainedDataSet,NULL,(long)pIDataSet);
+
+   pIOleObject -> Release();
+
+   pIOleClientSite -> Release();
+
+   setDataSourcesVisibility(pIDataSet,NULL);
+
+   return;
+   } 
 
 
-   void G::deleteFunction(IGSFunctioNater *pIFunction) {
+   void G::deleteDataSet(IDataSet *pIDataSet) {
 
-   unConnectFunction(pIFunction);
+   IOleObject* pIOleObject;
+   pIDataSet -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
+   pIOleObject -> SetClientSite(NULL);
+   pIOleObject -> Release();
 
-   ContainedFunction* pContainedFunction = containedFunctionList.Get(reinterpret_cast<long>(pIFunction));
+   ContainedDataSet *pContainedDataSet = containedDataSetList.Get(reinterpret_cast<long>(pIDataSet));
 
-   containedFunctionList.Remove(pContainedFunction);
+   containedDataSetList.Remove(pContainedDataSet);
 
-   int item = functionList.IndexOf(pIFunction);
+   delete pContainedDataSet;
 
-   boolean isCurrentSelection = (item == (int)SendMessage(hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L));
+   dataSetList.Remove(pIDataSet);
 
-   functionList.Remove(pIFunction);
+   setDataSourcesVisibility(NULL,NULL);
 
-   VARIANT_BOOL anyControlVisible;
-
-   pIFunction -> get_AnyControlVisible(&anyControlVisible);
-
-   pIFunction -> Release();
-
-   delete pContainedFunction;
-
-   if ( anyControlVisible ) {
-
-      SendMessage(hwndDataSourcesFunctions,TCM_DELETEITEM,(WPARAM)item,0L);
-      int n = functionList.Count();
-      if ( n == 0 ) {
-         RECT rect;  
-         GetWindowRect(hwndFrame,&rect);
-         SendMessage(hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-         return;
-      }
-
-      TC_ITEM tcItem;
-      char szTemp[32];
-      memset(&tcItem,0,sizeof(tcItem));
-      tcItem.mask = TCIF_TEXT;
-      tcItem.pszText = szTemp;
-      for ( int k = 0; k < n; k++ ) {
-         sprintf(szTemp,"F%ld",k);
-         SendMessage(hwndDataSourcesFunctions,TCM_SETITEM,(WPARAM)k,(LPARAM)&tcItem);
-      }
-
-   }
-
-   if ( 0 < containedFunctionList.Count() ) {
-      if ( isCurrentSelection ) {
-         SendMessage(hwndDataSourcesFunctions,TCM_SETCURSEL,0L,0L);
-         pContainedFunction = containedFunctionList.GetFirst();
-         pContainedFunction -> pFunction() -> get_AnyControlVisible(&anyControlVisible);
-         if ( anyControlVisible )
-            ShowWindow(pContainedFunction -> HWNDSite(),SW_SHOW);
-      } else {
-         InvalidateRect(hwndDataSourcesFunctions,NULL,TRUE);
-      }
-   }
+   pIDataSet -> Release();
 
    return;
    }
 
 
-   int G::connectFunction(IGSFunctioNater *pIFunction,bool deferVisibility,bool doVisibilityOnly) {
+   IGSFunctioNater* G::newFunction(bool connectNow) {
 
-   int item;
+   long functionID = (long)PlotIdBands::plotIdFunctions + functionList.Count() + 1;
 
-   if ( ! deferVisibility || doVisibilityOnly ) {
+   IGSFunctioNater *pIFunction = (IGSFunctioNater*)NULL;
 
-      TC_ITEM tie;
-      char szFunction[32];
+   pFunction_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IGSFunctioNater,reinterpret_cast<void **>(&pIFunction));
 
-      sprintf(szFunction,"F%d",functionList.IndexOf(pIFunction) + 1);
+   pIFunction -> Initialize(pIDataSetMaster,pIOpenGLImplementation,NULL,NULL,
+                              propertyPlotView,
+                              propertyDefault2DPlotType,
+                              propertyDefault3DPlotType,
+                              propertyBackgroundColor,
+                              propertyFloor,
+                              propertyCeiling,someObjectChanged,(void *)this);
+ 
+   IPlot *pIPlot = NULL;
 
-      memset(&tie,0,sizeof(TC_ITEM));
+   pIFunction -> get_IPlot((void **)&pIPlot);
 
-      tie.mask = TCIF_TEXT;
-      tie.pszText = szFunction;
-      tie.cchTextMax = 32;
+   pIPlot -> put_OkToPlot(0);
 
-      item = (int)SendMessage(hwndDataSourcesFunctions,TCM_INSERTITEM,(WPARAM)SendMessage(hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L),(LPARAM)&tie);
+   plotList.Add(pIPlot,NULL,functionID);
 
+   functionList.Add(pIFunction,NULL,functionID);
+
+   if ( connectNow )
+      connectFunction(pIFunction);
+
+   return pIFunction;
    }
 
-   ContainedFunction* pContainedFunction = NULL;
 
-   if ( ! doVisibilityOnly ) {
-      IUnknown* pIUnknownFunction;
-      pIFunction -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownFunction));
-      pContainedFunction = new ContainedFunction(this,functionList.ID(pIFunction),hwndDataSourcesFunctions,pIFunction,pIUnknownFunction,DIID_IGSFunctioNaterEvents);
-      pIUnknownFunction -> Release();
-   } else {
-      if ( ! deferVisibility ) {
-         while ( pContainedFunction = containedFunctionList.GetNext(pContainedFunction) ) {
-            if ( pContainedFunction -> pFunction() == pIFunction ) {
-               TC_ITEM tie = {0};
-               tie.mask = TCIF_PARAM;
-               tie.lParam = (LPARAM)pContainedFunction;// -> HWNDSite();
-               SendMessage(hwndDataSourcesFunctions,TCM_SETITEM,item,(LPARAM)&tie);
-               return 1;
-            }
-         }
-      }
-   }
+   void G::connectFunction(IGSFunctioNater *pIFunction) {
 
-   if ( doVisibilityOnly )
-      return 1;
+   IUnknown* pIUnknownFunction;
+   pIFunction -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownFunction));
+   ContainedFunction *pContainedFunction = new ContainedFunction(this,functionList.ID(pIFunction),hwndDataSourcesFunctions,pIFunction,pIUnknownFunction,DIID_IGSFunctioNaterEvents);
+   pIUnknownFunction -> Release();
+
+   pIFunction -> put_AllowPropertySettings(VARIANT_TRUE);
+
+   pIFunction -> put_AllowControlVisibilitySettings(allowUserFunctionControlVisibilityAccess);
+
+   pIFunction -> put_OnChangeCallback(someObjectChanged,(void *)this);
 
    IOleObject* pIOleObject;
    IOleClientSite* pIOleClientSite;
@@ -692,26 +678,45 @@
 
    pIOleClientSite -> Release();
 
-   return 1;
+   setDataSourcesVisibility(NULL,pIFunction);
+
+   return;
    }
 
 
-   int G::unConnectFunction(IGSFunctioNater* pIFunction) {
+   void G::deleteFunction(IGSFunctioNater *pIFunction) {
+
    IOleObject* pIOleObject;
    pIFunction -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
    pIOleObject -> SetClientSite(NULL);
    pIOleObject -> Release();
-   return 0;
+
+   ContainedFunction* pContainedFunction = containedFunctionList.Get(reinterpret_cast<long>(pIFunction));
+
+   containedFunctionList.Remove(pContainedFunction);
+
+   IPlot *pIPlot = NULL;
+
+   pIFunction -> get_IPlot((void **)&pIPlot);
+
+   functionList.Remove(pIFunction);
+
+   plotList.Remove(pIPlot);
+
+   pIFunction -> Release();
+
+   delete pContainedFunction;
+
+   setDataSourcesVisibility(NULL,NULL);
+
+   return;
    }
 
 
    IText* G::newText() {
    IText* pIText;
-   CoCreateInstance(CLSID_Text,
-                    pIUnknownOuter,
-                    CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                    IID_IText,
-                    reinterpret_cast<void **>(&pIText));
+
+   CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pIText));
 
 // Possible Release() problem !!!
 
@@ -743,17 +748,8 @@
                            propertyDefault2DPlotType,
                            propertyDefault3DPlotType,
                            propertyBackgroundColor,
-                           propertyViewTheta,
-                           propertyViewPhi,
-                           propertyViewSpin,
                            propertyFloor,
-                           propertyCeiling,
-                           propertyCountLights,
-                           ppPropertyLightOn,
-                           ppPropertyAmbientLight,
-                           ppPropertyDiffuseLight,
-                           ppPropertySpecularLight,
-                           ppPropertyLightPos,someObjectChanged,(void *)this);
+                           propertyCeiling,someObjectChanged,(void *)this);
  
    IPlotNotify *pIPlotNotify;
    QueryInterface(IID_IPlotNotify,reinterpret_cast<void **>(&pIPlotNotify));
@@ -895,9 +891,7 @@
 
    void G::someObjectChanged(void *pArg) {
    G *p = (G *)pArg;
-   RECT rect;
-   GetWindowRect(p -> hwndFrame,&rect);
-   SendMessage(p -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+   p -> setDataSourcesVisibility(NULL,NULL);
    p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
    return;
    }

@@ -110,7 +110,11 @@
    STDMETHODIMP Function::SetExtent(DWORD dwDrawAspect,SIZEL *pSizel) {
    if ( ! ( dwDrawAspect & DVASPECT_CONTENT ) )
       return E_NOTIMPL;
-   hiMetricToPixel(pSizel,&containerSize);
+   SIZEL sizel{pSizel -> cx,pSizel -> cy};
+   hiMetricToPixel(&sizel,&sizel);
+   resultingWidth = sizel.cx;
+   resultingHeight = sizel.cy;
+   SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,resultingWidth,resultingHeight,SWP_NOMOVE);
    return S_OK;
    }
  
@@ -123,12 +127,10 @@
    if ( ! hwndSpecDialog )
       initWindows();
 
-   resize(containerSize.cx);
+   resize();
 
-   if ( containerSize.cx <= 0 ) 
-      containerSize.cx = CONTAINERSIZE_CX;
-
-   memcpy(pSizel,&containerSize,sizeof(SIZEL));
+   pSizel -> cx = resultingWidth;
+   pSizel -> cy = resultingHeight;
 
    pixelsToHiMetric(pSizel,pSizel);
 
@@ -151,9 +153,11 @@
       if ( ! anyVisible() )
          return S_OK;
       SetObjectRects(prc,NULL);
-      SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
+      resize();
+      ShowWindow(hwndSpecDialog,SW_SHOW);
       break;
    case OLEIVERB_HIDE:
+      ShowWindow(GetParent(hwndSpecDialog),SW_HIDE);
       ShowWindow(hwndSpecDialog,SW_HIDE);
       break;
    case OLEIVERB_UIACTIVATE:

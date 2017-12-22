@@ -68,11 +68,7 @@
    pIClassFactory -> CreateInstance(pIUnknownThis,IID_IUnknown,reinterpret_cast<void**>(&pIUnknownProperties));
    pIClassFactory -> Release();
 #else
-   CoCreateInstance(CLSID_InnoVisioNateProperties,
-                         pIUnknownThis,
-                         CLSCTX_INPROC_SERVER,
-                         IID_IUnknown,
-                         reinterpret_cast<void **>(&pIUnknownProperties));
+   HRESULT rc = CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
 #endif
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&iProperties));
    pIUnknownThis -> Release();

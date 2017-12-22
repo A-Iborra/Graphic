@@ -36,14 +36,14 @@
          SetWindowLong(GetDlgItem(hwnd,IDDI_FUNCTION_EQUATION_ENTRY),GWL_WNDPROC,(long)(p -> oldExpressionHandler));
       break;
 
-   case WM_SIZE: {
-      if ( ! p ) break;
-      int cx = LOWORD(lParam);
-      int cy = HIWORD(lParam);
-      if ( ! cx ) break;
-      p -> resize(cx);
-      }
-      break;
+   //case WM_SIZE: {
+   //   if ( ! p ) break;
+   //   int cx = LOWORD(lParam);
+   //   int cy = HIWORD(lParam);
+   //   if ( ! cx ) break;
+   //   p -> resize();
+   //   }
+   //   break;
 
    case WM_MOVE:
       p -> rectDialog.left = LOWORD(lParam);
@@ -235,7 +235,7 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> iProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
-         p -> resize(p -> containerSize.cx);
+         p -> resize();
          if ( p -> pWhenChangedCallback )
             p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }

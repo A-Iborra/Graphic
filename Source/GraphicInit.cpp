@@ -27,14 +27,6 @@
 #include "List.cpp"
 
 
-   int G::oleSetWindowRect(RECT* prcPos) {
-   SetWindowPos(hwndFrame,HWND_TOP,
-                      prcPos -> left + 4,prcPos -> top + 4,
-                         prcPos-> right - prcPos -> left - 8,prcPos -> bottom - prcPos -> top - 8,0L);
-   return TRUE;
-   }
- 
- 
    int G::initWindows() {
 
    RECT rect;
@@ -82,7 +74,7 @@
 
    hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
    if ( defaultStatusBarHandler ) 
-      SetWindowLong(hwndStatusBar,GWL_WNDPROC,(long)statusBarHandler);
+      SetWindowLongPtr(hwndStatusBar,GWLP_WNDPROC,(ULONG_PTR)statusBarHandler);
    else
       defaultStatusBarHandler = (WNDPROC)SetWindowLong(hwndStatusBar,GWL_WNDPROC,(long)statusBarHandler);
 
@@ -90,36 +82,16 @@
 
    hwndDataSourcesDialog = CreateDialogIndirectParam(hModule,dt,hwndFrame,(DLGPROC)dataSourcesHandler,(LPARAM)this);
 
-   SetWindowLong(hwndDataSourcesDialog,GWL_STYLE,(GetWindowLong(hwndDataSourcesDialog,GWL_STYLE) & ~ WS_CAPTION) & ~ WS_VISIBLE);
+   SetWindowLongPtr(hwndDataSourcesDialog,GWL_STYLE,(ULONG_PTR)((GetWindowLongPtr(hwndDataSourcesDialog,GWL_STYLE) & ~ WS_CAPTION) & ~ WS_VISIBLE));
 
    hwndDataSourcesTab = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_TAB);
 
    hwndDataSourcesFunctions = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_FUNCTIONS_TAB);
 
-   TC_ITEM tie;
-   memset(&tie,0,sizeof(TC_ITEM));
-   tie.mask = TCIF_TEXT;
-   tie.pszText = "Functions";
-   tie.cchTextMax = 18;
-   TabCtrl_InsertItem(hwndDataSourcesTab, 1, &tie);
+   hwndDataSourcesDataSets = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_DATASETS_TAB);
 
    put_PlotView(plotView);
    put_PlotType(plotType);
-
-   IGSFunctioNater* pIFunction = (IGSFunctioNater*)NULL;
-
-   while ( pIFunction = cachedFunctionList.GetFirst() ) {
-      connectFunction(pIFunction,false,false);
-      pIFunction -> put_ShowVariables(TRUE);
-      pIFunction -> put_ShowExpression(TRUE);
-      pIFunction -> put_ShowControls(TRUE);
-      pIFunction -> put_AllowControlVisibilitySettings(FALSE);
-      pIFunction -> put_ShowResults(TRUE);
-      GetWindowRect(hwndFrame,&rect);
-      SendMessage(hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-      pIFunction -> Release();
-      cachedFunctionList.Remove(pIFunction);
-   }
 
    if ( containedFunctionList.Count() > 0 ) {
       SendMessage(hwndDataSourcesFunctions,TCM_SETCURSEL,0L,0L);

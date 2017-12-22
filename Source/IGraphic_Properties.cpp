@@ -242,11 +242,8 @@
    short oldStatus;
    propertyShowStatusBar -> get_boolValue(&oldStatus);
    propertyShowStatusBar -> put_boolValue(usb);
-   if ( usb != oldStatus ) {
-      RECT rect;
-      GetWindowRect(hwndFrame,&rect);
-      graphicFrameHandler(hwndFrame,WM_SIZE,0L,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-   }
+   if ( usb != oldStatus ) 
+      setDataSourcesVisibility(NULL,NULL);
    return S_OK;
    }
    STDMETHODIMP G::get_UseStatusBar(VARIANT_BOOL *pusb) {
@@ -359,9 +356,7 @@
    STDMETHODIMP G::put_ShowFunctions(VARIANT_BOOL bShow) {
    showFunctions = bShow;
    ShowWindow(hwndDataSourcesDialog,bShow && functionList.Count() > 0 ? SW_SHOW : SW_HIDE);
-   RECT rect;
-   GetWindowRect(hwndFrame,&rect);
-   SendMessage(hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+   setDataSourcesVisibility(NULL,NULL);
    return S_OK;
    }
 
@@ -369,5 +364,10 @@
    STDMETHODIMP G::get_ShowFunctions(VARIANT_BOOL *bShow) {
    if ( ! bShow ) return E_POINTER;
    *bShow = showFunctions;
+   return S_OK;
+   }
+
+   STDMETHODIMP G::put_AllowUserSetFunctionVisibility(VARIANT_BOOL doAllow) {
+   allowUserFunctionControlVisibilityAccess = VARIANT_TRUE == doAllow ? TRUE : FALSE;
    return S_OK;
    }

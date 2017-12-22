@@ -22,17 +22,9 @@
                                  IGProperty* parentDefault2DPlotType,
                                  IGProperty* parentDefault3DPlotType,
                                  IGProperty *parentBackground,
-                                 IGProperty *parentTheta,
-                                 IGProperty *parentPhi,
-                                 IGProperty *parentSpin,
                                  IGProperty *parentFloor,
                                  IGProperty *parentCeiling,
-                                 IGProperty *pCountLights,
-                                 IGProperty **ppLightingOn,
-                                 IGProperty **ppAmbientLight,
-                                 IGProperty **ppDiffuseLight,
-                                 IGProperty **ppSpecularLight,
-                                 IGProperty **ppLightPos,void (__stdcall *pCallback)(void *),void *pCallbarkArg) {
+                                 void (__stdcall *pCallback)(void *),void *pCallbarkArg) {
  
    if ( pPropColor ) {
       if ( propertyLineColor ) {
@@ -68,16 +60,6 @@
       overrideOwnerType = true;
 
    pOwnerPropertyBackgroundColor = parentBackground;
-   pOwnerPropertyPhi = parentPhi;
-   pOwnerPropertyTheta = parentTheta;
-   pOwnerPropertySpin = parentSpin;
-
-   pOwnerPropertyCountLights = pCountLights;
-   pOwnerPropertiesLightOn = ppLightingOn;
-   pOwnerPropertiesAmbientLight = ppAmbientLight;
-   pOwnerPropertiesDiffuseLight = ppDiffuseLight;
-   pOwnerPropertiesSpecularLight = ppSpecularLight;
-   pOwnerPropertiesLightPosition = ppLightPos;
 
    put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
  

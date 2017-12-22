@@ -1,0 +1,29 @@
+
+#pragma once
+
+#include "ContainedObject.h"
+#include "DataSet_i.h"
+
+  class ContainedDataSet : 
+      public ContainedObject,
+      public IDataSetEvents {
+
+  public:
+
+     ContainedDataSet(G *pParent,long plotID,HWND hwndTab,IDataSet *pIDataSet,IUnknown* pIUnknownObject,REFIID riidEventsInterface);
+
+     IDataSet *pDataSet() { return pIDataSet; };
+
+     STDMETHOD(QueryInterface)(REFIID riid,void **ppv);
+
+     STDMETHOD_ (ULONG, AddRef)();
+     STDMETHOD_ (ULONG, Release)();
+
+  private:
+
+     long plotID;
+
+     IDataSet *pIDataSet;
+
+  };
+

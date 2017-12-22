@@ -28,7 +28,7 @@
 //      IPlot
 
      STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
-                           IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty **,IGProperty **,IGProperty **,IGProperty **,IGProperty **,
+                           IGProperty*,IGProperty *pPropertyFloor,IGProperty *pPropertyCeiling,
                               void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
 
      STDMETHOD(PrepareForData)();
@@ -196,16 +196,7 @@
      IGProperty *pOwnerPropertyPlotView;
      IGProperty *pOwnerProperty2DPlotType;
      IGProperty *pOwnerProperty3DPlotType;
-     IGProperty *pOwnerPropertyTheta;
-     IGProperty *pOwnerPropertyPhi;
-     IGProperty *pOwnerPropertySpin;
      IGProperty *pOwnerPropertyBackgroundColor;
-     IGProperty *pOwnerPropertyCountLights;
-     IGProperty **pOwnerPropertiesLightOn;
-     IGProperty **pOwnerPropertiesAmbientLight;
-     IGProperty **pOwnerPropertiesDiffuseLight;
-     IGProperty **pOwnerPropertiesSpecularLight;
-     IGProperty **pOwnerPropertiesLightPosition;
 
      IPlotNotify *pIPlotNotify;
      IGSystemStatusBar* pIGSystemStatusBar;

@@ -144,6 +144,29 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="launchExcelcpp.cpp" />
+    <ClCompile Include="loadExcelNamedRange.cpp" />
+    <ClCompile Include="loadExcelWorkbook.cpp" />
+    <ClCompile Include="loadExcelWorksheet.cpp" />
+    <ClCompile Include="specDialogHandler.cpp" />
+    <ClCompile Include="propertiesHandler.cpp" />
+    <ClCompile Include="excelHandler.cpp" />
+    <ClCompile Include="IConnectionPoint.cpp" />
+    <ClCompile Include="IConnectionPointContainer.cpp" />
+    <ClCompile Include="IDataObject.cpp" />
+    <ClCompile Include="IEnumConnectionPoints.cpp" />
+    <ClCompile Include="IEnumerateConnections.cpp" />
+    <ClCompile Include="IOleControl.cpp" />
+    <ClCompile Include="IOleInPlaceActiveObject.cpp" />
+    <ClCompile Include="IOleInPlaceObject.cpp" />
+    <ClCompile Include="IOleObject.cpp" />
+    <ClCompile Include="IPropertiesClient.cpp" />
+    <ClCompile Include="IPropertyPageClient.cpp" />
+    <ClCompile Include="IProvideClassInfo.cpp" />
+    <ClCompile Include="IQuickActivate.cpp" />
+    <ClCompile Include="IRunnableObject.cpp" />
+    <ClCompile Include="IUnknown.cpp" />
+    <ClCompile Include="IViewObject.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="\Common\Utils\registryUtils.cpp" />
@@ -163,6 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataSet.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DataSet.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

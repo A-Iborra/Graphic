@@ -19,36 +19,6 @@
 #include "list.cpp"
 
 
-   long __stdcall DataSet::QueryInterface(REFIID riid,void **ppv) {
-   *ppv = NULL; 
- 
-   if ( riid == IID_IUnknown )
-      *ppv = static_cast<DataSet *>(this); 
-   else
- 
-   if ( riid == IID_IDataSet ) 
-      *ppv = static_cast<IDataSet *>(this);
-   else
- 
-      return E_NOINTERFACE;
- 
-   AddRef(); 
-   return S_OK; 
-   }
-   unsigned long __stdcall DataSet::AddRef() {
-   return ++refCount;
-   }
-   unsigned long __stdcall DataSet::Release() {
-   refCount--;
-   if ( refCount == 0 ) {
-      delete this;
-      return 0;
-   }
-   return refCount;
-   }
-
-
-
    HRESULT DataSet::ReSet() {
    DataList *t;
 
@@ -66,25 +36,54 @@
    xMax = -DBL_MAX;
    yMax = -DBL_MAX;
    zMax = -DBL_MAX;
+
    dataArity = DATA_ARITY_UNKNOWN;
+
    if ( gdiData ) {
       delete [] gdiData;
       gdiData = NULL;
    }
 
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) ) 
+   for ( IDataSet *p : otherDomains )
       p -> ReSet();
 
    return S_OK;
    }
  
+   HRESULT DataSet::put_Name(BSTR name) {
+   WideCharToMultiByte(CP_ACP,0,name,-1,szName,64,0,0);
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::get_Name(BSTR *pName) {
+   if ( ! pName ) 
+      return E_POINTER;
+   *pName = SysAllocStringLen(NULL,strlen(szName));
+   MultiByteToWideChar(CP_ACP,0,szName,-1,*pName,64);
+   return S_OK;
+   }
+
+   HRESULT DataSet::put_DataSource(BSTR dataSource) {
+   WideCharToMultiByte(CP_ACP,0,dataSource,-1,szDataSource,64,0,0);
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::get_DataSource(BSTR *pDataSource) {
+   if ( ! pDataSource ) 
+      return E_POINTER;
+   *pDataSource = SysAllocStringLen(NULL,strlen(szDataSource));
+   MultiByteToWideChar(CP_ACP,0,szDataSource,-1,*pDataSource,MAX_PATH);
+   return S_OK;
+   }
+
+
 
    HRESULT DataSet::get_maxX(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMax,returnedMax = xMax;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_maxX(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
@@ -94,8 +93,7 @@
 
    HRESULT DataSet::put_maxX(double v) {
    xMax = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) ) 
+   for ( IDataSet *p : otherDomains )
       p -> put_maxX(v);
    return S_OK;
    }
@@ -104,8 +102,7 @@
    HRESULT DataSet::get_maxY(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMax,returnedMax = yMax;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_maxY(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
@@ -115,8 +112,7 @@
 
    HRESULT DataSet::put_maxY(double v) {
    yMax = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) )
+   for ( IDataSet *p : otherDomains )
       p -> put_maxY(v);
    return S_OK;
    }
@@ -125,8 +121,7 @@
    HRESULT DataSet::get_maxZ(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMax,returnedMax = zMax;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_maxZ(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
@@ -147,8 +142,7 @@
 
    HRESULT DataSet::put_maxZ(double v) {
    zMax = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) )
+   for ( IDataSet *p : otherDomains )
       p -> put_maxZ(v);
    return S_OK;
    }
@@ -157,8 +151,7 @@
    HRESULT DataSet::get_minX(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMin,returnedMin = xMin;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_minX(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }

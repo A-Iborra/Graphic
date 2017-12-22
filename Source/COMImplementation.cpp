@@ -121,6 +121,7 @@ char OBJECT_DESCRIPTION[][128] = {"GSystemGraphic Position And Size Properties",
                                     "GSystemGraphic Lighting Properties",
                                     "GSystemGraphic Axis Properties",
                                     "GSystemGraphic Plot Properties",
+                                    "GSystemGraphic DataSet Properties",
                                     "GSystemGraphic Function Properties"};
  
 char OBJECT_NAME[][128] = {"GSystemGraphic.PropertiesPosSize",
@@ -130,6 +131,7 @@ char OBJECT_NAME[][128] = {"GSystemGraphic.PropertiesPosSize",
                                  "GSystemGraphic.PropertiesLighting",
                                  "GSystemGraphic.PropertiesAxis",
                                  "GSystemGraphic.PropertiesPlot",
+                                 "GSystemGraphic.PropertiesDataSets",
                                  "GSystemGraphic.PropertiesFunctions"};
 
 char OBJECT_NAME_V[][128] = {"GSystemGraphic.PropertiesPosSize.1",
@@ -139,6 +141,7 @@ char OBJECT_NAME_V[][128] = {"GSystemGraphic.PropertiesPosSize.1",
                                  "GSystemGraphic.PropertiesLighting.1",
                                  "GSystemGraphic.PropertiesAxis.1",
                                  "GSystemGraphic.PropertiesPlot.1",
+                                 "GSystemGraphic.PropertiesDataSets.1",
                                  "GSystemGraphic.PropertiesFunctions.1"};
 
 CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
@@ -148,6 +151,7 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
                                  CLSID_GSystemGraphicPropertiesLighting,
                                  CLSID_GSystemGraphicPropertiesAxis,
                                  CLSID_GSystemGraphicPropertiesPlot,
+                                 CLSID_GSystemGraphicPropertiesDataSets,
                                  CLSID_GSystemGraphicPropertiesFunctions,
                                  GUID_NULL};
 
@@ -159,7 +163,8 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
    static GFactory propertyPageLighting(OBJECT_CLSID[4]);
    static GFactory propertyPageAxis(OBJECT_CLSID[5]);
    static GFactory propertyPagePlot(OBJECT_CLSID[6]);
-   static GFactory propertyPageFunctions(OBJECT_CLSID[7]);
+   static GFactory propertyPageDataSets(OBJECT_CLSID[7]);
+   static GFactory propertyPageFunctions(OBJECT_CLSID[8]);
  
    STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppObject) {
 
@@ -190,6 +195,9 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
       return propertyPagePlot.QueryInterface(riid,ppObject);
 
    if ( rclsid == OBJECT_CLSID[7] )
+      return propertyPageDataSets.QueryInterface(riid,ppObject);
+
+   if ( rclsid == OBJECT_CLSID[8] )
       return propertyPageFunctions.QueryInterface(riid,ppObject);
 
    return E_NOINTERFACE;
@@ -270,6 +278,8 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
 
    *ppv = NULL; 
 
+#if 1
+
    if ( ! pStaticObject )
       pStaticObject = new G(punkOuter);
 
@@ -297,8 +307,49 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
    if ( OBJECT_CLSID[6] == myGuid )
       return pStaticObject -> PropertyPage(6) -> QueryInterface(riid,ppv);
 
-   if ( OBJECT_CLSID[7] == myGuid )
+   if ( OBJECT_CLSID[8] == myGuid )
       return pStaticObject -> PropertyPage(7) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[7] == myGuid )
+      return pStaticObject -> PropertyPage(8) -> QueryInterface(riid,ppv);
+
+   delete pStaticObject;
+
+   pStaticObject = NULL;
+
+#else
+
+   G *pG = new G(punkOuter);
+
+   if ( CLSID_GSystemGraphic == myGuid ) 
+      return pG -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[0] == myGuid )
+      return pG -> PropertyPage(0) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[1] == myGuid )
+      return pG -> PropertyPage(1) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[2] == myGuid )
+      return pG -> PropertyPage(2) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[3] == myGuid )
+      return pG -> PropertyPage(3) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[4] == myGuid )
+      return pG -> PropertyPage(4) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[5] == myGuid )
+      return pG -> PropertyPage(5) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[6] == myGuid )
+      return pG -> PropertyPage(6) -> QueryInterface(riid,ppv);
+
+   if ( OBJECT_CLSID[7] == myGuid )
+      return pG -> PropertyPage(7) -> QueryInterface(riid,ppv);
+
+   delete pG;
+#endif
 
    return E_NOINTERFACE;
    } 

@@ -5,11 +5,11 @@
 */
 
 #include <windows.h>
+#include <olectl.h>
+#include <CommCtrl.h>
 
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <math.h>
 
 #include "general.h"
 #include "utils.h"
@@ -19,17 +19,17 @@
 
    DataPoint movePoint = {-DBL_MAX,-DBL_MAX,-DBL_MAX};
  
-   DataSet::DataSet(IUnknown *pUnk) : 
-   pUnknownOuter(pUnk),
-   pIEvaluator(NULL),
-   otherDomains(),
-   refCount(0),
-   pBoundingBox(NULL),
-   dataArity(DATA_ARITY_UNKNOWN),
-   pPropertyFloor(NULL),
-   pPropertyCeiling(NULL)
+   long oleMiscStatus = OLEMISC_ACTIVATEWHENVISIBLE | OLEMISC_SETCLIENTSITEFIRST | OLEMISC_INSIDEOUT | 
+                           OLEMISC_CANTLINKINSIDE | OLEMISC_RECOMPOSEONRESIZE | OLEMISC_ALWAYSRUN;
 
-   {
+   DataSet::DataSet(IUnknown *pUnk) : 
+
+     pWhenChangedCallback(NULL),
+     pWhenChangedCallbackArg(NULL),
+
+     pUnknownOuter(pUnk),
+     otherDomains() {
+
    firstData = NULL;
    topData = NULL;
    gdiData = NULL;
@@ -39,33 +39,107 @@
    xMin = DBL_MAX;
    yMin = DBL_MAX;
    zMin = DBL_MAX;
+
    pBoundingBox = new boundingBox(&xMin,&yMin,&zMin,&xMax,&yMax,&zMax);
-   currentColor[0] = currentColor[1] = currentColor[2] = 0.0;
+
+   memset(szName,0,sizeof(szName));
+   memset(szDataSource,0,sizeof(szDataSource));
+   memset(szNamedRange,0,sizeof(szNamedRange));
+   memset(szSpreadsheetName,0,sizeof(szSpreadsheetName));
    memset(szEquations,0,sizeof(szEquations));
+
+   pIOleInPlaceActiveObject = new _IOleInPlaceActiveObject(this);
+
+   pIConnectionPoint = new _IConnectionPoint(this,IID_IDataSetEvents);
+
+   IUnknown* pIUnknownThis;
+
+   QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
+
+   CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
+
+   pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&pIGProperties));
+
+   pIUnknownThis -> Release();
+
+   IGPropertiesClient *pIPropertiesClient = NULL;
+
+   QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIPropertiesClient));
+
+   pIGProperties -> Advise(pIPropertiesClient);
+
+   pIPropertiesClient -> Release();
+
+   pIGProperties -> Add(L"state",&pPropertyState);
+
+   pPropertyState -> directAccess(TYPE_BINARY,&propertiesStart,offsetof(DataSet,propertiesEnd) - offsetof(DataSet,propertiesStart));
+
+   CLSIDFromString(L"Excel.Application",&CLSID_excel);
+
    return;
    }
  
 
    DataSet::~DataSet() {
+
    ReSet();
-   //IDataSet* pOther;
-   for ( IDataSet *pOther : otherDomains ) //while ( pOther = otherDomains.GetLast() ) {
+
+   for ( IDataSet *pOther : otherDomains ) 
       pOther -> Release();
-      //otherDomains.Remove(pOther);
-   //}
    otherDomains.clear();
-   //extents *pExtents = extentsStack.GetLast();
-   for ( extents *pExtents : extentsStack ) //while ( pExtents ) {
-      //extentsStack.Remove(pExtents);
+
+   for ( extents *pExtents : extentsStack ) 
       delete pExtents;
-   //}
    extentsStack.clear();
+
    delete pBoundingBox;
+
    if ( pIEvaluator )
       pIEvaluator -> Release();
+
+   if ( pIUnknownProperties )
+      pIUnknownProperties -> Release();
+
+   if ( pIOleInPlaceSite ) 
+      pIOleInPlaceSite -> Release();
+
+   if ( pIOleClientSite ) 
+      pIOleClientSite -> Release();
+
+   if ( pIPropertyNotifySink ) 
+      pIPropertyNotifySink -> Release();
+
+   if ( pAdviseSink ) 
+      pAdviseSink -> Release();
+
+   if ( pIGProperties ) 
+      pIGProperties -> Release();
+
+   if ( enumConnectionPoints ) 
+      delete enumConnectionPoints;
+
+   delete pIConnectionPoint;
+
    return;
    }
  
+
+   int DataSet::initWindows() {
+
+   HWND hwndOwner = NULL;
+ 
+   HRESULT hr = pIOleInPlaceSite -> GetWindow(&hwndOwner);
+
+   if ( ! hwndOwner )
+      return 0;
+
+   DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_DATASET_SPEC),RT_DIALOG));
+
+   hwndSpecDialog = CreateDialogIndirectParam(hModule,dt,hwndOwner,(DLGPROC)dataSetDialogHandler,(LPARAM)this);
+
+   return 0;
+   }
+
 
    int DataSet::resetLimits(const DataPoint& d) {
 

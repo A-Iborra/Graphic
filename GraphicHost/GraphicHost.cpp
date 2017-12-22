@@ -1,85 +1,112 @@
 
 #include "GraphicHost.h"
+#include "utils.h"
 
-#include "GSystem_i.h"
-#include "OpenGLImplementation_i.c"
-#include "Properties_i.c"
-#include "DataSet_i.c"
-#include "Plot_i.c"
+   WNDPROC GraphicHost::nativeStaticHandler = NULL;
 
-   HWND hwndFrame;
-   HWND hwndClient1;
-   HWND hwndClient2;
-   HGLRC renderingContext;
+   GraphicHost::GraphicHost(HWND hs) :
+      hwndSite(hs) {
 
-   IOpenGLImplementation *pIOpenGLImplementation = NULL;
-   IGProperties *pIGProperties = NULL;
-   IGProperty *pIPropertyBackground = NULL;
-   IGProperty *pIPropertyPlotView = NULL;
-   IDataSet *pIDataSetMaster = NULL;
-   IPlot *pIPlot = NULL;
+   pIOleClientSite = new _IOleClientSite(this);
 
-   int APIENTRY wWinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPWSTR lpCmdLine,int nCmdShow) {
+   pIOleInPlaceSite = new _IOleInPlaceSite(this);
 
-   CoInitialize(NULL);
+   SetWindowLongPtr(hwndSite,GWLP_USERDATA,(ULONG_PTR)this);
 
-   CoCreateInstance(CLSID_OpenGLImplementor,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOpenGLImplementation,reinterpret_cast<void **>(&pIOpenGLImplementation));
+   HRESULT rc = CoCreateInstance(CLSID_GSystemGraphic,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Graphic));
 
-   CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
+   pIOleObject_Graphic -> QueryInterface(IID_IGSGraphic,reinterpret_cast<void **>(&pIGraphic));
 
-   CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSetMaster));
+   pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
 
-   CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
+   nativeStaticHandler = (WNDPROC)SetWindowLongPtr(hwndSite,GWLP_WNDPROC,(ULONG_PTR)graphicHandler);
 
-   pIGProperties -> Add(L"Background",&pIPropertyBackground);
+   pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
 
-   float fvColor[4] = {0.75,0.75,0.75,0.0};
+   RECT rect;
+   GetWindowRect(hwndSite,&rect);
 
-   pIPropertyBackground -> directAccess(TYPE_BINARY,(void *)fvColor,sizeof(fvColor));
+   long cx = rect.right - rect.left;
+   long cy = rect.bottom - rect.left;
 
-   pIGProperties -> Add(L"View",&pIPropertyPlotView);
+   SIZEL sizel{rect.right - rect.left,rect.bottom - rect.left};
 
-   long plotView = gcPlotView3D;
+   pixelsToHiMetric(&sizel,&sizel);
 
-   pIPropertyPlotView -> directAccess(TYPE_LONG,(void *)&plotView,sizeof(plotView));
+   pIOleObject_Graphic -> SetExtent(DVASPECT_CONTENT,&sizel);
 
-   pIPlot -> Initialize(pIDataSetMaster,pIOpenGLImplementation,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+   CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
 
-   pIOpenGLImplementation -> Start();
+   pIGProperties -> Add(L"Graphic",&pIGProperty_Graphic);
 
-   WNDCLASS gClass;
+   pIGProperty_Graphic -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
 
-   memset(&gClass,0,sizeof(WNDCLASS));
-   gClass.style = CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW;
-   gClass.lpfnWndProc = (WNDPROC)handler;
-   gClass.cbClsExtra = 32;
-   gClass.cbWndExtra = 32;
-   gClass.hInstance = hInstance;
-   gClass.hIcon = NULL;
-   gClass.hCursor = NULL;
-   gClass.hbrBackground = 0;
-   gClass.lpszMenuName = NULL;
-   gClass.lpszClassName = L"Graphic-Host";
-  
-   RegisterClass(&gClass);
+   pIGProperties -> put_FileName(L"Graphic.settings");
 
-   hwndFrame = CreateWindowEx(0L,L"Graphic-Host",L"InnoVisioNate Graphic Host",WS_OVERLAPPEDWINDOW | WS_VISIBLE,0,0,1600,1024,NULL,NULL,hInstance,NULL);
+   pIOleObject_Graphic -> QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIGPropertiesClient_Graphic));
 
-   CreateWindowEx(0L,WC_BUTTON,L"Draw",WS_CHILD | WS_VISIBLE,0,0,48,24,hwndFrame,(HMENU)1,hInstance,NULL);
+   VARIANT_BOOL wasSuccessful;
 
-   CreateWindowEx(0L,WC_BUTTON,L"Draw",WS_CHILD | WS_VISIBLE,0,0,48,24,hwndFrame,(HMENU)2,hInstance,NULL);
+   pIGProperties -> LoadFile(&wasSuccessful);
 
-   hwndClient1 = CreateWindowEx(WS_EX_CLIENTEDGE,WC_STATIC,L"",WS_CHILD | WS_VISIBLE,32,32,512,512,hwndFrame,(HMENU)10,hInstance,NULL);
-
-   hwndClient2 = CreateWindowEx(WS_EX_CLIENTEDGE,WC_STATIC,L"",WS_CHILD | WS_VISIBLE,32 + 512 + 32,32 + 128,256,256,hwndFrame,(HMENU)20,hInstance,NULL);
-
-   PostMessage(hwndFrame,WM_SETSIZES,0L,0L);
-
-   MSG msg;
-   while ( GetMessage(&msg,NULL,0L,0L) ) {
-      if ( PeekMessage(&msg,NULL,WM_QUIT,WM_QUIT,PM_REMOVE) ) break;
-      DispatchMessage(&msg);
+   if ( wasSuccessful ) {
+      pIGProperty_Graphic -> clearStorageObjects();
+      pIGProperty_Graphic -> addStorageObject(pIOleObject_Graphic);
+      pIGProperty_Graphic -> readStorageObjects();
+      pIGProperty_Graphic -> clearStorageObjects();
    }
 
-   return 0;
+   pIGraphic -> put_AllowUserSetFunctionVisibility(VARIANT_TRUE);
+
+   pIOleObject_Graphic -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndSite,&rect);
+
+   return;
    }
+
+
+   GraphicHost::~GraphicHost() {
+
+   pIGPropertiesClient_Graphic -> SavePrep();
+
+   pIGProperty_Graphic -> clearStorageObjects();
+   pIGProperty_Graphic -> addStorageObject(pIOleObject_Graphic);
+   pIGProperty_Graphic -> writeStorageObjects();
+   pIGProperty_Graphic -> clearStorageObjects();
+
+   pIGProperties -> Save();
+
+   pIGraphic -> Release();
+
+   pIOleObject_Graphic -> Release();
+
+   return;
+   }
+
+
+   long __stdcall GraphicHost::QueryInterface(REFIID riid,void **ppv) {
+
+   if ( IID_IUnknown == riid ) 
+      *ppv = static_cast<IUnknown*>(this);
+   else
+
+   if ( IID_IOleClientSite == riid ) 
+      *ppv = reinterpret_cast<void*>(pIOleClientSite);
+   else
+
+   if ( IID_IOleInPlaceSite == riid ) 
+      *ppv = reinterpret_cast<void*>(pIOleInPlaceSite);
+   else
+
+      return E_NOINTERFACE;
+
+   reinterpret_cast<IUnknown*>(*ppv) -> AddRef();
+   return S_OK;
+   }
+
+   unsigned long __stdcall GraphicHost::AddRef() {
+   return 1;
+   }
+   unsigned long __stdcall GraphicHost::Release() {
+   return 1;
+   }
+

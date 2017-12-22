@@ -38,13 +38,9 @@
   STDMETHODIMP Function::SetObjectRects(LPCRECT pRectPos,LPCRECT pRectClip) {
   rectDialog.left = pRectPos -> left;
   rectDialog.top = pRectPos -> top;
-#if 0
-  containerSize.cx = pRectPos -> right - pRectPos -> left;
-  containerSize.cy = pRectPos -> bottom - pRectPos -> top;
-#endif
-  rectDialog.right = rectDialog.left + containerSize.cx;
-  rectDialog.bottom = rectDialog.bottom + containerSize.cy;
-  SetWindowPos(hwndSpecDialog,HWND_TOP,rectDialog.left,rectDialog.top,containerSize.cx,containerSize.cy,0L);
+  rectDialog.right = pRectPos -> right;
+  rectDialog.bottom = pRectPos -> bottom;
+  SetWindowPos(hwndSpecDialog,HWND_TOP,rectDialog.left,rectDialog.top,rectDialog.right - rectDialog.left,rectDialog.bottom - rectDialog.top,0L);
   return S_OK;
   }
 

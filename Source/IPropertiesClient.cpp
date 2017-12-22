@@ -44,7 +44,7 @@
 
    HRESULT G::_IGPropertiesClient::SavePrep() {
 
-   pParent -> plotCount = pParent -> plotList.Count();
+   pParent -> dataSetCount = pParent -> dataSetList.Count();
    pParent -> functionCount = pParent -> functionList.Count();
    pParent -> textCount = pParent -> textList.Count();
  
@@ -70,15 +70,16 @@
 
    pParent -> propertyFunctions -> clearStorageObjects();
 
-   pParent -> propertyPlots -> clearStorageObjects();
+   pParent -> propertyDataSets -> clearStorageObjects();
 
-   IPlot *p = (IPlot *)NULL;
-   while ( p = pParent -> plotList.GetNext(p) ) 
-      pParent -> propertyPlots -> addStorageObject(p);
+   IDataSet *pds = (IDataSet *)NULL;
+   while ( pds = pParent -> dataSetList.GetNext(pds) ) 
+      pParent -> propertyDataSets -> addStorageObject(pds);
 
-   pParent -> propertyPlots -> writeStorageObjects();
+   pParent -> propertyDataSets -> writeStorageObjects();
 
-   pParent -> propertyPlots -> clearStorageObjects();
+   pParent -> propertyDataSets -> clearStorageObjects();
+
 
    pParent -> propertyTexts -> clearStorageObjects();
 
@@ -118,7 +119,7 @@
    pParent -> plotView = gcPlotView3D;
    pParent -> plotType = gcPlotTypeNatural;
  
-   pParent -> plotCount = 0;
+   pParent -> dataSetCount = 0;
    pParent -> textCount = 0;
    pParent -> functionCount = 0;
    pParent -> showFunctions = true;
@@ -266,72 +267,74 @@
          pParent -> functionList.Remove(p);
       }
 
-      ContainedFunction *pf = (ContainedFunction *)NULL;
-      while ( pf = pParent -> containedFunctionList.GetNext(pf) ) {
-         ShowWindow(pf -> HWNDSite(),SW_HIDE);
-         pParent -> containedFunctionList.Remove(pf);
-         delete pf;
-      }
-
       for ( long k = 0; k < cntObjects; k++ )
-         pParent -> newFunction(true);
+         pParent -> newFunction(false);
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
-      IGSFunctioNater *f = (IGSFunctioNater *)NULL;
-      while ( f = pParent -> functionList.GetNext(f) ) 
-         pParent -> propertyFunctions -> addStorageObject(f);
+      p = (IGSFunctioNater *)NULL;
+      while ( p = pParent -> functionList.GetNext(p) ) 
+         pParent -> propertyFunctions -> addStorageObject(p);
 
       pParent -> propertyFunctions -> readStorageObjects();
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
-      f = (IGSFunctioNater *)NULL;
-      while ( f = pParent -> functionList.GetNext(f) ) {
-         f -> get_AnyControlVisible(&anyFunctionControlVisible);
-         if ( anyFunctionControlVisible ) {
-            pParent -> connectFunction(f,false,true);
-            break;
-         }
-      }
+      p = NULL;
+      while ( p = pParent -> functionList.GetNext(p) )
+         pParent -> connectFunction(p);
 
-      pf = (ContainedFunction *)NULL;
-      while ( pf = pParent -> containedFunctionList.GetNext(pf) )
-         ShowWindow(pf -> HWNDSite(),SW_HIDE);
+      ContainedFunction *pcf = (ContainedFunction *)NULL;
+      while ( pcf = pParent -> containedFunctionList.GetNext(pcf) )
+         ShowWindow(pcf -> HWNDSite(),SW_HIDE);
 
       SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
 
-      pf = pParent -> containedFunctionList.Get((long)pParent -> functionList.GetFirst());
-      if ( pf ) {
-         pf -> pFunction() -> get_AnyControlVisible(&anyFunctionControlVisible);
-         if ( anyFunctionControlVisible )
-            ShowWindow(pf -> HWNDSite(),SW_SHOW);
-      }
+      //pcf = pParent -> containedFunctionList.Get((long)pParent -> functionList.GetFirst());
+      //if ( pcf ) {
+      //   pcf -> pFunction() -> get_AnyControlVisible(&anyFunctionControlVisible);
+      //   if ( anyFunctionControlVisible )
+      //      ShowWindow(pcf -> HWNDSite(),SW_SHOW);
+      //}
 
    }
 
-   pParent -> propertyPlots -> get_storedObjectCount(&cntObjects);
+   pParent -> propertyDataSets -> get_storedObjectCount(&cntObjects);
 
    if ( cntObjects ) {
 
-      IPlot *p = (IPlot *)NULL;
-      while ( p = pParent -> plotList.GetFirst() ) {
-         p -> Release();
-         pParent -> plotList.Remove(p);
+      IDataSet *p = (IDataSet *)NULL;
+      while ( p = pParent -> dataSetList.GetFirst() ) {
+         pParent -> deleteDataSet(p);
+         pParent -> dataSetList.Remove(p);
       }
 
       for ( long k = 0; k < cntObjects; k++ )
-         pParent -> newPlot(k + 1);
+         pParent -> newDataSet(false);
 
-      pParent -> propertyPlots -> clearStorageObjects();
+      pParent -> propertyDataSets -> clearStorageObjects();
 
-      p = (IPlot *)NULL;
-      while ( p = pParent -> plotList.GetNext(p) ) 
-         pParent -> propertyPlots -> addStorageObject(p);
+      IDataSet *pds = (IDataSet *)NULL;
+      while ( pds = pParent -> dataSetList.GetNext(pds) ) 
+         pParent -> propertyDataSets -> addStorageObject(pds);
 
-      pParent -> propertyPlots -> readStorageObjects();
+      pParent -> propertyDataSets -> readStorageObjects();
 
-      pParent -> propertyPlots -> clearStorageObjects();
+      pParent -> propertyDataSets -> clearStorageObjects();
+
+      p = NULL;
+      while ( p = pParent -> dataSetList.GetNext(p) )
+         pParent -> connectDataSet(p);
+
+      ContainedDataSet *pCds = (ContainedDataSet *)NULL;
+      while ( pCds = pParent -> containedDataSetList.GetNext(pCds) )
+         ShowWindow(pCds -> HWNDSite(),SW_HIDE);
+
+      SendMessage(pParent -> hwndDataSourcesDataSets,TCM_SETCURSEL,(WPARAM)0,0L);
+
+      //pCds = pParent -> containedDataSetList.Get((long)pParent -> dataSetList.GetFirst());
+      //if ( pCds )
+      //   ShowWindow(pCds -> HWNDSite(),SW_SHOW);
 
    }
 
@@ -388,9 +391,7 @@
    }
 
    if ( pParent -> hwndFrame ) {
-      RECT rect;
-      GetWindowRect(pParent -> hwndFrame,&rect);
-      SendMessage(pParent -> hwndFrame,WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
+      pParent -> setDataSourcesVisibility(NULL,NULL);
       pParent -> render(0);
    }
 

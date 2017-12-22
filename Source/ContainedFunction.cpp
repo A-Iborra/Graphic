@@ -108,17 +108,7 @@
    }
 
    HRESULT ContainedFunction::Started(long expectedValues) {
-
    pParent -> PrepareForData(plotID);
-
-   IGSFunctioNater *pIFunction = NULL;
-
-   pIUnknownObject -> QueryInterface(IID_IGSFunctioNater,(void **)&pIFunction);
-
-   pIFunction -> put_IPlot((void *)pParent -> plotList.Get(plotID));
-
-   pIFunction -> Release();
-
    return S_OK;
    }
 

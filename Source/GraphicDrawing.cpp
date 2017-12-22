@@ -61,6 +61,8 @@
 
    IPlot *pPlot = (IPlot *)NULL;
 
+   long allowedPlotCount = 0L;
+
    while ( pPlot = p -> plotList.GetNext(pPlot) ) {
 
       long okayToPlot = false;
@@ -70,20 +72,30 @@
       else
          okayToPlot = ( ! p -> autoClear || p -> currentPlotSourceID == 0 );
 
-      pPlot -> put_OkToPlot(okayToPlot);
+      IDataSet *pIDataSet = NULL;
+      pPlot -> get_DataSet(&pIDataSet);
 
       if ( okayToPlot ) {
          DataPoint minPoint,maxPoint;
-         IDataSet *pIDataSet;
-         pPlot -> get_DataSet(&pIDataSet);
          pIDataSet -> GetDomain(&minPoint,&maxPoint);
          p -> pIDataSetMaster -> ResetLimits(&minPoint);
          p -> pIDataSetMaster -> ResetLimits(&maxPoint);
       }
 
+      long countPoints = 0;
+
+      pIDataSet -> get_countPoints(&countPoints);
+
+      if ( 0 == countPoints )
+         okayToPlot = 0L;
+
+      pPlot -> put_OkToPlot(okayToPlot);
+
+      if ( okayToPlot )
+         allowedPlotCount++;
    }
 
-   if ( 0 == p -> plotList.Count() ) {
+   if ( 0 == allowedPlotCount ) {
       DataPoint dpMin = {0.0,0.0,0.0};
       DataPoint dpMax = {1.0,1.0,1.0};
       p -> pIDataSetMaster -> pushDataPoint(&dpMin);

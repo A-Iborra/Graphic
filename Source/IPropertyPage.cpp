@@ -30,6 +30,8 @@
 
    HRESULT G::_IPropertyPage::Activate(HWND hwndParent,const RECT *pRect,BOOL doModal) {
 
+Beep(2000,100);
+
    HWND hwndCreated = NULL;
 
    PROPSHEETPAGE propSheetPage = {0};
@@ -98,6 +100,8 @@
 
    HRESULT G::_IPropertyPage::Deactivate() {
 
+Beep(2000,100);
+
    if ( CLSID_GSystemGraphicPropertiesPosSize == theCLSID ) {
       if ( pParent -> hwndAppearanceSettings )
          DestroyWindow(pParent -> hwndAppearanceSettings);
@@ -160,6 +164,8 @@
 
 
    HRESULT G::_IPropertyPage::GetPageInfo(PROPPAGEINFO *pPageInfo) {
+
+Beep(2000,100);
 
    memset(pPageInfo,0,sizeof(PROPPAGEINFO));
 
@@ -224,6 +230,8 @@
 
 
    HRESULT G::_IPropertyPage::Show(UINT cmdShow) {
+
+Beep(2000,100);
 
    if ( CLSID_GSystemGraphicPropertiesPosSize == theCLSID ) {
       ShowWindow(pParent -> hwndAppearanceSettings,cmdShow);

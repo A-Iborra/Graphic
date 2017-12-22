@@ -129,11 +129,12 @@
 
             SetFocus(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY));
             }
-            return LRESULT(0);
+            break;
  
          default:
-            return LRESULT(0);
+            break;
          }
+         break;
 
       case IDDI_FUNCTION_EXPRESSION_LABEL:
          switch ( notifyCode ) {
@@ -142,11 +143,12 @@
             if ( p -> hwndSpecDialog ) 
                p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL);
             }
-            return LRESULT(0);
+            break;
  
          default:
-            return LRESULT(0);
+           break;
          }
+         break;
 
       case IDDI_FUNCTION_RESULT_LABEL:
          switch ( notifyCode ) {
@@ -154,11 +156,12 @@
             p -> pIPropertyResultsLabel -> getWindowItemValue(hwnd,IDDI_FUNCTION_RESULT_LABEL);
             if ( p -> hwndSpecDialog )
                p -> pIPropertyResultsLabel -> setWindowItemText(p -> hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL);
-            return LRESULT(0);
+            break;
  
          default:
-            return LRESULT(0);
+            break;
          }
+         break;
 
       case IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES:
          p -> pIPropertyPropertiesVisible -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
@@ -237,13 +240,16 @@
          p -> pIPropertyPlotPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
          break;
 
+      case IDDI_FUNCTION_START:
+         p -> Start();
+         break;
       }
+
+      if ( p -> pWhenChangedCallback )
+         p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+
       }
       return LRESULT(0);
-
-   //case WM_PAINT:
-   //   ShowWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWVISIBILITYPROPERTIES),! p -> userMode ? SW_SHOW : SW_HIDE);
-   //   break;
 
    }
  

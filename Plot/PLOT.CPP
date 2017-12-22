@@ -42,17 +42,7 @@
      pOwnerProperty2DPlotType(NULL),
      pOwnerProperty3DPlotType(NULL),
      pOwnerPropertyPlotView(NULL),
-     pOwnerPropertyTheta(NULL),
-     pOwnerPropertyPhi(NULL),
-     pOwnerPropertySpin(NULL),
      pOwnerPropertyBackgroundColor(NULL),
-
-     pOwnerPropertyCountLights(NULL),
-     pOwnerPropertiesLightOn(NULL),
-     pOwnerPropertiesAmbientLight(NULL),
-     pOwnerPropertiesDiffuseLight(NULL),
-     pOwnerPropertiesSpecularLight(NULL),
-     pOwnerPropertiesLightPosition(NULL),
 
      propertyLineColor(NULL),
      propertyLineWeight(NULL),
@@ -76,6 +66,7 @@
 
      hwndParentWindow(NULL),
      hwndDimensionSettings(NULL),
+     hwndObjectWindow(NULL),
      hwndTypeSettings(NULL),
      hwndColorSettings(NULL),
      hMainMenu(NULL),

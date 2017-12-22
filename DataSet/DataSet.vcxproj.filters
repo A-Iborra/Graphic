@@ -19,6 +19,12 @@
       <UniqueIdentifier>{4ded3ae3-0b38-4bca-90db-9566b6ac060d}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Source Files\COM Files\Window Handlers">
+      <UniqueIdentifier>{43784e91-edfc-40b6-9e0e-ccae8cbbbe1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\COM Files\Excel Files">
+      <UniqueIdentifier>{b9a43b01-7972-421a-b6fc-8ba0577dd69b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataSet.cpp">
@@ -42,6 +48,75 @@
     <ClCompile Include="\Common\Utils\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IOleObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleControl.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IDataObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IViewObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IProvideClassInfo.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IRunnableObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IQuickActivate.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertiesClient.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPropertyPageClient.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPointContainer.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumConnectionPoints.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IUnknown.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IOleInPlaceActiveObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPoint.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumerateConnections.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="specDialogHandler.cpp">
+      <Filter>Source Files\COM Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="propertiesHandler.cpp">
+      <Filter>Source Files\COM Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="excelHandler.cpp">
+      <Filter>Source Files\COM Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="launchExcelcpp.cpp">
+      <Filter>Source Files\COM Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loadExcelWorkbook.cpp">
+      <Filter>Source Files\COM Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loadExcelWorksheet.cpp">
+      <Filter>Source Files\COM Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loadExcelNamedRange.cpp">
+      <Filter>Source Files\COM Files\Excel Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DataSet.def">
@@ -57,5 +132,10 @@
     <ClInclude Include="DataSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DataSet.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

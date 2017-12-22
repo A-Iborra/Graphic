@@ -603,7 +603,7 @@
    CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
  
    pIPlot -> Initialize(pIDataSetDomain,pIOpenGLImplementation,pIEvaluator,propertyLineColor,propertyLineWeight,pParentPropertyPlotView,propertyPlotType,
-                           NULL,NULL,NULL,NULL,NULL,NULL,pPropFloor,pPropCeiling,NULL,NULL,NULL,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
+                           NULL,NULL,pPropFloor,pPropCeiling,pWhenChangedCallback,pWhenChangedCallbackArg);
  
    pIPlot -> put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
 

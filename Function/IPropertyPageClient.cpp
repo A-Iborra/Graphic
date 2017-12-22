@@ -66,7 +66,7 @@
 
    PROPSHEETHEADER *pHeader = reinterpret_cast<PROPSHEETHEADER *>(pv);
 
-   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;// | PSH_RESIZABLE | PSH_AEROWIZARD;
    pHeader -> hInstance = hModule;
    pHeader -> pszIcon = NULL;
    pHeader -> pszCaption = " Function Properties";
@@ -108,10 +108,30 @@
    else
       *pCount = 1;
 
+   IGPropertyPageClient *pPlotProperties = NULL;
+
+   pIPlot -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pPlotProperties));
+
+   long plotPropertiesCount = 0L;
+
+   pPlotProperties -> get_PropertyPageCount(&plotPropertiesCount);
+
+   *pCount += plotPropertiesCount;
+
+   pPlotProperties -> Release();
+
    return S_OK;
    }
 
    HRESULT Function::GetPropertySheets(void *pPages) {
+
+   IGPropertyPageClient *pPlotProperties = NULL;
+
+   pIPlot -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pPlotProperties));
+
+   long plotPropertiesCount = 0L;
+
+   pPlotProperties -> get_PropertyPageCount(&plotPropertiesCount);
 
    PROPSHEETPAGE *pPropSheetPages = reinterpret_cast<PROPSHEETPAGE *>(pPages);
 
@@ -124,8 +144,17 @@
    pPropSheetPages[0].lParam = (LPARAM)this;
    pPropSheetPages[0].pfnCallback = NULL;
 
-   if ( ! isDesignMode && ! allowUserPropertiesControls )
+   if ( ! isDesignMode && ! allowUserPropertiesControls ) {
+      pPlotProperties -> GetPropertySheets((void *)(pPropSheetPages + 1));
+      for ( long k = 0; k < plotPropertiesCount; k++ ) {
+         PROPSHEETPAGE *pPage = pPropSheetPages + 1 + k;
+         static char szNewName1[128];
+         sprintf(szNewName1,"Plot-%s",pPage -> pszTitle);
+         pPage -> pszTitle = szNewName1;
+      }
+      pPlotProperties -> Release();
       return S_OK;
+   }
 
    pPropSheetPages[1].dwFlags = PSP_USETITLE;
    pPropSheetPages[1].dwSize = sizeof(PROPSHEETPAGE);
@@ -135,6 +164,18 @@
    pPropSheetPages[1].pszTitle = "Visibility";
    pPropSheetPages[1].lParam = (LPARAM)this;
    pPropSheetPages[1].pfnCallback = NULL;
+
+   pPlotProperties -> GetPropertySheets((void *)(pPropSheetPages + 2));
+
+   static char szNewName2[8][128];
+
+   for ( long k = 0; k < plotPropertiesCount; k++ ) {
+      PROPSHEETPAGE *pPage = pPropSheetPages + 2 + k;
+      sprintf(szNewName2[k],"Plot-%s",pPage -> pszTitle);
+      pPage -> pszTitle = szNewName2[k];
+   }
+
+   pPlotProperties -> Release();
 
    return S_OK;
    }

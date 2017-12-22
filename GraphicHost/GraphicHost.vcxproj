@@ -149,8 +149,13 @@
     <ClInclude Include="GraphicHost.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\source\Utils.cpp" />
+    <ClCompile Include="graphicHandler.cpp" />
     <ClCompile Include="GraphicHost.cpp" />
-    <ClCompile Include="handler.cpp" />
+    <ClCompile Include="IOleInPlaceSite.cpp" />
+    <ClCompile Include="IOleClentSite.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="frameHandler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

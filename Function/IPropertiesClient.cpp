@@ -38,18 +38,14 @@
    pIPropertyManuallyAddedVariables -> writeStorageObjects();
    pIPropertyManuallyAddedVariables -> clearStorageObjects();
 
-   if ( hwndSpecDialog ) {
-      RECT rect;
-      GetWindowRect(hwndSpecDialog,&rect);
-      containerSize.cx = rect.right - rect.left;
-      containerSize.cy = rect.bottom - rect.top;
-   } else {
-      if ( containerSize.cx == -1 ) {
-         containerSize.cx = CONTAINERSIZE_CX;
-         containerSize.cy = CONTAINERSIZE_CY;
-      }
+   pIPropertyPlots -> clearStorageObjects();
+
+   if ( pIPlot ) {
+      pIPropertyPlots -> addStorageObject(pIPlot);
+      pIPropertyPlots -> writeStorageObjects();
+      pIPropertyPlots -> clearStorageObjects();
    }
- 
+
    return S_OK;
    }
 
@@ -79,9 +75,6 @@
       break;
    }
 
-   containerSize.cx = CONTAINERSIZE_CX;
-   containerSize.cy = CONTAINERSIZE_CY;
- 
    allowUserProperties = true;
    allowUserPropertiesControls = true;
 
@@ -142,14 +135,6 @@
 
    }
 
-   if ( hwndSpecDialog ) {
-      SetDlgItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,expression);
-      if ( containerSize.cx <= 0 ) 
-         containerSize.cx = CONTAINERSIZE_CX;
-      resize(containerSize.cx);
-   } else
-      parseExpression();
-
    pIPropertyVariables -> get_storedObjectCount(&cntObjects);
 
    if ( cntObjects ) {
@@ -164,6 +149,15 @@
 
       pIPropertyVariables -> clearStorageObjects();
 
+   }
+
+   pIPropertyPlots -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+      pIPropertyPlots -> clearStorageObjects();
+      pIPropertyPlots -> addStorageObject(pIPlot);
+      pIPropertyPlots-> readStorageObjects();
+      pIPropertyPlots -> clearStorageObjects();
    }
 
    return S_OK;

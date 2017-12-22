@@ -17,6 +17,8 @@
 
      void ReSize();
 
+     void GetExtentPixels(SIZEL *);
+
      HWND HWNDSite() { return hwndSite; };
 
      void Show();
@@ -121,7 +123,8 @@
 
    protected:
 
-     IUnknown* pIUnknownObject;
+     IUnknown *pIUnknownObject;
+     IOleObject *pIOleObject;
 
      unsigned int refCount;
      HWND hwndTab,hwndSite;

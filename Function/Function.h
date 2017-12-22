@@ -23,10 +23,10 @@
 #include "Properties_i.h"
 #include "Variable_i.h"
 #include "Evaluator_i.h"
-#include "Function_i.h"
-
 #include "DataSet_i.h"
 #include "OpenGLImplementation_i.h"
+
+#include "Function_i.h"
 #include "Plot_i.h"
 
    class Function;
@@ -121,6 +121,16 @@
      STDMETHOD(put_IPlot)(void *);
      STDMETHOD(get_IPlot)(void **);
 
+     STDMETHOD(Initialize)(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
+                              IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                              IGProperty *parentPropertyPlotView,
+                              IGProperty *parentPropertyDefault2DPlotSubType,
+                              IGProperty *parentPropertyDefault3DPlotSubType,
+                              IGProperty *parentPropertyBackgroundColor,
+                              IGProperty *parentPropertyFloor,
+                              IGProperty *parentPropertyCeiling,
+                              void (__stdcall *pCallback)(void *),void *pArg);
+
      STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
 
      STDMETHOD(get_AnyControlVisible)(VARIANT_BOOL* pbAnyVisible);
@@ -150,8 +160,6 @@
      STDMETHOD (GetMiscStatus)(DWORD dwAspect, DWORD * pdwStatus);        
      
      STDMETHOD (SetColorScheme)(LPLOGPALETTE lpLogpal);
-
-     SIZEL containerSize;
 
 //      IOleWindow
 
@@ -396,7 +404,7 @@
      int defineFunction(char* pszTheExpression = NULL);
 
      int initWindows();
-     int resize(long cx);
+     int resize();
      short anyVisible();
      int hideAllTabs();
      int showVariableTab(IVariable* pV,char* pszVariableName);
@@ -431,7 +439,8 @@
 
      static long functionCount;
      long iterationCount;
-     int resultingHeight;
+     long resultingHeight;
+     long resultingWidth;
      int freezeEvents;
 
      int controlSpacing;
@@ -472,6 +481,8 @@
      IGProperty* pIPropertyPlotPropertiesVisible;
      IGProperty* pIPropertyVariables;
      IGProperty* pIPropertyManuallyAddedVariables;
+
+     IGProperty* pIPropertyPlots;
 
      IStream* pIStream_Marshalling;
      HGLOBAL hglMarshalling;

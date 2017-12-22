@@ -142,26 +142,6 @@
  
       }
       return LRESULT(FALSE);
- 
-   //case WM_SHOWWINDOW: {
-
-   //   if ( (BOOL)wParam ) {
-
-   //      p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION));
-
-   //      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
-   //                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
-
-   //      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
-   //                                                   p -> pOwnerPropertiesAmbientLight,
-   //                                                   p -> pOwnerPropertiesDiffuseLight,
-   //                                                   p -> pOwnerPropertiesSpecularLight,
-   //                                                   p -> pOwnerPropertiesLightPosition,
-   //                                                   p -> pOwnerPropertyCountLights,NULL);
-   //   }
-
-   //   }
-   //   break;
 
    case WM_NOTIFY: { 
       if ( holdUpdates )

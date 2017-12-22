@@ -126,7 +126,9 @@
       if ( ! hwndFrame ) {
          hwndOwner = hwndParent;
          initWindows();
-         oleSetWindowRect(const_cast<RECT *>(lprcPosRect));
+         SetWindowPos(hwndFrame,HWND_TOP,
+                        lprcPosRect -> left + 4,lprcPosRect -> top + 4,
+                            lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,0L);
       }
       ShowWindow(hwndFrame,SW_SHOW);
       break;

@@ -89,6 +89,8 @@ Sleep(10);
    }
  
    HWND OpenGLImplementor::TargetHWND() {
+   if ( ! plotWindow )
+      return NULL;
    return plotWindow -> hwnd;
    }
  

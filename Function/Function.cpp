@@ -16,12 +16,6 @@
 
 #include "List.cpp"
 
-#ifdef FUNCTION_SAMPLE
-
-   extern bool trialExpired;
-
-#endif
-
    LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult);
 
    STDAPI GSystemsVariablesDllGetClassObject(HMODULE hModule,REFCLSID clsid,REFIID riid,void** ppObject);
@@ -40,6 +34,9 @@
        hwndVariablesTab(0),
        hwndPropertiesVisibility(0),
        hwndErrors(0),
+
+       resultingWidth(0),
+       resultingHeight(0),
 
        allowUserProperties(false),
        allowUserPropertiesControls(false),
@@ -64,6 +61,7 @@
        pIOleInPlaceSite(NULL),
        pIOleInPlaceActiveObject(NULL),
        pIPropertyNotifySink(NULL),
+       pIPropertyPlots(NULL),
 
        pIPlot(NULL),
 
@@ -143,39 +141,20 @@
    memset(&rectControls,0,sizeof(RECT));
    memset(&rectProperties,0,sizeof(RECT));
 
-   containerSize.cx = -1;
-   containerSize.cy = -1;
-
    bstrDefaultMinValue = SysAllocString(L"-1");
    bstrDefaultMaxValue = SysAllocString(L"1");
    defaultStepCount = 10;
 
    ++functionCount;
  
-#ifdef EMBEDDED_VARIABLES
-   if ( ! VList::pIClassFactory_variables )
-      GSystemsVariablesDllGetClassObject(hModule,CLSID_Variable,IID_IClassFactory,reinterpret_cast<void **>(&VList::pIClassFactory_variables));
-#else
    if ( ! VList::pIClassFactory_variables )
       CoGetClassObject(CLSID_Variable,CLSCTX_INPROC_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&VList::pIClassFactory_variables));
-#endif
       
    IUnknown* pIUnknownThis;
 
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
 
-#ifdef EMBEDDED_PROPERTIES
-   IClassFactory* pIClassFactory;
-   GSystemsPropertiesDllGetClassObject(hModule,CLSID_GSystemProperties,IID_IClassFactory,reinterpret_cast<void**>(&pIClassFactory));
-   pIClassFactory -> CreateInstance(pIUnknownThis,IID_IUnknown,reinterpret_cast<void**>(&pIUnknownProperties));
-   pIClassFactory -> Release();
-#else
-   CoCreateInstance(CLSID_InnoVisioNateProperties,
-                         pIUnknownThis,
-                         CLSCTX_INPROC_SERVER,
-                         IID_IUnknown,
-                         reinterpret_cast<void **>(&pIUnknownProperties));
-#endif
+   CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
 
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&iProperties));
 
@@ -183,7 +162,7 @@
 
    evaluator = new ConnectedEvaluator(this);
 
-   pIConnectionPoint = new _IConnectionPoint(this,DIID_IGSFunctioNaterEvents),
+   pIConnectionPoint = new _IConnectionPoint(this,DIID_IGSFunctioNaterEvents);
 
    iProperties -> Add(L"variables",&pIPropertyVariables);
    pIPropertyVariables -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
@@ -237,6 +216,7 @@
    refCount = 1;
 
    IGPropertiesClient *pIPropertiesClient;
+
    QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIPropertiesClient));
    if ( pIPropertiesClient ) {
       iProperties -> Advise(pIPropertiesClient);
@@ -244,6 +224,7 @@
    }
 
    IGPropertyPageClient* pIPropertyPageClient;
+
    QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void**>(&pIPropertyPageClient));
    iProperties -> AdvisePropertyPageClient(pIPropertyPageClient);
    pIPropertyPageClient -> Release();
@@ -251,10 +232,14 @@
    CreateStreamOnHGlobal(NULL,TRUE,&pIStream_Marshalling);
    GetHGlobalFromStream(pIStream_Marshalling,&hglMarshalling);
 
-   refCount = 0;
+   HRESULT rc = CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
+
+   iProperties -> Add(L"plots",&pIPropertyPlots);
 
    //NTC: 12-14-2017: I am not sure why this InitNew was not in here prior to today. I have addeded it, though commented out.
-   //InitNew();
+   InitNew();
+
+   refCount = 0;
 
    return;
    };
@@ -286,6 +271,9 @@
    if ( pAdviseSink ) 
       pAdviseSink -> Release();
 
+   if ( pIPlot )
+      pIPlot -> Release();
+
 #if 0
    for ( IVariable **ppv : variableToDeleteList )
       (*ppv) -> Release();
@@ -298,13 +286,18 @@
       SetWindowLong(hwndSpecDialog,GWL_USERDATA,0);  
    }
 
-   if ( hwndVariables ) DestroyWindow(hwndVariables);
-   if ( hwndProperties ) DestroyWindow(hwndProperties);
-   if ( hwndPropertiesVisibility) DestroyWindow(hwndPropertiesVisibility);
+   if ( hwndVariables ) 
+      DestroyWindow(hwndVariables);
+   if ( hwndProperties ) 
+      DestroyWindow(hwndProperties);
+   if ( hwndPropertiesVisibility) 
+      DestroyWindow(hwndPropertiesVisibility);
 
-   if ( iProperties ) iProperties -> Release();
+   if ( iProperties ) 
+      iProperties -> Release();
 
-   if ( enumConnectionPoints ) delete enumConnectionPoints;
+   if ( enumConnectionPoints ) 
+      delete enumConnectionPoints;
 
    delete evaluator;
 
@@ -341,7 +334,7 @@
 
    dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_FUNCTION_VARIABLES),RT_DIALOG));
    hwndVariables = CreateDialogIndirectParam(hModule,dt,hwndSpecDialog,(DLGPROC)functionVariablesHandler,(LPARAM)this);
-   SetWindowLong(hwndVariables,GWL_ID,IDDIALOG_FUNCTION_VARIABLES);
+   SetWindowLongPtr(hwndVariables,GWLP_ID,(ULONG_PTR)IDDIALOG_FUNCTION_VARIABLES);
    hwndVariablesTab = GetDlgItem(hwndVariables,IDDI_FUNCTION_VARIABLES_TABS);
 
    TC_ITEM tie;
@@ -392,7 +385,7 @@
 
    controlSpacing = rect.left - rectControls.right - rectDialog.left;
 
-   SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,containerSize.cx,containerSize.cy,SWP_NOMOVE | SWP_SHOWWINDOW);
+   //SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,0,0,SWP_NOMOVE | SWP_SHOWWINDOW);
  
    pIPropertyExpression -> setWindowItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY);
 
@@ -426,159 +419,200 @@
 
    static int okayToResize = true;
 
-   int Function::resize(long cx) {
+   long widthOf(HWND hwnd) {
+   RECT rc;
+   GetWindowRect(hwnd,&rc);
+   return rc.right - rc.left;
+   }
+
+   long rightEdge(HWND hwndParent,HWND hwnd) {
+   RECT rc,rcParent;
+   GetWindowRect(hwndParent,&rcParent);
+   GetWindowRect(hwnd,&rc);
+   return rc.right - rcParent.left;
+   }
+
+   long bottomEdge(HWND hwndParent,HWND hwnd) {
+   RECT rc,rcParent;
+   GetWindowRect(hwndParent,&rcParent);
+   GetWindowRect(hwnd,&rc);
+   return rc.bottom - rcParent.top;
+   }
+
+   long rightEdge(HWND hwndParent,long id) {
+   RECT rc,rcParent;
+   GetWindowRect(hwndParent,&rcParent);
+   GetWindowRect(GetDlgItem(hwndParent,id),&rc);
+   return rc.right - rcParent.left;
+   }
+
+   long bottomEdge(HWND hwndParent,long id) {
+   RECT rc,rcParent;
+   GetWindowRect(hwndParent,&rcParent);
+   GetWindowRect(GetDlgItem(hwndParent,id),&rc);
+   return rc.bottom - rcParent.top;
+   }
+
+   int Function::resize() {
 
    if ( ! okayToResize )
       return 0;
 
-   int gapright,deltay = 0,deltax = 0;
+   int gapRight,deltay = 0,deltax = 0;
    int expressionLabelDeltay = 0;
    int resultsLabelDeltay = 0;
    bool anyControlVisible = false;
 
-   gapright = 8;
+   resultingHeight = 0;
+   resultingWidth = 0;
 
+   gapRight = 8;
+
+   RECT rc;
+   GetWindowRect(hwndVariables,&rc);
+
+   long cxMax = rc.right - rc.left + 2 * gapRight;
+
+   long currentBottom = 0;
+   
    if ( allowUserProperties ) {
-      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES),expressionVisible ? SW_SHOW : SW_HIDE);
-      int cxProperties = rectProperties.right - rectProperties.left + 8;
-      if ( ! expressionLabel[0] ) {
+
+      if ( ! expressionLabel[0] || ! expressionVisible )
          expressionLabelDeltay = 14;
-         ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),SW_HIDE);
-      } else {
+      else 
          expressionLabelDeltay = 0;
-         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),HWND_TOP,cxProperties + 4,rectLabel1.top,cx - 2 * gapright - cxProperties + 4,rectLabel1.bottom - rectLabel1.top,SWP_SHOWWINDOW);
+
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES),HWND_TOP,rectProperties.left,rectProperties.top - expressionLabelDeltay,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+
+      if ( ! expressionLabel[0] || ! expressionVisible )
+         ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),SW_HIDE);
+      else {
+         long x = rightEdge(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES) + 4;
+         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),HWND_TOP,x,rectLabel1.top,cxMax - x - 2 * gapRight,rectLabel1.bottom - rectLabel1.top,SWP_SHOWWINDOW);
+         resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL));
       }
-      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES),HWND_TOP,rectProperties.left,rectProperties.top - expressionLabelDeltay,0,0,SWP_NOSIZE);
-      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),HWND_TOP,cxProperties + 4,rectExpression.top - expressionLabelDeltay,cx - 2 * gapright - cxProperties + 4,rectExpression.bottom - rectExpression.top ,0L);
+
+      if ( ! expressionVisible ) 
+         ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),SW_HIDE);
+      else {
+
+         long x = rightEdge(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES) + 4;
+
+         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),HWND_TOP,x,rectExpression.top - expressionLabelDeltay,cxMax - x - 2 * gapRight,rectExpression.bottom - rectExpression.top,SWP_SHOWWINDOW);
+
+         resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES));
+         resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY));
+      }
+
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES);
+
    } else {
+
       ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PROPERTIES),SW_HIDE);
+
       if ( ! expressionLabel[0] ) {
          expressionLabelDeltay = 14;
          ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),SW_HIDE);
       } else {
          expressionLabelDeltay = 0;
-         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),HWND_TOP,8,rectLabel1.top,cx - 2 * gapright,rectExpression.bottom - rectExpression.top,SWP_SHOWWINDOW);
+         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),HWND_TOP,gapRight,rectLabel1.top,cxMax - 2 * gapRight,rectExpression.bottom - rectExpression.top,SWP_SHOWWINDOW);
+         resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL));
       }
-      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),HWND_TOP,8,rectExpression.top - expressionLabelDeltay,cx - 2 * gapright,rectExpression.bottom - rectExpression.top,0L);
+
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),HWND_TOP,gapRight,rectExpression.top - expressionLabelDeltay,cxMax - 8 - 2 * gapRight,rectExpression.bottom - rectExpression.top,0L);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY));
+
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY);
+
    }
 
-   if ( ! resultsLabel[0] ) {
-      resultsLabelDeltay = 14;
+   if ( ! resultsLabel[0] || ! resultsVisible ) 
       ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),SW_HIDE);
-   } else {
-      resultsLabelDeltay = 0;
-      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),HWND_TOP,rectLabel1.left,rectLabel1.top - expressionLabelDeltay,cx - 2 * gapright,rectExpression.bottom - rectExpression.top,SWP_NOMOVE);
+
+   if ( ! resultsVisible ) 
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),SW_HIDE);
+   else {
+
+      if ( resultsLabel[0] ) {
+         SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),HWND_TOP,gapRight,currentBottom + 4,cxMax - 2 * gapRight,rectExpression.bottom - rectExpression.top,SWP_SHOWWINDOW);
+         currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL);
+         resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL));
+      }
+
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),HWND_TOP,gapRight,currentBottom + 2,cxMax - 2 * gapRight,rectExpression.bottom - rectExpression.top,SWP_SHOWWINDOW);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_RESULT));
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_RESULT);
    }
 
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),HWND_TOP,0,0,cx - 2 * gapright,rectExpression.bottom - rectExpression.top,SWP_NOMOVE);
+   if ( ! variablesVisible ) {
+      ShowWindow(hwndVariables,SW_HIDE);
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_HIDE);
+   } else {
+      SetWindowPos(hwndVariables,HWND_TOP,gapRight,currentBottom + 8,cxMax - 2 * gapRight,rectVariables.bottom - rectVariables.top,SWP_SHOWWINDOW);
+      SetWindowPos(hwndVariablesTab,HWND_TOP,gapRight,currentBottom + 8,cxMax - 2 * gapRight,rectVariables.bottom - rectVariables.top,SWP_NOMOVE | SWP_SHOWWINDOW);
+      ShowWindow(GetDlgItem(hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_SHOW);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,hwndVariables));
+      resultingWidth = max(resultingWidth,rightEdge(hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX));
+      currentBottom = bottomEdge(hwndSpecDialog,hwndVariables);
+   }
 
-   SetWindowPos(hwndVariables,HWND_TOP,0,0,cx - 2 * gapright,rectVariables.bottom - rectVariables.top,SWP_NOMOVE);
-
-   SetWindowPos(hwndVariablesTab,HWND_TOP,0,0,cx - 2 * gapright - 2,rectVariables.bottom - rectVariables.top - 2,SWP_NOMOVE);
-
-   if ( ! expressionVisible )
-      deltay = rectExpression.bottom - rectLabel1.top - expressionLabelDeltay;
-   else 
-      resultingHeight = rectExpression.bottom - expressionLabelDeltay;
- 
-   deltay += expressionLabelDeltay;
-   deltay += resultsLabelDeltay;
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),HWND_TOP,rectResults.left,rectResults.top - deltay,0,0,SWP_NOSIZE);
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),HWND_TOP,rectLabel2.left,rectLabel2.top - deltay,0,0,SWP_NOSIZE);
-
-   if ( ! resultsVisible )
-      deltay += rectResults.bottom - rectLabel2.top - resultsLabelDeltay / 2;
-   else
-      resultingHeight += rectResults.bottom - rectLabel2.top - resultsLabelDeltay / 2;
-
-   SetWindowPos(hwndVariables,HWND_TOP,rectVariables.left,rectVariables.top - deltay,0,0,SWP_NOSIZE);
-
-   if ( ! variablesVisible )
-      deltay += rectVariables.bottom - rectVariables.top;
-   else
-      resultingHeight += rectVariables.bottom - rectVariables.top + 12;
+   long currentRight = 0L;
+   long controlsTop = currentBottom + 4;
 
    if ( ! controlsVisible || ! startVisible )
-      deltax += rectControls.right - rectControls.left;
-   else
-      anyControlVisible = true;
-
-   long startButtonLeft = rectControls.left - deltax;
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),HWND_TOP,rectControls.left - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
-
-   if ( ! controlsVisible || ! pauseVisible ) 
-      deltax += rectControls.right - rectControls.left;
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),SW_HIDE);
    else {
-      deltax -= controlSpacing;
-      anyControlVisible = true;
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),HWND_TOP,gapRight,controlsTop,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+      currentRight = rightEdge(hwndSpecDialog,IDDI_FUNCTION_START);
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_START);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_START));
    }
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),HWND_TOP,rectControls.left + (rectControls.right - rectControls.left) - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
+      
+   if ( ! controlsVisible || ! pauseVisible ) 
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),SW_HIDE);
+   else {
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),HWND_TOP,currentRight + 8,controlsTop,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+      currentRight = rightEdge(hwndSpecDialog,IDDI_FUNCTION_PAUSE);
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_PAUSE);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_PAUSE));
+   }
 
    if ( ! controlsVisible || ! resumeVisible ) 
-      deltax += rectControls.right - rectControls.left;
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),SW_HIDE);
    else {
-      deltax -= controlSpacing;
-      anyControlVisible = true;
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),HWND_TOP,currentRight + 8,controlsTop,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+      currentRight = rightEdge(hwndSpecDialog,IDDI_FUNCTION_RESUME);
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_RESUME);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_RESUME));
    }
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),HWND_TOP,rectControls.left + 2 * (rectControls.right - rectControls.left) - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
 
    if ( ! controlsVisible || ! stopVisible ) 
-      deltax += rectControls.right - rectControls.left;
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),SW_HIDE);
    else {
-      deltax -= controlSpacing;
-      anyControlVisible = true;
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),HWND_TOP,currentRight + 8,controlsTop,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+      currentRight = rightEdge(hwndSpecDialog,IDDI_FUNCTION_STOP);
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_STOP);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_STOP));
    }
-
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),HWND_TOP,rectControls.left + 3 * (rectControls.right - rectControls.left) - deltax,rectControls.top - deltay,0,0,SWP_NOSIZE);
-
-   long stopButtonBottom = rectControls.top - deltay + rectControls.bottom - rectControls.top;
 
    if ( ! controlsVisible || ! plotPropertiesVisible ) 
-      deltax += rectControls.right - rectControls.left;
+      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),SW_HIDE);
    else {
-      deltax -= controlSpacing;
-      anyControlVisible = true;
-      resultingHeight += 24;
+      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,gapRight,currentBottom + 4,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES);
+      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES));
    }
 
-   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,startButtonLeft,stopButtonBottom + controlSpacing,0,0,SWP_NOSIZE);
+   resultingHeight = currentBottom;
 
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EXPRESSION_LABEL),expressionVisible && expressionLabel[0] ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY),expressionVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT),resultsVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),resultsVisible && resultsLabel[0] ? SW_SHOW : SW_HIDE);
-   ShowWindow(hwndVariables,variablesVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),variablesVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),controlsVisible && startVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),controlsVisible && pauseVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),controlsVisible && resumeVisible ? SW_SHOW : SW_HIDE);
-   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),controlsVisible && stopVisible ? SW_SHOW : SW_HIDE);
-
-   //CalcDimensions(hwndSpecDialog,&containerSize);
-
-   if ( anyControlVisible )
-      resultingHeight += 2 * (rectControls.bottom - rectControls.top);
-   else
-      resultingHeight += 12;
-
-   if ( 12 == resultingHeight ) 
-      resultingHeight = 64;
-
-   rectDialog.right = rectDialog.left + cx;
+   rectDialog.right = rectDialog.left + resultingWidth;
    rectDialog.bottom = rectDialog.top + resultingHeight;
 
    if ( ! okayToResize ) return 0;
 
    okayToResize = false;
 
-   SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,rectDialog.right - rectDialog.left,rectDialog.bottom - rectDialog.top,SWP_NOMOVE);
-
-   containerSize.cy = resultingHeight;
+   SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,resultingWidth,resultingHeight,SWP_NOMOVE);
 
    if ( askedForInPlaceObject && pIOleInPlaceSite ) {
       pIOleInPlaceSite -> OnPosRectChange(&rectDialog);
@@ -594,7 +628,7 @@
    for ( int k = 0; k < 3; k++ ) 
       if ( visibleItems[k] )
          return true;
-   for ( int k = 4; k < 8; k++ )
+   for ( int k = 4; k < 9; k++ )
       if ( controlsVisible && visibleItems[k] )
          return true; 
    return false;
@@ -639,39 +673,4 @@
       }
    }
    return 0;
-   }
-
-
-   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam);
-
-   static long maxHeight;
-   static long maxWidth;
-
-   LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult) {
-   maxHeight = 0L;
-   maxWidth = 0L;
-   EnumChildWindows(hwndParent,testDimensions,(LPARAM)hwndParent);
-   pResult -> cx = maxWidth;
-   pResult -> cy = maxHeight;
-   return 0;
-   }
-
-   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam) {
-
-   //if ( ! 1 == GetWindowLongPtr(hwndTest,GWLP_USERDATA) )
-   //   return TRUE;
-//if ( ! IsWindowVisible(hwndTest) )
-//return TRUE;
-
-Beep(2000,100);
-
-   RECT rcChild;
-   RECT rcParent;
-   GetWindowRect((HWND)lParam,&rcParent);
-   GetWindowRect(hwndTest,&rcChild);
-
-   maxHeight = max(maxHeight,rcChild.bottom - rcParent.top);
-   maxWidth = max(maxWidth,rcChild.right - rcParent.left);
-
-   return TRUE;
    }

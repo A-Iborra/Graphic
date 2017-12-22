@@ -124,7 +124,7 @@
 
    PROPSHEETHEADER *pHeader = reinterpret_cast<PROPSHEETHEADER *>(pv);
 
-   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;// | PSH_RESIZABLE | PSH_AEROWIZARD;
    pHeader -> hInstance = gsVariables_hModule;
    pHeader -> pszIcon = NULL;
    pHeader -> pszCaption = " Variable Properties";

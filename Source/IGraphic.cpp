@@ -152,7 +152,7 @@
 
    STDMETHODIMP G::AddFunction(BSTR expression,IDispatch **ppFunction) {
 
-   IGSFunctioNater *f = newFunction(false);
+   IGSFunctioNater *f = newFunction(true);
 
    f -> put_Expression(expression);
 
@@ -171,7 +171,7 @@
 
    STDMETHODIMP G::AddFunctionInteractive(IDispatch **ppFunction) {
 
-   IGSFunctioNater *f = newFunction(false);
+   IGSFunctioNater *f = newFunction(true);
 
    IUnknown* pIUnknownFunction;
    f -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownFunction));

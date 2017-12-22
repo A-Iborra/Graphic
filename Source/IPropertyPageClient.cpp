@@ -91,7 +91,7 @@
 
    PROPSHEETHEADER *pHeader = reinterpret_cast<PROPSHEETHEADER *>(pv);
 
-   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;
+   pHeader -> dwFlags = PSH_PROPSHEETPAGE | PSH_NOCONTEXTHELP;// | PSH_RESIZABLE | PSH_AEROWIZARD;
    pHeader -> hInstance = hModule;
    pHeader -> pszIcon = NULL;
    pHeader -> pszCaption = " Properties";
@@ -105,9 +105,9 @@
    if ( ! pCount )
       return E_POINTER;
 #if 1
-   *pCount = 7;
-#else
    *pCount = 8;
+#else
+   *pCount = 9;
 #endif
    return S_OK;
    }
@@ -183,6 +183,15 @@
    pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_PLOTS);
    pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::plotHandler;
    pPropSheetPages[nextIndex].pszTitle = "Plots";
+   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
+   pPropSheetPages[nextIndex].pfnCallback = NULL;
+
+   pPropSheetPages[++nextIndex].dwFlags = PSP_USETITLE;
+   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[nextIndex].hInstance = hModule;
+   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_DATASETS);
+   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::dataSetHandler;
+   pPropSheetPages[nextIndex].pszTitle = "DataSets";
    pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
    pPropSheetPages[nextIndex].pfnCallback = NULL;
 

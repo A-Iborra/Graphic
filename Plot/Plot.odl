@@ -251,17 +251,8 @@ library Plot {
                            IGProperty *parentPropertyDefault2DPlotSubType,
                            IGProperty *parentPropertyDefault3DPlotSubType,
                            IGProperty *parentPropertyBackgroundColor,
-                           IGProperty *parentPropertyTheta,
-                           IGProperty *parentPropertyPhi,
-                           IGProperty *parentPropertySpin,
                            IGProperty *parentPropertyFloor,
                            IGProperty *parentPropertyCeiling,
-                           IGProperty *parentPropertyCountLights,
-                           IGProperty **parentPropertiesLightOn,
-                           IGProperty **parentPropertiesAmbientLight,
-                           IGProperty **parentPropertiesDiffuseLight,
-                           IGProperty **parentPropertiesSpecularLight,
-                           IGProperty **parentPropertiesLightPosition,
                            [in] void (*pCallback)(void *),[in] void *pArg);
 
      HRESULT PrepareForData();

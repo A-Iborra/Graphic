@@ -2,6 +2,9 @@
 #pragma once
 
 #include "ContainedObject.h"
+#include "Properties_i.h"
+#include "DataSet_i.h"
+#include "OpenGLImplementation_i.h"
 #include "Function_i.h"
 
   class ContainedFunction : 

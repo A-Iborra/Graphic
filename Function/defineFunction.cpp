@@ -158,6 +158,10 @@
    if ( S_FALSE != f -> evaluator -> IsBusy() )
       return 0;
 
+#ifdef MULTITHREADED_EVALUATOR
+   CoInitialize(NULL);
+#endif
+
    f -> defineFunction();
 
    f -> fire_Clear();   
@@ -167,6 +171,10 @@
       f -> evaluator -> DefineVariable(v);
 
    f -> evaluator -> Evaluate_szFunction(f -> expression);
+
+#ifdef MULTITHREADED_EVALUATOR
+   CoUninitialize();
+#endif
 
    return 0;
    }

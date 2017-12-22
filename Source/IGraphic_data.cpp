@@ -48,16 +48,21 @@
    if ( plotID || 0 == plotList.Count() ) {
       if ( ! plotID ) 
          plotID = plotList.Count() + 1;
+
       pPlot = plotList.Get(plotID);
       if ( ! pPlot )
          pPlot = newPlot(plotID);
+
       pPlot -> PrepareForData();
       pPlot -> put_AutoPlotViewDetection(autoPlotViewDetection);
+
    } else {
+
       while ( pPlot = plotList.GetNext(pPlot) ) {
          pPlot -> PrepareForData();
          pPlot -> put_AutoPlotViewDetection(autoPlotViewDetection);
       }
+
    }
  
    if ( 0 == plotID ) //|| autoClear )
@@ -68,6 +73,7 @@
  
   
    STDMETHODIMP G::TakeDataString(BSTR inputBstr,long plotID) {
+
    DataPoint dpLast;
 
    IPlot *pPlot = (IPlot *)NULL;

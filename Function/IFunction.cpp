@@ -58,6 +58,9 @@
    SetDlgItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,expression);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    InvalidateRect(hwndSpecDialog,NULL,TRUE);
    return S_OK;
    }
@@ -75,7 +78,9 @@
    WideCharToMultiByte(CP_ACP,0,bstrExpressionLabel,-1,expressionLabel,sizeof(expressionLabel),0,0);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
-   resize(containerSize.cx);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
    HRESULT Function::get_ExpressionLabel(BSTR *pbstrExpressionLabel) {
@@ -90,7 +95,9 @@
    WideCharToMultiByte(CP_ACP,0,bstrResultsLabel,-1,resultsLabel,sizeof(resultsLabel),0,0);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
-   resize(containerSize.cx);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
    HRESULT Function::get_ResultsLabel(BSTR *pbstrResultsLabel) {
@@ -103,9 +110,11 @@
    
    HRESULT Function::put_AllowPropertySettings(VARIANT_BOOL bAllowPropertySettings) {
    allowUserProperties = bAllowPropertySettings;
-   resize(containerSize.cx);
+   resize();
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
    HRESULT Function::get_AllowPropertySettings(VARIANT_BOOL* pbAllowPropertySettings) {
@@ -119,6 +128,9 @@
    allowUserPropertiesControls = bAllowControlVisibilitySettings;
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
    HRESULT Function::get_AllowControlVisibilitySettings(VARIANT_BOOL* pbAllowControlVisibilitySettings) {
@@ -131,9 +143,11 @@
    
    HRESULT Function::put_ShowVariables(VARIANT_BOOL bShowVariables) {
    variablesVisible = bShowVariables;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
    HRESULT Function::get_ShowVariables(VARIANT_BOOL* pbShowVariables) {
@@ -145,7 +159,6 @@
 
    HRESULT Function::put_ShowControls(VARIANT_BOOL bShowControls) {
    controlsVisible = bShowControls;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
    if ( bShowControls ) {
@@ -154,6 +167,9 @@
       put_ShowResume(bShowControls);
       put_ShowStop(bShowControls);
    }
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -167,9 +183,11 @@
    
    HRESULT Function::put_ShowStart(VARIANT_BOOL bShowStart) {
    startVisible = bShowStart;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -183,9 +201,11 @@
    
    HRESULT Function::put_ShowPause(VARIANT_BOOL bShowPause) {
    pauseVisible = bShowPause;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -199,9 +219,11 @@
    
    HRESULT Function::put_ShowResume(VARIANT_BOOL bShowResume) {
    resumeVisible = bShowResume;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -215,9 +237,11 @@
    
    HRESULT Function::put_ShowStop(VARIANT_BOOL bShowStop) {
    stopVisible = bShowStop;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -231,9 +255,11 @@
  
    HRESULT Function::put_ShowResults(VARIANT_BOOL bShowResults) {
    resultsVisible = bShowResults;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -247,9 +273,11 @@
  
    HRESULT Function::put_ShowExpression(VARIANT_BOOL bShowExpression) {
    expressionVisible = bShowExpression;
-   resize(containerSize.cx);
    if ( pIPropertyNotifySink )
       pIPropertyNotifySink -> OnChanged(DISPID_UNKNOWN);
+   resize();
+   //if ( pWhenChangedCallback )
+   //   pWhenChangedCallback(pWhenChangedCallbackArg);
    return S_OK;
    }
  
@@ -317,6 +345,7 @@
       v -> put_StepCount(stepCount);
 
       hideAllTabs();
+
       showVariableTab(v,szVariableName);
 
       delete [] szVariableName;
@@ -336,6 +365,7 @@
    v -> put_StepCount(stepCount);
 
    hideAllTabs();
+
    showVariableTab(v,szVariableName);
 
    delete [] szVariableName;
@@ -523,6 +553,8 @@
    }
 
    STDMETHODIMP Function::put_IPlot(void *pvIPlot) {
+   if ( pIPlot )
+      pIPlot -> Release();
    pIPlot = (IPlot *)pvIPlot;
    return S_OK;
    }
@@ -532,6 +564,20 @@
       return E_POINTER;
    *ppvIPlot = (void *)pIPlot;
    return S_OK;
+   }
+
+   STDMETHODIMP Function::Initialize(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
+                                          IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                                          IGProperty *parentPropertyPlotView,
+                                          IGProperty *parentPropertyDefault2DPlotSubType,
+                                          IGProperty *parentPropertyDefault3DPlotSubType,
+                                          IGProperty *parentPropertyBackgroundColor,
+                                          IGProperty *parentPropertyFloor,
+                                          IGProperty *parentPropertyCeiling,
+                                          void (__stdcall *pCallback)(void *),void *pArg) {
+
+   return pIPlot -> Initialize(pIDataSet_Domain,pIOpenGLImplementation,evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
+                                 parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg);
    }
 
    STDMETHODIMP Function::put_OnChangeCallback(void (__stdcall *pCallback)(void *),void *pArg) {

@@ -77,6 +77,11 @@ library GSystems {
       gcPlotTypeTriangles = 0x00080010
       };
 
+   enum PlotIdBands {
+      plotIdFunctions = 100,
+      plotIdDataSets = 200
+   };
+
    [uuid(8CAEFDCD-55E6-11d3-8365-006008BD5BC3)]
    interface IGSystemStatusBar : IUnknown {
 

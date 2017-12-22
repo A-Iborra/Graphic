@@ -17,6 +17,7 @@
       refCount(0),
       hwndTab(hwndT),
       pIUnknownObject(pIUnk),
+      pIOleObject(NULL),
       riidEventsInterface(riidEvents),
       pIConnectionPoint(0),
       dwConnectionCookie(0) {
@@ -25,6 +26,8 @@
 
    if ( pIUnknownObject ) 
       pIUnknownObject -> AddRef();
+
+   pIUnknownObject -> QueryInterface(IID_IOleObject,reinterpret_cast<void **>(&pIOleObject));
 
    pIOleInPlaceSite = new _IOleInPlaceSite(this);
    pIOleClientSite = new _IOleClientSite(this);
@@ -44,6 +47,9 @@
    if ( pIUnknownObject ) 
       pIUnknownObject -> Release();
 
+   if ( pIOleObject )
+      pIOleObject -> Release();
+
    delete pIOleInPlaceSite;
    delete pIOleClientSite;
 
@@ -53,6 +59,7 @@
    int ContainedObject::connectEvents() {
 
    IConnectionPointContainer* pIConnectionPointContainer;
+
    if ( ! SUCCEEDED(pIUnknownObject -> QueryInterface(IID_IConnectionPointContainer,reinterpret_cast<void**>(&pIConnectionPointContainer))) ) 
       return 0;
 
@@ -83,6 +90,25 @@
    }
    
 
+   void ContainedObject::GetExtentPixels(SIZEL *pSizel) {
+
+   if ( ! pSizel )
+      return;
+
+   pSizel -> cx = 0;
+   pSizel -> cy = 0;
+
+   if ( ! pIOleObject )
+      return;
+
+   pIOleObject -> GetExtent(DVASPECT_CONTENT,pSizel);
+
+   hiMetricToPixel(pSizel,pSizel);
+
+   return;
+   }
+
+
    void ContainedObject::ReSize() {
 
    RECT rect;
@@ -91,52 +117,18 @@
 
    SetWindowPos(hwndSite,HWND_TOP,2,24,rect.right - rect.left - 4,rect.bottom - rect.top - 26,0L);
 
-   IOleObject *pIOleObject_Object = NULL;
-
-   pIUnknownObject -> QueryInterface(IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Object));
-
-   if ( ! pIOleObject_Object )
-      return;
-
-   RECT rcParent;
-
-   GetWindowRect(hwndSite,&rect);
-   GetWindowRect(GetParent(hwndTab),&rcParent);
-
-   long cx = rect.right - rect.left;
-   long cy = rect.bottom - rect.left;
-
-   rect.left = 0;
-   rect.top = 0;
-   rect.right = cx;
-   rect.bottom = cy;
-
-   pIOleObject_Object -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndTab,&rect);
-
-   pIOleObject_Object -> Release();
-
-   ShowWindow(hwndTab,SW_SHOW);
-
-   ShowWindow(hwndSite,SW_SHOW);
-
    return;
    }
 
 
    void ContainedObject::Show() {
 
-   IOleObject *pIOleObject_Object = NULL;
-
-   pIUnknownObject -> QueryInterface(IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Object));
-
-   if ( ! pIOleObject_Object )
+   if ( ! pIOleObject )
       return;
 
-   RECT rcParent;
    RECT rect;
 
    GetWindowRect(hwndSite,&rect);
-   GetWindowRect(GetParent(hwndTab),&rcParent);
 
    long cx = rect.right - rect.left;
    long cy = rect.bottom - rect.top;
@@ -146,9 +138,11 @@
    rect.right = cx;
    rect.bottom = cy;
 
-   pIOleObject_Object -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndTab,&rect);
+   ShowWindow(hwndTab,SW_SHOW);
 
-   pIOleObject_Object -> Release();
+   ShowWindow(hwndSite,SW_SHOW);
+
+   pIOleObject -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndTab,&rect);
 
    ShowWindow(hwndTab,SW_SHOW);
 
@@ -160,16 +154,10 @@
 
    void ContainedObject::Hide() {
 
-   IOleObject *pIOleObject_Object = NULL;
-
-   pIUnknownObject -> QueryInterface(IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Object));
-
-   if ( ! pIOleObject_Object )
+   if ( ! pIOleObject )
       return;
 
-   pIOleObject_Object -> DoVerb(OLEIVERB_HIDE,NULL,pIOleClientSite,0L,NULL,NULL);
-
-   pIOleObject_Object -> Release();
+   pIOleObject -> DoVerb(OLEIVERB_HIDE,NULL,pIOleClientSite,0L,NULL,NULL);
 
    return;
    }

@@ -99,20 +99,30 @@
 #define IDMENU_OPENGL                                                     10000
    #define IDMENU_OPENGL_PROPERTIES                                       10001
 
-#define IDDIALOG_DATAOBJECT_SPEC                                           2200
-   #define IDNOTEBOOK_DATAOBJECT_INPUT                                     2201
-   #define IDNOTEBOOK_DATAOBJECT_ANALYSIS                                  2202
-   #define IDDI_DATAOBJECT_OK                                              2203
-   #define IDDI_DATAOBJECT_CANCEL                                          2204
-   #define IDDI_DATAOBJECT_START                                           2205
-   #define IDDI_DATAOBJECT_STOP                                            2206
-   #define IDDI_DATAOBJECT_PAUSE                                           2207
-   #define IDDI_DATAOBJECT_RESUME                                          2208
-   #define IDDI_DATAOBJECT_REMOVE                                          2209
-   #define IDDI_DATAOBJECT_ANALYSISLIST                                    2210
-   #define IDDI_DATAOBJECT_NOTEBOOK                                        2211
-   #define IDDI_DATAOBJECT_BADFILE_MSG                                     2212
-   #define IDICON_DATAOBJECT_FILELIST_FILE                                 2213
+#define IDDIALOG_DATASET_INSTRUCTIONS                                      2200
+   #define IDDI_DATASET_INSTRUCTIONS                                       2201
+   #define IDDI_DATASET_INSTRUCTIONS2                                      2202
+   #define IDDI_DATASET_INSTRUCTIONS3                                      2203
+   #define IDDI_DATASET_INSTRUCTIONS4                                      2204
+
+   #define IDSTRING_DATASET_INSTRUCTIONS                                   2201
+   #define IDSTRING_DATASET_INSTRUCTIONS2                                  2202
+   #define IDSTRING_DATASET_INSTRUCTIONS3                                  2203
+   #define IDSTRING_DATASET_INSTRUCTIONS4                                  2204
+
+#define IDDIALOG_DATASET_PROPERTIES                                        2210
+   #define IDDI_DATASET_NAME                                               2211
+   #define IDDI_DATASET_DATASOURCE                                         2212
+   #define IDDI_DATASET_GETDATASOURCE                                      2213
+
+#define IDDIALOG_DATASET_EXCEL                                             2220
+   #define IDDI_DATASET_EXCEL_SPREADSHEET_LIST                             2221
+   #define IDDI_DATASET_EXCEL_SPREADSHEET                                  2222
+   #define IDDI_DATASET_EXCEL_OPEN_WORKBOOK                                2223
+   #define IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST                          2224
+   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL                            2225
+   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LIST                             2226
+   #define IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS                          2227
 
 #define IDDIALOG_DATAOBJECT_FILELIST                                       2250
 #define IDDI_DATAOBJECT_FILELIST                                           2251
@@ -377,6 +387,7 @@
 #define IDDI_DATASOURCES_AUTOCLEAR                                         8030
 #define IDDI_DATASOURCES_CLEAR                                             8031
 #define IDDI_DATASOURCES_RESETDOMAIN                                       8040
+#define IDDI_DATASOURCES_DATASETS_TAB                                      8050
 
 #define IDNOTEBOOK_AXIS                                                    8100
 #define IDNI_AXIS_NOTEBOOK                                                 8101
@@ -519,6 +530,28 @@
    #define IDDI_PLOT_COLOR_LINE_CHOOSE                                     9231
    #define IDDI_PLOT_COLOR_TOP_CHOOSE                                      9232
    #define IDDI_PLOT_COLOR_BOTTOM_CHOOSE                                   9233
+
+//
+// The following is for the properties page presented by the GraphicControl
+// 
+#define IDDIALOG_GRAPHIC_DATASETS                                          9300
+#define IDDI_GRAPHIC_DATASETS_COUNT                                        9310
+#define IDDI_GRAPHIC_DATASETS_ADD                                          9320
+#define IDDI_GRAPHIC_DATASETS_EDIT                                         9330
+#define IDDI_GRAPHIC_DATASETS_DELETE                                       9340
+#define IDDI_GRAPHIC_DATASETS_LIST                                         9350
+#define IDDI_GRAPHIC_DATASETS_ALLOWCTLVISPROPS                             9360
+
+//
+// These constants are for the dialog the DataSet object shows in the run-time
+// UI in the DataSources specifications window.
+//
+#define IDDIALOG_DATASET_SPEC                                              9400
+   #define IDDI_DATASET_SPEC_PROPERTIES                                    9410
+   #define IDDI_DATASET_SPEC_NAME                                          9411
+   #define IDDI_DATASET_SPEC_DATASOURCE                                    9412
+   #define IDDI_DATASET_SPEC_GETDATASOURCE                                 9413
+   #define IDDI_DATASET_SPEC_PLOT_PROPERTIES                               9430
 
 #define IDDIALOG_VIEWSET                                                  10000
 #define IDDI_VIEWSET_XAXIS                                                10004

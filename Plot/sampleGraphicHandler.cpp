@@ -31,10 +31,12 @@
       return (LRESULT)FALSE;
       }
  
+   //case WM_GETDLGCODE:
+   //   return (LRESULT)0;
  
    default:
       break;
    }
  
-   return p -> defaultStaticWindowHandler(hwnd,msg,wParam,lParam);
+   return CallWindowProc(p -> defaultStaticWindowHandler,hwnd,msg,wParam,lParam);
    }

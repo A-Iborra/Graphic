@@ -17,11 +17,13 @@
 #include "Axis_i.h"
 #include "ViewSet_i.h"
 #include "Text_i.h"
+
 #include "Function_i.h"
 
 #include "GraphicControl_i.h"
 
 #include "ContainedFunction.h"
+#include "ContainedDataSet.h"
 
 #include "List.h"
 
@@ -106,6 +108,7 @@
 
      STDMETHOD(put_ShowFunctions)(VARIANT_BOOL);
      STDMETHOD(get_ShowFunctions)(VARIANT_BOOL *);
+     STDMETHOD(put_AllowUserSetFunctionVisibility)(VARIANT_BOOL doAllow);
 
      STDMETHOD(ClearAllData)();
 
@@ -380,237 +383,246 @@
 
 /* Not in the interface */
 
-     public:
+   public:
 
-     G(IUnknown *pUnkOuter);
-     ~G();
+      G(IUnknown *pUnkOuter);
+      ~G();
 
-     IPropertyPage *PropertyPage(long index) { return static_cast<IPropertyPage *>(pIPropertyPage[index]); };
+      IPropertyPage *PropertyPage(long index) { return static_cast<IPropertyPage *>(pIPropertyPage[index]); };
 
-     private:
+   private:
 
-     IUnknown* pIUnknownThis;
-     IOleClientSite *pIOleClientSite;
-     IOleInPlaceSite *pIOleInPlaceSite;
-     IOleAdviseHolder *pOleAdviseHolder;
-     IDataAdviseHolder *pDataAdviseHolder;
-     IAdviseSink *pAdviseSink;
+      int erase();
+      int eraseBackground();
+      int redraw();
 
-     DWORD adviseSink_dwAspect,adviseSink_advf;
+      int stop();
+      int wait();
 
-     int refCount;
+      HMENU hwndMenuPlot() { return hMenuPlot; };
 
-     HWND hwndOwner;
-     HWND hwndFrame;
-     HWND hwndGraphic;
-     HWND hwndStatusBar;
-     HMENU hMenuPlot;
-     HWND hwndAppearanceSettings,hwndStyleSettings,hwndTextSettings;
-     HWND hwndLightingSettings,hwndBackgroundSettings,hwndPlotSettings,hwndFunctionSettings;
-     HWND hwndAxisSettings;
-     HWND hwndDataSourcesDialog,hwndDataSourcesTab,hwndDataSourcesFunctions;
+      int initWindows();
+      void setDataSourcesVisibility(IDataSet *pIDataSet_Relevant,IGSFunctioNater *pIFunction_Relevant);
 
-     POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlMouseBeforeMenu,ptlLastMouse;
-     BOOL trackedMouse;
-     POINTL rightMouseClickPosition;
-     float zLevel;
+      IPlot* newPlot(long plotID);
 
-     static WNDPROC defaultPatchPainter;
-     static WNDPROC defaultStatusBarHandler;
+      IGSFunctioNater* newFunction(bool connectNow);
+      void connectFunction(IGSFunctioNater *);
+      void deleteFunction(IGSFunctioNater *);
 
-     int eraseMode,rendering;
-     double xPixelsPerUnit,yPixelsPerUnit;
-     double floorZ,ceilingZ;
+      IDataSet *newDataSet(bool connectNow);
+      void connectDataSet(IDataSet *);
+      void deleteDataSet(IDataSet *);
 
-     unsigned int hitTableHits,*hitTable;
-     long currentPlotSourceID;
+      IText* newText();
 
-     char windowTitle[32];
-     char szName[64];
-     ULONG windowStyle,windowFrameFlags,windowStorageBytes;
+      int render(long sourceID);
+      static unsigned __stdcall threadRender(void *);
 
-     List<IPlot> plotList;
-     List<IAxis> axisList;
-     List<IText> textList;
-     List<IGSFunctioNater> functionList;
-     List<IGSFunctioNater> cachedFunctionList;
-     List<ContainedFunction> containedFunctionList;
-     List<graphicCursor> graphicCursorList;
+      int pick(POINTL *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread);
+      int doPickBox(POINTL *ptl);
+      void savePickBox(HDC hdc,POINTL *pt);
+      void erasePickBox(HDC hdcTarget);
+      void drawPickBox(HDC hdc,POINTL *pt);
+      int statusPosition();
+      int drawGraphicCursor(POINTL *pPtlPickBox,int doPickBox);
+      int eraseGraphicCursor();
+      int stubDraw();
 
-     List<HANDLE> renderThreadList;
+      void saveBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
+      void restoreBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
 
-     SIZEL containerSize,pickBoxSize;
-     RECT rectStatusText;
-     RECT margins;
-     PlotViews plotView;
-     PlotTypes plotType;
-     PlotViews defaultPlotView;
+      int getSegments(long **pSegments);
 
-     long default2DPlotType;
-     long default3DPlotType;
+      void setColorBackground();
+      void changeType();
+      void clearData();
 
-     long plotCount;
-     long textCount;
-     long functionCount;
-     long supportedLightCount;
-     long statusTextWidth[2];
+      IUnknown* pIUnknownThis;
+      IOleClientSite *pIOleClientSite;
+      IOleInPlaceSite *pIOleInPlaceSite;
+      IOleAdviseHolder *pOleAdviseHolder;
+      IDataAdviseHolder *pDataAdviseHolder;
+      IAdviseSink *pAdviseSink;
 
-     BOOL autoClear,autoPlotViewDetection,showStatusBar,useGraphicsCursor;
-     BOOL showMargins,stretchToMargins,showFunctions;
-     BOOL allowUserFunctionControlVisibilityAccess;
-     BOOL denyUserPropertySettings;
-     BOOL isRunning;
+      DWORD adviseSink_dwAspect,adviseSink_advf;
 
-     char plotMarginUnits[16];
-     char ***lightPositions;
+      int refCount;
 
-     IUnknown *pIUnknownOuter;
+      HWND hwndOwner;
+      HWND hwndFrame;
+      HWND hwndGraphic;
+      HWND hwndStatusBar;
+      HMENU hMenuPlot;
+      HWND hwndAppearanceSettings,hwndStyleSettings,hwndTextSettings;
+      HWND hwndLightingSettings,hwndBackgroundSettings,hwndPlotSettings,hwndFunctionSettings;
+      HWND hwndAxisSettings;
+      HWND hwndDataSourcesDialog,hwndDataSourcesTab,hwndDataSourcesFunctions,hwndDataSourcesDataSets;
 
-     IClassFactory *pPlot_IClassFactory;
-     IClassFactory *pFunction_IClassFactory;
+      POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlMouseBeforeMenu,ptlLastMouse;
+      BOOL trackedMouse;
+      POINTL rightMouseClickPosition;
+      float zLevel;
 
-     IViewSet *pIViewSet;
-     IDataSet* pIDataSetMaster;
-     IAxis *xaxis,*yaxis,*zaxis;
-     IGraphicSegmentAction* pSelectedGraphicSegmentAction;
-     IGSystemStatusBar* pIGSystemStatusBar;
+      static WNDPROC defaultPatchPainter;
+      static WNDPROC defaultStatusBarHandler;
 
-     IOpenGLImplementation *pIOpenGLImplementation;
+      int eraseMode,rendering;
+      double xPixelsPerUnit,yPixelsPerUnit;
+      double floorZ,ceilingZ;
 
-     IEvaluator *pIEvaluator;
+      unsigned int hitTableHits,*hitTable;
+      long currentPlotSourceID;
 
-     IGProperties *pIGProperties;
+      char windowTitle[32];
+      char szName[64];
+      ULONG windowStyle,windowFrameFlags,windowStorageBytes;
 
-     IGProperty* propertyAutoClear;
+      List<IPlot> plotList;
+      List<IAxis> axisList;
+      List<IText> textList;
+      List<IGSFunctioNater> functionList;
+      List<ContainedFunction> containedFunctionList;
 
-     IGProperty* propertyPlotView;
-     IGProperty* propertyDefault2DPlotType;
-     IGProperty *propertyDefault3DPlotType;
+      List<IDataSet> dataSetList;
+      List<ContainedDataSet> containedDataSetList;
 
-     IGProperty* propertyPlotType;
+      List<graphicCursor> graphicCursorList;
 
-     IGProperty* propertyBackgroundColor;
+      List<HANDLE> renderThreadList;
 
-     IGProperty* propertyTextColor,*propertyTextBackgroundColor;
+      SIZEL containerSize,pickBoxSize;
+      RECT rectStatusText;
+      RECT margins;
+      PlotViews plotView;
+      PlotTypes plotType;
+      PlotViews defaultPlotView;
 
-     IGProperty* propertyViewPhi,*propertyViewTheta,*propertyViewSpin;
+      long default2DPlotType;
+      long default3DPlotType;
 
-     IGProperty* propertyDenyUserPropertySettings;
-     IGProperty* propertyAutoPlotViewDetection;
-     IGProperty* propertyShowFunctions;
-     IGProperty* propertyShowStatusBar;
-     IGProperty* propertyUseGraphicsCursor;
-     IGProperty* propertyShowMargins;
-     IGProperty* propertyAllowUserFunctionControlVisibilityAccess;
+      long textCount{0};
+      long functionCount{0};
+      long dataSetCount{0};
+      long supportedLightCount;
+      long statusTextWidth[2];
 
-     IGProperty* propertyPlotMarginUnits;
-     IGProperty* propertyPlotLeftMargin,*propertyPlotRightMargin;
-     IGProperty* propertyPlotTopMargin,*propertyPlotBottomMargin;
-     IGProperty* propertyPlotMargins;
-     IGProperty* propertyPlotMarginsStretchAll;
+      BOOL autoClear,autoPlotViewDetection,showStatusBar,useGraphicsCursor;
+      BOOL showMargins,stretchToMargins,showFunctions;
+      BOOL allowUserFunctionControlVisibilityAccess;
+      BOOL denyUserPropertySettings;
+      BOOL isRunning;
 
-     IGProperty** ppPropertyLightOn;
+      char plotMarginUnits[16];
+      char ***lightPositions;
 
-     IGProperty** ppPropertyAmbientLight;
-     IGProperty** ppPropertyDiffuseLight;
-     IGProperty** ppPropertySpecularLight;
+      IUnknown *pIUnknownOuter;
 
-     IGProperty** ppPropertyLightPos;
+      IClassFactory *pPlot_IClassFactory;
+      IClassFactory *pFunction_IClassFactory;
+      IClassFactory *pDataSet_IClassFactory;
 
-     IGProperty* propertyCountLights;
-     IGProperty* propertyCustomColors;
-     IGProperty* propertySpecularReference;
-     IGProperty* propertyAmbientReference;
-     IGProperty* propertyShinyness;
+      IViewSet *pIViewSet;
+      IDataSet* pIDataSetMaster;
+      IAxis *xaxis,*yaxis,*zaxis;
+      IGraphicSegmentAction* pSelectedGraphicSegmentAction;
+      IGSystemStatusBar* pIGSystemStatusBar;
 
-     IGProperty* propertyPrintProperties;
+      IOpenGLImplementation *pIOpenGLImplementation;
+
+      IEvaluator *pIEvaluator;
+
+      IGProperties *pIGProperties;
+
+      IGProperty* propertyAutoClear;
+
+      IGProperty* propertyPlotView;
+      IGProperty* propertyDefault2DPlotType;
+      IGProperty *propertyDefault3DPlotType;
+
+      IGProperty* propertyPlotType;
+
+      IGProperty* propertyBackgroundColor;
+
+      IGProperty* propertyTextColor,*propertyTextBackgroundColor;
+
+      IGProperty* propertyViewPhi,*propertyViewTheta,*propertyViewSpin;
+
+      IGProperty* propertyDenyUserPropertySettings;
+      IGProperty* propertyAutoPlotViewDetection;
+      IGProperty* propertyShowFunctions;
+      IGProperty* propertyShowStatusBar;
+      IGProperty* propertyUseGraphicsCursor;
+      IGProperty* propertyShowMargins;
+      IGProperty* propertyAllowUserFunctionControlVisibilityAccess;
+
+      IGProperty* propertyPlotMarginUnits;
+      IGProperty* propertyPlotLeftMargin,*propertyPlotRightMargin;
+      IGProperty* propertyPlotTopMargin,*propertyPlotBottomMargin;
+      IGProperty* propertyPlotMargins;
+      IGProperty* propertyPlotMarginsStretchAll;
+
+      IGProperty** ppPropertyLightOn;
+
+      IGProperty** ppPropertyAmbientLight;
+      IGProperty** ppPropertyDiffuseLight;
+      IGProperty** ppPropertySpecularLight;
+
+      IGProperty** ppPropertyLightPos;
+
+      IGProperty* propertyCountLights;
+      IGProperty* propertyCustomColors;
+      IGProperty* propertySpecularReference;
+      IGProperty* propertyAmbientReference;
+      IGProperty* propertyShinyness;
+
+      IGProperty* propertyPrintProperties;
  
-     IGProperty* propertyDataExtents;
+      IGProperty* propertyDataExtents;
 
-     IGProperty* propertyFunctions;
-     IGProperty* propertyPlots;
-     IGProperty* propertyTexts;
-     IGProperty* propertyAxiis;
+      IGProperty* propertyFunctions{NULL};
+      IGProperty* propertyDataSets{NULL};
+      IGProperty* propertyTexts{NULL};
+      IGProperty* propertyAxiis{NULL};
 
-     IGProperty* propertyStatusText;
+      IGProperty* propertyStatusText;
 
-     IGProperty* propertyFloor;
-     IGProperty* propertyCeiling;
+      IGProperty* propertyFloor;
+      IGProperty* propertyCeiling;
 
-     IGProperty* propertyRenderOpenGLAxisText;
+      IGProperty* propertyRenderOpenGLAxisText;
 
-     int erase();
-     int eraseBackground();
-     int redraw();
-     int stop();
-     int wait();
+      HBITMAP boxBitmaps[5] { NULL, NULL, NULL, NULL , NULL};
+      HBITMAP pickBoxBitmap {NULL};
 
-     HMENU hwndMenuPlot() { return hMenuPlot; };
+      static void __stdcall someObjectChanged(void *);
+      static void __stdcall styleHandlerSomeObjectChanged(void *);
 
-     int oleSetWindowRect(RECT* rcPos);
-     int initWindows();
+      static LRESULT CALLBACK graphicFrameHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK graphicHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK posSizeHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK styleHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK textHandler(HWND hwnd,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK lightingHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK backgroundHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK axisHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK plotHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK dataSetHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK functionHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK dataSourcesHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK sampleGraphicHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK patchPainterProc(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK statusBarHandler(HWND,UINT,WPARAM,LPARAM);
 
-     IPlot* newPlot(long plotID);
+      static unsigned int __stdcall processSelections(void *someObject);
+      static unsigned int __stdcall processMenus(void *someObject);
 
-     IGSFunctioNater* newFunction(bool deferVisibility);
-     void deleteFunction(IGSFunctioNater*);
-     int connectFunction(IGSFunctioNater* pIFunction,bool deferVisibility,bool doVisibilityOnly);
-     int unConnectFunction(IGSFunctioNater* pIFunction);
+      friend class ContainedFunction;
+      friend class _IGPropertiesClient;
+      friend class _IGPropertyClient;
+      friend class _IGPropertyPageClient;
 
-     IText* newText();
-
-     int render(long sourceID);
-     static unsigned __stdcall threadRender(void *);
-
-     int pick(POINTL *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread);
-     int doPickBox(POINTL *ptl);
-     void savePickBox(HDC hdc,POINTL *pt);
-     void erasePickBox(HDC hdcTarget);
-     void drawPickBox(HDC hdc,POINTL *pt);
-     int statusPosition();
-     int drawGraphicCursor(POINTL *pPtlPickBox,int doPickBox);
-     int eraseGraphicCursor();
-     int stubDraw();
-
-     void saveBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
-     void restoreBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
-
-     HBITMAP boxBitmaps[5] { NULL, NULL, NULL, NULL , NULL};
-     HBITMAP pickBoxBitmap {NULL};
-
-     int getSegments(long **pSegments);
-
-     static void __stdcall someObjectChanged(void *);
-     static void __stdcall styleHandlerSomeObjectChanged(void *);
-
-     static LRESULT CALLBACK graphicFrameHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK graphicHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK posSizeHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK styleHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK textHandler(HWND hwnd,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK lightingHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK backgroundHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK axisHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK plotHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK functionHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK dataSourcesHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK sampleGraphicHandler(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK patchPainterProc(HWND,UINT,WPARAM,LPARAM);
-     static LRESULT CALLBACK statusBarHandler(HWND,UINT,WPARAM,LPARAM);
-
-     void setColorBackground();
-     void changeType();
-     void clearData();
-
-     static unsigned int __stdcall processSelections(void *someObject);
-     static unsigned int __stdcall processMenus(void *someObject);
-
-     friend class ContainedFunction;
-     friend class _IGPropertiesClient;
-     friend class _IGPropertyClient;
-     friend class _IGPropertyPageClient;
-
-  };
+   };
 
 
    struct graphicCursor {
@@ -645,7 +657,8 @@ MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesText,0x8CAEFE83,0x55E6,0x11
 MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesLighting,0x8CAEFE84,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
 MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesAxis,0x8CAEFE85,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
 MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesPlot,0x8CAEFE86,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
-MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesFunctions,0x8CAEFE87,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
+MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesDataSets,0x8CAEFE87,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
+MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesFunctions,0x8CAEFE88,0x55E6,0x11d3,0x83,0x65,0x00,0x60,0x08,0xBD,0x5B,0xC3);
 
   extern G *pStaticObject;
 

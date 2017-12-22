@@ -55,7 +55,8 @@ library Graphic {
       gcPropPickBoxSize = 72,
       gcPropUseStatusBar = 73,
       gcPropUseGraphicsCursor = 74,
-      gcPropDenyUserPropertySettings = 75 };
+      gcPropDenyUserPropertySettings = 75,
+      gcPropAllowUserShowFunctions = 76};
 
    enum GraphicMethodsID {
       gcMethodClearAllData = 100,
@@ -204,8 +205,12 @@ library Graphic {
 
       [propput,id(gcPropShowFunctions),helpstring("Hide or show the function specifications. You cannot show them unless at least one function has been defined.")]
       HRESULT ShowFunctions([in]VARIANT_BOOL setShowing);
+
       [propget,id(gcPropShowFunctions),helpstring("Hide or show the function specifications. You cannot show them unless at least one function has been defined.")]
       HRESULT ShowFunctions([out,retval]VARIANT_BOOL *pShowing);
+
+      [propput,id(gcPropAllowUserShowFunctions),helpstring("When running (not design mode), allow the user to control the visibility aspects of the function specification dialog (or not).")]
+      HRESULT AllowUserSetFunctionVisibility([in] VARIANT_BOOL doAllow);
 
 /* Properties: Other categories */
 

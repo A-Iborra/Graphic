@@ -17,13 +17,10 @@
 #include "Function_i.c"
 #include "Variable_i.c"
 
-#ifdef EMBEDDED_PROPERTIES
-#include "Evaluator_i.h"
-#include "Properties_i.h"
-#else
 #include "Evaluator_i.c"
 #include "Properties_i.c"
-#endif
+
+#include "Plot_i.c"
 
    HMODULE hModule;
    char szModuleName[1024];
@@ -88,50 +85,6 @@
       memset(wstrModuleName,0,(strlen(szModuleName) + 1) * sizeof(OLECHAR));
       MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName) + 1);  
 
-#ifdef FUNCTION_SAMPLE
-
-      HKEY hKey;
-      char szInstallTime[32];
-      DWORD dwSize = 32;
-      SYSTEMTIME sysTime,installTime;
-
-      memset(&sysTime,0,sizeof(SYSTEMTIME));
-      GetSystemTime(&sysTime);
-
-      if ( ERROR_SUCCESS == RegOpenKeyEx(HKEY_CLASSES_ROOT,"CLSID\\{685223E6-5CF9-4d06-B744-DA4A9A777E68}",0,KEY_QUERY_VALUE,&hKey) ) {
-
-         RegOpenKeyEx(hKey,"InProcServer",0,KEY_QUERY_VALUE,&hKey);
-
-         RegQueryValueEx(hKey,NULL,0,NULL,(BYTE*)szInstallTime,&dwSize);
-         
-         szInstallTime[3] = '\0';
-         szInstallTime[6] = '\0';
-         szInstallTime[11] = '\0';
-         installTime.wMonth = (WORD)atol(szInstallTime + 1);
-         installTime.wDay = (WORD)atol(szInstallTime + 4);
-         installTime.wYear = (WORD)atol(szInstallTime + 7);
-
-         while ( installTime.wYear < sysTime.wYear ) {
-            sysTime.wYear--;
-            sysTime.wMonth += 12;
-         }
-
-         if ( installTime.wYear > sysTime.wYear || installTime.wMonth > sysTime.wMonth ) {
-            trialExpired = true;
-            break;
-         }
-
-         long dayOfYearInstalled = installTime.wDay + (installTime.wMonth - 1) * 30;
-         long dayOfYearNow = sysTime.wDay + (sysTime.wMonth - 1) * 30;
-
-         if ( dayOfYearNow - dayOfYearInstalled > 31 ) trialExpired = true;
-
-         RegCloseKey(hKey);
-
-      }
- 
-#endif
-
       }
       break;
  
@@ -171,14 +124,8 @@
 
    STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppObject) {
    *ppObject = NULL;
-#ifdef FUNCTION_SAMPLE
-   if ( rclsid != CLSID_GSystemFunctioNaterSample ) {
-      return CLASS_E_CLASSNOTAVAILABLE;
-   }
-#else
    if ( rclsid !=  CLSID_GSystemFunctioNater)
       return CLASS_E_CLASSNOTAVAILABLE;
-#endif
    return functionFactory.QueryInterface(riid,ppObject);
    }
  
