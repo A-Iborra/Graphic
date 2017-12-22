@@ -185,7 +185,7 @@
    pParent -> ppPropertyDiffuseLight[1] -> put_binaryValue(4 * sizeof(float),(BYTE*)fvDiffuse);
    pParent -> ppPropertySpecularLight[1] -> put_binaryValue(4 * sizeof(float),(BYTE*)fvSpecular);
 
-   char szLightPos[64];
+   char szLightPos[256];
 
    sprintf(szLightPos,"MaxX + 1.1 * (MaxX - MinX),MinY + (MaxY - MinY)/2,MinZ + (MaxZ - MinZ)/2");       // Front
    pParent -> ppPropertyLightPos[0] -> put_szValue(szLightPos);

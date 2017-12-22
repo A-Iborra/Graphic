@@ -185,7 +185,7 @@
    }
 
  
-   HRESULT BasePlot::AddText(void *vt,unsigned char *name,int id) {
+   HRESULT BasePlot::AddText(void *vt,char *name,int id) {
    IText *t = reinterpret_cast<IText *>(vt);
    t -> AddRef();
    textList.Add(t,(char *)name,id);

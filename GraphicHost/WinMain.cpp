@@ -11,11 +11,19 @@
 #include "DataSet_i.c"
 #include "Plot_i.c"
 
+#include "utilities.h"
+
    int APIENTRY wWinMain(HINSTANCE hInst,HINSTANCE hPrevInstance,LPWSTR lpCmdLine,int nCmdShow) {
 
    hInstance = hInst;
 
    CoInitialize(NULL);
+
+   char szTemp[MAX_PATH];
+
+   GetCommonAppDataLocation(NULL,szTemp);
+
+   sprintf(szApplicationDataDirectory,"%s\\InnoVisioNate\\Graphic",szTemp);
 
    WNDCLASS gClass;
 
@@ -35,19 +43,13 @@
 
    hwndFrame = CreateWindowEx(0L,L"Graphic-Host",L"InnoVisioNate Graphic Host",WS_OVERLAPPEDWINDOW | WS_VISIBLE,0,0,1600,1024,NULL,NULL,hInstance,NULL);
 
-   //CreateWindowEx(0L,WC_BUTTON,L"Draw",WS_CHILD | WS_VISIBLE,0,0,48,24,hwndFrame,(HMENU)1,hInstance,NULL);
-   //CreateWindowEx(0L,WC_BUTTON,L"Draw",WS_CHILD | WS_VISIBLE,0,0,48,24,hwndFrame,(HMENU)2,hInstance,NULL);
-
-   //hwndClient1 = CreateWindowEx(WS_EX_CLIENTEDGE,WC_STATIC,L"",WS_CHILD | WS_VISIBLE,32,32,512,512,hwndFrame,(HMENU)10,hInstance,NULL);
-   //hwndClient2 = CreateWindowEx(WS_EX_CLIENTEDGE,WC_STATIC,L"",WS_CHILD | WS_VISIBLE,32 + 512 + 32,32 + 128,256,256,hwndFrame,(HMENU)20,hInstance,NULL);
-
-   //PostMessage(hwndFrame,WM_SETSIZES,0L,0L);
-
    MSG msg;
    while ( GetMessage(&msg,NULL,0L,0L) ) {
       if ( PeekMessage(&msg,NULL,WM_QUIT,WM_QUIT,PM_REMOVE) ) break;
       DispatchMessage(&msg);
    }
+
+   CoUninitialize();
 
    return 0;
    }

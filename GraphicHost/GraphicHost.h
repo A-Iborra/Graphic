@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <CommCtrl.h>
 #include <OleCtl.h>
+#include <stdio.h>
 
 #include "Graphic_resource.h"
 
@@ -155,6 +156,8 @@
 
    HINSTANCE hInstance;
 
+   char szApplicationDataDirectory[MAX_PATH];
+
    HWND hwndFrame = NULL;
    HWND hwndGraphic = NULL;
    
@@ -165,6 +168,8 @@
 #else
    
    extern HINSTANCE hInstance;
+
+   extern char szApplicationDataDirectory[];
 
    extern IOleObject *pIOleObject_Graphic;
 

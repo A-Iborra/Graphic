@@ -333,8 +333,11 @@
    hwndSpecDialog = CreateDialogIndirectParam(hModule,dt,hwndOwner,(DLGPROC)functionDialogHandler,(LPARAM)this);
 
    dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_FUNCTION_VARIABLES),RT_DIALOG));
+
    hwndVariables = CreateDialogIndirectParam(hModule,dt,hwndSpecDialog,(DLGPROC)functionVariablesHandler,(LPARAM)this);
+
    SetWindowLongPtr(hwndVariables,GWLP_ID,(ULONG_PTR)IDDIALOG_FUNCTION_VARIABLES);
+
    hwndVariablesTab = GetDlgItem(hwndVariables,IDDI_FUNCTION_VARIABLES_TABS);
 
    TC_ITEM tie;
@@ -348,9 +351,13 @@
    TabCtrl_InsertItem(hwndVariablesTab,2,&tie);
 
    SendMessage(hwndVariablesTab,TCM_GETITEMRECT,(WPARAM)0,(LPARAM)&rect);
+
    SetParent(GetDlgItem(hwndVariables,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),hwndVariablesTab);
+
    SetWindowPos(GetDlgItem(hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),HWND_TOP,(long)(0.5*(double)rect.bottom),(long)(1.5*(double)rect.bottom),0,0,SWP_NOSIZE);
+
    LoadString((HINSTANCE)hModule,IDSTRING_FUNCTION_INSTRUCTIONS,szTemp,MAX_PROPERTY_SIZE);
+
    SetDlgItemText(hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX,szTemp);
 
    dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_FUNCTION_ERRORS),RT_DIALOG));
@@ -393,16 +400,7 @@
 
    pManuallyAddedVariables -> SetHwnds(hwndVariablesTab,hwndVariablesTab);
 
-   Loaded();
-
-#ifdef FUNCTION_SAMPLE
-   if ( trialExpired ) {
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_START),FALSE);
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PAUSE),FALSE);
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESUME),FALSE);
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_STOP),FALSE);
-   }
-#endif
+//????!?!?!?!   Loaded();
 
    SetWindowLongPtr(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),GWLP_USERDATA,(ULONG_PTR)this);
    oldResultLabelHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),GWLP_WNDPROC,(ULONG_PTR)functionDialogHandler);

@@ -67,7 +67,7 @@
       p -> hwndProperties = hwnd;
 
       p -> pPropertyDialogVariableList = new VList(p -> evaluator);
-      p -> pPropertyDialogVariableList -> SetHwnds(p -> hwndProperties,0);
+      //p -> pPropertyDialogVariableList -> SetHwnds(p -> hwndProperties,0);
 
       p -> pIPropertyExpression -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY);
       p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_EXPRESSION_LABEL);
@@ -188,6 +188,8 @@
 
          vSource -> CopyFrom(vTarget);
 
+         vSource -> SetHwnds(p -> hwndProperties,NULL);
+
          vSource -> Edit();
 
          vTarget -> CopyFrom(vSource);
@@ -243,6 +245,10 @@
       case IDDI_FUNCTION_START:
          p -> Start();
          break;
+
+      default:
+         return (LRESULT)0;
+
       }
 
       if ( p -> pWhenChangedCallback )

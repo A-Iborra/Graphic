@@ -29,7 +29,6 @@
 
    int G::initWindows() {
 
-   RECT rect;
    WNDCLASS gClass;
  
    HRESULT hr = pIOleInPlaceSite -> GetWindow(&hwndOwner);
@@ -100,7 +99,6 @@
    }
 
    pIOpenGLImplementation -> SetBaseWindow(hwndGraphic);
-   //pIOpenGLImplementation -> SetTargetWindow(hwndGraphic);
 
    long plotView = 0L;
    propertyPlotView -> get_longValue(&plotView);

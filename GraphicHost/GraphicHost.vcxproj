@@ -149,6 +149,7 @@
     <ClInclude Include="GraphicHost.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\source\utilities.cpp" />
     <ClCompile Include="..\..\Common\source\Utils.cpp" />
     <ClCompile Include="graphicHandler.cpp" />
     <ClCompile Include="GraphicHost.cpp" />

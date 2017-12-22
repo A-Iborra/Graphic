@@ -155,7 +155,7 @@
 
       SendMessage(hwndTabControl,TCM_INSERTITEM,(WPARAM)tabIndex,(LPARAM)&tie);
 
-      SendMessage(hwndTabControl,TCM_SETCURSEL,(WPARAM)tabIndex,0L);
+      //SendMessage(hwndTabControl,TCM_SETCURSEL,(WPARAM)tabIndex,0L);
  
       SendMessage(hwndTabControl,TCM_GETITEMRECT,(WPARAM)tabIndex,(LPARAM)&rect);
 
@@ -164,8 +164,8 @@
    }
    else {
 
-      ShowWindow(hwndDialog,SW_HIDE);
-      SetWindowPos(hwndDialog,HWND_TOP,-1000,-1000,0,0,SWP_NOSIZE);
+      //ShowWindow(hwndDialog,SW_HIDE);
+      //SetWindowPos(hwndDialog,HWND_TOP,-1000,-1000,0,0,SWP_NOSIZE);
 
    }
 

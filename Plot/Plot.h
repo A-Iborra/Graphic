@@ -38,7 +38,7 @@
      STDMETHOD(LastPoint)(DataPoint*);
 
      STDMETHOD(StubPlot)();
-     STDMETHOD(AddText)(void *text,unsigned char *name,int idNumber);
+     STDMETHOD(AddText)(void *text,char *name,int idNumber);
      STDMETHOD(RemoveText)(void *t);
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();

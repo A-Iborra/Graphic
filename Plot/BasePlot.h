@@ -35,7 +35,7 @@
      STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty*,IGProperty*,IGProperty*);
 
      STDMETHOD(Erase)();
-     STDMETHOD(AddText)(void *text,unsigned char *name,int id);
+     STDMETHOD(AddText)(void *text,char *name,int id);
      STDMETHOD(RemoveText)(void *t);
      STDMETHOD(PlotData)(IDataSet *ds); // <<---- not in the interface yet
 

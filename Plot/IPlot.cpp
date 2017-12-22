@@ -69,7 +69,7 @@
    }
 
 
-   HRESULT Plot::AddText(void *vt,unsigned char *name,int id) {
+   HRESULT Plot::AddText(void *vt,char *name,int id) {
    return BasePlot::AddText(vt,name,id);
    }
  

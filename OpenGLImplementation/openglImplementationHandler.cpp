@@ -340,9 +340,6 @@ OPENGL_ERROR_CHECK
 
 #if 1
       glColor3f(fvColor[0],fvColor[1],fvColor[2]);
-char szX[32];
-sprintf(szX,"%f %f %f\n",fvColor[0],fvColor[1],fvColor[2]);
-OutputDebugString(szX);
 OPENGL_ERROR_CHECK
 
       glLineWidth((float)lw);

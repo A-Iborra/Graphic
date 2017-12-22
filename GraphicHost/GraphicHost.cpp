@@ -41,7 +41,13 @@
 
    pIGProperty_Graphic -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
 
-   pIGProperties -> put_FileName(L"Graphic.settings");
+   WCHAR szwSettingsFile[MAX_PATH];
+
+   MultiByteToWideChar(CP_ACP,0,szApplicationDataDirectory,-1,szwSettingsFile,MAX_PATH);
+
+   wcscpy(szwSettingsFile + wcslen(szwSettingsFile),L"\\Graphic.settings");
+
+   pIGProperties -> put_FileName(szwSettingsFile);
 
    pIOleObject_Graphic -> QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIGPropertiesClient_Graphic));
 

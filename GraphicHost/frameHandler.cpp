@@ -14,6 +14,14 @@
       }
       return (LRESULT)TRUE;
 
+   case WM_PAINT: {
+      PAINTSTRUCT ps;
+      BeginPaint(hwnd,&ps);
+      FillRect(ps.hdc,&ps.rcPaint,(HBRUSH)(COLOR_WINDOW + 1));
+      EndPaint(hwnd,&ps);
+      }
+      break;
+
    case WM_SETUP_GRAPHIC: {
 
       hwndGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,L"STATIC",L"",WS_CHILD | WS_VISIBLE,128,128,1300,768,hwndFrame,NULL,hInstance,NULL);//(LPVOID)pGraphicHost);

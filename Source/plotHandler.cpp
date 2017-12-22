@@ -64,7 +64,7 @@
 
       p -> hwndPlotSettings = hwnd;
 
-      char szTemp[32];
+      char szTemp[128];
       sprintf(szTemp,"There are %ld plots on this graphic",p -> plotList.Count());
       SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_COUNT),szTemp);
 
@@ -92,7 +92,7 @@
          memset(&lvItem,0,sizeof(LVITEM));
          long n;
          BSTR bstrExpression;
-         char szTemp[64];
+         char szTemp[128];
          pIPlot -> get_Name(&bstrExpression);
          if ( 0 == wcslen(bstrExpression) ) 
             sprintf(szTemp,"Plot #%d",p -> plotList.ID(pIPlot));
