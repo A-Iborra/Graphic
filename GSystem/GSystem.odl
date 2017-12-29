@@ -42,8 +42,9 @@ library GSystems {
 
    enum DataArity {
       DATA_ARITY_UNKNOWN = 0,
-      DATA_ARITY_2D = 1,
-      DATA_ARITY_3D = 2 };
+      DATA_ARITY_1D = 1,
+      DATA_ARITY_2D = 2,
+      DATA_ARITY_3D = 3 };
 
    enum TextFormat {
       TEXT_FORMAT_NONE             = 0x0000,

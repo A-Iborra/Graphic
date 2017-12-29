@@ -130,8 +130,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Midl Include="GSystem.odl">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Win32</TargetEnvironment>
       <TargetEnvironment Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Win32</TargetEnvironment>
     </Midl>
   </ItemGroup>
