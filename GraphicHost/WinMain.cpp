@@ -45,9 +45,14 @@
 
    MSG msg;
    while ( GetMessage(&msg,NULL,0L,0L) ) {
-      if ( PeekMessage(&msg,NULL,WM_QUIT,WM_QUIT,PM_REMOVE) ) break;
+      if ( PeekMessage(&msg,NULL,WM_QUIT,WM_QUIT,PM_REMOVE) ) 
+         break;
+      if ( WM_KEYFIRST <= msg.message && msg.message <= WM_KEYLAST ) 
+         TranslateMessage(&msg);
       DispatchMessage(&msg);
    }
+
+   DestroyWindow(hwndFrame);
 
    CoUninitialize();
 

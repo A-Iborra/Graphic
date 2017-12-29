@@ -149,6 +149,8 @@
    pIProperties -> Add(L"Default solid size in percent domain",&propertyDefaultSolidSizeInPercentDomain);
    pIProperties -> DirectAccess(L"Default solid size in percent domain",TYPE_DOUBLE,&defaultSolidSizeInPercentDomain,sizeof(defaultSolidSizeInPercentDomain));
 
+   pIProperties -> Add(L"dataset",&propertyDataSet);
+
    refCount = 0;
 
    WNDCLASS aClass;

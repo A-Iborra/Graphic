@@ -1,7 +1,9 @@
 
 #pragma once
 
+#include <Windows.h>
 #include <stddef.h>
+#include <process.h>
 
 #include "general.h"
 
@@ -43,8 +45,8 @@
      STDMETHOD(Draw)();
      STDMETHOD(Redraw)();
 
-     STDMETHOD(put_DataSet)(IDataSet *newDataSet);
-     STDMETHOD(get_DataSet)(IDataSet **getDataSet);
+     STDMETHOD(put_IDataSet)(IDataSet *newDataSet);
+     STDMETHOD(get_IDataSet)(IDataSet **getDataSet);
 
      STDMETHOD(get_DataArity)(enum DataArity *);
 

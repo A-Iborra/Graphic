@@ -8,7 +8,7 @@
 #include <CommCtrl.h>
 #include <stdio.h>
 
-#include "resource.h"
+#include "Graphic_Resource.h"
 #include "utils.h"
 
 #include "V.h"
@@ -17,6 +17,16 @@
 
 
    HRESULT V::SavePrep() {
+
+   if ( ! hwndDialog )
+      return S_OK;
+
+   pIProperty_minValue -> getWindowItemText(hwndDialog,IDDI_VARIABLE_DOMAIN_MIN);
+   pIProperty_stepCount -> getWindowItemText(hwndDialog,IDDI_VARIABLE_STEPS);
+   pIProperty_stepExpression -> getWindowItemText(hwndDialog,IDDI_VARIABLE_DOMAIN_EXPRESSION);
+   pIProperty_maxValue -> getWindowItemText(hwndDialog,IDDI_VARIABLE_DOMAIN_MAX);
+   pIProperty_valueExpression -> getWindowItemText(hwndDialog,IDDI_VARIABLE_VALUE);
+
    return S_OK;
    }
 

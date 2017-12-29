@@ -72,9 +72,6 @@
     <ClCompile Include="Source\backgroundHandler.cpp">
       <Filter>Source Files\Window Handlers\Property Sheet Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="Source\dataSourcesHandler.cpp">
-      <Filter>Source Files\Window Handlers\Property Sheet Handlers</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GraphicHandler.cpp">
       <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
@@ -191,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="Source\dataSourcesVisibility.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\dataSourcesHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

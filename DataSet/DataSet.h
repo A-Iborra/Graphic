@@ -1,6 +1,9 @@
 
 #pragma once
 
+#include <algorithm>
+#include <functional>
+
 #include <OCIdl.h>
 #include <list>
 #include <CommCtrl.h>
@@ -28,13 +31,18 @@ using namespace VBIDE;
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
-
 #include "OpenGLImplementation_i.h"
+#include "Function_i.h"
+
+#include "Plot_i.h"
 
 #include "Graphic_resource.h"
 
 #include "List.h"
 #include "utils.h"
+
+#define EXCEL_VALUE_SIZE MAX_PATH
+#define ERROR_MESSAGE_DURATION   5000
 
    struct boundingBox {
       boundingBox(double *pxmin,double *pymin,double *pzmin,double *pxmax,double *pymax,double *pzmax) :
@@ -78,6 +86,27 @@ using namespace VBIDE;
 
       STDMETHOD(put_DataSource)(BSTR);
       STDMETHOD(get_DataSource)(BSTR *);
+
+      STDMETHOD(put_IsFunctionSource)(VARIANT_BOOL);
+      STDMETHOD(get_IsFunctionSource)(VARIANT_BOOL *);
+
+      STDMETHOD(put_IFunction)(void *);
+      STDMETHOD(get_IFunction)(void **);
+
+      STDMETHOD(put_IPlot)(void *);
+      STDMETHOD(get_IPlot)(void **);
+
+      STDMETHOD(Initialize)(void * pvIDataSet_Domain,void *pvIOpenGLImplementation,
+                              IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                              IGProperty *parentPropertyPlotView,
+                              IGProperty *parentPropertyDefault2DPlotSubType,
+                              IGProperty *parentPropertyDefault3DPlotSubType,
+                              IGProperty *parentPropertyBackgroundColor,
+                              IGProperty *parentPropertyFloor,
+                              IGProperty *parentPropertyCeiling,
+                              void (__stdcall *pCallback)(void *),void *pArg);
+
+      STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
 
       STDMETHOD(put_maxX)(double);                     
       STDMETHOD(get_maxX)(double *getVal);                     
@@ -168,232 +197,224 @@ using namespace VBIDE;
       STDMETHOD(Evaluate)(BSTR,double *);
 
       STDMETHOD(GetDomainGDI)(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+      STDMETHOD(Start)();
  
+      STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar*);
+
    private:
  
 //     IOleObject 
 
-     STDMETHOD (SetClientSite)(IOleClientSite *pClientSite);
-     STDMETHOD (GetClientSite)(IOleClientSite **ppCLientSite);
-     STDMETHOD (SetHostNames)(LPCOLESTR szContainerApp,LPCOLESTR szContainerObj);
-     STDMETHOD (Close)(DWORD dwSaveOption);
-     STDMETHOD (SetMoniker)(DWORD dwWhichMoniker, IMoniker *pmk);
-     STDMETHOD (GetMoniker)(DWORD dwAssign, DWORD dwWhichMoniker,IMoniker **ppmk);
-     STDMETHOD (InitFromData)(IDataObject *pDataObject,BOOL fCreation,DWORD dwReserved);
-     STDMETHOD (GetClipboardData)(DWORD dwReserved,IDataObject **ppDataObject);
-     STDMETHOD (DoVerb)(LONG iVerb,LPMSG lpmsg,IOleClientSite *pActiveSite,LONG lindex,HWND hwndParent,LPCRECT lprcPosRect);
-     STDMETHOD (EnumVerbs)(IEnumOLEVERB **ppenumOleVerb);
-     STDMETHOD (Update)();
-     STDMETHOD (IsUpToDate)();
-     STDMETHOD (GetUserClassID)(CLSID * pClsid);
-     STDMETHOD (GetUserType)(DWORD dwFormOfType, LPOLESTR *pszUserType);
-     STDMETHOD (SetExtent)(DWORD dwDrawAspect, LPSIZEL lpsizel);
-     STDMETHOD (GetExtent)(DWORD dwDrawAspect, LPSIZEL lpsizel);
+      STDMETHOD (SetClientSite)(IOleClientSite *pClientSite);
+      STDMETHOD (GetClientSite)(IOleClientSite **ppCLientSite);
+      STDMETHOD (SetHostNames)(LPCOLESTR szContainerApp,LPCOLESTR szContainerObj);
+      STDMETHOD (Close)(DWORD dwSaveOption);
+      STDMETHOD (SetMoniker)(DWORD dwWhichMoniker, IMoniker *pmk);
+      STDMETHOD (GetMoniker)(DWORD dwAssign, DWORD dwWhichMoniker,IMoniker **ppmk);
+      STDMETHOD (InitFromData)(IDataObject *pDataObject,BOOL fCreation,DWORD dwReserved);
+      STDMETHOD (GetClipboardData)(DWORD dwReserved,IDataObject **ppDataObject);
+      STDMETHOD (DoVerb)(LONG iVerb,LPMSG lpmsg,IOleClientSite *pActiveSite,LONG lindex,HWND hwndParent,LPCRECT lprcPosRect);
+      STDMETHOD (EnumVerbs)(IEnumOLEVERB **ppenumOleVerb);
+      STDMETHOD (Update)();
+      STDMETHOD (IsUpToDate)();
+      STDMETHOD (GetUserClassID)(CLSID * pClsid);
+      STDMETHOD (GetUserType)(DWORD dwFormOfType, LPOLESTR *pszUserType);
+      STDMETHOD (SetExtent)(DWORD dwDrawAspect, LPSIZEL lpsizel);
+      STDMETHOD (GetExtent)(DWORD dwDrawAspect, LPSIZEL lpsizel);
      
-     STDMETHOD (Advise)(IAdviseSink *pAdvSink, DWORD * pdwConnection);
-     STDMETHOD (Unadvise)(DWORD dwConnection);
-     STDMETHOD (EnumAdvise)(IEnumSTATDATA **ppenumAdvise);
-     STDMETHOD (GetMiscStatus)(DWORD dwAspect, DWORD * pdwStatus);        
+      STDMETHOD (Advise)(IAdviseSink *pAdvSink, DWORD * pdwConnection);
+      STDMETHOD (Unadvise)(DWORD dwConnection);
+      STDMETHOD (EnumAdvise)(IEnumSTATDATA **ppenumAdvise);
+      STDMETHOD (GetMiscStatus)(DWORD dwAspect, DWORD * pdwStatus);        
      
-     STDMETHOD (SetColorScheme)(LPLOGPALETTE lpLogpal);
+      STDMETHOD (SetColorScheme)(LPLOGPALETTE lpLogpal);
 
 //      IOleWindow
 
-     STDMETHOD (GetWindow)(HWND *);
-     STDMETHOD (ContextSensitiveHelp)(BOOL);
+      STDMETHOD (GetWindow)(HWND *);
+      STDMETHOD (ContextSensitiveHelp)(BOOL);
 
 //      IOleInPlaceObject
 
-     STDMETHOD (InPlaceActivate)();
-     STDMETHOD (InPlaceDeactivate)();
-     STDMETHOD (UIDeactivate)();
-     STDMETHOD (SetObjectRects)(LPCRECT,LPCRECT);
-     STDMETHOD (ReactivateAndUndo)();
+      STDMETHOD (InPlaceActivate)();
+      STDMETHOD (InPlaceDeactivate)();
+      STDMETHOD (UIDeactivate)();
+      STDMETHOD (SetObjectRects)(LPCRECT,LPCRECT);
+      STDMETHOD (ReactivateAndUndo)();
 
 //      IOleControl
 
-     STDMETHOD (GetControlInfo)(CONTROLINFO *);
-     STDMETHOD (OnMnemonic)(MSG *);
-     STDMETHOD (OnAmbientPropertyChange)(long);
-     STDMETHOD (FreezeEvents)(int);
+      STDMETHOD (GetControlInfo)(CONTROLINFO *);
+      STDMETHOD (OnMnemonic)(MSG *);
+      STDMETHOD (OnAmbientPropertyChange)(long);
+      STDMETHOD (FreezeEvents)(int);
 
 //      IDataObject
 
-     STDMETHOD (GetData)(FORMATETC *,STGMEDIUM *);
-     STDMETHOD (GetDataHere)(FORMATETC *,STGMEDIUM *);
-     STDMETHOD (QueryGetData)(FORMATETC *);
-     STDMETHOD (GetCanonicalFormatEtc)(FORMATETC *,FORMATETC *);
-     STDMETHOD (SetData)(FORMATETC *,STGMEDIUM *,BOOL);
-     STDMETHOD (EnumFormatEtc)(DWORD,IEnumFORMATETC **);
-     STDMETHOD (DAdvise)(FORMATETC *,DWORD,IAdviseSink *,DWORD *);
-     STDMETHOD (DUnadvise)(DWORD);
-     STDMETHOD (EnumDAdvise)(IEnumSTATDATA **);
+      STDMETHOD (GetData)(FORMATETC *,STGMEDIUM *);
+      STDMETHOD (GetDataHere)(FORMATETC *,STGMEDIUM *);
+      STDMETHOD (QueryGetData)(FORMATETC *);
+      STDMETHOD (GetCanonicalFormatEtc)(FORMATETC *,FORMATETC *);
+      STDMETHOD (SetData)(FORMATETC *,STGMEDIUM *,BOOL);
+      STDMETHOD (EnumFormatEtc)(DWORD,IEnumFORMATETC **);
+      STDMETHOD (DAdvise)(FORMATETC *,DWORD,IAdviseSink *,DWORD *);
+      STDMETHOD (DUnadvise)(DWORD);
+      STDMETHOD (EnumDAdvise)(IEnumSTATDATA **);
 
 //      IViewObject
 
-     STDMETHOD (Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
-     STDMETHOD (GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
-     STDMETHOD (Freeze)(DWORD,long,void *,DWORD *);
-     STDMETHOD (Unfreeze)(DWORD);
-     STDMETHOD (SetAdvise)(DWORD,DWORD,IAdviseSink *);
-     STDMETHOD (GetAdvise)(DWORD *,DWORD *,IAdviseSink **);
+      STDMETHOD (Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+      STDMETHOD (GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
+      STDMETHOD (Freeze)(DWORD,long,void *,DWORD *);
+      STDMETHOD (Unfreeze)(DWORD);
+      STDMETHOD (SetAdvise)(DWORD,DWORD,IAdviseSink *);
+      STDMETHOD (GetAdvise)(DWORD *,DWORD *,IAdviseSink **);
 
 //      IViewObject2
 
-     STDMETHOD (GetExtent)(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *);
+      STDMETHOD (GetExtent)(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *);
 
 //      IViewObjectEx
 
-     STDMETHOD (GetRect)(DWORD dwAspect,RECTL *);
-     STDMETHOD (GetViewStatus)(DWORD *);
-     STDMETHOD (QueryHitPoint)(DWORD dwAspect,const struct tagRECT *pRectBounds,POINT ptlHit,long lCloseHint,DWORD *dwHitResult);
-     STDMETHOD (QueryHitRect)(DWORD dwAspect,const struct tagRECT *pRectBounds,const struct tagRECT *rctHit,long lCloseHint,DWORD *dwHitResult);
-     STDMETHOD (GetNaturalExtent)(DWORD dwExtent,LONG lIndex,DVTARGETDEVICE *ptd,HDC hicTargetDev,DVEXTENTINFO *extentInfo,SIZEL *);
+      STDMETHOD (GetRect)(DWORD dwAspect,RECTL *);
+      STDMETHOD (GetViewStatus)(DWORD *);
+      STDMETHOD (QueryHitPoint)(DWORD dwAspect,const struct tagRECT *pRectBounds,POINT ptlHit,long lCloseHint,DWORD *dwHitResult);
+      STDMETHOD (QueryHitRect)(DWORD dwAspect,const struct tagRECT *pRectBounds,const struct tagRECT *rctHit,long lCloseHint,DWORD *dwHitResult);
+      STDMETHOD (GetNaturalExtent)(DWORD dwExtent,LONG lIndex,DVTARGETDEVICE *ptd,HDC hicTargetDev,DVEXTENTINFO *extentInfo,SIZEL *);
 
 //      IProvideClassInfo
 
-     STDMETHOD (GetClassInfo)(ITypeInfo **);
+      STDMETHOD (GetClassInfo)(ITypeInfo **);
 
 //      IProvideClassInfo2
 
-     STDMETHOD (GetGUID)(DWORD,GUID *);
+      STDMETHOD (GetGUID)(DWORD,GUID *);
 
 //      IRunnableObject
 
-     STDMETHOD (GetRunningClass)(CLSID *);
-     STDMETHOD (Run)(LPBC);
-     int __stdcall IsRunning(void);
-     STDMETHOD (LockRunning)(BOOL,BOOL);
-     STDMETHOD (SetContainedObject)(BOOL);
+      STDMETHOD (GetRunningClass)(CLSID *);
+      STDMETHOD (Run)(LPBC);
+      int __stdcall IsRunning(void);
+      STDMETHOD (LockRunning)(BOOL,BOOL);
+      STDMETHOD (SetContainedObject)(BOOL);
 
 //      IQuickActivate
 
-     STDMETHOD(QuickActivate)(QACONTAINER* pQAContainer,QACONTROL* pQAControl);
-     STDMETHOD(SetContentExtent)(SIZEL* pSizel);
-     STDMETHOD(GetContentExtent)(SIZEL* pSizel);
+      STDMETHOD(QuickActivate)(QACONTAINER* pQAContainer,QACONTROL* pQAControl);
+      STDMETHOD(SetContentExtent)(SIZEL* pSizel);
+      STDMETHOD(GetContentExtent)(SIZEL* pSizel);
 
 //      IGPropertiesClient
 
-     STDMETHOD(SavePrep)();
-     STDMETHOD(InitNew)();
-     STDMETHOD(Loaded)();
-     STDMETHOD(Saved)();
-     STDMETHOD(IsDirty)();
-     STDMETHOD(GetClassID)(BYTE *pCLSID);
+      STDMETHOD(SavePrep)();
+      STDMETHOD(InitNew)();
+      STDMETHOD(Loaded)();
+      STDMETHOD(Saved)();
+      STDMETHOD(IsDirty)();
+      STDMETHOD(GetClassID)(BYTE *pCLSID);
 
 //      IPropertyPageClient
 
-     STDMETHOD(BeforeAllPropertyPages)();
-     STDMETHOD(GetPropertyPagesInfo)(long* countPages,SAFEARRAY** stringDescriptions,SAFEARRAY** stringHelpDirs,SAFEARRAY** pSize);
-     STDMETHOD(CreatePropertyPage)(long,HWND,RECT*,BOOL,HWND* hwndPropertyPage);
-     STDMETHOD(Apply)();
-     STDMETHOD(IsPageDirty)(long,BOOL*);
-     STDMETHOD(Help)(BSTR bstrHelpDir);
-     STDMETHOD(TranslateAccelerator)(long,long*);
-     STDMETHOD(AfterAllPropertyPages)(BOOL);
-     STDMETHOD(DestroyPropertyPage)(long);
-     STDMETHOD(GetPropertySheetHeader)(void *pHeader);
-     STDMETHOD(get_PropertyPageCount)(long *pCount);
-     STDMETHOD(GetPropertySheets)(void *pSheets);
+      STDMETHOD(BeforeAllPropertyPages)();
+      STDMETHOD(GetPropertyPagesInfo)(long* countPages,SAFEARRAY** stringDescriptions,SAFEARRAY** stringHelpDirs,SAFEARRAY** pSize);
+      STDMETHOD(CreatePropertyPage)(long,HWND,RECT*,BOOL,HWND* hwndPropertyPage);
+      STDMETHOD(Apply)();
+      STDMETHOD(IsPageDirty)(long,BOOL*);
+      STDMETHOD(Help)(BSTR bstrHelpDir);
+      STDMETHOD(TranslateAccelerator)(long,long*);
+      STDMETHOD(AfterAllPropertyPages)(BOOL);
+      STDMETHOD(DestroyPropertyPage)(long);
+      STDMETHOD(GetPropertySheetHeader)(void *pHeader);
+      STDMETHOD(get_PropertyPageCount)(long *pCount);
+      STDMETHOD(GetPropertySheets)(void *pSheets);
 
 //      IConnectionPointContainer
 
-     STDMETHOD(FindConnectionPoint)(REFIID riid,IConnectionPoint **);
-     STDMETHOD(EnumConnectionPoints)(IEnumConnectionPoints **);
+      STDMETHOD(FindConnectionPoint)(REFIID riid,IConnectionPoint **);
+      STDMETHOD(EnumConnectionPoints)(IEnumConnectionPoints **);
 
-   public:
+   //public:
 
-     //long fire_UndefinedVariable(BSTR variableName);
-     //void fire_UndefinedFunction(BSTR functionName);
-
-     //void fire_Started(long expectedIterations);
-     //void fire_Paused();
-     //void fire_Resumed();
-     //void fire_Stopped();
+     void fire_Started(long expectedIterations);
+     void fire_Paused();
+     void fire_Resumed();
+     void fire_Stopped();
  
-     //void fire_TakeValues(long iterationNumber,char* pszNames,char* szValues,char** pszCookedResults);
-     //void fire_Finished();
+     void fire_TakeValues(long iterationNumber,char* pszNames,char* szValues,char** pszCookedResults);
+     void fire_Finished();
 
-     //void fire_Clear();
-     //void fire_Parsed();
+     void fire_Clear();
 
-     //void fire_DivideByZero();
-     //void fire_InvalidArgument(BSTR bstrFunction,double argumentValue);
+      struct _IConnectionPoint : IConnectionPoint {
+      public:
 
-     //IVariable* UnknownVariable(char* variableName,bool* createdNew);
-     //int UnknownFunction(char* functionName);
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
 
-     //HWND hWnd() { return hwndSpecDialog; }
+         STDMETHOD (GetConnectionInterface)(IID *);
+         STDMETHOD (GetConnectionPointContainer)(IConnectionPointContainer **ppCPC);
+         STDMETHOD (Advise)(IUnknown *pUnk,DWORD *pdwCookie);
+         STDMETHOD (Unadvise)(DWORD);
+         STDMETHOD (EnumConnections)(IEnumConnections **ppEnum);
 
-     struct _IConnectionPoint : IConnectionPoint {
-	  public:
+         _IConnectionPoint(DataSet *pp,REFIID outGoingInterfaceType);
+	      ~_IConnectionPoint();
 
-        STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
-        STDMETHOD_ (ULONG, AddRef)();
-        STDMETHOD_ (ULONG, Release)();
+	      IUnknown *AdviseSink() { return adviseSink; };
 
-        STDMETHOD (GetConnectionInterface)(IID *);
-        STDMETHOD (GetConnectionPointContainer)(IConnectionPointContainer **ppCPC);
-        STDMETHOD (Advise)(IUnknown *pUnk,DWORD *pdwCookie);
-   	  STDMETHOD (Unadvise)(DWORD);
-        STDMETHOD (EnumConnections)(IEnumConnections **ppEnum);
+      private:
 
-        _IConnectionPoint(DataSet *pp,REFIID outGoingInterfaceType);
-		  ~_IConnectionPoint();
+         int getSlot();
+         int findSlot(DWORD dwCookie);
 
-		  IUnknown *AdviseSink() { return adviseSink; };
+	      IUnknown *adviseSink{NULL};
+	      DataSet *pParent{NULL};
+         DWORD nextCookie{0L};
+	      int countConnections{0};
+         int countLiveConnections{0};
 
-     private:
+         REFIID outGoingInterfaceType;
 
-        int getSlot();
-        int findSlot(DWORD dwCookie);
+         CONNECTDATA *connections{NULL};
 
-		  IUnknown *adviseSink{NULL};
-		  DataSet *pParent{NULL};
-        DWORD nextCookie{0L};
-		  int countConnections{0};
-       int countLiveConnections{0};
+         long refCount{0};
 
-        REFIID outGoingInterfaceType;
+         //friend class Function;
 
-        CONNECTDATA *connections{NULL};
+      } *pIConnectionPoint{NULL};
 
-        long refCount{0};
+      struct _IEnumConnectionPoints : IEnumConnectionPoints {
+      public:
 
-        //friend class Function;
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
 
-     } *pIConnectionPoint{NULL};
+ 	      STDMETHOD (Next)(ULONG cConnections,IConnectionPoint **rgpcn,ULONG *pcFetched);
+         STDMETHOD (Skip)(ULONG cConnections);
+         STDMETHOD (Reset)();
+         STDMETHOD (Clone)(IEnumConnectionPoints **);
 
-	  struct _IEnumConnectionPoints : IEnumConnectionPoints {
-	  public:
+	      _IEnumConnectionPoints(DataSet *pp,_IConnectionPoint **cp,int connectionPointCount);
+         ~_IEnumConnectionPoints();
 
-        STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
-        STDMETHOD_ (ULONG, AddRef)();
-        STDMETHOD_ (ULONG, Release)();
+      private:
 
- 	     STDMETHOD (Next)(ULONG cConnections,IConnectionPoint **rgpcn,ULONG *pcFetched);
-        STDMETHOD (Skip)(ULONG cConnections);
-        STDMETHOD (Reset)();
-        STDMETHOD (Clone)(IEnumConnectionPoints **);
+         int cpCount{0};
+         int enumeratorIndex{0};
+	      DataSet *pParent{NULL};
 
-	     _IEnumConnectionPoints(DataSet *pp,_IConnectionPoint **cp,int connectionPointCount);
-       ~_IEnumConnectionPoints();
+	      _IConnectionPoint **connectionPoints{NULL};
 
-     private:
+      } *enumConnectionPoints{NULL};
 
-        int cpCount{0};
-        int enumeratorIndex{0};
-		  DataSet *pParent{NULL};
+      struct _IEnumerateConnections : public IEnumConnections {
+      public:
 
-		  _IConnectionPoint **connectionPoints{NULL};
-
-     } *enumConnectionPoints{NULL};
-
-     struct _IEnumerateConnections : public IEnumConnections {
-     public:
-
-        _IEnumerateConnections(IUnknown* pParentUnknown,ULONG cConnections,CONNECTDATA* paConnections,ULONG initialIndex);
-        ~_IEnumerateConnections();
+         _IEnumerateConnections(IUnknown* pParentUnknown,ULONG cConnections,CONNECTDATA* paConnections,ULONG initialIndex);
+         ~_IEnumerateConnections();
 
          STDMETHODIMP         QueryInterface(REFIID, void **);
          STDMETHODIMP_(ULONG) AddRef();
@@ -403,52 +424,102 @@ using namespace VBIDE;
          STDMETHODIMP         Reset();
          STDMETHODIMP         Clone(IEnumConnections**);
 
-     private:
+      private:
 
-        ULONG refCount{0};
-        IUnknown *pParentUnknown{NULL};
-        ULONG enumeratorIndex{0L};
-        ULONG countConnections{0L};
-        CONNECTDATA *connections{NULL};
+         ULONG refCount{0};
+         IUnknown *pParentUnknown{NULL};
+         ULONG enumeratorIndex{0L};
+         ULONG countConnections{0L};
+         CONNECTDATA *connections{NULL};
 
-     } *enumConnections{NULL};
-
+      } *enumConnections{NULL};
 
 //      IOleInPlaceActiveObject
 
-     struct _IOleInPlaceActiveObject : IOleInPlaceActiveObject {
+      struct _IOleInPlaceActiveObject : IOleInPlaceActiveObject {
 
-        _IOleInPlaceActiveObject(DataSet *pp) : pParent(pp) {};
-		  ~_IOleInPlaceActiveObject();
+         _IOleInPlaceActiveObject(DataSet *pp) : pParent(pp) {};
+	      ~_IOleInPlaceActiveObject();
 
-        STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
-        STDMETHOD_ (ULONG, AddRef)();
-        STDMETHOD_ (ULONG, Release)();
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
 
-        STDMETHOD (GetWindow)(HWND *);
-        STDMETHOD (ContextSensitiveHelp)(BOOL);
+         STDMETHOD (GetWindow)(HWND *);
+         STDMETHOD (ContextSensitiveHelp)(BOOL);
 
-        STDMETHOD (TranslateAccelerator)(LPMSG);
-        STDMETHOD (OnFrameWindowActivate)(BOOL);
-        STDMETHOD (OnDocWindowActivate)(BOOL);
-        STDMETHOD (ResizeBorder)(LPCRECT ,IOleInPlaceUIWindow *,BOOL);
-        STDMETHOD (EnableModeless)(BOOL);
+         STDMETHOD (TranslateAccelerator)(LPMSG);
+         STDMETHOD (OnFrameWindowActivate)(BOOL);
+         STDMETHOD (OnDocWindowActivate)(BOOL);
+         STDMETHOD (ResizeBorder)(LPCRECT ,IOleInPlaceUIWindow *,BOOL);
+         STDMETHOD (EnableModeless)(BOOL);
 
       private:
 
          DataSet* pParent;
 
-     } *pIOleInPlaceActiveObject{NULL};
+      } *pIOleInPlaceActiveObject{NULL};
+
+   public:
+
+      class _IGSFunctioNaterEvents : public IGSFunctioNaterEvents {
+      public:
+
+         _IGSFunctioNaterEvents(DataSet *pp,IGSFunctioNater *pIFunction,std::function<void()>* pOnFinished);
+         ~_IGSFunctioNaterEvents();
+
+         STDMETHOD(QueryInterface)(REFIID riid,void **ppv);
+
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
+
+      private:
+
+         STDMETHOD(GetTypeInfoCount)(UINT *pctinfo);
+         STDMETHOD(GetTypeInfo)(UINT itinfo, LCID lcid, ITypeInfo **pptinfo);
+         STDMETHOD(GetIDsOfNames)(REFIID riid, LPOLESTR *rgszNames, UINT cNames, LCID lcid, DISPID *rgdispid);
+         STDMETHOD(Invoke)(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pdispparams, VARIANT *pvarResult, EXCEPINFO *pexcepinfo, UINT *puArgErr);
+
+         STDMETHOD(UndefinedVariable)(BSTR);
+         STDMETHOD(UndefinedFunction)(BSTR);
+         STDMETHOD(Clear)();
+         STDMETHOD(Parsed)();
+         STDMETHOD(Started)(long);
+         STDMETHOD(Paused)();
+         STDMETHOD(Resumed)();
+         STDMETHOD(Stopped)();
+         STDMETHOD(TakeValues)(long,long,SAFEARRAY**,SAFEARRAY**);
+         STDMETHOD(TakeResults)(long iterationNumber,BSTR bstrResults);
+         STDMETHOD(Finished)();
+
+         DataSet *pParent{NULL};
+         IGSFunctioNater *pIFunction{NULL};
+
+         IConnectionPoint* pIConnectionPoint{NULL};
+         DWORD dwConnectionCookie{0};
+
+         std::function<void()>* pExecuteOnFinish;
+
+     } *pIGSFunctioNaterEvents{NULL};
  
    private:
 
       int initWindows();
 
-      long loadExcelWorkbook();
-      Excel::_Workbook *openExcelWorkbook(bool *pWasOpen);
-      long loadExcelNamedRange();
-      long loadExcelWorksheet();
-      long launchExcel();
+      long loadExcelWorkbook(HWND hwndSheetList,HWND hwndRangeList,char *pszWorkbookName,char *pszRelevantSheetName,char *pszRelevantRangeName);
+      Excel::_Workbook *openExcelWorkbook(char *pszWorkbookName,bool *pWasOpen);
+      long loadExcelNamedRange(HWND hwndDestinationList,char *pszWorkbookName,char *pszRangeName);
+      long loadExcelCellRange(HWND hwndDestinationList,HWND hwndErrorReport,char *pszWorkbookName,char *pszWorksheetName,char *pszCellRange);
+      Excel::_Worksheet *getExcelWorksheet(Excel::_Workbook *pIWorkbook,char *pszSheetName);
+      long loadExcelWorksheet(char *pszWorkbookName,char *pszWorksheetName);
+      long launchExcel(char *pszWorkbookName);
+      long populateData(HWND hwndListView,SAFEARRAY *pArray);
+      long exportToExcel(char *pszWorkbookName,char *pszWorksheetName,char *pszTopCell,bool isAutoCall = false);
+      static DWORD WINAPI threadedExportToExcel(void *pvArg);//char *pszWorkbookName,char *pszWorksheetName,char *pszTopCell,bool isAutoCall = false);
+
+      bool cancelExcelExport{false};
+
+      long loadDataSet(HWND hwndListView);
  
       int resetLimits(const DataPoint&);
       int resizeBounds();
@@ -461,6 +532,7 @@ using namespace VBIDE;
       IOleInPlaceSite *pIOleInPlaceSite{NULL};
       IAdviseSink *pAdviseSink{NULL};
       IPropertyNotifySink *pIPropertyNotifySink{NULL};
+      IGSystemStatusBar* pIGSystemStatusBar{NULL};
       int freezeEvents{0};
 
       DWORD adviseSink_dwAspect{0L};
@@ -470,11 +542,9 @@ using namespace VBIDE;
       IUnknown *pIUnknownProperties{NULL};
       IGProperties *pIGProperties{NULL};
 
-      short isDesignMode{0};
-      COLORREF backgroundColor{RGB(0,0,0)};
-      COLORREF foregroundColor{RGB(0,0,0)};
-
       HWND hwndSpecDialog{NULL};
+
+      SIZEL containerSize{0L,0L};
 
       boundingBox *pBoundingBox{NULL};
  
@@ -488,10 +558,15 @@ using namespace VBIDE;
       char szDataSource[MAX_PATH];
       char szSpreadsheetName[MAX_PATH];
       char szNamedRange[MAX_PATH];
+      char szCellRange[MAX_PATH];
+      char szExportWorkbookName[MAX_PATH];
+      char szExportWorksheetName[64];
+      char szExportWorksheetTopLeftCell[32];
       double xMax,xMin,yMax,yMin,zMax,zMin;
       double currentColor[3]{0.0,0.0,0.0};
       char szEquations[1024];
-
+      bool isFunction{false};
+      bool isEmbedded{false};
       BYTE propertiesEnd{0};
 
       CLSID CLSID_excel;
@@ -500,27 +575,44 @@ using namespace VBIDE;
 
       IGProperty *pPropertyFloor{NULL};
       IGProperty *pPropertyCeiling{NULL};
-      IEvaluator *pIEvaluator{NULL};
+      IGProperty* pPropertyPlots{NULL};
+
+      IGProperty* pPropertyEmbeddedData{NULL};
 
       DataList *firstData{NULL};
       DataList *topData{NULL};
       DataList *gdiData{NULL};
       DataArity dataArity{DATA_ARITY_UNKNOWN};
 
+      IEvaluator *pIEvaluator{NULL};
+      IGSFunctioNater *pIFunction{NULL};
 
+      IPlot *pIPlot{NULL};
+
+      HWND hwndMainPropertiesPage{NULL};
       HWND hwndExcelSettings{NULL};
+      HWND hwndFunctionDataSettings{NULL};
 
       void (__stdcall *pWhenChangedCallback)(void *);
       void *pWhenChangedCallbackArg;
 
+      std::function<void()> *pOneShotOnFinishedLambda{NULL};
+
       std::list<IDataSet *> otherDomains;
       std::list<extents *> extentsStack;
 
+      static WNDPROC nativeEditHandler;
+      static WNDPROC nativeStaticHandler;
+
       static LRESULT EXPENTRY dataSetDialogHandler(HWND,UINT,WPARAM,LPARAM);
    
-      static LRESULT EXPENTRY dataSetInstructionsHandler(HWND,UINT,WPARAM,LPARAM);
+      //static LRESULT EXPENTRY dataSetInstructionsHandler(HWND,UINT,WPARAM,LPARAM);
       static LRESULT EXPENTRY dataSetPropertiesHandler(HWND,UINT,WPARAM,LPARAM);
       static LRESULT EXPENTRY dataSetExcelHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT EXPENTRY dataSetFunctionDataHandler(HWND,UINT,WPARAM,LPARAM);
+
+      static LRESULT EXPENTRY overrideEditHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT EXPENTRY statusAndErrorTextStaticHandler(HWND,UINT,WPARAM,LPARAM);
 
    };
 
@@ -528,3 +620,4 @@ using namespace VBIDE;
 
    extern HMODULE hModule;
    extern long oleMiscStatus;
+   extern ITypeInfo* pITypeInfo_IGSFunctioNaterEvents;

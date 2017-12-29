@@ -14,7 +14,7 @@
 
   public:
 
-     GraphicHost(HWND hwndTab);//,REFIID riidEventsInterface);
+     GraphicHost();
 
      ~GraphicHost();
 
@@ -24,17 +24,6 @@
 
      STDMETHOD_ (ULONG, AddRef)();
      STDMETHOD_ (ULONG, Release)();
-
-     int connectEvents();
-     int unConnectEvents();
-
-     void ReSize();
-
-     HWND HWNDSite() { return hwndSite; };
-
-     void Show();
-
-     void Hide();
 
   private:
 
@@ -70,8 +59,6 @@
 
         GraphicHost* pParent;
 
-        //friend class ContainedObject;
-
      } * pIOleInPlaceSite{NULL};
 
 //     IOleClientSite
@@ -96,27 +83,6 @@
         STDMETHOD(OnShowWindow)(BOOL);
         STDMETHOD(RequestNewObjectLayout)();
 
-        //class _IDispatch : public IDispatch {
-
-        //public:
-
-        //   _IDispatch(_IOleClientSite *pp) : pParent(pp) {};
-
-        //   STDMETHOD(QueryInterface)(REFIID riid,void **ppv);
-        //   STDMETHOD_ (ULONG, AddRef)();
-        //   STDMETHOD_ (ULONG, Release)();
-
-        //private:
-
-        //   STDMETHOD(GetTypeInfoCount)(UINT *pctinfo);
-        //   STDMETHOD(GetTypeInfo)(UINT itinfo, LCID lcid, ITypeInfo **pptinfo);
-        //   STDMETHOD(GetIDsOfNames)(REFIID riid, LPOLESTR *rgszNames, UINT cNames, LCID lcid, DISPID *rgdispid);
-        //   STDMETHOD(Invoke)(DISPID dispidMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pdispparams, VARIANT *pvarResult, EXCEPINFO *pexcepinfo, UINT *puArgErr);
-
-        //   _IOleClientSite *pParent;
-
-        // } iDispatch;
-
       protected:
 
         GraphicHost* pParent;
@@ -134,19 +100,14 @@
       IOleObject *pIOleObject_Graphic{NULL};
       IOleInPlaceObject *pIOleInPlaceObject_Graphic{NULL};
 
-      unsigned int refCount{0};
-
       HWND hwndSite{NULL};
 
-      //REFIID riidEventsInterface;
-
-      //IConnectionPoint* pIConnectionPoint;
+      unsigned int refCount{0};
 
       DWORD dwConnectionCookie{0};
 
       static LRESULT EXPENTRY graphicHandler(HWND,UINT,WPARAM,LPARAM);
 
-      static WNDPROC nativeStaticHandler;
 
    };
 

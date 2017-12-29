@@ -13,42 +13,6 @@
 
 #include "Function.h"
 
-   LRESULT EXPENTRY Function::functionPropertiesVisibilityHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   
-   if ( WM_INITDIALOG == msg ) {
-
-      PROPSHEETPAGE *pPage = reinterpret_cast<PROPSHEETPAGE *>(lParam);
-
-      Function *p = (Function *)pPage -> lParam;
-
-      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-      
-      p -> hwndPropertiesVisibility = hwnd;
-
-      p -> pIPropertyExpressionVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION);
-      p -> pIPropertyResultsVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS);
-      p -> pIPropertyVariablesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES);
-      p -> pIPropertyControlsVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS);
-      p -> pIPropertyStartVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START);
-      p -> pIPropertyPauseVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE);
-      p -> pIPropertyResumeVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME);
-      p -> pIPropertyStopVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP);
-      p -> pIPropertyPlotPropertiesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS);
-
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),p -> controlsVisible);
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),p -> controlsVisible);
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),p -> controlsVisible);
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),p -> controlsVisible);
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),p -> controlsVisible);
-
-      SetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE,GetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE) & ~WS_CAPTION);
-
-      return (LRESULT)FALSE;
-   }
-
-   return functionPropertiesHandler(hwnd,msg,wParam,lParam);
-   }
-
 
    LRESULT EXPENTRY Function::functionPropertiesHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -67,19 +31,18 @@
       p -> hwndProperties = hwnd;
 
       p -> pPropertyDialogVariableList = new VList(p -> evaluator);
-      //p -> pPropertyDialogVariableList -> SetHwnds(p -> hwndProperties,0);
 
       p -> pIPropertyExpression -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY);
       p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_EXPRESSION_LABEL);
       p -> pIPropertyResultsLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_RESULT_LABEL);
 
-      if ( p -> isDesignMode ) {
-         p -> pIPropertyPropertiesVisible -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
-         p -> pIPropertyPropertiesControlVisibility -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
-      } else {
-         ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES),SW_HIDE);
-         ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS),SW_HIDE);
-      }
+      //if ( p -> isDesignMode ) {
+      //   p -> pIPropertyPropertiesVisible -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
+      //   p -> pIPropertyPropertiesControlVisibility -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
+      //} else {
+      //   ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES),SW_HIDE);
+      //   ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS),SW_HIDE);
+      //}
 
       SetWindowLongPtr(p -> hwndProperties,GWL_STYLE,GetWindowLongPtr(p -> hwndProperties,GWL_STYLE) & ~WS_CAPTION);
 
@@ -163,13 +126,13 @@
          }
          break;
 
-      case IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES:
-         p -> pIPropertyPropertiesVisible -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES:
+      //   p -> pIPropertyPropertiesVisible -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS:
-         p -> pIPropertyPropertiesControlVisibility -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS:
+      //   p -> pIPropertyPropertiesControlVisibility -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
+      //   break;
 
       case IDDI_FUNCTION_PROPERTIES_VARIABLE_EDIT: {
 
@@ -197,50 +160,54 @@
          }
          break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION: {
-         p -> pIPropertyExpressionVisible -> getWindowItemChecked(hwnd,controlID);
-         }
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION: {
+      //   p -> pIPropertyExpressionVisible -> getWindowItemChecked(hwnd,controlID);
+      //   }
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS :
-         p -> pIPropertyResultsVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS :
+      //   p -> pIPropertyResultsVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES :
-         p -> pIPropertyVariablesVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES :
+      //   p -> pIPropertyVariablesVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS : {
-         short isVisible;
-         p -> pIPropertyControlsVisible -> getWindowItemChecked(hwnd,controlID);
-         p -> pIPropertyControlsVisible -> get_boolValue(&isVisible);
-         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),isVisible);
-         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),isVisible);
-         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),isVisible);
-         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),isVisible);
-         EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),isVisible);
-         }
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS : {
+      //   short isVisible;
+      //   p -> pIPropertyControlsVisible -> getWindowItemChecked(hwnd,controlID);
+      //   p -> pIPropertyControlsVisible -> get_boolValue(&isVisible);
+      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),isVisible);
+      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),isVisible);
+      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),isVisible);
+      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),isVisible);
+      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),isVisible);
+      //   }
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_START :
-         p -> pIPropertyStartVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_START :
+      //   p -> pIPropertyStartVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE :
-         p -> pIPropertyPauseVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE :
+      //   p -> pIPropertyPauseVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME :
-         p -> pIPropertyResumeVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME :
+      //   p -> pIPropertyResumeVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP :
-         p -> pIPropertyStopVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP :
+      //   p -> pIPropertyStopVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
-      case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS :
-         p -> pIPropertyPlotPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
-         break;
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS :
+      //   p -> pIPropertyPlotPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
+
+      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_DATASETPROPS :
+      //   p -> pIPropertyDataSetPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
+      //   break;
 
       case IDDI_FUNCTION_START:
          p -> Start();
@@ -261,3 +228,49 @@
  
    return 0;
    }
+
+//
+//NTC: 12-28-2017: I am taking control visibility settings out of the interface.
+// I don't really recall why there are even there, unless at design time, a developer wants to hide
+// the entire Function specifications dialog from the UI (perhaps to prevent the specification dialog(s)
+// from appearing at all, which would be easy to implement as one property.)
+//
+#if 0
+   LRESULT EXPENTRY Function::functionPropertiesVisibilityHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+   
+   if ( WM_INITDIALOG == msg ) {
+
+      PROPSHEETPAGE *pPage = reinterpret_cast<PROPSHEETPAGE *>(lParam);
+
+      Function *p = (Function *)pPage -> lParam;
+
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
+      
+      p -> hwndPropertiesVisibility = hwnd;
+
+      p -> pIPropertyExpressionVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION);
+      p -> pIPropertyResultsVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS);
+      p -> pIPropertyVariablesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES);
+      p -> pIPropertyControlsVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS);
+      p -> pIPropertyStartVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START);
+      p -> pIPropertyPauseVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE);
+      p -> pIPropertyResumeVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME);
+      p -> pIPropertyStopVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP);
+      p -> pIPropertyPlotPropertiesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS);
+      p -> pIPropertyDataSetPropertiesVisible -> setWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_DATASETPROPS);
+
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),p -> controlsVisible);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),p -> controlsVisible);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),p -> controlsVisible);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),p -> controlsVisible);
+      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),p -> controlsVisible);
+
+      SetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE,GetWindowLongPtr(p -> hwndPropertiesVisibility,GWL_STYLE) & ~WS_CAPTION);
+
+      return (LRESULT)FALSE;
+   }
+
+   return functionPropertiesHandler(hwnd,msg,wParam,lParam);
+   }
+#endif
+

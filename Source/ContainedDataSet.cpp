@@ -25,10 +25,6 @@
       *ppv = static_cast<IDataSetEvents *>(this);
    else
 
-   //if ( IID_IDispatch == riid ) 
-   //   *ppv = static_cast<IDispatch*>(this);
-   //else
-
       return ContainedObject::QueryInterface(riid,ppv);
 
    reinterpret_cast<IUnknown*>(*ppv) -> AddRef();
@@ -37,43 +33,18 @@
    unsigned long __stdcall ContainedDataSet::AddRef() { return ContainedObject::AddRef(); }
    unsigned long __stdcall ContainedDataSet::Release() { return ContainedObject::Release(); }
 
-#if 0
-   HRESULT ContainedFunction::UndefinedVariable(BSTR bstrName) {
+   HRESULT ContainedDataSet::Clear() {
    return S_OK;
    }
 
-
-   HRESULT ContainedFunction::UndefinedFunction(BSTR bstrName) {
+   HRESULT ContainedDataSet::Started(long expectedValues) {
+   //NTC: A data set would have already populated itself, so, unlike other objects, a PrepareForData call is not necessary here, but setting OkayToPlot is necessary
+   IPlot *pIPlot = pParent -> plotList.Get(plotID);
+   pIPlot -> put_OkToPlot(1);
    return S_OK;
    }
 
-   HRESULT ContainedFunction::Clear() {
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::Parsed() {
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::Started(long expectedValues) {
-   pParent -> PrepareForData(plotID);
-   return S_OK;
-   }
-
-
-   HRESULT ContainedFunction::Paused() {
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::Resumed() {
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::Stopped() {
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::TakeValues(long iterationNumber,long valueCount,SAFEARRAY** bstrNames,SAFEARRAY** arrayValues) {
+   HRESULT ContainedDataSet::TakeValues(long iterationNumber,long valueCount,SAFEARRAY** bstrNames,SAFEARRAY** arrayValues) {
    long index,lBound;
    long n = 0;
    static char szTest[128];
@@ -107,16 +78,8 @@
    return S_OK;
    }
 
-   HRESULT ContainedFunction::TakeResults(long iterationNumber,BSTR bstrResults) {
-   pParent -> TakeDataString(bstrResults,plotID);
-   return S_OK;
-   }
-
-   HRESULT ContainedFunction::Finished() {
+   HRESULT ContainedDataSet::Finished() {
    pParent -> FinishedWithData(plotID);
    pParent -> Draw(plotID);
    return S_OK;
    }
-
-#endif
-

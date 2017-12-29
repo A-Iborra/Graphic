@@ -556,6 +556,8 @@
    if ( pIPlot )
       pIPlot -> Release();
    pIPlot = (IPlot *)pvIPlot;
+   if ( pIPlot )
+      pIPlot -> AddRef();
    return S_OK;
    }
 
@@ -563,6 +565,22 @@
    if ( ! ppvIPlot )
       return E_POINTER;
    *ppvIPlot = (void *)pIPlot;
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::put_IDataSet(void *pvIDataSet) {
+   if ( pIDataSet )
+      pIDataSet -> Release();
+   pIDataSet = (IDataSet *)pvIDataSet;
+   if ( pIDataSet )
+      pIDataSet -> AddRef();
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::get_IDataSet(void **ppvIDataSet) {
+   if ( ! ppvIDataSet )
+      return E_POINTER;
+   *ppvIDataSet = (void *)pIDataSet;
    return S_OK;
    }
 
@@ -576,8 +594,20 @@
                                           IGProperty *parentPropertyCeiling,
                                           void (__stdcall *pCallback)(void *),void *pArg) {
 
-   return pIPlot -> Initialize(pIDataSet_Domain,pIOpenGLImplementation,evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
-                                 parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg);
+   pIPlot -> put_IDataSet(pIDataSet);
+
+   pIDataSet -> put_IPlot(pIPlot);
+
+   HRESULT rc = pIPlot -> Initialize(pIDataSet_Domain,pIOpenGLImplementation,evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
+                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg);
+
+   pIDataSet -> put_IsFunctionSource(TRUE);
+   BSTR bstrExpression;
+   get_Expression(&bstrExpression);
+   pIDataSet -> put_DataSource(bstrExpression);
+   SysFreeString(bstrExpression);
+
+   return rc;
    }
 
    STDMETHODIMP Function::put_OnChangeCallback(void (__stdcall *pCallback)(void *),void *pArg) {
@@ -590,5 +620,19 @@
    if ( ! pbAnyVisible )
       return E_POINTER;
    *pbAnyVisible = anyVisible() ? TRUE : FALSE;
+   return S_OK;
+   }
+
+   STDMETHODIMP Function::AdviseGSystemStatusBar(IGSystemStatusBar* p) {
+   if ( pIDataSet )
+      pIDataSet -> AdviseGSystemStatusBar(p);
+   if ( pIPlot )
+      pIPlot -> AdviseGSystemStatusBar(p);
+   if ( ! p ) {
+      if ( ! pIGSystemStatusBar ) 
+         return E_UNEXPECTED;
+      pIGSystemStatusBar = NULL;
+   }
+   pIGSystemStatusBar = p;
    return S_OK;
    }

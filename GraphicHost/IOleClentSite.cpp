@@ -25,10 +25,6 @@
       *ppv = static_cast<IUnknown*>(this);
    else
 
-   //if ( IID_IDispatch == riid ) 
-   //   *ppv = static_cast<IDispatch*>(&iDispatch);
-   //else
-
    if ( IID_IOleClientSite == riid ) 
       *ppv = static_cast<::IOleClientSite*>(this);
    else

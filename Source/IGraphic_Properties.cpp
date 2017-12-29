@@ -242,7 +242,7 @@
    short oldStatus;
    propertyShowStatusBar -> get_boolValue(&oldStatus);
    propertyShowStatusBar -> put_boolValue(usb);
-   if ( usb != oldStatus ) 
+   if ( abs(usb) != abs(oldStatus) ) 
       setDataSourcesVisibility(NULL,NULL);
    return S_OK;
    }

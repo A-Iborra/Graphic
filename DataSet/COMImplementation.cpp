@@ -24,25 +24,42 @@
 #include "Variable_i.h"
 #include "Evaluator_i.h"
 #include "Evaluator_i.c"
+#include "Plot_i.c"
 
-  HMODULE hModule;
-  char szModuleName[1024];
-  OLECHAR wstrModuleName[1024];
+   HMODULE hModule;
+   char szModuleName[1024];
+   OLECHAR wstrModuleName[1024];
+   ITypeInfo* pITypeInfo_IGSFunctioNaterEvents;
 
   STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppObject);
 
-  BOOL WINAPI DllMain(HANDLE module,ULONG flag,void *res) {
+   BOOL WINAPI DllMain(HANDLE module,ULONG flag,void *res) {
 
-  switch(flag) {
+   switch(flag) {
 
-  case DLL_PROCESS_ATTACH:
+   case DLL_PROCESS_ATTACH: {
 
-     hModule = reinterpret_cast<HMODULE>(module);
+      hModule = reinterpret_cast<HMODULE>(module);
 
-     GetModuleFileName(hModule,szModuleName,1024);
-     memset(wstrModuleName,0,sizeof(wstrModuleName));
-     MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  
-     break;
+      GetModuleFileName(hModule,szModuleName,1024);
+      memset(wstrModuleName,0,sizeof(wstrModuleName));
+      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  
+
+      char szLibrary[1026];
+      sprintf(szLibrary,"%s\\%ld",szModuleName,(long)FUNCTION_TYPELIB_ID);
+      BSTR bstrLibrary = SysAllocStringLen(NULL,256);
+      memset(bstrLibrary,0,strlen(szLibrary) + 1);
+      MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,strlen(szLibrary) + 1);
+
+      ITypeLib *ptLib;
+
+      LoadTypeLib(bstrLibrary,&ptLib);
+
+      HRESULT hr = ptLib -> GetTypeInfoOfGuid(DIID_IGSFunctioNaterEvents,&pITypeInfo_IGSFunctioNaterEvents);
+
+      }
+
+      break;
 
   case DLL_PROCESS_DETACH:
 //     OleUninitialize();

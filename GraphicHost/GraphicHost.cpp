@@ -2,10 +2,25 @@
 #include "GraphicHost.h"
 #include "utils.h"
 
-   WNDPROC GraphicHost::nativeStaticHandler = NULL;
+   GraphicHost::GraphicHost() {
 
-   GraphicHost::GraphicHost(HWND hs) :
-      hwndSite(hs) {
+   WNDCLASS gClass;
+
+   memset(&gClass,0,sizeof(WNDCLASS));
+   gClass.style = CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW;
+   gClass.lpfnWndProc = (WNDPROC)GraphicHost::graphicHandler;
+   gClass.cbClsExtra = 32;
+   gClass.cbWndExtra = 32;
+   gClass.hInstance = hInstance;
+   gClass.hIcon = NULL;
+   gClass.hCursor = NULL;
+   gClass.hbrBackground = 0;
+   gClass.lpszMenuName = NULL;
+   gClass.lpszClassName = L"Graphic-Client";
+  
+   RegisterClass(&gClass);
+
+   hwndSite = CreateWindowEx(WS_EX_CLIENTEDGE,L"Graphic-Client",L"",WS_CHILD | WS_VISIBLE,64,64,1364,768 + 64,hwndFrame,NULL,hInstance,NULL);
 
    pIOleClientSite = new _IOleClientSite(this);
 
@@ -19,17 +34,19 @@
 
    pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
 
-   nativeStaticHandler = (WNDPROC)SetWindowLongPtr(hwndSite,GWLP_WNDPROC,(ULONG_PTR)graphicHandler);
-
    pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
 
    RECT rect;
    GetWindowRect(hwndSite,&rect);
 
-   long cx = rect.right - rect.left;
-   long cy = rect.bottom - rect.left;
+   RECT rcAdjust{0,0,0,0};
 
-   SIZEL sizel{rect.right - rect.left,rect.bottom - rect.left};
+   AdjustWindowRectEx(&rcAdjust,GetWindowLongPtr(hwndSite,GWL_STYLE),FALSE,GetWindowLongPtr(hwndSite,GWL_EXSTYLE));
+
+   long cx = rect.right - rect.left - (rcAdjust.right - rcAdjust.left);
+   long cy = rect.bottom - rect.top - (rcAdjust.bottom - rcAdjust.top);
+
+   SIZEL sizel{cx,cy};
 
    pixelsToHiMetric(&sizel,&sizel);
 
@@ -64,6 +81,8 @@
 
    pIGraphic -> put_AllowUserSetFunctionVisibility(VARIANT_TRUE);
 
+   pIGraphic -> put_UseStatusBar(VARIANT_TRUE);
+
    pIOleObject_Graphic -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndSite,&rect);
 
    return;
@@ -80,11 +99,9 @@
    pIGProperty_Graphic -> clearStorageObjects();
 
    pIGProperties -> Save();
-
    pIGraphic -> Release();
-
    pIOleObject_Graphic -> Release();
-
+   pIGProperties -> Release();
    return;
    }
 

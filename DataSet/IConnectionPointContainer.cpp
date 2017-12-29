@@ -12,23 +12,9 @@
 #include "DataSet.h"
 #include "Graphic_resource.h"
 
-#ifdef MULTITHREADED_EVALUATOR
-#define UNMARSHALL_INTERFACE                                                                                             \
-      IGSFunctioNaterEvents* p;                                                                                          \
-      CreateStreamOnHGlobal(hglMarshalling,FALSE,&pIStream_Marshalling);                                                 \
-      if ( S_OK != CoUnmarshalInterface(pIStream_Marshalling,IID_IDispatch,reinterpret_cast<void**>(&p)) )               \
-         p = reinterpret_cast<IGSFunctioNaterEvents*>(connectData.pUnk);                                                 \
-      pIStream_Marshalling -> Release();                                                                                 \
-      pIStream_Marshalling = NULL;
-#else
-#define UNMARSHALL_INTERFACE                                                                                             \
-      IGSFunctioNaterEvents* p = reinterpret_cast<IGSFunctioNaterEvents*>(connectData.pUnk);                             
-#endif
-
-#define STANDARD_NOARGUMENT_EVENT(id)                                                                                    \
+#define STANDARD_NOARGUMENT_EVENT(fn)                                                                                    \
    IEnumConnections* pIEnum;                                                                                             \
    CONNECTDATA connectData;                                                                                              \
-   VARIANT varResult;                                                                                                    \
                                                                                                                          \
    pIConnectionPoint -> EnumConnections(&pIEnum);                                                                        \
                                                                                                                          \
@@ -38,12 +24,9 @@
                                                                                                                          \
       if ( pIEnum -> Next(1, &connectData, NULL) ) break;                                                                \
                                                                                                                          \
-      UNMARSHALL_INTERFACE                                                                                               \
+      IDataSetEvents * p = reinterpret_cast<IDataSetEvents *>(connectData.pUnk);                                         \
                                                                                                                          \
-      VariantClear(&varResult);                                                                                          \
-                                                                                                                         \
-      DISPPARAMS disp = { NULL, NULL, 0, 0 };                                                                            \
-      p -> Invoke(id, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &disp, &varResult, NULL, NULL);                    \
+      p -> fn();                                                                                                         \
                                                                                                                          \
    }                                                                                                                     \
                                                                                                                          \
@@ -73,146 +56,40 @@
 
    }
  
-#if 0
+   void DataSet::fire_Clear() {
+   STANDARD_NOARGUMENT_EVENT(Clear)
+   return;
+   }
  
-   long Function::fire_UndefinedVariable(BSTR bstrVariableName) {
-
-   HRESULT hr = S_OK;
+   void DataSet::fire_Started(long countValues) {
 
    IEnumConnections* pIEnum;
-   CONNECTDATA connectData;
-   VARIANT arg;
-   VARIANT varResult;
-   unsigned int errArg = 0;
 
    pIConnectionPoint -> EnumConnections(&pIEnum);
 
-   if ( ! pIEnum ) return hr;
-
+   if ( ! pIEnum ) 
+      return;
+ 
    while ( 1 ) {
 
+      CONNECTDATA connectData;
+   
       if ( pIEnum -> Next(1, &connectData, NULL) ) break;
 
-      UNMARSHALL_INTERFACE
-
-      memset(&arg,0,sizeof(VARIANT));
-      memset(&varResult,0,sizeof(VARIANT));
-
-      VariantClear(&arg);
-      VariantClear(&varResult);
-
-      arg.vt = VT_BSTR;
-      arg.bstrVal = SysAllocString(bstrVariableName);
-
-      DISPPARAMS disp = { &arg, NULL, 1, 0 };
-      hr = p -> Invoke(functionEventID_UndefinedVariable, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &disp, &varResult, NULL, &errArg);
-
-      SysFreeString(arg.bstrVal);
+      IDataSetEvents * p = reinterpret_cast<IDataSetEvents *>(connectData.pUnk);                                         \
+  
+      p -> Started(countValues);
 
    }
 
    pIEnum -> Release();
 
-   return hr;
-   }
-
-
-   void Function::fire_UndefinedFunction(BSTR functionName) {
-
-   IEnumConnections* pIEnum;
-   CONNECTDATA connectData;
-   VARIANT variant; 
-   VARIANT varResult;
-
-   pIConnectionPoint -> EnumConnections(&pIEnum);
-
-   if ( ! pIEnum ) return;
-
-   while ( 1 ) {
-
-      if ( pIEnum -> Next(1, &connectData, NULL) ) break;
-
-      UNMARSHALL_INTERFACE
-
-      VariantClear(&varResult); 
-      variant.vt = VT_BSTR;
-      variant.bstrVal = SysAllocString(functionName);
-      DISPPARAMS disp = { &variant, NULL, 1, 0 };
-      p -> Invoke(functionEventID_UndefinedFunction, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &disp, &varResult, NULL, NULL);
-
-      SysFreeString(variant.bstrVal);
-
-   }
-
-   pIEnum -> Release();
-
+   //if ( hwndSpecDialog )
+   //   EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),pIPlot ? TRUE : FALSE);
    return;
    }
 
-
-
-   void Function::fire_Clear() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Clear)
-   return;
-   }
-
-
-   void Function::fire_Parsed() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Parsed)
-   return;
-   }
-
-
-   void Function::fire_Started(long cntExpectedIterations) {
-
-   IEnumConnections* pIEnum;
-   CONNECTDATA connectData;
-   VARIANT variant; 
-   VARIANT varResult;
-
-   pIConnectionPoint -> EnumConnections(&pIEnum);
-
-   if ( ! pIEnum ) return;
-
-   while ( 1 ) {
-
-      if ( pIEnum -> Next(1, &connectData, NULL) ) break;
-
-      UNMARSHALL_INTERFACE
-
-      VariantClear(&varResult);
-      variant.vt = VT_I4;
-      variant.lVal = cntExpectedIterations;
-      DISPPARAMS disp = { &variant, NULL, 1, 0 };
-      p -> Invoke(functionEventID_Started, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &disp, &varResult, NULL, NULL);
-
-   }
-
-   pIEnum -> Release();
-
-   return;
-   }
- 
- 
-   void Function::fire_Paused() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Paused)
-   return;
-   }
- 
- 
-   void Function::fire_Resumed() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Resumed)
-   return;
-   }
- 
- 
-   void Function::fire_Stopped() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Stopped)
-   return;
-   }
- 
- 
-   void Function::fire_TakeValues(long iterationNumber,char* pszNames,char* pszValueString,char** pszCookedResults) {
+   void DataSet::fire_TakeValues(long iterationNumber,char* pszNames,char* pszValueString,char** pszCookedResults) {
 
    if ( pszCookedResults )
       *pszCookedResults = NULL;
@@ -257,10 +134,9 @@
 
    char *pszResults = new char[cntChars + 1];
    memset(pszResults,0,cntChars + 1);
-   //char *pName = NULL;
    p = pszResults;
    int k = 0;
-   for ( char *pName : szNames ) { //while ( pName = szNames.GetNext(pName) ) {
+   for ( char *pName : szNames ) {
       char *pValue = szValues[k];
       p += sprintf(p,"%s = %s ",pName,pValue);
       k++;
@@ -281,21 +157,19 @@
    SafeArrayAccessData(saValues,reinterpret_cast<void**>(&pd));
 
    double *pd2 = (double*)NULL;
-   for ( double *pd2 : theValues ) { //while ( pd2 = theValues.GetNext(pd2) ) {
+   for ( double *pd2 : theValues ) {
       *pd = *pd2;
       pd++;
    }
 
    SafeArrayUnaccessData(saValues);
 
-   //BSTR* pbstr = NULL;
    n = 0;
-   for ( BSTR *pbstr : theNames ) { //while ( pbstr = theNames.GetFirst() ) {
+   for ( BSTR *pbstr : theNames ) {
       n++;
       SafeArrayPutElement(saNames,&n,*pbstr);
       SysFreeString(*pbstr);
       delete pbstr;
-      //theNames.Remove(pbstr);
    }
 
    theNames.clear();
@@ -316,46 +190,9 @@
    
       if ( pIEnum -> Next(1, &connectData, NULL) ) break;
 
-      VARIANTARG pvars[4];
-   
-      VariantInit(&pvars[0]);
-      VariantInit(&pvars[1]);
-      VariantInit(&pvars[2]);
-   
-      pvars[0].vt = VT_BYREF | VT_ARRAY | VT_R8;
-      pvars[0].pparray = &saValues;
-   
-      pvars[1].vt = VT_BYREF | VT_ARRAY | VT_BSTR;
-      pvars[1].pparray = &saNames;
-   
-      pvars[2].vt = VT_I4;
-      pvars[2].lVal = theValues.size();
-   
-      pvars[3].vt = VT_I4;
-      pvars[3].lVal = iterationNumber;
-   
-      DISPPARAMS disp = { pvars, NULL, 4, 0 };
-   
-      VARIANT varResult = {VT_EMPTY};
-
-      VariantClear(&varResult);
-   
-      UNMARSHALL_INTERFACE
-   
-      p -> Invoke(functionEventID_TakeValues,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_METHOD,&disp,&varResult,NULL,NULL);
-   
-      disp.cArgs = 2;
-
-      VariantInit(&pvars[0]);
-      VariantInit(&pvars[1]);
-      pvars[0].vt = VT_BSTR;
-      pvars[0].bstrVal = SysAllocString(bstrResults);
-      pvars[1].vt = VT_I4;
-      pvars[1].lVal = iterationNumber;
-
-      VariantClear(&varResult);
-
-      p -> Invoke(functionEventID_TakeResults,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_METHOD,&disp,&varResult,NULL,NULL);
+      IDataSetEvents * p = reinterpret_cast<IDataSetEvents *>(connectData.pUnk);                                         \
+  
+      p -> TakeValues(iterationNumber,theValues.size(),&saNames,&saValues);
 
    }
 
@@ -369,12 +206,10 @@
 
    for ( char *s : szNames ) 
       delete [] s;
-
    szNames.clear();
 
    for ( char *s : szValues )
       delete [] s;
-
    szValues.clear();
 
    pIEnum -> Release();
@@ -388,60 +223,15 @@
    }
 
  
-   void Function::fire_Finished() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_Finished)
-   if ( hwndSpecDialog )
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),pIPlot ? TRUE : FALSE);
-   return;
+   void DataSet::fire_Finished() {
+
+   STANDARD_NOARGUMENT_EVENT(Finished)
+
+   if ( pOneShotOnFinishedLambda ) {
+      (*pOneShotOnFinishedLambda)();
+      delete pOneShotOnFinishedLambda;
+      pOneShotOnFinishedLambda = NULL;
    }
-
-
-   void Function::fire_DivideByZero() {
-   STANDARD_NOARGUMENT_EVENT(functionEventID_DivideByZero)
-   return;
-   }
-
-
-   void Function::fire_InvalidArgument(BSTR bstrFunctionName,double argumentValue) {
-
-   IEnumConnections* pIEnum;
-   CONNECTDATA connectData;
-   VARIANT varResult; 
-
-   pIConnectionPoint -> EnumConnections(&pIEnum);
-
-   if ( ! pIEnum ) return;
-
-   while ( 1 ) {
-
-      if ( pIEnum -> Next(1, &connectData, NULL) ) break;
-
-      UNMARSHALL_INTERFACE
-
-      VARIANTARG pvars[2];
-
-      memset(pvars,0,2 * sizeof(VARIANTARG));
- 
-//      VariantClear(&pvars[0]);
-//      VariantClear(&pvars[1]);
-
-      pvars[0].vt = VT_R8;
-      pvars[0].dblVal = argumentValue;
-
-      pvars[1].vt = VT_BSTR;
-      pvars[1].bstrVal = SysAllocString(bstrFunctionName);
-
-      VariantClear(&varResult);
-
-      DISPPARAMS disp = { pvars, NULL, 2, 0 }; 
-
-      p -> Invoke(functionEventID_InvalidArgument, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &disp, &varResult, NULL, NULL); 
-
-      SysFreeString(pvars[1].bstrVal);
-   }
-
-   pIEnum -> Release();
 
    return;
    }
-#endif

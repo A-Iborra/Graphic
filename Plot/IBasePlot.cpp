@@ -42,13 +42,14 @@
    pPropertyFloor = propFloor;
    pPropertyCeiling = propCeiling;
 
-   CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
+   if ( ! pIDataSet ) {
+      CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
+      externalDataSet = FALSE;
+   }
 
    pIDataSet -> put_floor(pPropertyFloor);
 
    pIDataSet -> put_ceiling(pPropertyCeiling);
-
-   externalDataSet = FALSE;
  
 #if 0
    if ( pIDataSetDomain )
@@ -67,16 +68,17 @@
    }
  
  
-   HRESULT BasePlot::put_DataSet(IDataSet *newDataSet) {
+   HRESULT BasePlot::put_IDataSet(IDataSet *newDataSet) {
    if ( ! externalDataSet ) 
-      pIDataSet -> Release();
+      if ( pIDataSet )
+         pIDataSet -> Release();
    pIDataSet = newDataSet;
    externalDataSet = TRUE;
-   pIDataSet -> put_floor(pPropertyFloor);
-   pIDataSet -> put_ceiling(pPropertyCeiling);
+   if ( pIDataSet ) 
+      pIDataSet -> AddRef();
    return S_OK;
    }
-   HRESULT BasePlot::get_DataSet(IDataSet **getDataSet) {
+   HRESULT BasePlot::get_IDataSet(IDataSet **getDataSet) {
    *getDataSet = pIDataSet;
    return S_OK;
    }
@@ -329,8 +331,6 @@
    if ( propertyLineWeight )
       propertyLineWeight -> copyTo(pPropertyLastDrawLineWeight);
 
-//CHECKME Causing a screen refresh   pIOpenGLImplementation -> ResetDepth();
-
    pIGraphicSegment -> Open();
 
    DataList *pItem = NULL;
@@ -364,9 +364,7 @@
 
    while ( t = textList.GetNext(t) ) 
       t -> Draw();
- 
-//   pIOpenGLImplementation -> Flush();
- 
+
    return S_OK;
    }
  

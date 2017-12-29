@@ -20,9 +20,9 @@ import "ocidl.idl";
    importlib("GSystem.tlb");
    importlib("GraphicControl.tlb");
    importlib("OpenGLImplementation.tlb");
-   importlib("DataSet.tlb");
    importlib("Variable.tlb");
    importlib("Evaluator.tlb");
+   importlib("DataSet.tlb");
 
    enum functionEventID {
       functionEventID_UndefinedVariable = 1,
@@ -264,7 +264,10 @@ import "ocidl.idl";
       [propput,id(400)] HRESULT IPlot([in] void *pIPlot);
       [propget,id(400)] HRESULT IPlot([out,retval] void **ppIPlot);
 
-      [id(401),helpstring("IF you want the Function to create it's own plot, rather than have an existing one created by it's client, call Initialize to pass the plot parameters to the IPlot the Function will create.")]
+      [propput,id(401)] HRESULT IDataSet([in] void *pIDataSet);
+      [propget,id(401)] HRESULT IDataSet([out,retval] void **ppIDataSet);
+
+      [id(402),helpstring("IF you want the Function to create it's own plot, rather than have an existing one created by it's client, call Initialize to pass the plot parameters to the IPlot the Function will create.")]
 
       HRESULT Initialize(IDataSet *pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
                            IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
@@ -277,25 +280,18 @@ import "ocidl.idl";
                            [in] void (*pCallback)(void *),[in] void *pArg);
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
-      [propput,id(402)] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
+      [propput,id(403)] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
 
       [helpstring("Returns whether any of the Controls for the function are visible, so that if not, the client does not have to display the function settings in it's UI")]
-      [propget,id(403)] HRESULT AnyControlVisible([out,retval] VARIANT_BOOL *pAnyVisible);
+      [propget,id(404)] HRESULT AnyControlVisible([out,retval] VARIANT_BOOL *pAnyVisible);
+
+      [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
+      HRESULT AdviseGSystemStatusBar(IGSystemStatusBar *);
 
    };
 
-
-#ifdef FUNCTION_SAMPLE
-
-   [uuid(ACF6D075-7A0C-4d5a-BF66-2B9C7CA77253),helpstring("Function Sample Class Function"),control]
-   coclass GSystemFunctioNaterSample {
-
-#else
-
    [uuid(8CAEFD86-55E6-11d3-8365-006008BD5BC3),helpstring("Function Class Function"),control]
    coclass GSystemFunctioNater {
-
-#endif
 
       [default] interface IGSFunctioNater;
       [default,source] dispinterface IGSFunctioNaterEvents;

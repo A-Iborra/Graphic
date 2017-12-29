@@ -4,21 +4,27 @@
 
 */
 
-#include <windows.h>
-#include <stdio.h>
-
-#include "general.h"
-
 #include "Plot.h"
-
 
    HRESULT Plot::SavePrep() {
 
+   if ( ! pIDataSet )
+      return S_OK;
+
    DataPoint dp[2];
+
    pIDataSet -> GetDomain(&dp[0],&dp[1]);
 
    propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<byte *>(dp));
 
+   if ( propertyDataSet ) {
+
+      propertyDataSet -> clearStorageObjects();
+      propertyDataSet -> addStorageObject(pIDataSet);
+      propertyDataSet -> writeStorageObjects();
+      propertyDataSet -> clearStorageObjects();
+
+   }
    return S_OK;
    }
 
@@ -87,15 +93,19 @@
  
  
    HRESULT Plot::Loaded() {
-   long v;
-   DataPoint dp[2];
-   BYTE *pdp = (BYTE *)&dp[0];
 
-   propertyDataExtents -> get_binaryValue(sizeof(dp),reinterpret_cast<byte **>(&pdp));
+   if ( pIDataSet ) {
+      DataPoint dp[2];
+      BYTE *pdp = (BYTE *)&dp[0];
 
-   pIDataSet -> SetDomain(&dp[0],&dp[1]);
+      propertyDataExtents -> get_binaryValue(sizeof(dp),reinterpret_cast<byte **>(&pdp));
+
+      pIDataSet -> SetDomain(&dp[0],&dp[1]);
+   }
 
    haveAnyData = TRUE;
+
+   long v;
 
    propertyPlotView -> get_longValue(&v);
    put_PlotView(static_cast<PlotViews>(v));
@@ -104,6 +114,21 @@
    put_PlotType(static_cast<PlotTypes>(v));
  
    put_ColorProperty(propertyLineColor);
+
+   if ( propertyDataSet ) {
+
+      long cntObjects;
+
+      propertyDataSet -> get_storedObjectCount(&cntObjects);
+
+      if ( cntObjects ) {
+         propertyDataSet -> clearStorageObjects();
+         propertyDataSet -> addStorageObject(pIDataSet);
+         propertyDataSet-> readStorageObjects();
+         propertyDataSet -> clearStorageObjects();
+      }
+
+   }
 
    return S_OK;
    }

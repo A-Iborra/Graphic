@@ -57,7 +57,7 @@
   
    RegisterClass(&gClass);
  
-   hwndFrame = CreateWindowEx(0L,"G-graphic-Frame","Graphic",WS_CHILD | WS_BORDER,0,0,0,0,hwndOwner,NULL,hModule,(void *)this);
+   hwndFrame = CreateWindowEx(0*WS_EX_CONTROLPARENT,"G-graphic-Frame","Graphic",WS_CHILD,0,0,0,0,hwndOwner,NULL,hModule,(void *)this);
   
    gClass.lpfnWndProc = graphicHandler;
    gClass.lpszClassName = "G-graphic";
@@ -71,7 +71,8 @@
  
    RegisterClass(&gClass);
 
-   hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
+   hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,100,100,hwndFrame,NULL,hModule,(void *)this);
+
    if ( defaultStatusBarHandler ) 
       SetWindowLongPtr(hwndStatusBar,GWLP_WNDPROC,(ULONG_PTR)statusBarHandler);
    else

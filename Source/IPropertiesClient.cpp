@@ -159,9 +159,9 @@
  
    // Colors and Lights
 
-   fvAmbient[0] = 0.4f; fvAmbient[1] = 0.4f; fvAmbient[2] = 0.4f; fvAmbient[3] = 1.0f;
+   fvAmbient[0] = 0.1f; fvAmbient[1] = 0.1f; fvAmbient[2] = 0.1f; fvAmbient[3] = 1.0f;
 
-   fvDiffuse[0] = 0.7f; fvDiffuse[1] = 0.7f; fvDiffuse[2] = 0.7f; fvDiffuse[3] = 1.0f;
+   fvDiffuse[0] = 0.1f; fvDiffuse[1] = 0.1f; fvDiffuse[2] = 0.1f; fvDiffuse[3] = 1.0f;
 
    fvSpecular[0] = 1.0f; fvSpecular[1] = 1.0f; fvSpecular[2] = 1.0f; fvSpecular[3] = 1.0f;
 
@@ -175,8 +175,6 @@
    }
 
    pParent -> ppPropertyLightOn[0] -> put_boolValue(true);
-
-   pParent -> ppPropertyLightOn[1] -> put_boolValue(true);
 
    fvAmbient[0] = 0.2f; fvAmbient[1] = 0.2f; fvAmbient[2] = 0.2f; fvAmbient[3] = 1.0f;
    fvDiffuse[0] = 0.35f; fvDiffuse[1] = 0.35f; fvDiffuse[2] = 0.35f; fvDiffuse[3] = 1.0f;
@@ -284,18 +282,13 @@
       while ( p = pParent -> functionList.GetNext(p) )
          pParent -> connectFunction(p);
 
+      pParent -> setDataSourcesVisibility(NULL,NULL);
+
       ContainedFunction *pcf = (ContainedFunction *)NULL;
       while ( pcf = pParent -> containedFunctionList.GetNext(pcf) )
          ShowWindow(pcf -> HWNDSite(),SW_HIDE);
 
       SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
-
-      //pcf = pParent -> containedFunctionList.Get((long)pParent -> functionList.GetFirst());
-      //if ( pcf ) {
-      //   pcf -> pFunction() -> get_AnyControlVisible(&anyFunctionControlVisible);
-      //   if ( anyFunctionControlVisible )
-      //      ShowWindow(pcf -> HWNDSite(),SW_SHOW);
-      //}
 
    }
 
@@ -326,15 +319,13 @@
       while ( p = pParent -> dataSetList.GetNext(p) )
          pParent -> connectDataSet(p);
 
+      pParent -> setDataSourcesVisibility(NULL,NULL);
+
       ContainedDataSet *pCds = (ContainedDataSet *)NULL;
       while ( pCds = pParent -> containedDataSetList.GetNext(pCds) )
          ShowWindow(pCds -> HWNDSite(),SW_HIDE);
 
       SendMessage(pParent -> hwndDataSourcesDataSets,TCM_SETCURSEL,(WPARAM)0,0L);
-
-      //pCds = pParent -> containedDataSetList.Get((long)pParent -> dataSetList.GetFirst());
-      //if ( pCds )
-      //   ShowWindow(pCds -> HWNDSite(),SW_SHOW);
 
    }
 

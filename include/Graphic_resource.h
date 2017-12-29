@@ -109,20 +109,53 @@
    #define IDSTRING_DATASET_INSTRUCTIONS2                                  2202
    #define IDSTRING_DATASET_INSTRUCTIONS3                                  2203
    #define IDSTRING_DATASET_INSTRUCTIONS4                                  2204
+   #define IDSTRING_DATASET_DATASOURCE_EMBED_INSTRUCTIONS                  2223
 
 #define IDDIALOG_DATASET_PROPERTIES                                        2210
    #define IDDI_DATASET_NAME                                               2211
    #define IDDI_DATASET_DATASOURCE                                         2212
    #define IDDI_DATASET_GETDATASOURCE                                      2213
+   #define IDDI_DATASET_OPEN_WORKBOOK                                      2214
+   #define IDDI_DATASET_DATA_BOX                                           2215
+   #define IDDI_DATASET_DATA_BOX_ROWCOUNT                                  2216
+   #define IDDI_DATASET_DATA_BOX_POPULATE                                  2217
+   #define IDDI_DATASET_DATA_BOX_ARITY                                     2218
+   #define IDDI_DATASET_DATA_BOX_DIMENSION1_RANGE                          2219
+   #define IDDI_DATASET_DATA_BOX_DIMENSION2_RANGE                          2220
+   #define IDDI_DATASET_DATA_BOX_DIMENSION3_RANGE                          2221
 
-#define IDDIALOG_DATASET_EXCEL                                             2220
-   #define IDDI_DATASET_EXCEL_SPREADSHEET_LIST                             2221
-   #define IDDI_DATASET_EXCEL_SPREADSHEET                                  2222
-   #define IDDI_DATASET_EXCEL_OPEN_WORKBOOK                                2223
-   #define IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST                          2224
-   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL                            2225
-   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LIST                             2226
-   #define IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS                          2227
+   #define IDDI_DATASET_EXPORT_BOX                                         2229
+   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST                             2230
+   #define IDDI_DATASET_GETEXPORT_DEST                                     2231
+   #define IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST                       2232
+   #define IDDI_DATASET_DATASOURCE_EXPORT_CELL                             2233
+   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST_OPEN                        2234
+   #define IDDI_DATASET_DATASOURCE_EXPORT                                  2235
+   #define IDDI_DATASET_DATASOURCE_EXPORT_CANCEL                           2236
+   #define IDDI_DATASET_DATASOURCE_EXPORT_STATUS                           2237
+   #define IDDI_DATASET_DATASOURCE_EMBED_INSTRUCTIONS                      2238
+   #define IDDI_DATASET_DATASOURCE_IS_EMBEDDED                             2249
+   #define IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE                         2240
+   #define IDDI_DATASET_DATASOURCE_ERROR                                   2241
+
+#define IDDIALOG_DATASET_EXCEL                                             2230
+   #define IDDI_DATASET_EXCEL_SPREADSHEET_LIST                             2231
+   #define IDDI_DATASET_EXCEL_SPREADSHEET                                  2232
+   #define IDDI_DATASET_EXCEL_OPEN_WORKBOOK                                2233
+   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LIST_LABEL                       2234
+   #define IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST                          2235
+   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL                            2236
+   #define IDDI_DATASET_EXCEL_NAMEDRANGES_LIST                             2237
+   #define IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS                          2238
+   #define IDDI_DATASET_EXCEL_RANGE_ENTRY                                  2239
+   #define IDDI_DATASET_EXCEL_RANGE_INPUT_BOX                              2240
+   #define IDDI_DATASET_EXCEL_RANGE_LOAD                                   2241
+   #define IDDI_DATASET_EXCEL_SELECTSHEET_LABEL1                           2242
+   #define IDDI_DATASET_EXCEL_LOAD_ERROR                                   2243
+
+#define IDDIALOG_DATASET_FUNCTION                                          2250
+   #define IDDI_DATASET_FUNCTION_RUN                                       2251
+   #define IDDI_DATASET_FUNCTION_DATA                                      2252
 
 #define IDDIALOG_DATAOBJECT_FILELIST                                       2250
 #define IDDI_DATAOBJECT_FILELIST                                           2251
@@ -171,7 +204,8 @@
    #define IDDI_FUNCTION_EXPRESSION_LABEL                                  4111
    #define IDDI_FUNCTION_RESULT_LABEL                                      4112
    #define IDDI_FUNCTION_LISTVIEW                                          4113
-   #define IDDI_FUNCTION_PLOT_PROPERTIES                                   4114
+   //#define IDDI_FUNCTION_PLOT_PROPERTIES                                   4114
+   //#define IDDI_FUNCTION_DATASET_PROPERTIES                                4115
 
    #define IDDI_FUNCTION_SAVEPREP                                          4121
    #define IDDI_FUNCTION_SAVE                                              4122
@@ -207,20 +241,26 @@
    #define IDDI_FUNCTION_PROPERTIES_VARIABLES                              5106
    #define IDDI_FUNCTION_PROPERTIES_VARIABLE_EDIT                          5107
    #define IDDI_FUNCTION_PROPERTIES_ALLVARIABLES_EDIT                      5108
-   #define IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES                        5109
-   #define IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS                       5110
-
-#define IDDIALOG_FUNCTION_PROPERTIES_VISIBILITY                            5120
-
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION                  5121
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS                     5122
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES                   5123
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS                    5130
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_START                       5131
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE                       5132
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME                      5133
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP                        5134
-   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS                   5135
+   //#define IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES                        5109
+   //#define IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS                       5110
+//
+//NTC: 12-28-2017: I am taking control visibility settings out of the interface.
+// I don't really recall why there are even there, unless at design time, a developer wants to hide
+// the entire Function specifications dialog from the UI (perhaps to prevent the specification dialog(s)
+// from appearing at all, which would be easy to implement as one property.)
+//
+//#define IDDIALOG_FUNCTION_PROPERTIES_VISIBILITY                            5120
+//
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION                  5121
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS                     5122
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES                   5123
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS                    5130
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_START                       5131
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE                       5132
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME                      5133
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP                        5134
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS                   5135
+//   #define IDDI_FUNCTION_PROPERTIES_VISIBILITY_DATASETPROPS                5136
 
 #define IDDIALOG_VARIABLE                                                  6100
 #define IDDI_VARIABLE_VALUE_VARIABLE                                       6105
@@ -550,8 +590,8 @@
    #define IDDI_DATASET_SPEC_PROPERTIES                                    9410
    #define IDDI_DATASET_SPEC_NAME                                          9411
    #define IDDI_DATASET_SPEC_DATASOURCE                                    9412
-   #define IDDI_DATASET_SPEC_GETDATASOURCE                                 9413
-   #define IDDI_DATASET_SPEC_PLOT_PROPERTIES                               9430
+   //#define IDDI_DATASET_SPEC_PLOT_PROPERTIES                               9430
+   #define IDDI_DATASET_SPEC_PLOT                                          9431
 
 #define IDDIALOG_VIEWSET                                                  10000
 #define IDDI_VIEWSET_XAXIS                                                10004

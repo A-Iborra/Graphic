@@ -62,14 +62,8 @@
    IUnknown* pIUnknownThis;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
 
-#ifdef EMBEDDED_PROPERTIES
-   IClassFactory* pIClassFactory;
-   GSystemsPropertiesDllGetClassObject(gsVariables_hModule,CLSID_InnoVisioNateProperties,IID_IClassFactory,reinterpret_cast<void**>(&pIClassFactory));
-   pIClassFactory -> CreateInstance(pIUnknownThis,IID_IUnknown,reinterpret_cast<void**>(&pIUnknownProperties));
-   pIClassFactory -> Release();
-#else
    HRESULT rc = CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
-#endif
+
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&iProperties));
    pIUnknownThis -> Release();
 
@@ -133,7 +127,8 @@
  
    int V::initWindows() {
  
-   if ( ! hwndOwner ) return FALSE;
+   if ( ! hwndOwner ) 
+      return FALSE;
 
    hwndDialog = CreateDialogParam(gsVariables_hModule,MAKEINTRESOURCE(IDDIALOG_VARIABLE),hwndOwner,(DLGPROC)handler,(LPARAM)this);
 
@@ -155,17 +150,14 @@
 
       SendMessage(hwndTabControl,TCM_INSERTITEM,(WPARAM)tabIndex,(LPARAM)&tie);
 
-      //SendMessage(hwndTabControl,TCM_SETCURSEL,(WPARAM)tabIndex,0L);
- 
       SendMessage(hwndTabControl,TCM_GETITEMRECT,(WPARAM)tabIndex,(LPARAM)&rect);
 
       SetWindowPos(hwndDialog,HWND_TOP,(long)(0.5*(double)rect.bottom),(long)(1.5*(double)rect.bottom),0,0,SWP_NOSIZE | SWP_NOZORDER);
  
-   }
-   else {
+   } else {
 
-      //ShowWindow(hwndDialog,SW_HIDE);
-      //SetWindowPos(hwndDialog,HWND_TOP,-1000,-1000,0,0,SWP_NOSIZE);
+      ShowWindow(hwndDialog,SW_HIDE);
+      SetWindowPos(hwndDialog,HWND_TOP,-1000,-1000,0,0,SWP_NOSIZE);
 
    }
 
@@ -280,7 +272,7 @@
 
       }
       return LRESULT(TRUE);
- 
+
    case WM_COMMAND: {
 
       if ( ! p ) break; 

@@ -186,11 +186,12 @@
 
       NMHDR *pn = (NMHDR *)lParam;
 
-      int k = SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
-      if ( -1 == k )
+      if ( ! ( TCN_SELCHANGE == pn -> code ) && ! ( TCN_SELCHANGING == pn -> code ) )
          break;
 
-      if ( ! ( TCN_SELCHANGE == pn -> code ) && ! ( TCN_SELCHANGING == pn -> code ) )
+      int k = SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
+
+      if ( -1 == k )
          break;
 
       TC_ITEM tie;
@@ -239,10 +240,10 @@
 
       }
 
-      RECT rcDialog;
-      GetWindowRect(p -> hwndDataSourcesDialog,&rcDialog);
+      //RECT rcDialog;
+      //GetWindowRect(p -> hwndDataSourcesDialog,&rcDialog);
 
-      SendMessage(p -> hwndDataSourcesDialog,WM_SIZE,0L,MAKELPARAM(rcDialog.right - rcDialog.left,rcDialog.bottom - rcDialog.top));
+      //SendMessage(p -> hwndDataSourcesDialog,WM_SIZE,0L,MAKELPARAM(rcDialog.right - rcDialog.left,rcDialog.bottom - rcDialog.top));
 
       }
       break;

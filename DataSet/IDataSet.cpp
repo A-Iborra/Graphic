@@ -20,6 +20,7 @@
 
 
    HRESULT DataSet::ReSet() {
+
    DataList *t;
 
    while ( topData != (DataList *)NULL ) {
@@ -78,6 +79,85 @@
    return S_OK;
    }
 
+
+   HRESULT DataSet::put_IsFunctionSource(VARIANT_BOOL isf) {
+   isFunction = isf == VARIANT_TRUE ? true : false;
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::get_IsFunctionSource(VARIANT_BOOL *pResponse) {
+   if ( ! pResponse )
+      return E_POINTER;
+   *pResponse = isFunction ? VARIANT_TRUE : VARIANT_FALSE;
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::put_IFunction(void *pIFun) {
+   pIFunction = (IGSFunctioNater *)pIFun;
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::get_IFunction(void **ppIFun) {
+   if ( ! ppIFun )
+      return E_POINTER;
+   *ppIFun = (void *)pIFunction;
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::put_IPlot(void *pIP) {
+   if ( pIPlot )
+      pIPlot -> Release();
+   pIPlot = (IPlot *)pIP;
+   if ( pIPlot )
+      pIPlot -> AddRef();
+   if ( pPropertyPlots ) {
+      pIGProperties -> Remove(L"plots");
+      pPropertyPlots -> Release();
+      pPropertyPlots = NULL;
+   }
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::get_IPlot(void **ppIP) {
+   if ( ! ppIP )
+      return E_POINTER;
+   *ppIP = (void *)pIPlot;
+   return S_OK;
+   }
+
+   STDMETHODIMP DataSet::Initialize(void* pvIDataSet_Domain,void *pvIOpenGLImplementation,
+                                          IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                                          IGProperty *parentPropertyPlotView,
+                                          IGProperty *parentPropertyDefault2DPlotSubType,
+                                          IGProperty *parentPropertyDefault3DPlotSubType,
+                                          IGProperty *parentPropertyBackgroundColor,
+                                          IGProperty *parentPropertyFloor,
+                                          IGProperty *parentPropertyCeiling,
+                                          void (__stdcall *pCallback)(void *),void *pArg) {
+
+   IDataSet *pds = NULL;
+
+   QueryInterface(IID_IDataSet,reinterpret_cast<void **>(&pds));
+   pIPlot -> put_IDataSet(pds);
+   pds -> Release();
+
+   HRESULT rc = pIPlot -> Initialize((IDataSet *)pvIDataSet_Domain,(IOpenGLImplementation *)pvIOpenGLImplementation,
+                                       NULL/*evaluator*/,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
+                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg);
+
+   return rc;
+   }
+
+   STDMETHODIMP DataSet::put_OnChangeCallback(void (__stdcall *pCallback)(void *),void *pArg) {
+   pWhenChangedCallback = pCallback;
+   pWhenChangedCallbackArg = pArg;
+   return S_OK;
+   }
 
 
    HRESULT DataSet::get_maxX(double *getVal) {
@@ -165,8 +245,7 @@
 
    HRESULT DataSet::put_minX(double v) {
    xMin = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) )
+   for ( IDataSet *p : otherDomains )
       p -> put_minX(v);
    return S_OK;
    }
@@ -175,8 +254,7 @@
    HRESULT DataSet::get_minY(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMin,returnedMin = yMin;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_minY(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }
@@ -186,8 +264,7 @@
 
    HRESULT DataSet::put_minY(double v) {
    yMin = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) )
+   for ( IDataSet *p : otherDomains )
       p -> put_minY(v);
    return S_OK;
    }
@@ -196,8 +273,7 @@
    HRESULT DataSet::get_minZ(double *getVal) {
    if ( ! getVal ) return E_POINTER;
    double otherMin,returnedMin = zMin;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) { //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains ) {
       p -> get_minZ(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }
@@ -218,8 +294,7 @@
 
    HRESULT DataSet::put_minZ(double v) {
    zMin = v;
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) ) {
+   for ( IDataSet *p : otherDomains )
       p -> put_minZ(v);
    return S_OK;
    }
@@ -502,12 +577,11 @@
    if ( newPoint -> y != -DBL_MAX ) yMax = max(newPoint -> y,yMax);
    if ( newPoint -> z != -DBL_MAX ) zMax = max(newPoint -> z,zMax);
 
-   //IDataSet* p = (IDataSet *)NULL;
-   for ( IDataSet *p : otherDomains ) //while ( p = otherDomains.GetNext(p) ) 
+   for ( IDataSet *p : otherDomains )
       p -> ResetLimits(newPoint);
 
 #if 1
-   char szNumber[6][32];
+   char szNumber[6][64];
 
    if ( -DBL_MAX == xMin || DBL_MAX == xMin )
       sprintf(szNumber[0],"INF");
@@ -1192,10 +1266,68 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains ) 
       pDataSet -> GetDomainGDI(pMinPoint,pMaxPoint);
 
    return S_OK;
    }
 
+
+
+   STDMETHODIMP DataSet::Start() {
+
+   DataList *pDataList = NULL;
+   DataPoint dp;
+
+   get(pDataList,&dp,&pDataList);
+
+   if ( ! pDataList ) {
+      if ( szDataSource[0] && szSpreadsheetName[0] && szCellRange[0]) 
+         loadExcelCellRange(NULL,NULL,szDataSource,szSpreadsheetName,szCellRange);
+      else if ( szDataSource[0] && szNamedRange[0] )
+         loadExcelNamedRange(NULL,szDataSource,szNamedRange);
+      else
+         return E_UNEXPECTED;
+      get(pDataList,&dp,&pDataList);
+      if ( ! pDataList )
+         return E_UNEXPECTED;
+   }
+
+   fire_Clear();
+
+   long countPoints = 0;
+
+   get_countPoints(&countPoints);
+#if 0
+   while ( 1 ) {
+
+      if ( ! pDataList )
+         break;
+
+      countPoints++;
+
+      get(pDataList,&dp,&pDataList);
+
+   } 
+#endif
+
+   fire_Started(countPoints);
+
+   pDataList = NULL;
+
+   fire_Finished();
+
+   return S_OK;
+   }
+
+   STDMETHODIMP DataSet::AdviseGSystemStatusBar(IGSystemStatusBar* p) {
+   if ( pIPlot )
+      pIPlot -> AdviseGSystemStatusBar(p);
+   if ( ! p ) {
+      if ( ! pIGSystemStatusBar ) 
+         return E_UNEXPECTED;
+      pIGSystemStatusBar = NULL;
+   }
+   pIGSystemStatusBar = p;
+   return S_OK;
+   }

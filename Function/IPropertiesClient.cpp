@@ -3,16 +3,9 @@
                        Copyright (c) 1999,2000,2001,2002 Nathan T. Clark
 
 */
-#include <windows.h>
-#include <CommCtrl.h>
-
-#include "general.h"
-#include "Graphic_resource.h"
-#include "gmessage.h"
-
-#include "vlist.h"
 
 #include "Function.h"
+#include "Graphic_resource.h"
 
 #include "List.cpp"
 
@@ -44,6 +37,14 @@
       pIPropertyPlots -> addStorageObject(pIPlot);
       pIPropertyPlots -> writeStorageObjects();
       pIPropertyPlots -> clearStorageObjects();
+   }
+
+   pIPropertyDataSets -> clearStorageObjects();
+
+   if ( pIDataSet ) {
+      pIPropertyDataSets -> addStorageObject(pIDataSet);
+      pIPropertyDataSets -> writeStorageObjects();
+      pIPropertyDataSets -> clearStorageObjects();
    }
 
    return S_OK;
@@ -87,9 +88,12 @@
    resumeVisible = TRUE;
    stopVisible = TRUE;
    plotPropertiesVisible = TRUE;
+   dataSetPropertiesVisible = TRUE;
 
+#if 0
    strcpy(expressionLabel,"Specify some expression here");
    strcpy(resultsLabel,"results:");
+#endif
 
    return Loaded();
    }
@@ -139,6 +143,9 @@
 
    if ( cntObjects ) {
 
+      if ( expression[0] )
+         parseExpression();
+
       pIPropertyVariables -> clearStorageObjects();
 
       v = NULL;
@@ -160,6 +167,15 @@
       pIPropertyPlots -> clearStorageObjects();
    }
 
+   pIPropertyDataSets -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+      pIPropertyDataSets -> clearStorageObjects();
+      pIPropertyDataSets -> addStorageObject(pIDataSet);
+      pIPropertyDataSets-> readStorageObjects();
+      pIPropertyDataSets -> clearStorageObjects();
+   }
+
    return S_OK;
    }
  
@@ -175,11 +191,7 @@
 
 
    HRESULT Function::GetClassID(BYTE *pCLSID) {
-#ifdef FUNCTION_SAMPLE
-   *(CLSID*)pCLSID = CLSID_GSystemFunctioNaterSample;
-#else
    *(CLSID*)pCLSID = CLSID_GSystemFunctioNater;
-#endif
    return S_OK;
    }
 

@@ -11,8 +11,6 @@
 
 #include "DataSet.h"
 
-   LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult);
-
    STDMETHODIMP DataSet::SetClientSite(IOleClientSite *pcs) {
  
    if ( pIOleInPlaceSite ) 
@@ -27,48 +25,13 @@
  
    if ( ! pcs ) {
       DestroyWindow(hwndSpecDialog);
-      hwndSpecDialog = 0L;
+      hwndSpecDialog = NULL;
       return S_OK;
    }
 
    pIOleClientSite = pcs;
    pIOleClientSite -> AddRef();
    pIOleClientSite -> QueryInterface(IID_IOleInPlaceSite,(void **)&pIOleInPlaceSite);
-
-   IDispatch *pIDispatch;
-
-   if ( pIOleClientSite && SUCCEEDED(pIOleClientSite -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(&pIDispatch))) ) {
-
-	   DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-      VARIANT varBackColor;
-      VARIANT varFont;
-      VARIANT varForeColor;
-      VARIANT varUserMode;
-
-      memset(&varBackColor,0,sizeof(VARIANT));
-      memset(&varFont,0,sizeof(VARIANT));
-      memset(&varForeColor,0,sizeof(VARIANT));
-
-      varUserMode.vt = VT_BOOL;
-
-      VariantClear(&varBackColor);
-      VariantClear(&varFont);
-      VariantClear(&varForeColor);
-      VariantClear(&varUserMode);
-
-      pIDispatch -> Invoke(DISPID_AMBIENT_BACKCOLOR,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varBackColor,NULL,NULL);
-      pIDispatch -> Invoke(DISPID_AMBIENT_FORECOLOR,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varForeColor,NULL,NULL);
-      pIDispatch -> Invoke(DISPID_AMBIENT_FONT,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varFont,NULL,NULL);
-      pIDispatch -> Invoke(DISPID_AMBIENT_USERMODE,IID_NULL,LOCALE_USER_DEFAULT,DISPATCH_PROPERTYGET,&dispparamsNoArgs,&varUserMode,NULL,NULL);
-
-      pIDispatch -> Release();
-
-      OleTranslateColor(varBackColor.lVal,NULL,&backgroundColor);
-      OleTranslateColor(varForeColor.lVal,NULL,&foregroundColor);
-
-      isDesignMode = ! varUserMode.bVal;
-
-   }
 
    initWindows();
 
@@ -128,12 +91,8 @@
    if ( ! hwndSpecDialog )
       initWindows();
 
-   RECT rc;
-
-   GetWindowRect(hwndSpecDialog,&rc);
-
-   pSizel -> cx = rc.right - rc.left;
-   pSizel -> cy = rc.bottom - rc.top;
+   pSizel -> cx = containerSize.cx;
+   pSizel -> cy = containerSize.cy;
 
    pixelsToHiMetric(pSizel,pSizel);
 
@@ -154,7 +113,6 @@
    case OLEIVERB_SHOW:
       if ( ! hwndSpecDialog ) 
          initWindows();
-      SetObjectRects(prc,NULL);
       SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
       break;
    case OLEIVERB_HIDE:
@@ -249,35 +207,4 @@
  
    STDMETHODIMP DataSet::SetColorScheme(LOGPALETTE *) {
    return E_NOTIMPL;
-   }
-
-
-   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam);
-
-   static long maxHeight;
-   static long maxWidth;
-
-   LONG APIENTRY CalcDimensions(HWND hwndParent,SIZEL *pResult) {
-   maxHeight = 0L;
-   maxWidth = 0L;
-   EnumChildWindows(hwndParent,testDimensions,(LPARAM)hwndParent);
-   pResult -> cx = maxWidth;
-   pResult -> cy = maxHeight;
-   return 0;
-   }
-
-   BOOL CALLBACK testDimensions(HWND hwndTest,LPARAM lParam) {
-
-   if ( ! IsWindowVisible(hwndTest) )
-      return TRUE;
-
-   RECT rcChild;
-   RECT rcParent;
-   GetWindowRect((HWND)lParam,&rcParent);
-   GetWindowRect(hwndTest,&rcChild);
-
-   maxHeight = max(maxHeight,rcChild.bottom - rcParent.top);
-   maxWidth = max(maxWidth,rcChild.right - rcParent.left);
-
-   return TRUE;
    }

@@ -10,6 +10,16 @@
 
 #include "Plot.h"
 
+#define SET_TYPES \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),BM_SETCHECK,(long)gcPlotTypeNatural & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);    \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),BM_SETCHECK,(long)gcPlotTypeContour & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);    \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_PIE),BM_SETCHECK,(long)gcPlotTypePie & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);            \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_STACKS),BM_SETCHECK,(long)gcPlotTypeStacks & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);      \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_SURFACE),BM_SETCHECK,(long)gcPlotTypeSurface & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);    \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_WIREFRAME),BM_SETCHECK,(long)gcPlotTypeWireFrame & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);\
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_QUADS),BM_SETCHECK,(long)gcPlotTypeQuads & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);        \
+   SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_TRIANGLES),BM_SETCHECK,(long)gcPlotTypeTriangles & (long)(pType & gcPlotViewMask) ? BST_CHECKED : BST_UNCHECKED,0L);
+
    LRESULT CALLBACK Plot::typeHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -35,14 +45,7 @@
 
       p -> propertyOverrideOwnerType -> setWindowChecked(GetDlgItem(hwnd,IDDI_PLOT_TYPE_OVERRIDE_OWNER));
 
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),BM_SETCHECK,(long)gcPlotTypeNatural & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),BM_SETCHECK,(long)gcPlotTypeContour & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_PIE),BM_SETCHECK,(long)gcPlotTypePie & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_STACKS),BM_SETCHECK,(long)gcPlotTypeStacks & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_SURFACE),BM_SETCHECK,(long)gcPlotTypeSurface & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_WIREFRAME),BM_SETCHECK,(long)gcPlotTypeWireFrame & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_QUADS),BM_SETCHECK,(long)gcPlotTypeQuads & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-      SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_TRIANGLES),BM_SETCHECK,(long)gcPlotTypeTriangles & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
+      SET_TYPES
 
       EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),p -> overrideOwnerType ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),p -> overrideOwnerType ? TRUE : FALSE);
@@ -72,26 +75,6 @@
 
       }
       return LRESULT(0);
-
-   //case WM_SHOWWINDOW: {
-
-   //   if ( (BOOL)wParam ) {
-
-   //      p -> pIOpenGLImplementation -> SetTargetWindow(GetDlgItem(hwnd,IDDI_PLOT_DIMENSION_SAMPLEPOSITION));
-
-   //      p -> pIOpenGLImplementation -> SetUp(p -> pIDataSet,p -> overrideOwnerView ? p -> propertyPlotView : p -> pOwnerPropertyPlotView,
-   //                                             p -> pOwnerPropertyTheta,p -> pOwnerPropertyPhi,p -> pOwnerPropertySpin);
-
-   //      p -> pIOpenGLImplementation -> SetLighting(p -> pOwnerPropertiesLightOn,
-   //                                                   p -> pOwnerPropertiesAmbientLight,
-   //                                                   p -> pOwnerPropertiesDiffuseLight,
-   //                                                   p -> pOwnerPropertiesSpecularLight,
-   //                                                   p -> pOwnerPropertiesLightPosition,
-   //                                                   p -> pOwnerPropertyCountLights,NULL);
-   //   }
-
-   //   }
-   //   break;
 
    case WM_COMMAND: {
 
@@ -130,7 +113,9 @@
             mask = (long)gcPlotTypeTriangles;
             break;
          }
-               
+
+         mask = mask & (long)gcPlotViewMask;
+
          if ( isChecked )
             p -> plotType = p -> plotType | mask;
          else
@@ -152,14 +137,7 @@
          } else
             p -> pOwnerProperty2DPlotType -> get_longValue(reinterpret_cast<long*>(&pType));
 
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),BM_SETCHECK,(long)gcPlotTypeNatural & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),BM_SETCHECK,(long)gcPlotTypeContour & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_PIE),BM_SETCHECK,(long)gcPlotTypePie & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_STACKS),BM_SETCHECK,(long)gcPlotTypeStacks & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_SURFACE),BM_SETCHECK,(long)gcPlotTypeSurface & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_WIREFRAME),BM_SETCHECK,(long)gcPlotTypeWireFrame & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_QUADS),BM_SETCHECK,(long)gcPlotTypeQuads & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
-         SendMessage(GetDlgItem(hwnd,IDDI_PLOT_TYPE_TRIANGLES),BM_SETCHECK,(long)gcPlotTypeTriangles & (long)pType ? BST_CHECKED : BST_UNCHECKED,0L);
+         SET_TYPES
 
          EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_NATURAL),p -> overrideOwnerType ? TRUE : FALSE);
          EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TYPE_CONTOUR),p -> overrideOwnerType ? TRUE : FALSE);

@@ -21,7 +21,7 @@
    case WM_INITDIALOG: {
       p = (Function *)lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
+      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
       }
       return LRESULT(1);
 
@@ -35,15 +35,6 @@
       if ( p -> oldExpressionHandler )
          SetWindowLong(GetDlgItem(hwnd,IDDI_FUNCTION_EQUATION_ENTRY),GWL_WNDPROC,(long)(p -> oldExpressionHandler));
       break;
-
-   //case WM_SIZE: {
-   //   if ( ! p ) break;
-   //   int cx = LOWORD(lParam);
-   //   int cy = HIWORD(lParam);
-   //   if ( ! cx ) break;
-   //   p -> resize();
-   //   }
-   //   break;
 
    case WM_MOVE:
       p -> rectDialog.left = LOWORD(lParam);
@@ -164,7 +155,8 @@
          }
       }
 
-      EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
+      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
+      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_DATASET_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
 
       EndPaint(hwnd,&ps);
       }
@@ -258,11 +250,32 @@
          p -> Stop();
          return LRESULT(TRUE);
 
-      case IDDI_FUNCTION_PLOT_PROPERTIES: {
-         if ( p -> pIPlot )
-            p -> pIPlot -> EditProperties();
-         }
-         return LRESULT(TRUE);
+      //case IDDI_FUNCTION_PLOT_PROPERTIES:
+      //   if ( ! p -> pIPlot )
+      //      break;
+      //   p -> pIPlot -> EditProperties();
+      //   return LRESULT(TRUE);
+
+      //case IDDI_FUNCTION_DATASET_PROPERTIES: {
+      //   if ( ! p -> pIPlot ) 
+      //      break;
+      //   IDataSet *pIDataSet = NULL;
+      //   p -> pIPlot -> get_IDataSet(&pIDataSet);
+      //   pIDataSet -> put_IsFunctionSource(VARIANT_TRUE);
+      //   BSTR bstrExpression = NULL;
+      //   p -> get_Expression(&bstrExpression);
+      //   pIDataSet -> put_DataSource(bstrExpression);
+      //   SysFreeString(bstrExpression);
+      //   IGSFunctioNater *pFunction = NULL;
+      //   p -> QueryInterface(IID_IGSFunctioNater,reinterpret_cast<void **>(&pFunction));
+      //   pIDataSet -> put_IFunction(reinterpret_cast<void *>(pFunction));
+      //   pFunction -> Release();
+      //   IUnknown* pIUnknown;
+      //   pIDataSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
+      //   p -> iProperties -> ShowProperties(hwnd,pIUnknown);
+      //   pIUnknown -> Release();
+      //   }
+      //   return LRESULT(TRUE);
    
       }
       }
@@ -308,10 +321,8 @@
             ShowWindow(hwndV,SW_HIDE);
             p -> currentShowingVariable = NULL;
          } else {
-            if ( k == 0 )
-               ShowWindow(GetDlgItem(p -> hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_HIDE);
-            else
-               ShowWindow(p -> hwndErrors,SW_HIDE);
+            ShowWindow(p -> hwndErrors,SW_HIDE);
+            ShowWindow(GetDlgItem(p -> hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_HIDE);
          }
          return LRESULT(0);
  
@@ -324,6 +335,8 @@
             p -> currentShowingVariable -> get_HWND(&hwndV);
             ShowWindow(hwndV,SW_SHOW);
             EnableWindow(hwndV,TRUE);
+            ShowWindow(p -> hwndErrors,SW_HIDE);
+            ShowWindow(GetDlgItem(p -> hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_HIDE);
          } else {
             if ( k == 0 ) 
                ShowWindow(GetDlgItem(p -> hwndVariablesTab,IDDI_FUNCTION_VARIABLES_DOMAIN_BOX),SW_SHOW);

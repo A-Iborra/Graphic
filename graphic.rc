@@ -55,25 +55,25 @@ BEGIN
         POPUP "Dimension"
         BEGIN
             MENUITEM "2 D",               IDMI_GRAPHIC_VIEW_2D
-            POPUP "3 D"
-            BEGIN
-               MENUITEM "Natural"            IDDI_GRAPHIC_SUB_STYLE_NATURAL
-               MENUITEM "Wireframe"          IDDI_GRAPHIC_SUB_STYLE_WIREFRAME
-               MENUITEM "Surface"            IDDI_GRAPHIC_SUB_STYLE_SURFACE
-               MENUITEM "Stacks"             IDDI_GRAPHIC_SUB_STYLE_STACKS
-            END
-            MENUITEM "Set...",            IDMI_GRAPHIC_VIEW_SET
+            MENUITEM "3 D",               IDMI_GRAPHIC_VIEW_3D
+            //BEGIN
+            //   MENUITEM "Natural"            IDDI_GRAPHIC_SUB_STYLE_NATURAL
+            //   MENUITEM "Wireframe"          IDDI_GRAPHIC_SUB_STYLE_WIREFRAME
+            //   MENUITEM "Surface"            IDDI_GRAPHIC_SUB_STYLE_SURFACE
+            //   MENUITEM "Stacks"             IDDI_GRAPHIC_SUB_STYLE_STACKS
+            //END
+            MENUITEM "Set 3D View...",    IDMI_GRAPHIC_VIEW_SET
         END
         MENUITEM SEPARATOR
-        POPUP "evaluate"
+        POPUP "Evaluate"
         BEGIN
             MENUITEM "",                    IDMI_GRAPHIC_EVALUATE
         END
         MENUITEM SEPARATOR
 
-        MENUITEM "properties...",     IDMI_GRAPHIC_PROPERTIES
-        MENUITEM "perspective...",    IDMI_GRAPHIC_SET_PERSPECTIVE
-        MENUITEM "text...",           IDMI_GRAPHIC_TEXT
+        MENUITEM "Properties...",     IDMI_GRAPHIC_PROPERTIES
+        MENUITEM "Perspective...",    IDMI_GRAPHIC_SET_PERSPECTIVE
+        MENUITEM "Text...",           IDMI_GRAPHIC_TEXT
     END
 END
 

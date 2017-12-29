@@ -15,6 +15,8 @@
 
 #include "List.cpp"
 
+//#define DO_THREAD_RENDERING
+
    int G::render(long sourceID) {
 
    if ( ! pIOpenGLImplementation )
@@ -26,16 +28,15 @@
    if ( ! IsWindowVisible(hwndGraphic) )
       return 0;
 
-   if ( renderThreadList.Count() > 0 ) 
-      return 0;
+   //if ( renderThreadList.Count() > 0 ) 
+   //   return 0;
 
    stop();
 
    currentPlotSourceID = sourceID;
-
-   unsigned int threadAddr;
  
-#if 0
+#ifdef DO_THREAD_RENDERING
+   unsigned int threadAddr;
    HANDLE *pt = new HANDLE(NULL);
    *pt = (HANDLE)_beginthreadex(NULL,0,G::threadRender,(void*)this,0,&threadAddr);
    renderThreadList.Add(pt);
@@ -49,7 +50,7 @@
 
    unsigned __stdcall G::threadRender(void *pThis) {
 
-#if 0
+#ifdef DO_THREAD_RENDERING
    CoInitializeEx(NULL,COINIT_MULTITHREADED);
 #endif
 
@@ -73,7 +74,7 @@
          okayToPlot = ( ! p -> autoClear || p -> currentPlotSourceID == 0 );
 
       IDataSet *pIDataSet = NULL;
-      pPlot -> get_DataSet(&pIDataSet);
+      pPlot -> get_IDataSet(&pIDataSet);
 
       if ( okayToPlot ) {
          DataPoint minPoint,maxPoint;
@@ -162,15 +163,13 @@
          p -> put_StatusText(0,"Extents: infinite");
    }
 
-//   p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
-
    HANDLE *pt = p -> renderThreadList.GetLast();
    p -> renderThreadList.Remove(pt);
    delete pt;
 
    p -> rendering = false;
 
-#if 0
+#ifdef DO_THREAD_RENDERING
    CoUninitialize();
 #endif
 

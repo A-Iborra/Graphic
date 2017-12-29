@@ -74,7 +74,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Oleacc.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\DataSet.def</ModuleDefinitionFile>
       <ProgramDatabaseFile>./DataSet.pdb</ProgramDatabaseFile>
@@ -118,7 +118,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Oleacc.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\DataSet.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -137,10 +137,17 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\source\utilities.cpp" />
+    <ClCompile Include="exportToExcel.cpp" />
+    <ClCompile Include="functionDataSetHandler.cpp" />
+    <ClCompile Include="IGSFunctioNaterEvents.cpp" />
     <ClCompile Include="launchExcelcpp.cpp" />
+    <ClCompile Include="loadDataSet.cpp" />
+    <ClCompile Include="loadExcelCellRange.cpp" />
     <ClCompile Include="loadExcelNamedRange.cpp" />
     <ClCompile Include="loadExcelWorkbook.cpp" />
     <ClCompile Include="loadExcelWorksheet.cpp" />
+    <ClCompile Include="populateData.cpp" />
     <ClCompile Include="specDialogHandler.cpp" />
     <ClCompile Include="propertiesHandler.cpp" />
     <ClCompile Include="excelHandler.cpp" />
@@ -178,6 +185,7 @@
     </Midl>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Graphic_resource.h" />
     <ClInclude Include="DataSet.h" />
   </ItemGroup>
   <ItemGroup>

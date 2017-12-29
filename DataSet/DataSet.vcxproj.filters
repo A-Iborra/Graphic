@@ -19,10 +19,10 @@
       <UniqueIdentifier>{4ded3ae3-0b38-4bca-90db-9566b6ac060d}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
-    <Filter Include="Source Files\COM Files\Window Handlers">
+    <Filter Include="Source Files\Window Handlers">
       <UniqueIdentifier>{43784e91-edfc-40b6-9e0e-ccae8cbbbe1a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\COM Files\Excel Files">
+    <Filter Include="Source Files\Excel Files">
       <UniqueIdentifier>{b9a43b01-7972-421a-b6fc-8ba0577dd69b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -97,25 +97,46 @@
       <Filter>Source Files\COM Files</Filter>
     </ClCompile>
     <ClCompile Include="specDialogHandler.cpp">
-      <Filter>Source Files\COM Files\Window Handlers</Filter>
+      <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
     <ClCompile Include="propertiesHandler.cpp">
-      <Filter>Source Files\COM Files\Window Handlers</Filter>
+      <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
     <ClCompile Include="excelHandler.cpp">
-      <Filter>Source Files\COM Files\Window Handlers</Filter>
+      <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
     <ClCompile Include="launchExcelcpp.cpp">
-      <Filter>Source Files\COM Files\Excel Files</Filter>
+      <Filter>Source Files\Excel Files</Filter>
     </ClCompile>
     <ClCompile Include="loadExcelWorkbook.cpp">
-      <Filter>Source Files\COM Files\Excel Files</Filter>
+      <Filter>Source Files\Excel Files</Filter>
     </ClCompile>
     <ClCompile Include="loadExcelWorksheet.cpp">
-      <Filter>Source Files\COM Files\Excel Files</Filter>
+      <Filter>Source Files\Excel Files</Filter>
     </ClCompile>
     <ClCompile Include="loadExcelNamedRange.cpp">
-      <Filter>Source Files\COM Files\Excel Files</Filter>
+      <Filter>Source Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loadExcelCellRange.cpp">
+      <Filter>Source Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exportToExcel.cpp">
+      <Filter>Source Files\Excel Files</Filter>
+    </ClCompile>
+    <ClCompile Include="functionDataSetHandler.cpp">
+      <Filter>Source Files\Window Handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="loadDataSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGSFunctioNaterEvents.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="populateData.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +151,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Graphic_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

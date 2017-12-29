@@ -90,9 +90,9 @@
                                              propertyTextColor,propertyLineWeight,pPropFloor,pPropCeiling);
    }
 
-   pIBasePlot -> get_DataSet(&pIDataSet);
+   pIBasePlot -> get_IDataSet(&pIDataSet);
 
-   pIBasePlotBoundingBox -> get_DataSet(&pIDataSetBoundingBox);
+   pIBasePlotBoundingBox -> get_IDataSet(&pIDataSetBoundingBox);
 
    if ( pIDataSetWorld ) {
       pIDataSetWorld -> RemoveIncludedDomain(pIDataSet);

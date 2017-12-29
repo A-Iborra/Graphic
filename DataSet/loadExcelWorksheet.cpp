@@ -2,31 +2,16 @@
 
 #include <time.h>
 
-   long DataSet::loadExcelWorksheet() {
+   Excel::_Worksheet *DataSet::getExcelWorksheet(Excel::_Workbook *pIWorkbook,char *pszSheetName) {
 
-   bool wasOpen = false;
+   Excel::Sheets * pIWorksheets = NULL;
+   Excel::_Worksheet *pIWorksheet = NULL;
 
-   //VARIANT vtFalse;
-   //vtFalse.vt = VT_BOOL;
-   //vtFalse.boolVal = false;
-   //
+   HRESULT hr = pIWorkbook -> get_Worksheets(&pIWorksheets);
+
    VARIANT vtIndex;
    vtIndex.vt = VT_I4;
    vtIndex.lVal = 0L;
-
-   Excel::_Workbook *pIWorkbook = NULL;
-   Excel::Sheets *pIWorksheets = NULL;
-   Excel::_Worksheet *pIWorksheet = NULL;
-   Excel::_Worksheet *pIWorksheet_Selected = NULL;
-
-   if ( hwndExcelSettings ) 
-      SendDlgItemMessage(hwndExcelSettings,IDDI_DATASET_EXCEL_NAMEDRANGES_LIST,CB_RESETCONTENT,0L,0L);
-
-   try {
-
-   pIWorkbook = openExcelWorkbook(&wasOpen);
-
-   HRESULT hr = pIWorkbook -> get_Worksheets(&pIWorksheets);
 
    long count = 0L;
 
@@ -50,12 +35,8 @@
 
       WideCharToMultiByte(CP_ACP,0,theName.GetBSTR(),-1,szThisSheet,64,0,0);
 
-      if ( szSpreadsheetName[0] && 0 == strcmp(szThisSheet,szSpreadsheetName) ) {
-         pIWorksheet_Selected = pIWorksheet;
-         pIWorksheet_Selected -> AddRef();
-         pIWorksheet -> Release();
+      if ( 0 == strcmp(szThisSheet,pszSheetName) ) 
          break;
-      }
 
       pIWorksheet -> Release();
 
@@ -65,11 +46,35 @@
 
    pIWorksheets -> Release();
 
+   return pIWorksheet;
+   }
+
+
+   long DataSet::loadExcelWorksheet(char *pszWorkbookName,char *pszWorksheetName) {
+
+   bool wasOpen = false;
+
+   Excel::_Workbook *pIWorkbook = NULL;
+   Excel::_Worksheet *pIWorksheet = NULL;
+
+   if ( hwndExcelSettings ) 
+      SendDlgItemMessage(hwndExcelSettings,IDDI_DATASET_EXCEL_NAMEDRANGES_LIST,CB_RESETCONTENT,0L,0L);
+
+   try {
+
+   pIWorkbook = openExcelWorkbook(pszWorkbookName,&wasOpen);
+
+   pIWorksheet = getExcelWorksheet(pIWorkbook,pszWorksheetName);
+
+   VARIANT vtIndex;
+   vtIndex.vt = VT_I4;
+   vtIndex.lVal = 0L;
+
    Excel::NamesPtr pRanges = NULL;
 
-   hr = pIWorksheet_Selected -> get_Names(&pRanges);
+   HRESULT hr = pIWorksheet -> get_Names(&pRanges);
 
-   count = pRanges -> GetCount();
+   long count = pRanges -> GetCount();
 
    for ( long k = 0; k < count; k++ ) {
 
@@ -90,7 +95,7 @@
 
    pRanges -> Release();
 
-   pIWorksheet_Selected -> Release();
+   pIWorksheet -> Release();
 
    } catch ( _com_error e ) {
 
@@ -98,7 +103,7 @@
 
       sprintf(szMessage,"There was an error working with the workbook %s in worksheet %s.\n\nThe Excel subsystem returned the error %s (%ld).\n\n"
                            "Please check your Workbook or try using a different one.",
-                  szDataSource,szSpreadsheetName,e.ErrorMessage(),e.Error());
+                  szDataSource,pszWorksheetName,e.ErrorMessage(),e.Error());
 
       MessageBox(NULL,szMessage,"Error",MB_ICONEXCLAMATION | MB_TOPMOST);
 

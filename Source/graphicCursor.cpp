@@ -10,21 +10,6 @@
    if ( ! useGraphicsCursor ) 
       return 0;
 
-   //
-   //NTC: 12-05-2017: I am going to rethink how to have a 3-D cursor.
-   //
-   if ( gcPlotView3D == plotView ) {
-      HDC hdc = GetDC(hwndGraphic);
-      erasePickBox(hdc);
-      savePickBox(hdc,pPtlPickBox);
-      if ( doPickBox )
-         drawPickBox(hdc,pPtlPickBox);
-      ReleaseDC(hwndGraphic,hdc);
-      ptlPickBox.x = pPtlPickBox -> x;
-      ptlPickBox.y = pPtlPickBox -> y; 
-      return 0;
-   }
-
    POINT ptMouse;
    RECT rectWindow;
 
@@ -34,9 +19,6 @@
 
    if ( ptMouse.x > rectWindow.right || ptMouse.y > rectWindow.bottom || ptMouse.x < rectWindow.left || ptMouse.y < rectWindow.top ) 
       return 0;
-
-   if ( 0 < graphicCursorList.Count() )
-      eraseGraphicCursor();
 
    ptMouse.x -= rectWindow.left;
    ptMouse.y -= rectWindow.top;
@@ -62,6 +44,27 @@
    char szPosition[64];
    sprintf(szPosition,"(%f,%f,%f)",dpStart.x,dpStart.y,dpStart.z);
    put_StatusText(1,szPosition);
+
+   //
+   //NTC: 12-05-2017: I am going to rethink how to have a 3-D cursor.
+   //
+   if ( gcPlotView3D == plotView ) {
+      HDC hdc = GetDC(hwndGraphic);
+      erasePickBox(hdc);
+      savePickBox(hdc,pPtlPickBox);
+      if ( doPickBox )
+         drawPickBox(hdc,pPtlPickBox);
+      ReleaseDC(hwndGraphic,hdc);
+      ptlPickBox.x = pPtlPickBox -> x;
+      ptlPickBox.y = pPtlPickBox -> y; 
+
+
+
+      return 0;
+   }
+
+   if ( 0 < graphicCursorList.Count() )
+      eraseGraphicCursor();
 
    memcpy(&dpCurrent,&dpStart,sizeof(DataPoint));
 

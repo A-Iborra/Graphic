@@ -3,20 +3,61 @@
                        Copyright (c) 1999,2000,2001,2002 Nathan T. Clark
 
 */
-#include <windows.h>
-#include <CommCtrl.h>
-
-#include "general.h"
-#include "Graphic_resource.h"
-#include "gmessage.h"
-
-#include "vlist.h"
 
 #include "DataSet.h"
 
-#include "List.cpp"
+   BYTE nothing = 0xF;
 
    HRESULT DataSet::SavePrep() {
+
+   if ( szCellRange[0] )
+      memset(szNamedRange,0,sizeof(szNamedRange));
+
+   if ( pPropertyPlots ) {
+
+      pPropertyPlots -> clearStorageObjects();
+
+      if ( pIPlot ) {
+         pPropertyPlots -> addStorageObject(pIPlot);
+         pPropertyPlots -> writeStorageObjects();
+         pPropertyPlots -> clearStorageObjects();
+      }
+
+   }
+
+   if ( isEmbedded ) {
+
+      long countPoints = 0;
+
+      get_countPoints(&countPoints);
+
+      long storageSize = countPoints * sizeof(DataPoint);
+
+      BYTE *pStorage = new BYTE[storageSize];
+
+      DataPoint *pTarget = (DataPoint *)pStorage;
+
+      DataList *pDataList = NULL;
+      DataPoint dp;
+
+      for ( long k = 0; k < countPoints; k++ ) {
+
+         get(pDataList,&dp,&pDataList);
+
+         memcpy(pTarget++,&dp,sizeof(DataPoint));
+
+      }
+
+      pPropertyEmbeddedData -> put_binaryValue(storageSize,pStorage);
+
+      delete [] pStorage;
+
+   } else {
+
+      pPropertyEmbeddedData -> put_binaryValue(1,&nothing);
+
+   }
+
    return S_OK;
    }
 
@@ -27,6 +68,59 @@
  
  
    HRESULT DataSet::Loaded() {
+
+   if ( pPropertyPlots ) {
+
+      long cntObjects = 0;
+
+      pPropertyPlots -> get_storedObjectCount(&cntObjects);
+
+      if ( cntObjects ) {
+         pPropertyPlots -> clearStorageObjects();
+         pPropertyPlots -> addStorageObject(pIPlot);
+         pPropertyPlots-> readStorageObjects();
+         pPropertyPlots -> clearStorageObjects();
+      }
+
+   }
+
+   long countBytes = 0L;
+
+   pPropertyEmbeddedData -> get_size(&countBytes);
+
+   if ( 1 < countBytes ) {
+
+      isEmbedded = true;
+
+      BYTE *pSource = NULL;
+
+      pPropertyEmbeddedData -> get_binaryData(&pSource);
+
+      BYTE *pEnd = pSource + countBytes;
+
+      DataPoint *pDPSource = (DataPoint *)pSource;
+
+      DataPoint dp;
+
+      ReSet();
+
+      long pointCount = countBytes / sizeof(DataPoint);
+
+      for ( long k = 0; k < pointCount; k++ ) {
+
+         memcpy(&dp,(BYTE *)pDPSource,sizeof(DataPoint));
+
+         pushDataPoint(&dp);
+
+         pDPSource++;
+
+      }
+
+   } else
+
+      isEmbedded = false;
+
+
    return S_OK;
    }
  

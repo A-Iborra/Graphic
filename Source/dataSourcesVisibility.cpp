@@ -55,9 +55,6 @@
 
    long entryDataSetTabIndex = tabIndex(hwndDataSourcesTab,"DataSets");
 
-   //long entryFunctionTabIndex = functionTabIndex;
-   //long entryDataSetTabIndex = dataSetTabIndex;
-
    SIZEL sizeUI{0,0};
 
    std::vector<IGSFunctioNater *> visibleFunctions;
@@ -186,7 +183,7 @@
          tie.cchTextMax = 18;
          SendMessage(hwndDataSourcesTab,TCM_INSERTITEM,(WPARAM)SendMessage(hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L),(LPARAM)&tie);
 
-         for ( long k = 0; k < visibleFunctions.size(); k++ ) {
+         for ( long k = 0; k < (long)visibleFunctions.size(); k++ ) {
             IGSFunctioNater *pf = visibleFunctions[k];
             ContainedFunction *pIFunction = NULL;
             while ( pIFunction = containedFunctionList.GetNext(pIFunction) )
@@ -308,6 +305,7 @@
          notifyHeader.hwndFrom = hwndDataSourcesFunctions;
 
       }
+
       notifyHeader.code = TCN_SELCHANGE;
 
       SendMessage(hwndDataSourcesDialog,WM_NOTIFY,0L,(LPARAM)&notifyHeader);
@@ -320,7 +318,9 @@
 
       RECT rectStatusBar;
 
-      SetWindowPos(hwndStatusBar,HWND_TOP,0,0,cxGraphic + cxDataSourcesAdjust,cyGraphic,SWP_SHOWWINDOW);
+      GetWindowRect(hwndStatusBar,&rectStatusBar);
+
+      SetWindowPos(hwndStatusBar,HWND_TOP,0,cyGraphic - (rectStatusBar.bottom - rectStatusBar.top),cxGraphic + cxDataSourcesAdjust,(rectStatusBar.bottom - rectStatusBar.top),SWP_SHOWWINDOW);
 
       GetWindowRect(hwndStatusBar,&rectStatusBar);
 

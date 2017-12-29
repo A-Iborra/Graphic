@@ -105,23 +105,11 @@
          }
       }
 
-#if 0
-   
-      if ( pwExisting ) {
-         pwExisting -> hwnd = NULL;
-         pwExisting = NULL;
-      }
-
-      pwExisting = new PlotWindow(hwndNew,p,p -> pIEvaluator);
-      p -> plotWindowList.push_back(pwExisting);
-
-#else
       if ( ! pwExisting ) {
          pwExisting = new PlotWindow(hwndNew,p,p -> pIEvaluator);
          p -> plotWindowList.push_back(pwExisting);
       } else
          pwExisting -> createRenderingContext();
-#endif
 
       p -> plotWindow = pwExisting;
 
@@ -442,24 +430,25 @@ OPENGL_ERROR_CHECK
          BYTE *pb = (BYTE *)fvTopColor;
          ps -> pPropTopColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
       }
+
       if ( ps -> pPropBottomColor ) {
          BYTE *pb = (BYTE *)fvBottomColor;
          ps -> pPropBottomColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
       }
 
-      glShadeModel(GL_SMOOTH);
-      glEnable(GL_LIGHTING);
-
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,fvTopColor);
-      glMaterialfv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,fvBottomColor);
+      glMaterialfv(GL_FRONT,GL_SPECULAR,fvTopColor);
 
-      glFrontFace(GL_CCW);         
+      glMaterialfv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,fvBottomColor);
+      glMaterialfv(GL_BACK,GL_SPECULAR,fvBottomColor);
+
+      glFrontFace(GL_CCW); 
       glDisable(GL_CULL_FACE);
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
       glEnable(GL_DEPTH_TEST);
-   
+
       glBegin(GL_QUADS);
 
       delete ps;
@@ -904,7 +893,6 @@ MessageBox(NULL,ex.what(),"",MB_OK);
 
       strCall_ReadPixels *ps = (strCall_ReadPixels *)wParam;
 
-//      p -> plotWindow -> GetPixels(ps -> x1,ps -> y1,ps -> x2,ps -> y2,p -> plotWindow -> openGLState.windowCY,ps -> pResult);
       GLint bufferSize[4] = {0};
       glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
       
@@ -922,6 +910,13 @@ MessageBox(NULL,ex.what(),"",MB_OK);
          break;
       }
 
+      //
+      //NTC: 12-29-2017: isRendered only becomes true when something is drawn and finalize is called.
+      // I think there might be situations where the client has setup OpenGL (i.e., set the active window)
+      // but if it doesn't draw and finalize, isRendered remains false.
+      // The intent of the flag is to prevent openGL mouse related activity (i.e. pick) before the graphic
+      // is complete, however, so the logic that uses this flag must allow normal windows mouse activity.
+      // 
       *prv = p -> plotWindow -> isRendered;
    
       }

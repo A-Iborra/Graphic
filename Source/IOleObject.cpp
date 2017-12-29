@@ -93,7 +93,8 @@
    hiMetricToPixel(pSizel,&tempSizel);
    rect.right = tempSizel.cx;
    rect.bottom = tempSizel.cy;
-   SetWindowPos(hwndFrame,HWND_TOP,0L + 4,0L + 4,rect.right - rect.left - 8,rect.bottom - rect.top - 8,SWP_NOMOVE);
+   //SetWindowPos(hwndFrame,HWND_TOP,0L + 4,0L + 4,rect.right - rect.left - 8,rect.bottom - rect.top - 8,SWP_NOMOVE);
+   SetWindowPos(hwndFrame,HWND_TOP,0L,0L,rect.right - rect.left,rect.bottom - rect.top,SWP_NOMOVE);
    memcpy(&containerSize,&tempSizel,sizeof(SIZEL));
    return S_OK;
    }

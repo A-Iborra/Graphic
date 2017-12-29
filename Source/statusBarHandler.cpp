@@ -11,11 +11,18 @@
 #include "Graphic.h"
 
    LRESULT CALLBACK G::statusBarHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   G *p = (G *)GetWindowLong(hwnd,GWL_USERDATA);
+   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
    switch ( msg ) {
    case WM_CREATE:
-      SetWindowLong(hwnd,GWL_USERDATA,lParam);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,lParam);
       return (LRESULT)FALSE;
+
+//   case WM_MOVE:
+//ShowWindow(hwnd,SW_SHOW);
+//   case WM_SHOWWINDOW:
+//      Beep(2000,100);
+//      break;
 
    case SB_SETTEXT: {
       CallWindowProc(p -> defaultStatusBarHandler,hwnd,msg,wParam,lParam);

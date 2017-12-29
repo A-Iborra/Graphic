@@ -84,9 +84,9 @@ library Plot {
    interface IBasePlot : IUnknown {
 
      [propput,helpstring("")]
-     HRESULT DataSet([in] IDataSet *dataSet);
+     HRESULT IDataSet([in] IDataSet *dataSet);
      [propget,helpstring("")]
-     HRESULT DataSet([out,retval] IDataSet **dataSet);
+     HRESULT IDataSet([out,retval] IDataSet **dataSet);
 
      [propget] HRESULT DataArity([out,retval] enum DataArity *);
 
@@ -210,9 +210,9 @@ library Plot {
      HRESULT ActionTable([out,retval] IGraphicSegmentAction **);
 
      [propput,helpstring("")]
-     HRESULT DataSet([in] IDataSet *dataSet);
+     HRESULT IDataSet([in] IDataSet *dataSet);
      [propget,helpstring("")]
-     HRESULT DataSet([out,retval] IDataSet **dataSet);
+     HRESULT IDataSet([out,retval] IDataSet **dataSet);
 
      [propget] HRESULT DataArity([out,retval] enum DataArity *);
 

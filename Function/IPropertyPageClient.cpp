@@ -103,35 +103,43 @@
 
    }
 
+   //
+   //NTC: 12-28-2017: I am taking control visibility settings out of the interface.
+   // I don't really recall why there are even there, unless at design time, a developer wants to hide
+   // the entire Function specifications dialog from the UI (perhaps to prevent the specification dialog(s)
+   // from appearing at all, which would be easy to implement as one property.)
+   //
+#if 0
    if ( isDesignMode || allowUserPropertiesControls )
       *pCount = 2;
    else
+#endif
       *pCount = 1;
 
-   IGPropertyPageClient *pPlotProperties = NULL;
+   IDataSet *pIDataSet = NULL;
 
-   pIPlot -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pPlotProperties));
+   pIPlot -> get_IDataSet(&pIDataSet);
 
-   long plotPropertiesCount = 0L;
+   if ( pIDataSet ) {
 
-   pPlotProperties -> get_PropertyPageCount(&plotPropertiesCount);
+      IGPropertyPageClient *pDataSetProperties = NULL;
 
-   *pCount += plotPropertiesCount;
+      pIDataSet -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pDataSetProperties));
 
-   pPlotProperties -> Release();
+      long dataSetPropertiesCount = 0L;
+
+      pDataSetProperties -> get_PropertyPageCount(&dataSetPropertiesCount);
+
+      *pCount += dataSetPropertiesCount;
+
+      pDataSetProperties -> Release();
+
+   }
 
    return S_OK;
    }
 
    HRESULT Function::GetPropertySheets(void *pPages) {
-
-   IGPropertyPageClient *pPlotProperties = NULL;
-
-   pIPlot -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pPlotProperties));
-
-   long plotPropertiesCount = 0L;
-
-   pPlotProperties -> get_PropertyPageCount(&plotPropertiesCount);
 
    PROPSHEETPAGE *pPropSheetPages = reinterpret_cast<PROPSHEETPAGE *>(pPages);
 
@@ -144,38 +152,55 @@
    pPropSheetPages[0].lParam = (LPARAM)this;
    pPropSheetPages[0].pfnCallback = NULL;
 
-   if ( ! isDesignMode && ! allowUserPropertiesControls ) {
-      pPlotProperties -> GetPropertySheets((void *)(pPropSheetPages + 1));
-      for ( long k = 0; k < plotPropertiesCount; k++ ) {
-         PROPSHEETPAGE *pPage = pPropSheetPages + 1 + k;
-         static char szNewName1[128];
-         sprintf(szNewName1,"Plot-%s",pPage -> pszTitle);
-         pPage -> pszTitle = szNewName1;
-      }
-      pPlotProperties -> Release();
-      return S_OK;
+   long nextIndex = 1;
+
+#if 0
+   if ( isDesignMode || allowUserPropertiesControls ) {
+      pPropSheetPages[1].dwFlags = PSP_USETITLE;
+      pPropSheetPages[1].dwSize = sizeof(PROPSHEETPAGE);
+      pPropSheetPages[1].hInstance = hModule;
+      pPropSheetPages[1].pszTemplate = MAKEINTRESOURCE(IDDIALOG_FUNCTION_PROPERTIES_VISIBILITY);
+      pPropSheetPages[1].pfnDlgProc = (DLGPROC)functionPropertiesVisibilityHandler;
+      pPropSheetPages[1].pszTitle = "Visibility";
+      pPropSheetPages[1].lParam = (LPARAM)this;
+      pPropSheetPages[1].pfnCallback = NULL;
+      nextIndex = 2;
+   }
+#endif
+
+   IGPropertyPageClient *pDataSetProperties = NULL;
+
+   pIDataSet -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pDataSetProperties));
+
+   long dataSetPropertiesCount = 0L;
+
+   pIDataSet -> put_IsFunctionSource(VARIANT_TRUE);
+
+   BSTR bstrExpression = NULL;
+   get_Expression(&bstrExpression);
+   pIDataSet -> put_DataSource(bstrExpression);
+   SysFreeString(bstrExpression);
+
+   IGSFunctioNater *pFunction = NULL;
+   QueryInterface(IID_IGSFunctioNater,reinterpret_cast<void **>(&pFunction));
+   pIDataSet -> put_IFunction(reinterpret_cast<void *>(pFunction));
+   pFunction -> Release();
+
+   pDataSetProperties -> get_PropertyPageCount(&dataSetPropertiesCount);
+
+   pDataSetProperties -> GetPropertySheets((void *)(pPropSheetPages + nextIndex));
+
+   static char szNewName3[8][128];
+
+   for ( long k = 0; k < dataSetPropertiesCount; k++ ) {
+      PROPSHEETPAGE *pPage = pPropSheetPages + nextIndex + k;
+      if ( strstr((char *)pPage -> pszTitle,"Plot-") ) 
+         continue;
+      sprintf(szNewName3[k],"DataSet-%s",pPage -> pszTitle);
+      pPage -> pszTitle = szNewName3[k];
    }
 
-   pPropSheetPages[1].dwFlags = PSP_USETITLE;
-   pPropSheetPages[1].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[1].hInstance = hModule;
-   pPropSheetPages[1].pszTemplate = MAKEINTRESOURCE(IDDIALOG_FUNCTION_PROPERTIES_VISIBILITY);
-   pPropSheetPages[1].pfnDlgProc = (DLGPROC)functionPropertiesVisibilityHandler;
-   pPropSheetPages[1].pszTitle = "Visibility";
-   pPropSheetPages[1].lParam = (LPARAM)this;
-   pPropSheetPages[1].pfnCallback = NULL;
-
-   pPlotProperties -> GetPropertySheets((void *)(pPropSheetPages + 2));
-
-   static char szNewName2[8][128];
-
-   for ( long k = 0; k < plotPropertiesCount; k++ ) {
-      PROPSHEETPAGE *pPage = pPropSheetPages + 2 + k;
-      sprintf(szNewName2[k],"Plot-%s",pPage -> pszTitle);
-      pPage -> pszTitle = szNewName2[k];
-   }
-
-   pPlotProperties -> Release();
+   pDataSetProperties -> Release();
 
    return S_OK;
    }

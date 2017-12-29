@@ -5,5 +5,12 @@
 
    GraphicHost *p = (GraphicHost *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
-   return CallWindowProc(nativeStaticHandler,hwnd,msg,wParam,lParam);
+   if ( WM_PAINT == msg ) {
+      PAINTSTRUCT ps;
+      BeginPaint(hwnd,&ps);
+      EndPaint(hwnd,&ps);
+      return (LRESULT)0;
+   }
+
+   return DefWindowProc(hwnd,msg,wParam,lParam);
    }

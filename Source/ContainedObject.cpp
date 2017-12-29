@@ -22,7 +22,7 @@
       pIConnectionPoint(0),
       dwConnectionCookie(0) {
 
-   hwndSite = CreateWindowEx(0L,"STATIC","",WS_CHILD,0,0,0,0,hwndTab,NULL,NULL,(void*)this);
+   hwndSite = CreateWindowEx(WS_EX_CLIENTEDGE,"STATIC","",WS_CHILD,0,0,0,0,hwndTab,NULL,NULL,(void*)this);
 
    if ( pIUnknownObject ) 
       pIUnknownObject -> AddRef();
@@ -147,6 +147,8 @@
    ShowWindow(hwndTab,SW_SHOW);
 
    ShowWindow(hwndSite,SW_SHOW);
+
+   UpdateWindow(hwndSite);
 
    return;
    }

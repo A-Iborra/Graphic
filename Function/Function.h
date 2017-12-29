@@ -121,6 +121,9 @@
      STDMETHOD(put_IPlot)(void *);
      STDMETHOD(get_IPlot)(void **);
 
+     STDMETHOD(put_IDataSet)(void *);
+     STDMETHOD(get_IDataSet)(void **);
+
      STDMETHOD(Initialize)(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
                               IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                               IGProperty *parentPropertyPlotView,
@@ -134,6 +137,8 @@
      STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
 
      STDMETHOD(get_AnyControlVisible)(VARIANT_BOOL* pbAnyVisible);
+
+     STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar *);
 
 //     IOleObject 
 
@@ -414,7 +419,7 @@
      static LRESULT EXPENTRY functionDialogHandler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT EXPENTRY functionVariablesHandler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT EXPENTRY functionPropertiesHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
-     static LRESULT EXPENTRY functionPropertiesVisibilityHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
+     //static LRESULT EXPENTRY functionPropertiesVisibilityHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT EXPENTRY expressionHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
 
      WNDPROC oldExpressionHandler;
@@ -428,7 +433,10 @@
      IAdviseSink *pAdviseSink;
      IOleInPlaceSite *pIOleInPlaceSite;
      IPropertyNotifySink *pIPropertyNotifySink;
+     IGSystemStatusBar* pIGSystemStatusBar{NULL};
+
      IPlot *pIPlot;
+     IDataSet *pIDataSet;
 
      void (__stdcall *pWhenChangedCallback)(void *);
      void *pWhenChangedCallbackArg;
@@ -450,9 +458,9 @@
      COLORREF backgroundColor,foregroundColor;
 
      union {
-         short visibleItems[9];
+         short visibleItems[10];
          struct {
-            short expressionVisible,resultsVisible,variablesVisible,controlsVisible,startVisible,pauseVisible,resumeVisible,stopVisible,plotPropertiesVisible;
+            short expressionVisible,resultsVisible,variablesVisible,controlsVisible,startVisible,pauseVisible,resumeVisible,stopVisible,plotPropertiesVisible,dataSetPropertiesVisible;
          };
      };
 
@@ -479,10 +487,12 @@
      IGProperty* pIPropertyResumeVisible;
      IGProperty* pIPropertyStopVisible;
      IGProperty* pIPropertyPlotPropertiesVisible;
+     IGProperty* pIPropertyDataSetPropertiesVisible;
      IGProperty* pIPropertyVariables;
      IGProperty* pIPropertyManuallyAddedVariables;
 
      IGProperty* pIPropertyPlots;
+     IGProperty* pIPropertyDataSets;
 
      IStream* pIStream_Marshalling;
      HGLOBAL hglMarshalling;

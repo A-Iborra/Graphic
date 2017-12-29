@@ -73,8 +73,8 @@
      STDMETHOD(put_ActionTable)(IGraphicSegmentAction *);
      STDMETHOD(get_ActionTable)(IGraphicSegmentAction **);
 
-     STDMETHOD(put_DataSet)(IDataSet *newDataSet);
-     STDMETHOD(get_DataSet)(IDataSet **getDataSet);
+     STDMETHOD(put_IDataSet)(IDataSet *newDataSet);
+     STDMETHOD(get_IDataSet)(IDataSet **getDataSet);
 
      STDMETHOD(get_DataArity)(enum DataArity *);
 
@@ -225,6 +225,9 @@
      IGProperty* propertyDataExtents;
 
      IGProperty *propertyPlotNumber;
+
+     IGProperty* propertyDataSet{NULL};
+
 
      HANDLE PlotThread();
 

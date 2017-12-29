@@ -133,16 +133,8 @@
    SetPixelFormat(deviceContext,pixelFormat,&pfd);
 
    if ( renderingContext ) {
-
       wglDeleteContext(renderingContext);
-
       renderingContext = NULL;
-
-      //renderingContext = wglCreateContext(deviceContext);
-
-      //wglMakeCurrent(deviceContext,renderingContext);
-
-      //return TRUE;
    }
 
    if ( 0 == openGLState.windowCX || 0 == openGLState.windowCY )
@@ -154,17 +146,12 @@
 WINDOWS_ERROR_CHECK
 OPENGL_ERROR_CHECK
 
-GLint bufferSize[4] = {0};
-glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
-
-//glBufferData(GL_BACK,
-   glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   //glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 OPENGL_ERROR_CHECK
 
    glDrawBuffer(GL_BACK);
 OPENGL_ERROR_CHECK
-
-   
 
    return TRUE;
    }
@@ -422,7 +409,6 @@ OPENGL_ERROR_CHECK
                              IGProperty *pPropBottomMargin,
                              IGProperty *pPropMarginUnits,
                              IGProperty *pPropStretchToMargins) {
-glGetError();
 
    RECT rect;
    char *pszUnits = NULL;
@@ -779,7 +765,7 @@ glGetError();
                 IGProperty *pPropSpecularLight[],
                 IGProperty *pPropLightPos[],
                 IGProperty *pPropCountLights,
-                IGProperty *pPropShinyness){
+                IGProperty *pPropShinyness) {
 
    if ( ! pPropLightEnabled ) {
       for ( int k = 0; k < SUPPORTED_LIGHT_COUNT; k++ )
@@ -803,18 +789,22 @@ glGetError();
       return S_OK;
    }
 
-   short b;
+   glShadeModel(GL_SMOOTH);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_DEPTH_TEST);
 
-   glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,0);
-//   glEnable(GL_COLOR_MATERIAL);
    glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+   glColorMaterial(GL_FRONT_AND_BACK,GL_SPECULAR);
  
    glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1.0f);
+
 OPENGL_ERROR_CHECK
 
    for ( int k = 0; k < lightCount && k < lightCount; k ++ ) {
 
       if ( pPropLightEnabled[k] ) {
+
+         short b;
 
          pPropLightEnabled[k] -> get_boolValue(&b);
 
@@ -826,6 +816,7 @@ OPENGL_ERROR_CHECK
                if ( pPropAmbientLight[k] ) {
                   BYTE *pb = (BYTE *)&fvAmbientLight[k][0];
                   pPropAmbientLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+fvAmbientLight[k][3] = 0.0;
                   glLightfv(GL_LIGHT0 + k,GL_AMBIENT,fvAmbientLight[k]);
                }
             }
@@ -834,6 +825,7 @@ OPENGL_ERROR_CHECK
                if ( pPropDiffuseLight[k] ) {
                   BYTE *pb = (BYTE *)&fvDiffuseLight[k][0];
                   pPropDiffuseLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+fvDiffuseLight[k][3] = 0.0;
                   glLightfv(GL_LIGHT0 + k,GL_DIFFUSE,fvDiffuseLight[k]);
                }
             }
@@ -842,6 +834,7 @@ OPENGL_ERROR_CHECK
                if ( pPropSpecularLight[k] ) {
                   BYTE *pb = (BYTE *)&fvSpecularLight[k][0];
                   pPropSpecularLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+fvSpecularLight[k][3] = 0.0;
                   glLightfv(GL_LIGHT0 + k,GL_SPECULAR,fvSpecularLight[k]);
                }
             }
@@ -859,6 +852,7 @@ OPENGL_ERROR_CHECK
                      lightPosition[k][1] = (float)evalConsume(pIEvaluator,pszValues);
                   if ( pszValues ) 
                      lightPosition[k][2] = (float)evalConsume(pIEvaluator,pszValues);
+lightPosition[k][3] = 1.0;
                   delete [] pszValues;
                   glLightfv(GL_LIGHT0 + k,GL_POSITION,lightPosition[k]);
                   glLightf(GL_LIGHT0 + k,GL_SPOT_CUTOFF,90.0f);
@@ -877,7 +871,11 @@ OPENGL_ERROR_CHECK
    if ( pPropShinyness ) {
       pPropShinyness -> get_longValue(&shinyness);
       glMateriali(GL_FRONT,GL_SHININESS,shinyness);
+      glMateriali(GL_BACK,GL_SHININESS,shinyness);
    }
+
+   //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+   //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
 
 OPENGL_ERROR_CHECK
    return S_OK;

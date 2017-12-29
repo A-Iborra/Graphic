@@ -326,6 +326,10 @@
          InvalidateRect(hwnd,&rect,TRUE);
       }
       }
+
+if ( IsWindowVisible(hwnd) )
+p -> render(0);
+
       return LRESULT(FALSE);
  
    case WM_COMMAND: {
@@ -413,7 +417,7 @@
          }
          p -> propertyCustomColors -> put_binaryValue(128,reinterpret_cast<byte *>(ci.lpCustColors));
          }
-         return LRESULT(0);
+         break;
  
       case IDDI_LIGHT_AMBIENT_RED:
       case IDDI_LIGHT_AMBIENT_GREEN:
@@ -478,11 +482,16 @@
          }   
  
          }
+
          return LRESULT(FALSE);
  
       default:
          break;
       }
+
+if ( IsWindowVisible(hwnd) )
+p -> render(0);
+
       }
       return LRESULT(FALSE);
  

@@ -8,9 +8,7 @@
    switch ( msg ) {
    
    case WM_CREATE: {
-
       PostMessage(hwnd,WM_SETUP_GRAPHIC,0L,0L);
-
       }
       return (LRESULT)TRUE;
 
@@ -23,11 +21,7 @@
       break;
 
    case WM_SETUP_GRAPHIC: {
-
-      hwndGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,L"STATIC",L"",WS_CHILD | WS_VISIBLE,128,128,1300,768,hwndFrame,NULL,hInstance,NULL);//(LPVOID)pGraphicHost);
-
-      pGraphicHost = new GraphicHost(hwndGraphic);
-
+      pGraphicHost = new GraphicHost();
       }
       break;
 

@@ -18,6 +18,9 @@ library DataSet {
 
    importlib("Properties.tlb");
    importlib("GSystem.tlb");
+   importlib("GraphicControl.tlb");
+   importlib("Variable.tlb");
+   importlib("Evaluator.tlb");
 
    [  uuid(8CAEFDA2-55E6-11d3-8365-006008BD5BC3),
       helpstring("GSystem DataSet Interface"),
@@ -25,108 +28,148 @@ library DataSet {
    ] 
    interface IDataSet : IUnknown {
 
-     [propput] HRESULT Name([in] BSTR name);
-     [propget] HRESULT Name([out,retval] BSTR *pName);
+      [propput] HRESULT Name([in] BSTR name);
+      [propget] HRESULT Name([out,retval] BSTR *pName);
 
-     [propput] HRESULT DataSource([in] BSTR dataSource);
-     [propget] HRESULT DataSource([out,retval] BSTR *pDataSource);
+      [propput] HRESULT DataSource([in] BSTR dataSource);
+      [propget] HRESULT DataSource([out,retval] BSTR *pDataSource);
 
-     [propput] HRESULT maxX([in] double maxVal);
-     [propget] HRESULT maxX([out,retval] double *getVal);
-     [propput] HRESULT maxY([in] double maxVal);
-     [propget] HRESULT maxY([out,retval] double *getVal);
-     [propput] HRESULT maxZ([in] double maxVal);
-     [propget] HRESULT maxZ([out,retval] double *getVal);
-     [propput] HRESULT minX([in] double minVal);
-     [propget] HRESULT minX([out,retval] double *getVal);
-     [propput] HRESULT minY([in] double minVal);
-     [propget] HRESULT minY([out,retval] double *getVal);
-     [propput] HRESULT minZ([in] double minVal);
-     [propget] HRESULT minZ([out,retval] double *getVal);
+      [propput] HRESULT IsFunctionSource([in] VARIANT_BOOL);
+      [propget] HRESULT IsFunctionSource([out,retval] VARIANT_BOOL *);
 
-     [propput] HRESULT floor([in]IGProperty *);
+      [propput] HRESULT IFunction([in] void *pIFunction);
+      [propget] HRESULT IFunction([out,retval] void **ppIFunction);
 
-     [propput] HRESULT ceiling([in]IGProperty *);
+      [propput] HRESULT IPlot([in] void *pIPlot);
+      [propget] HRESULT IPlot([out,retval] void **ppIPlot);
 
-     [propget] HRESULT top([out,retval] struct DataList **getTop);
-     [propget] HRESULT bottom([out,retval] struct DataList **getBottom);
+      HRESULT Initialize(void *pvIDataSet_Domain,void *pIOpenGLImplementation,
+                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                           IGProperty *parentPropertyPlotView,
+                           IGProperty *parentPropertyDefault2DPlotSubType,
+                           IGProperty *parentPropertyDefault3DPlotSubType,
+                           IGProperty *parentPropertyBackgroundColor,
+                           IGProperty *parentPropertyFloor,
+                           IGProperty *parentPropertyCeiling,
+                           [in] void (*pCallback)(void *),[in] void *pArg);
 
-     [propget] HRESULT countPoints([out,retval]long *pCount);
+      [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
+      [propput] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
 
-     [propput] HRESULT DataArity([in] enum DataArity );
-     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+      [propput] HRESULT maxX([in] double maxVal);
+      [propget] HRESULT maxX([out,retval] double *getVal);
+      [propput] HRESULT maxY([in] double maxVal);
+      [propget] HRESULT maxY([out,retval] double *getVal);
+      [propput] HRESULT maxZ([in] double maxVal);
+      [propget] HRESULT maxZ([out,retval] double *getVal);
+      [propput] HRESULT minX([in] double minVal);
+      [propget] HRESULT minX([out,retval] double *getVal);
+      [propput] HRESULT minY([in] double minVal);
+      [propget] HRESULT minY([out,retval] double *getVal);
+      [propput] HRESULT minZ([in] double minVal);
+      [propget] HRESULT minZ([out,retval] double *getVal);
 
-     HRESULT peek([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
-     HRESULT peekInt([in] int item, [out,retval] struct DataList **getItem);
+      [propput] HRESULT floor([in]IGProperty *);
 
-     HRESULT peekGDI([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
+      [propput] HRESULT ceiling([in]IGProperty *);
 
-     HRESULT get(struct DataList *afterItem,struct DataPoint *data,struct DataList **nextItem);
-     HRESULT set(struct DataList *item,struct DataPoint *data);
+      [propget] HRESULT top([out,retval] struct DataList **getTop);
+      [propget] HRESULT bottom([out,retval] struct DataList **getBottom);
 
-     HRESULT pushString(char *valueString);
+      [propget] HRESULT countPoints([out,retval]long *pCount);
 
-     HRESULT pushDataPoint(struct DataPoint *point);
+      [propput] HRESULT DataArity([in] enum DataArity );
+      [propget] HRESULT DataArity([out,retval] enum DataArity *);
 
-     HRESULT popDataPoint(struct DataPoint *point);
+      HRESULT peek([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
+      HRESULT peekInt([in] int item, [out,retval] struct DataList **getItem);
 
-     HRESULT ReSet();
+      HRESULT peekGDI([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
 
-     HRESULT insert(struct DataList *insertBefore,struct DataPoint *data);
+      HRESULT get(struct DataList *afterItem,struct DataPoint *data,struct DataList **nextItem);
+      HRESULT set(struct DataList *item,struct DataPoint *data);
 
-     HRESULT addXYZ(double *x,double *y,double *z);
+      HRESULT pushString(char *valueString);
 
-     HRESULT addMovePoint();
+      HRESULT pushDataPoint(struct DataPoint *point);
 
-     HRESULT makeUnitSize();
+      HRESULT popDataPoint(struct DataPoint *point);
 
-     HRESULT ResetLimits(struct DataPoint *);
+      HRESULT ReSet();
 
-     HRESULT SetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+      HRESULT insert(struct DataList *insertBefore,struct DataPoint *data);
 
-     HRESULT SetDomainXYZ(double *xmin,double *ymin,double *zmin,double *xmax,double *ymax,double *zmax);
+      HRESULT addXYZ(double *x,double *y,double *z);
 
-     HRESULT GetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+      HRESULT addMovePoint();
 
-     HRESULT IncludeDomain(IDataSet* pTheOtherDataSet);
+      HRESULT makeUnitSize();
 
-     [propget] HRESULT IsIncludedDomain([in]IDataSet*pOtherDataSet,[out,retval]boolean *);
+      HRESULT ResetLimits(struct DataPoint *);
 
-     HRESULT RemoveIncludedDomain(IDataSet* pTheOtherDataSet);
+      HRESULT SetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
 
-     HRESULT SetColorRGB(double *red,double *green,double *blue);
+      HRESULT SetDomainXYZ(double *xmin,double *ymin,double *zmin,double *xmax,double *ymax,double *zmax);
 
-     HRESULT Scale(struct DataPoint* scaleVector);
+      HRESULT GetDomain(struct DataPoint* minPoint,struct DataPoint* maxPoint);
 
-     HRESULT Translate(struct DataPoint* translate);
+      HRESULT IncludeDomain(IDataSet* pTheOtherDataSet);
 
-     HRESULT TranslateGDI(POINT *ptGDI);
+      [propget] HRESULT IsIncludedDomain([in]IDataSet*pOtherDataSet,[out,retval]boolean *);
 
-     HRESULT Rotate(char axis,double degrees);
+      HRESULT RemoveIncludedDomain(IDataSet* pTheOtherDataSet);
 
-     HRESULT RotateVector(double angle,struct DataPoint *v);
+      HRESULT SetColorRGB(double *red,double *green,double *blue);
 
-     HRESULT Move(struct DataPoint* toPoint);
+      HRESULT Scale(struct DataPoint* scaleVector);
 
-     HRESULT Shear(char axis,double ratio);
+      HRESULT Translate(struct DataPoint* translate);
 
-     HRESULT GenerateBoundingBox(IDataSet* pIDataSetBoundingBox);
+      HRESULT TranslateGDI(POINT *ptGDI);
 
-     HRESULT GenerateGDICoordinates(IUnknown *castablePtrToIOpenGLImplementation);
+      HRESULT Rotate(char axis,double degrees);
 
-     HRESULT PushExtents();
+      HRESULT RotateVector(double angle,struct DataPoint *v);
+
+      HRESULT Move(struct DataPoint* toPoint);
+
+      HRESULT Shear(char axis,double ratio);
+
+      HRESULT GenerateBoundingBox(IDataSet* pIDataSetBoundingBox);
+
+      HRESULT GenerateGDICoordinates(IUnknown *castablePtrToIOpenGLImplementation);
+
+      HRESULT PushExtents();
       
-     HRESULT PopExtents();
+      HRESULT PopExtents();
 
-     HRESULT Evaluate(BSTR expression,double *result);
+      HRESULT Evaluate(BSTR expression,double *result);
 
-     HRESULT GetDomainGDI(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+      HRESULT GetDomainGDI(struct DataPoint* minPoint,struct DataPoint* maxPoint);
+
+      [helpstring("Starts sending the data to whomever is listening on the IDataSetEvents interface.")]
+      HRESULT Start();
+
+      [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
+      HRESULT AdviseGSystemStatusBar(IGSystemStatusBar *);
 
    };
 
 
    [uuid(8CAEFDA3-55E6-11d3-8365-006008BD5BC3),helpstring("DataSet Events Interface")]
    interface IDataSetEvents : IUnknown {
+
+      [helpstring("The DataSet sends this event before evaluation of the expression. This is a good point to clear your \"dataspace\" as fresh data will soon be coming.")]
+      HRESULT Clear();
+
+      [ helpstring("The DataSet sends this event after it has determined the number of values it will produce.")]
+      HRESULT Started([in]long cntExpectedResults);
+
+      [helpstring("This event supplies the client with the data, passing the iteration Number, the number of values in the array of variable names and the array of variable values.")]
+      HRESULT TakeValues([in]long iterationNo,[in]long valueCount,[in]SAFEARRAY(BSTR)* pNamesArrayOfStrings,[in]SAFEARRAY(double)* pValuesArrayOfDoubles);
+
+      [helpstring("The DataSet is finished sending the data.")]
+      HRESULT Finished();
 
    };
   

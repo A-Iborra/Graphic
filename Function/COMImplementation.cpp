@@ -21,6 +21,7 @@
 #include "Properties_i.c"
 
 #include "Plot_i.c"
+#include "DataSet_i.c"
 
    HMODULE hModule;
    char szModuleName[1024];

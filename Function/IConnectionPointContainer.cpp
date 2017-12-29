@@ -389,8 +389,10 @@
  
    void Function::fire_Finished() {
    STANDARD_NOARGUMENT_EVENT(functionEventID_Finished)
-   if ( hwndSpecDialog )
-      EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),pIPlot ? TRUE : FALSE);
+   //if ( hwndSpecDialog ) {
+   //   EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),pIPlot ? TRUE : FALSE);
+   //   EnableWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_DATASET_PROPERTIES),pIPlot ? TRUE : FALSE);
+   //}
    return;
    }
 

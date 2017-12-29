@@ -91,10 +91,5 @@
 
 
    HRESULT GraphicHost::_IOleInPlaceSite::OnPosRectChange(const RECT*) {
-/*
-   RECT rect;
-   GetWindowRect(GetParent(GetParent(pParent -> HWNDSite())),&rect);
-   SendMessage(GetParent(GetParent(pParent -> HWNDSite())),WM_SIZE,(WPARAM)SIZE_RESTORED,MAKELPARAM(rect.right - rect.left,rect.bottom - rect.top));
-*/
    return S_OK;
    }

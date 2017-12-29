@@ -644,7 +644,7 @@
    HRESULT Axis::get_DataSet(IDataSet **ppds) {
    if ( ! ppds ) return E_POINTER;
    if ( ! pIPlot ) return E_UNEXPECTED;
-   return pIPlot -> get_DataSet(ppds);
+   return pIPlot -> get_IDataSet(ppds);
    }
 
 

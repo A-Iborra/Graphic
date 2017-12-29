@@ -62,8 +62,11 @@
        pIOleInPlaceActiveObject(NULL),
        pIPropertyNotifySink(NULL),
        pIPropertyPlots(NULL),
+       pIPropertyDataSets(NULL),
+       pIGSystemStatusBar(NULL),
 
        pIPlot(NULL),
+       pIDataSet(NULL),
 
        pOleAdviseHolder(NULL),
        pDataAdviseHolder(NULL),
@@ -101,15 +104,17 @@
        pIPropertyManuallyAddedVariables(NULL),
 
        userMode(FALSE),
-       expressionVisible(FALSE),
-       resultsVisible(FALSE),
-       variablesVisible(FALSE),
-       controlsVisible(FALSE),
-       startVisible(FALSE),
-       pauseVisible(FALSE),
-       resumeVisible(FALSE),
-       stopVisible(FALSE),
-       plotPropertiesVisible(FALSE),
+       expressionVisible(TRUE),
+       resultsVisible(TRUE),
+       variablesVisible(TRUE),
+       controlsVisible(TRUE),
+       startVisible(TRUE),
+       pauseVisible(TRUE),
+       resumeVisible(TRUE),
+       stopVisible(TRUE),
+       plotPropertiesVisible(TRUE),
+       dataSetPropertiesVisible(TRUE),
+
        enteringData(FALSE),
        stopAllProcessing(FALSE),
 
@@ -193,6 +198,8 @@
 
    iProperties -> Add(L"plot properties visible",&pIPropertyPlotPropertiesVisible);
 
+   iProperties -> Add(L"data set properties visible",&pIPropertyDataSetPropertiesVisible);
+
    pIPropertyPropertiesVisible -> directAccess(TYPE_BOOL,&allowUserProperties,sizeof(allowUserProperties));
    pIPropertyPropertiesControlVisibility -> directAccess(TYPE_BOOL,&allowUserPropertiesControls,sizeof(allowUserPropertiesControls));
 
@@ -205,6 +212,7 @@
    pIPropertyResumeVisible -> directAccess(TYPE_BOOL,&resumeVisible,sizeof(resumeVisible));
    pIPropertyStopVisible -> directAccess(TYPE_BOOL,&stopVisible,sizeof(stopVisible));
    pIPropertyPlotPropertiesVisible -> directAccess(TYPE_BOOL,&plotPropertiesVisible,sizeof(plotPropertiesVisible));
+   pIPropertyDataSetPropertiesVisible -> directAccess(TYPE_BOOL,&dataSetPropertiesVisible,sizeof(dataSetPropertiesVisible));
 
    pIPropertyExpressionLabel -> directAccess(TYPE_SZSTRING,expressionLabel,sizeof(expressionLabel));
    pIPropertyResultsLabel -> directAccess(TYPE_SZSTRING,resultsLabel,sizeof(resultsLabel));
@@ -236,7 +244,10 @@
 
    iProperties -> Add(L"plots",&pIPropertyPlots);
 
-   //NTC: 12-14-2017: I am not sure why this InitNew was not in here prior to today. I have addeded it, though commented out.
+   rc = CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
+
+   iProperties -> Add(L"datasets",&pIPropertyDataSets);
+
    InitNew();
 
    refCount = 0;
@@ -273,6 +284,9 @@
 
    if ( pIPlot )
       pIPlot -> Release();
+
+   if ( pIDataSet )
+      pIDataSet -> Release();
 
 #if 0
    for ( IVariable **ppv : variableToDeleteList )
@@ -399,8 +413,6 @@
    pVariableList -> SetHwnds(hwndVariablesTab,hwndVariablesTab);
 
    pManuallyAddedVariables -> SetHwnds(hwndVariablesTab,hwndVariablesTab);
-
-//????!?!?!?!   Loaded();
 
    SetWindowLongPtr(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),GWLP_USERDATA,(ULONG_PTR)this);
    oldResultLabelHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_RESULT_LABEL),GWLP_WNDPROC,(ULONG_PTR)functionDialogHandler);
@@ -593,13 +605,25 @@
       resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_STOP));
    }
 
-   if ( ! controlsVisible || ! plotPropertiesVisible ) 
-      ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),SW_HIDE);
-   else {
-      SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,gapRight,currentBottom + 4,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
-      currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES);
-      resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES));
-   }
+   //currentRight = 0L;
+   //controlsTop = currentBottom + 4;
+
+   //if ( ! controlsVisible || ! plotPropertiesVisible ) 
+   //   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),SW_HIDE);
+   //else {
+   //   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES),HWND_TOP,gapRight,controlsTop + 4,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+   //   currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES);
+   //   currentRight = rightEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES);
+   //   resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_PLOT_PROPERTIES));
+   //}
+
+   //if ( ! controlsVisible || ! dataSetPropertiesVisible ) 
+   //   ShowWindow(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_DATASET_PROPERTIES),SW_HIDE);
+   //else {
+   //   SetWindowPos(GetDlgItem(hwndSpecDialog,IDDI_FUNCTION_DATASET_PROPERTIES),HWND_TOP,currentRight + 8,controlsTop + 4,0,0,SWP_NOSIZE | SWP_SHOWWINDOW);
+   //   currentBottom = bottomEdge(hwndSpecDialog,IDDI_FUNCTION_DATASET_PROPERTIES);
+   //   resultingWidth = max(resultingWidth,rightEdge(hwndSpecDialog,IDDI_FUNCTION_DATASET_PROPERTIES));
+   //}
 
    resultingHeight = currentBottom;
 
@@ -626,7 +650,7 @@
    for ( int k = 0; k < 3; k++ ) 
       if ( visibleItems[k] )
          return true;
-   for ( int k = 4; k < 9; k++ )
+   for ( int k = 4; k < 10; k++ )
       if ( controlsVisible && visibleItems[k] )
          return true; 
    return false;

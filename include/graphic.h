@@ -459,7 +459,7 @@
       HWND hwndAxisSettings;
       HWND hwndDataSourcesDialog,hwndDataSourcesTab,hwndDataSourcesFunctions,hwndDataSourcesDataSets;
 
-      POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlMouseBeforeMenu,ptlLastMouse;
+      POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlLastMouse;
       BOOL trackedMouse;
       POINTL rightMouseClickPosition;
       float zLevel;
@@ -618,6 +618,7 @@
       static unsigned int __stdcall processMenus(void *someObject);
 
       friend class ContainedFunction;
+      friend class ContainedDataSet;
       friend class _IGPropertiesClient;
       friend class _IGPropertyClient;
       friend class _IGPropertyPageClient;

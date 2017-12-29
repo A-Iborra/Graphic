@@ -16,6 +16,7 @@
                           HDC hicTarget,HDC hdcDraw,const struct _RECTL *rectlClient,
                           const struct _RECTL *rectlMetaFile,int (__stdcall *cancelFunction)(DWORD),DWORD cancelParameter) {
  
+#if 0
    if ( dvAspect != DVASPECT_CONTENT ) return S_OK;
 
    if ( ! pIOleClientSite ) 
@@ -49,7 +50,7 @@
          rectlClient -> left,rectlClient -> top,rectlClient -> right - rectlClient -> left, rectlClient -> bottom - rectlClient -> top,SWP_NOZORDER);
 
    }
-
+#endif
    return S_OK;
    }
  
@@ -106,10 +107,8 @@
    STDMETHODIMP DataSet::GetExtent(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *s) {
    if ( ! hwndSpecDialog )
       initWindows();
-   RECT rc;
-   GetWindowRect(hwndSpecDialog,&rc);
-   s -> cx = rc.right - rc.left;
-   s -> cy = rc.bottom - rc.top;
+   s -> cx = containerSize.cx;
+   s -> cy = containerSize.cy;
    pixelsToHiMetric(s,s);
    return S_OK;
    }

@@ -139,8 +139,6 @@
 
    memset(windowTitle,0,sizeof(windowTitle));
 
-   ptlMouseBeforeMenu.x = ptlMouseBeforeMenu.y = 0;
-
    memset(&rightMouseClickPosition,0,sizeof(rightMouseClickPosition));
 
    memset(&rectStatusText,0,sizeof(rectStatusText));
@@ -554,7 +552,25 @@
 
    pDataSet_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
 
+   pIDataSet -> Initialize((void *)pIDataSetMaster,(void *)pIOpenGLImplementation,NULL,NULL,
+                              propertyPlotView,
+                              propertyDefault2DPlotType,
+                              propertyDefault3DPlotType,
+                              propertyBackgroundColor,
+                              propertyFloor,
+                              propertyCeiling,someObjectChanged,(void *)this);
+
+   IPlot *pIPlot = NULL;
+
+   pIDataSet -> get_IPlot((void **)&pIPlot);
+
+   pIPlot -> put_OkToPlot(0);
+
+   plotList.Add(pIPlot,NULL,dataSetID);
+
    dataSetList.Add(pIDataSet,NULL,dataSetID);
+
+   pIDataSet -> AdviseGSystemStatusBar(pIGSystemStatusBar);
 
    if ( connectNow ) 
       connectDataSet(pIDataSet);
@@ -568,6 +584,8 @@
    pIDataSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownDataSet));
    ContainedDataSet *pContainedDataSet = new ContainedDataSet(this,dataSetList.ID(pIDataSet),hwndDataSourcesDataSets,pIDataSet,pIUnknownDataSet,IID_IDataSetEvents);
    pIUnknownDataSet -> Release();
+
+   pIDataSet -> put_OnChangeCallback(someObjectChanged,(void *)this);
 
    IOleObject* pIOleObject;
    IOleClientSite* pIOleClientSite;
@@ -585,8 +603,6 @@
    pIOleObject -> Release();
 
    pIOleClientSite -> Release();
-
-   setDataSourcesVisibility(pIDataSet,NULL);
 
    return;
    } 
@@ -639,6 +655,8 @@
 
    plotList.Add(pIPlot,NULL,functionID);
 
+   pIFunction -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+
    functionList.Add(pIFunction,NULL,functionID);
 
    if ( connectNow )
@@ -677,8 +695,6 @@
    pIOleObject -> Release();
 
    pIOleClientSite -> Release();
-
-   setDataSourcesVisibility(NULL,pIFunction);
 
    return;
    }

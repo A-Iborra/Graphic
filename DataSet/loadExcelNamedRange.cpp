@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-   long DataSet::loadExcelNamedRange() {
+   long DataSet::loadExcelNamedRange(HWND hwndDestinationList,char *pszWorkbookName,char *pszRangeName) {
 
    if ( ! hwndExcelSettings )
       return 0;
@@ -14,23 +14,29 @@
    vtIndex.lVal = 0L;
 
    Excel::_Workbook *pIWorkbook = NULL;
+   Excel::Sheets *pIWorksheets = NULL;
+   Excel::_Worksheet *pIWorksheet = NULL;
    Excel::NamesPtr pRanges = NULL;
    Excel::NamePtr pRange = NULL;
 
-   HWND hwndListView = GetDlgItem(hwndExcelSettings,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS);
-      
-   SendMessage(hwndListView,LVM_DELETEALLITEMS,0L,0L);
+   //HWND hwndListView = GetDlgItem(hwndExcelSettings,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS);
+     
+   if ( hwndDestinationList ) { 
 
-   LVCOLUMN lvColumn = {0};
+      SendMessage(hwndDestinationList,LVM_DELETEALLITEMS,0L,0L);
 
-   lvColumn.mask = LVCF_WIDTH;
+      LVCOLUMN lvColumn = {0};
 
-   while ( SendMessage(hwndListView,LVM_GETCOLUMN,0,(LPARAM)&lvColumn) )
-      SendMessage(hwndListView,LVM_DELETECOLUMN,0L,0L);
+      lvColumn.mask = LVCF_WIDTH;
+
+      while ( SendMessage(hwndDestinationList,LVM_GETCOLUMN,0,(LPARAM)&lvColumn) )
+         SendMessage(hwndDestinationList,LVM_DELETECOLUMN,0L,0L);
+
+   }
 
    try {
 
-   pIWorkbook = openExcelWorkbook(&wasOpen);
+   pIWorkbook = openExcelWorkbook(pszWorkbookName,&wasOpen);
 
    HRESULT hr = pIWorkbook -> get_Names(&pRanges);
 
@@ -48,7 +54,7 @@
 
       WideCharToMultiByte(CP_ACP,0,theName,-1,szName,128,0,0);
 
-      if ( 0 == strcmp(szNamedRange,szName) ) 
+      if ( 0 == strcmp(pszRangeName,szName) ) 
          break;
 
       pRange -> Release();
@@ -142,9 +148,6 @@
    long columnCount = column2 - column1 + 1;
    long rowCount = row2 - row1 + 1;
 
-   Excel::Sheets *pIWorksheets = NULL;
-   Excel::_Worksheet *pIWorksheet = NULL;
-
    hr = pIWorkbook -> get_Worksheets(&pIWorksheets);
 
    count = 0L;
@@ -198,24 +201,6 @@
 
    }
 
-   RECT rc;
-
-   GetWindowRect(hwndListView,&rc);
-
-   long cxColumns = rc.right - rc.left;
-
-   long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
-
-   char szHeader[32];
-
-   LVCOLUMN lvColumn;
-   memset(&lvColumn,0,sizeof(LVCOLUMN));
-
-   lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
-   lvColumn.fmt = LVCFMT_LEFT;
-   lvColumn.cx = cxOneColumn;
-   lvColumn.pszText = szHeader;
-
    VARIANT vtCell1,vtCell2;
 
    vtCell1.vt = VT_BSTR;
@@ -224,50 +209,72 @@
    vtCell2.vt = VT_BSTR;
    vtCell2.bstrVal = NULL;
 
-   for ( long k = 0; k < columnCount; k++ ) {
+   if ( hwndDestinationList ) {
 
-      swprintf(szwRange,L"R%ld:C%ld",row1 - 1,column1 + k);
+      RECT rc;
 
-      if ( vtCell1.bstrVal )
-         SysFreeString(vtCell1.bstrVal);
+      GetWindowRect(hwndDestinationList,&rc);
 
-      vtCell1.bstrVal = SysAllocString(szwRange);
+      long cxColumns = rc.right - rc.left;
 
-      swprintf(szwRange,L"R%ld:C%ld",row1 - 1,column1 + k);
+      long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
 
-      if ( vtCell2.bstrVal )
-         SysFreeString(vtCell2.bstrVal);
+      char szHeader[32];
 
-      vtCell2.bstrVal = SysAllocString(szwRange);
+      LVCOLUMN lvColumn;
+      memset(&lvColumn,0,sizeof(LVCOLUMN));
 
-      try {
+      lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+      lvColumn.fmt = LVCFMT_LEFT;
+      lvColumn.cx = cxOneColumn;
+      lvColumn.pszText = szHeader;
 
-      _variant_t vtSafeArray = pIWorksheet -> GetCells() -> GetRange(vtCell1,vtCell2) -> GetValue();
+      for ( long k = 0; k < columnCount; k++ ) {
 
-      LONG upperBound;
+         swprintf(szwRange,L"R%ld:C%ld",row1 - 1,column1 + k);
 
-      SafeArrayGetUBound(vtSafeArray.parray,1,&upperBound);
+         if ( vtCell1.bstrVal )
+            SysFreeString(vtCell1.bstrVal);
 
-      VARIANT *pValues = NULL;
+         vtCell1.bstrVal = SysAllocString(szwRange);
 
-      SafeArrayAccessData(vtSafeArray.parray,(void **)&pValues);
+         swprintf(szwRange,L"R%ld:C%ld",row1 - 1,column1 + k);
 
-      pValues = pValues + upperBound * k;
+         if ( vtCell2.bstrVal )
+            SysFreeString(vtCell2.bstrVal);
 
-      if ( VT_BSTR == pValues -> vt ) 
-         WideCharToMultiByte(CP_ACP,0,pValues -> bstrVal,-1,szHeader,32,0,0);
-      else
-         sprintf(szHeader,"Col %ld",k + 1);
+         vtCell2.bstrVal = SysAllocString(szwRange);
 
-      SafeArrayUnaccessData(vtSafeArray.parray);
+         try {
 
-      } catch ( _com_error e ) {
+         _variant_t vtSafeArray = pIWorksheet -> GetCells() -> GetRange(vtCell1,vtCell2) -> GetValue();
 
-         sprintf(szHeader,"Col %ld",k + 1);
+         LONG upperBound;
+
+         SafeArrayGetUBound(vtSafeArray.parray,1,&upperBound);
+
+         VARIANT *pValues = NULL;
+
+         SafeArrayAccessData(vtSafeArray.parray,(void **)&pValues);
+
+         pValues = pValues + upperBound * k;
+
+         if ( VT_BSTR == pValues -> vt ) 
+            WideCharToMultiByte(CP_ACP,0,pValues -> bstrVal,-1,szHeader,32,0,0);
+         else
+            sprintf(szHeader,"Col %ld",k + 1);
+
+         SafeArrayUnaccessData(vtSafeArray.parray);
+
+         } catch ( _com_error e ) {
+
+            sprintf(szHeader,"Col %ld",k + 1);
+
+         }
+
+         SendMessage(hwndDestinationList,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
 
       }
-
-      SendMessage(hwndListView,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
 
    }
 
@@ -287,13 +294,19 @@
 
    _variant_t vtSafeArray = pIWorksheet -> GetCells() -> GetRange(vtCell1,vtCell2) -> GetValue();
 
+#if 1
+
+   populateData(hwndDestinationList,vtSafeArray.parray);
+
+#else
+
    LONG lowerBound[2],upperBound[2];
 
    SafeArrayGetUBound(vtSafeArray.parray,1,&upperBound[0]);
-   SafeArrayGetUBound(vtSafeArray.parray,1,&upperBound[1]);
+   SafeArrayGetUBound(vtSafeArray.parray,2,&upperBound[1]);
 
    SafeArrayGetLBound(vtSafeArray.parray,1,&lowerBound[0]);
-   SafeArrayGetLBound(vtSafeArray.parray,1,&lowerBound[1]);
+   SafeArrayGetLBound(vtSafeArray.parray,2,&lowerBound[1]);
 
    VARIANT *pValues = NULL;
 
@@ -301,8 +314,8 @@
 
    VARIANT *pv = pValues;
 
-   WCHAR szwValue[32];
-   char szValue[32];
+   WCHAR szwValue[EXCEL_VALUE_SIZE];
+   char szValue[EXCEL_VALUE_SIZE];
 
    LVITEM lvItem = {0};
    lvItem.mask = LVIF_TEXT;
@@ -314,32 +327,59 @@
 
          VARIANT *pvt = pv++;
 
+         try {
+
+#if 1
+         if ( ! ( S_OK == VariantChangeTypeEx(pvt,pvt,NULL,0,VT_BSTR) ) ) 
+            swprintf(szwValue,L"#error");
+         else
+            swprintf(szwValue,L"%ls",pvt -> bstrVal);
+
+#else
+
          switch ( pvt -> vt ) {
          case VT_INT:
-            swprintf(szwValue,L"%d",pvt -> intVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> intVal); break;
          case VT_I1:
-            swprintf(szwValue,L"%c",pvt -> cVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%c",pvt -> cVal); break;
          case VT_I2:
-            swprintf(szwValue,L"%d",pvt -> iVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> iVal); break;
          case VT_I4:
-            swprintf(szwValue,L"%d",pvt -> lVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> lVal); break;
          case VT_UI1:
-            swprintf(szwValue,L"%c",pvt -> cVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%c",pvt -> cVal); break;
          case VT_UI2:
-            swprintf(szwValue,L"%d",pvt -> iVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> iVal); break;
          case VT_UI4:
-            swprintf(szwValue,L"%ld",pvt -> uintVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ld",pvt -> uintVal); break;
          case VT_UINT:
-            swprintf(szwValue,L"%ld",pvt -> uintVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ld",pvt -> uintVal); break;
          case VT_R4:
-            swprintf(szwValue,L"%f",pvt -> fltVal); break;
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%f",pvt -> fltVal); break;
          case VT_R8:  
-            swprintf(szwValue,L"%lf",pvt -> dblVal); break;
-
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%lf",pvt -> dblVal); break;
+         case VT_BSTR:
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ls",pvt -> bstrVal); break;
+         case VT_DATE: {
+            if ( ! ( S_OK == VariantChangeTypeEx(pvt,pvt,NULL,0,VT_BSTR) ) ) 
+               swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"#error");
+            else
+               swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ls",pvt -> bstrVal);
+            }
+            break;
          default:
-            swprintf(szwValue,L"nan");
+            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"nan");
             break;
          }
+#endif
+
+         } catch ( ... ) {
+OutputDebugString("\nhello world");
+
+         }
+
+
+         if ( hwndDestinationList ) {
 
          lvItem.iItem = k;
 
@@ -348,15 +388,32 @@
          WideCharToMultiByte(CP_ACP,0,szwValue,-1,szValue,32,0,0);
 
          if ( 0 == j )
-            SendMessageW(hwndListView,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+            SendMessageW(hwndDestinationList,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
          else
-            SendMessageW(hwndListView,LVM_SETITEM,0L,(LPARAM)&lvItem);
+            SendMessageW(hwndDestinationList,LVM_SETITEM,0L,(LPARAM)&lvItem);
+
+         }
 
       }
 
    }
+#endif
 
    SafeArrayUnaccessData(vtSafeArray.parray);
+
+   } catch ( _com_error e ) {
+
+      char szMessage[1024];
+
+
+
+      sprintf(szMessage,"There was an error working with the workbook %s in named range %s.\n\nThe Excel subsystem returned the error %s (%ld).\n\n"
+                           "Please check your Workbook or try using a different one.",
+                  szDataSource,pszRangeName,e.ErrorMessage(),e.Error());
+
+      MessageBox(NULL,szMessage,"Error",MB_ICONEXCLAMATION | MB_TOPMOST);
+
+   }
 
    if ( pIWorksheet )
       pIWorksheet -> Release();
@@ -375,20 +432,6 @@
 
    if ( pIApplication )
       pIApplication -> Release();
-
-   } catch ( _com_error e ) {
-
-      char szMessage[1024];
-
-
-
-      sprintf(szMessage,"There was an error working with the workbook %s in named range %s.\n\nThe Excel subsystem returned the error %s (%ld).\n\n"
-                           "Please check your Workbook or try using a different one.",
-                  szDataSource,szNamedRange,e.ErrorMessage(),e.Error());
-
-      MessageBox(NULL,szMessage,"Error",MB_ICONEXCLAMATION | MB_TOPMOST);
-
-   }
 
    return 0;
    }

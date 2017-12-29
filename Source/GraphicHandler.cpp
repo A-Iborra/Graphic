@@ -37,7 +37,6 @@
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
       }
       return LRESULT(FALSE);
- 
 
    case WM_MOUSELEAVE:
       if ( ! isOpenGLActive )
@@ -126,20 +125,17 @@
  
 
    case WM_RBUTTONDOWN: {
-      if ( ! isOpenGLActive )
-         break;
+
       POINTL ptl = {LOWORD(lParam),HIWORD(lParam)};
-      p -> eraseGraphicCursor();
       p -> rightMouseClickPosition = ptl;
-      if ( ! p -> pick(&ptl,processMenus,FALSE) ) {
-         p -> ptlMouseBeforeMenu.x = ptl.x;
-         p -> ptlMouseBeforeMenu.y = ptl.y;
-         POINT pt{ptl.x,ptl.y};
-         ClientToScreen(hwnd,&pt);
-         ptl.x = pt.x;
-         ptl.y = pt.y;
-         TrackPopupMenu(p -> hwndMenuPlot(),TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptl.x,ptl.y,0,hwnd,NULL);
-      }
+      POINT ptMenu{ptl.x,ptl.y};
+      ClientToScreen(hwnd,&ptMenu);
+      if ( isOpenGLActive ) {
+         p -> eraseGraphicCursor();
+         if ( ! p -> pick(&ptl,processMenus,FALSE) )
+            TrackPopupMenu(p -> hwndMenuPlot(),TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptMenu.x,ptMenu.y,0,hwnd,NULL);
+      } else
+         TrackPopupMenu(p -> hwndMenuPlot(),TPM_LEFTALIGN | TPM_RIGHTBUTTON,ptMenu.x,ptMenu.y,0,hwnd,NULL);
       }
       return LRESULT(TRUE);
  
@@ -230,7 +226,7 @@
             mi.cch = 256;
             GetMenuItemInfo(hmenuTemp,k,MF_BYPOSITION,&mi);
 
-            if ( strcmp("evaluate",szFunctionName) == 0 ) {
+            if ( strcmp("Evaluate",szFunctionName) == 0 ) {
 
                if ( 0 == p -> functionList.Count() ) {
                   mi.fMask = MIIM_STATE;
@@ -296,6 +292,10 @@
          SetMenuItemInfo(hmenuTemp,p -> plotView == gcPlotView2D ? 0 : 1,TRUE,&mi);
          mi.fState = MFS_UNCHECKED;
          SetMenuItemInfo(hmenuTemp,p -> plotView == gcPlotView2D ? 1 : 0,TRUE,&mi);
+         mi.fState = MFS_DISABLED;
+         if ( p -> plotView == gcPlotView3D )
+            mi.fState = MFS_ENABLED;
+         SetMenuItemInfo(hmenuTemp,2,TRUE,&mi);
          }
          break;
 
@@ -356,22 +356,6 @@
       case IDMI_GRAPHIC_VIEW_SET:
          p -> pIViewSet -> Properties(G::someObjectChanged,(void *)p);
          return LRESULT(TRUE);
-
-      case IDDI_GRAPHIC_SUB_STYLE_SURFACE:
-         p -> put_PlotType(gcPlotTypeSurface);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
- 
-      case IDDI_GRAPHIC_SUB_STYLE_WIREFRAME:
-         p -> put_PlotType(gcPlotTypeWireFrame);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
- 
-      case IDDI_GRAPHIC_SUB_STYLE_NATURAL:
-         p -> put_PlotType(gcPlotTypeNatural);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
- 
-      case IDDI_GRAPHIC_SUB_STYLE_STACKS:
-         p -> put_PlotType(gcPlotTypeStacks);
-         return SendMessage(hwnd,WM_COMMAND,(WPARAM)IDMI_GRAPHIC_VIEW_3D,lParam);
 
       case IDMI_GRAPHIC_ZOOM_FULL: {
  
@@ -447,12 +431,9 @@
       return LRESULT(FALSE);
  
    case WM_SIZE: {
-
       if ( ! p )
          break;
-
       p -> setDataSourcesVisibility(NULL,NULL);
-
       }
       return (LRESULT)0;
 

@@ -67,7 +67,7 @@
    IDataSet* pIDataSetPlot;
    boolean bIsIncluded;
 
-   pIPlot -> get_DataSet(&pIDataSetPlot);
+   pIPlot -> get_IDataSet(&pIDataSetPlot);
 
    pIDataSetDomain -> get_IsIncludedDomain(pIDataSetPlot,&bIsIncluded);
    if ( bIsIncluded )

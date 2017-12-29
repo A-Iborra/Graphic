@@ -728,13 +728,9 @@ dxScale = 1.0;
 
    get_PartOfWorldDomain(&oldPartOfWorldDomain);
 
-   CoCreateInstance(CLSID_DataSet,
-                      NULL,
-                      CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                      IID_IDataSet,
-                      reinterpret_cast<void **>(&pIDataSet));
+   CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
 
-   pIBasePlot -> put_DataSet(pIDataSet);
+   pIBasePlot -> put_IDataSet(pIDataSet);
 
    pIDataSetWorld = pIDataSet;
 
@@ -779,7 +775,7 @@ dxScale = 1.0;
 
    pIDataSet = pIDataSetOld;
 
-   pIBasePlot -> put_DataSet(pIDataSet);
+   pIBasePlot -> put_IDataSet(pIDataSet);
 
    format = oldFormat;
 

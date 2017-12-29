@@ -8,6 +8,11 @@
 
 #include "DataSet.h"
 
+#define ENABLE_LOAD \
+EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> szCellRange) && \
+   -1 < SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L) && \
+   0 < strlen(p -> szDataSource) ) ? TRUE : FALSE);
+
    LRESULT EXPENTRY DataSet::dataSetExcelHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
    
    DataSet *p = (DataSet *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -25,38 +30,75 @@
       p -> hwndExcelSettings = hwnd;
 
       EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE),FALSE);
-      //EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET),FALSE);
-
-      //if ( p -> szSpreadsheetName[0] ) {
-      //   SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET,p -> szSpreadsheetName);
-      //   char szLabel[128];
-      //   sprintf(szLabel,"Named ranges in %s:",p -> szSpreadsheetName);
-      //   SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL,szLabel);
-      //   p -> loadExcelWorksheet();
-      //}
 
       RECT rcDialog;
       RECT rcRangeList;
 
       GetWindowRect(hwnd,&rcDialog);
 
-      GetWindowRect(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST),&rcRangeList);
+      GetWindowRect(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_INPUT_BOX),&rcRangeList);
 
       SetWindowPos(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),HWND_TOP,16,rcRangeList.bottom - rcDialog.top + 16,rcDialog.right - rcDialog.left - 32,rcDialog.bottom - rcDialog.top - (rcRangeList.bottom - rcDialog.top + 16) - 16,0L);
 
-      if ( p -> szDataSource[0] )
-         p -> loadExcelWorkbook();
+      ENABLE_LOAD
 
-      if ( p -> szNamedRange[0] )
-         p -> loadExcelNamedRange();
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_LOAD_ERROR),GWLP_USERDATA,(ULONG_PTR)RGB(255,0,0));
+
+      DataSet::nativeStaticHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_LOAD_ERROR),GWLP_WNDPROC,(ULONG_PTR)DataSet::statusAndErrorTextStaticHandler);
 
       }
       break;
 
-   case WM_SHOWWINDOW:
-   case WM_ACTIVATE:
+   case WM_SHOWWINDOW: {
+
+      if ( ! wParam )
+         break;
+
       SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE),p -> szDataSource);
-      //SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET),p -> szSpreadsheetName);
+
+      if ( ! p -> szDataSource[0] )
+         break;
+
+      ENABLE_LOAD
+
+      SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY,p -> szCellRange);
+
+      long countSheets = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
+
+      long countRanges = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
+
+      if ( 0 == countRanges || 0 == countSheets ) {
+         p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST),GetDlgItem(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST),p -> szDataSource,p -> szSpreadsheetName,p -> szNamedRange);
+         countSheets = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
+         countRanges = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
+         long currentSelection = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L);
+         if ( -1 < currentSelection ) {
+            SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szNamedRange);
+            p -> loadExcelNamedRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),p -> szDataSource,p -> szNamedRange);
+         }
+      }
+
+      long currentSheet = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L);
+
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGES_LIST_LABEL),countRanges ? TRUE : FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST),countRanges ? TRUE : FALSE);
+
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SELECTSHEET_LABEL1),countSheets ? TRUE : FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST),countSheets ? TRUE : FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY),countSheets && -1 < currentSheet ? TRUE : FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),countSheets && - 1 < currentSheet ? TRUE : FALSE);
+
+      long countData = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS,LVM_GETITEMCOUNT,0L,0L);
+
+      if ( 0 == countData ) {
+         if ( p -> szCellRange[0] && p -> szSpreadsheetName[0] && ! p -> szNamedRange[0] ) 
+            p -> loadExcelCellRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),GetDlgItem(hwnd,IDDI_DATASET_EXCEL_LOAD_ERROR),p -> szDataSource, p -> szSpreadsheetName,p -> szCellRange);
+         else 
+            if ( p -> szNamedRange[0] )
+               p -> loadExcelNamedRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),p -> szDataSource,p -> szNamedRange);
+      }
+
+      }
       break;
 
    case WM_COMMAND: {
@@ -65,48 +107,48 @@
 
       switch ( LOWORD(wParam) ) {
 
-      //case IDDI_DATASET_EXCEL_SPREADSHEET_LIST: {
-      //   if ( CBN_SELCHANGE == notifyCode ) {
-      //      char szSelectedSheet[64];
-      //      SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L),(LPARAM)szSelectedSheet);
-      //      if ( strcmp(szSelectedSheet,p -> szSpreadsheetName) ) {
-      //         strcpy(p -> szSpreadsheetName,szSelectedSheet);
-      //         SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET,p -> szSpreadsheetName);
-      //         char szLabel[128];
-      //         sprintf(szLabel,"Named ranges in %s:",p -> szSpreadsheetName);
-      //         SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL,szLabel);
-      //         p -> loadExcelWorksheet();
-      //      }
-      //   }
-      //   }
-      //   break;
-
-      case IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST: {
-         if ( CBN_SELCHANGE == notifyCode ) {
-            char szSelectedRange[64];
-            SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L),(LPARAM)szSelectedRange);
-            if ( strcmp(szSelectedRange,p -> szNamedRange) ) {
-               strcpy(p -> szNamedRange,szSelectedRange);
-               p -> loadExcelNamedRange();
-               //SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET,p -> szSpreadsheetName);
-               //char szLabel[128];
-               //sprintf(szLabel,"Named ranges in %s:",p -> szSpreadsheetName);
-               //SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGES_LABEL,szLabel);
-               //p -> loadExcelWorksheet();
-            }
-         }
-         }
+      case IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST:
+         if ( ! ( CBN_SELCHANGE == notifyCode ) )
+            break;
+         SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szNamedRange);
+         p -> szCellRange[0] = '\0';
+         SetDlgItemText(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY,p -> szCellRange);
+         p -> loadExcelNamedRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),p -> szDataSource,p -> szNamedRange);
          break;
 
-      case IDDI_DATASET_EXCEL_OPEN_WORKBOOK: {
-         p -> launchExcel();
-         }
+      case IDDI_DATASET_EXCEL_SPREADSHEET_LIST:
+         if ( ! ( CBN_SELCHANGE == notifyCode ) )
+            break;
+         SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szSpreadsheetName);
+         EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY),TRUE);
+         GetDlgItemText(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY,p -> szCellRange,MAX_PATH);
+         if ( 0 < strlen(p -> szCellRange) )
+            p -> loadExcelCellRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),GetDlgItem(hwnd,IDDI_DATASET_EXCEL_LOAD_ERROR),p -> szDataSource,p -> szSpreadsheetName,p -> szCellRange);
+         break;
+
+      case IDDI_DATASET_EXCEL_OPEN_WORKBOOK:
+         p -> launchExcel(p -> szDataSource);
+         break;
+
+      case IDDI_DATASET_EXCEL_RANGE_ENTRY:
+         if ( ! ( EN_CHANGE == notifyCode ) )
+            break;
+         GetDlgItemText(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY,p -> szCellRange,MAX_PATH);
+         EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),0 < strlen(p -> szCellRange) ? TRUE : FALSE);
+         break;
+
+      case IDDI_DATASET_EXCEL_RANGE_LOAD:
+         SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_SETCURSEL,(WPARAM)-1,0L);
+         p -> loadExcelCellRange(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS),GetDlgItem(hwnd,IDDI_DATASET_EXCEL_LOAD_ERROR),p -> szDataSource,p -> szSpreadsheetName,p -> szCellRange);
          break;
 
       default:
          break;
 
       }
+
+      ENABLE_LOAD
+
       }
       break;
 

@@ -11,10 +11,6 @@
 
 #include "Function.h"
 
-#ifdef FUNCTION_SAMPLE
-   extern bool trialExpired;
-#endif
-
    long __stdcall _IEvaluatorEvents::QueryInterface(REFIID riid,void **ppv) {
 
    if ( IID_IUnknown == riid ) 
@@ -128,9 +124,6 @@
    }
 
    HRESULT _IEvaluatorEvents::Finished() {
-#ifdef FUNCTION_SAMPLE
-   if ( trialExpired ) return S_OK;
-#endif
    EnableWindow(GetDlgItem(pParent -> hWnd(),IDDI_FUNCTION_START),TRUE);
    EnableWindow(GetDlgItem(pParent -> hWnd(),IDDI_FUNCTION_EQUATION_ENTRY),TRUE);
    EnableWindow(GetDlgItem(pParent -> hWnd(),IDDI_FUNCTION_PAUSE),FALSE);

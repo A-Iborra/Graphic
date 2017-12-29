@@ -4,14 +4,9 @@
 
 */
 
-#include <windows.h>
-#include <process.h>
-
-#include "Utils.h"
 #include "Plot.h"
 
-#include "List.cpp"
-
+#include "Utils.h"
  
    STDMETHODIMP Plot::Initialize(IDataSet* pIDataSetDomain,
                                  IOpenGLImplementation *pimp,
@@ -62,9 +57,7 @@
    pOwnerPropertyBackgroundColor = parentBackground;
 
    put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
- 
-   //InitNew();
- 
+
    return S_OK;
    }
 
@@ -168,9 +161,16 @@
    }
 
 
-   HRESULT Plot::put_DataSet(IDataSet *inDataSet) { return BasePlot::put_DataSet(inDataSet); }
+   HRESULT Plot::put_IDataSet(IDataSet *inDataSet) { 
+   if ( propertyDataSet ) {
+      propertyDataSet -> Release();
+      pIProperties -> Remove(L"dataset");
+      propertyDataSet = NULL;
+   }
+   return BasePlot::put_IDataSet(inDataSet); 
+   }
 
-   HRESULT Plot::get_DataSet(IDataSet **getDataSet) { return BasePlot::get_DataSet(getDataSet); }
+   HRESULT Plot::get_IDataSet(IDataSet **getDataSet) { return BasePlot::get_IDataSet(getDataSet); }
  
    HRESULT Plot::get_DataArity(DataArity *pDataArity) { return BasePlot::get_DataArity(pDataArity); }
  
