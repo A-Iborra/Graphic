@@ -45,7 +45,7 @@
       if ( cx == 0 || cy == 0 )
          break;
 
-      SetWindowPos(GetDlgItem(hwnd,IDDI_DATASOURCES_TAB),HWND_TOP,0,0,cx - 12,cy - 12,SWP_NOMOVE);
+      SetWindowPos(GetDlgItem(hwnd,IDDI_DATASOURCES_TAB),HWND_TOP,0,0,cx - 12,cy - 12,SWP_NOMOVE | SWP_NOREDRAW);
 
       SIZEL sizelFunctionsUI{0,0};
 
@@ -68,8 +68,9 @@
 
       }
 
-      SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizelFunctionsUI.cx + 16,min(cy - 74,sizelFunctionsUI.cy + 32),0L);
-
+      if ( 0 < functionCount )
+         SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizelFunctionsUI.cx + 16,min(cy - 74,sizelFunctionsUI.cy + 32),SWP_NOREDRAW);
+#if 1
       for ( int k = 0; k < functionCount; k++ ) {
 
          TC_ITEM tie = {0};
@@ -81,6 +82,7 @@
          ((ContainedFunction *)tie.lParam) -> ReSize();
 
       }
+#endif
 
       long dataSetCount = SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEMCOUNT,0L,0L);
 
@@ -102,7 +104,7 @@
          sizelDataSetsUI.cy = max(sizelDataSetsUI.cy,sizeDataSet.cy);
 
       }
-
+#if 1
       for ( int k = 0; k < dataSetCount; k++ ) {
 
          TC_ITEM tie = {0};
@@ -114,9 +116,9 @@
          ((ContainedFunction *)tie.lParam) -> ReSize();
 
       }
-
+#endif
       if ( 0 < dataSetCount )
-         SetWindowPos(p -> hwndDataSourcesDataSets,HWND_TOP,8,32,sizelDataSetsUI.cx + 16,min(cy - 74,sizelDataSetsUI.cy + 32),0L);
+         SetWindowPos(p -> hwndDataSourcesDataSets,HWND_TOP,8,32,sizelDataSetsUI.cx + 16,min(cy - 74,sizelDataSetsUI.cy + 32),SWP_NOREDRAW);
 
       long countTabs = SendMessage(p -> hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L);
 
@@ -230,6 +232,11 @@
             else
                ((ContainedObject *)tie.lParam) -> Show();
 
+         RECT rcDialog;
+         GetWindowRect(p -> hwndDataSourcesDialog,&rcDialog);
+
+         SendMessage(p -> hwndDataSourcesDialog,WM_SIZE,0L,MAKELPARAM(rcDialog.right - rcDialog.left,rcDialog.bottom - rcDialog.top));
+
       } else {
 
          if ( tie.lParam )
@@ -239,11 +246,6 @@
                ((ContainedObject *)tie.lParam) -> Show();
 
       }
-
-      //RECT rcDialog;
-      //GetWindowRect(p -> hwndDataSourcesDialog,&rcDialog);
-
-      //SendMessage(p -> hwndDataSourcesDialog,WM_SIZE,0L,MAKELPARAM(rcDialog.right - rcDialog.left,rcDialog.bottom - rcDialog.top));
 
       }
       break;

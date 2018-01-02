@@ -13,6 +13,7 @@
 
 #include "Function.h"
 
+   static bool holdEquationUpdate = false;
 
    LRESULT EXPENTRY Function::functionPropertiesHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -32,19 +33,33 @@
 
       p -> pPropertyDialogVariableList = new VList(p -> evaluator);
 
+      holdEquationUpdate = true;
+
+      long currentSelection = SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
+
       p -> pIPropertyExpression -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY);
       p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_EXPRESSION_LABEL);
       p -> pIPropertyResultsLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_RESULT_LABEL);
 
-      //if ( p -> isDesignMode ) {
-      //   p -> pIPropertyPropertiesVisible -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
-      //   p -> pIPropertyPropertiesControlVisibility -> setWindowItemChecked(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
-      //} else {
-      //   ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES),SW_HIDE);
-      //   ShowWindow(GetDlgItem(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS),SW_HIDE);
-      //}
+      long newSelection = SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
+
+      NMHDR notifyHeader = {0};
+
+      notifyHeader.hwndFrom = p -> hwndVariablesTab;
+      notifyHeader.code = TCN_SELCHANGING;
+
+      SendMessage(p -> hwndVariables,WM_NOTIFY,0L,(LPARAM)&notifyHeader);
+
+      SendMessage(p -> hwndVariablesTab,TCM_SETCURSEL,(WPARAM)currentSelection,0L);
+
+      notifyHeader.code = TCN_SELCHANGE;
+
+      SendMessage(p -> hwndVariables,WM_NOTIFY,0L,(LPARAM)&notifyHeader);
+
+      holdEquationUpdate = false;
 
       SetWindowLongPtr(p -> hwndProperties,GWL_STYLE,GetWindowLongPtr(p -> hwndProperties,GWL_STYLE) & ~WS_CAPTION);
+
 
       }
       return LRESULT(1);
@@ -57,6 +72,9 @@
       case IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY:
          switch ( notifyCode ) {
          case EN_CHANGE: {
+
+            //if ( holdEquationUpdate )
+            //   break;
 
             char szTemp[MAX_PROPERTY_SIZE];
             GetDlgItemText(hwnd,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY,szTemp,MAX_PROPERTY_SIZE);
@@ -126,14 +144,6 @@
          }
          break;
 
-      //case IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES:
-      //   p -> pIPropertyPropertiesVisible -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWPROPERTIES);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS:
-      //   p -> pIPropertyPropertiesControlVisibility -> getWindowItemChecked(hwnd,IDDI_FUNCTION_PROPERTIES_ALLOWCTLVISPROPS);
-      //   break;
-
       case IDDI_FUNCTION_PROPERTIES_VARIABLE_EDIT: {
 
          char szTemp[64];
@@ -160,55 +170,6 @@
          }
          break;
 
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_EXPRESSION: {
-      //   p -> pIPropertyExpressionVisible -> getWindowItemChecked(hwnd,controlID);
-      //   }
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESULTS :
-      //   p -> pIPropertyResultsVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_VARIABLES :
-      //   p -> pIPropertyVariablesVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_CONTROLS : {
-      //   short isVisible;
-      //   p -> pIPropertyControlsVisible -> getWindowItemChecked(hwnd,controlID);
-      //   p -> pIPropertyControlsVisible -> get_boolValue(&isVisible);
-      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_START),isVisible);
-      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE),isVisible);
-      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME),isVisible);
-      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP),isVisible);
-      //   EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS),isVisible);
-      //   }
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_START :
-      //   p -> pIPropertyStartVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PAUSE :
-      //   p -> pIPropertyPauseVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_RESUME :
-      //   p -> pIPropertyResumeVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_STOP :
-      //   p -> pIPropertyStopVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_PLOTPROPS :
-      //   p -> pIPropertyPlotPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
-      //case IDDI_FUNCTION_PROPERTIES_VISIBILITY_DATASETPROPS :
-      //   p -> pIPropertyDataSetPropertiesVisible -> getWindowItemChecked(hwnd,controlID);
-      //   break;
-
       case IDDI_FUNCTION_START:
          p -> Start();
          break;
@@ -217,9 +178,6 @@
          return (LRESULT)0;
 
       }
-
-      if ( p -> pWhenChangedCallback )
-         p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
 
       }
       return LRESULT(0);

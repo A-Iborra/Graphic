@@ -138,6 +138,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\source\utilities.cpp" />
+    <ClCompile Include="excelCommon.cpp" />
     <ClCompile Include="exportToExcel.cpp" />
     <ClCompile Include="functionDataSetHandler.cpp" />
     <ClCompile Include="IGSFunctioNaterEvents.cpp" />

@@ -113,7 +113,8 @@
    case OLEIVERB_SHOW:
       if ( ! hwndSpecDialog ) 
          initWindows();
-      SetWindowPos(hwndSpecDialog,HWND_TOP,prc -> left,prc -> top,prc -> right - prc -> left,prc -> bottom - prc -> top,SWP_SHOWWINDOW);
+      SetObjectRects(prc,NULL);
+      ShowWindow(hwndSpecDialog,SW_SHOW);
       break;
    case OLEIVERB_HIDE:
       ShowWindow(hwndSpecDialog,SW_HIDE);

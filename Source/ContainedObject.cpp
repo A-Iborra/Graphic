@@ -22,7 +22,7 @@
       pIConnectionPoint(0),
       dwConnectionCookie(0) {
 
-   hwndSite = CreateWindowEx(WS_EX_CLIENTEDGE,"STATIC","",WS_CHILD,0,0,0,0,hwndTab,NULL,NULL,(void*)this);
+   hwndSite = CreateWindowEx(WS_EX_CLIENTEDGE,"STATIC","",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndTab,NULL,NULL,(void*)this);
 
    if ( pIUnknownObject ) 
       pIUnknownObject -> AddRef();
@@ -126,25 +126,11 @@
    if ( ! pIOleObject )
       return;
 
-   RECT rect;
+   if ( ! IsWindowVisible(hwndTab) )
+      return;
 
-   GetWindowRect(hwndSite,&rect);
-
-   long cx = rect.right - rect.left;
-   long cy = rect.bottom - rect.top;
-
-   rect.left = 0;
-   rect.top = 0;
-   rect.right = cx;
-   rect.bottom = cy;
-
-   ShowWindow(hwndTab,SW_SHOW);
-
-   ShowWindow(hwndSite,SW_SHOW);
-
-   pIOleObject -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndTab,&rect);
-
-   ShowWindow(hwndTab,SW_SHOW);
+   if ( ! IsWindowVisible(GetParent(hwndTab)) )
+      return;
 
    ShowWindow(hwndSite,SW_SHOW);
 
@@ -159,7 +145,7 @@
    if ( ! pIOleObject )
       return;
 
-   pIOleObject -> DoVerb(OLEIVERB_HIDE,NULL,pIOleClientSite,0L,NULL,NULL);
+   ShowWindow(hwndSite,SW_HIDE);
 
    return;
    }

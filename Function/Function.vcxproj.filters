@@ -98,9 +98,6 @@
     <ClCompile Include="Function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="functionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="propertiesHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -118,6 +115,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\source\VList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="functionSpecDialogHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

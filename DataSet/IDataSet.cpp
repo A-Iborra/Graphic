@@ -1285,7 +1285,7 @@
       if ( szDataSource[0] && szSpreadsheetName[0] && szCellRange[0]) 
          loadExcelCellRange(NULL,NULL,szDataSource,szSpreadsheetName,szCellRange);
       else if ( szDataSource[0] && szNamedRange[0] )
-         loadExcelNamedRange(NULL,szDataSource,szNamedRange);
+         loadExcelNamedRange(NULL,NULL,szDataSource,szNamedRange);
       else
          return E_UNEXPECTED;
       get(pDataList,&dp,&pDataList);

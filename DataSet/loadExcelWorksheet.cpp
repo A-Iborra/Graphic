@@ -1,53 +1,5 @@
+
 #include "DataSet.h"
-
-#include <time.h>
-
-   Excel::_Worksheet *DataSet::getExcelWorksheet(Excel::_Workbook *pIWorkbook,char *pszSheetName) {
-
-   Excel::Sheets * pIWorksheets = NULL;
-   Excel::_Worksheet *pIWorksheet = NULL;
-
-   HRESULT hr = pIWorkbook -> get_Worksheets(&pIWorksheets);
-
-   VARIANT vtIndex;
-   vtIndex.vt = VT_I4;
-   vtIndex.lVal = 0L;
-
-   long count = 0L;
-
-   pIWorksheets -> get_Count(&count);
-
-   char szThisSheet[64];
-
-   for ( long k = 0; k < count; k++ ) {
-
-      vtIndex.lVal = k + 1;
-
-      IDispatch *pIDispatch = NULL;
-
-      hr = pIWorksheets -> get_Item(vtIndex,&pIDispatch);
-
-      pIDispatch -> QueryInterface(__uuidof(Excel::_Worksheet),reinterpret_cast<void **>(&pIWorksheet));
-
-      bstr_t theName = pIWorksheet -> GetName();
-
-      pIDispatch -> Release();
-
-      WideCharToMultiByte(CP_ACP,0,theName.GetBSTR(),-1,szThisSheet,64,0,0);
-
-      if ( 0 == strcmp(szThisSheet,pszSheetName) ) 
-         break;
-
-      pIWorksheet -> Release();
-
-      pIWorksheet = NULL;
-
-   }
-
-   pIWorksheets -> Release();
-
-   return pIWorksheet;
-   }
 
 
    long DataSet::loadExcelWorksheet(char *pszWorkbookName,char *pszWorksheetName) {

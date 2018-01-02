@@ -86,7 +86,7 @@
          SetWindowText(hwndErrorReport,szMessage);
       }
    } else
-      populateData(hwndDestinationList,vtSafeArray.parray);
+      populateData(hwndDestinationList,hwndErrorReport,true,vtSafeArray.parray);
 
    } catch ( _com_error e ) {
 

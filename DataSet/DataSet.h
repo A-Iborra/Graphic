@@ -506,16 +506,20 @@ using namespace VBIDE;
 
       int initWindows();
 
-      long loadExcelWorkbook(HWND hwndSheetList,HWND hwndRangeList,char *pszWorkbookName,char *pszRelevantSheetName,char *pszRelevantRangeName);
+      long loadExcelWorkbook(HWND hwndSheetList,HWND hwndRangeList,HWND hwndErrorReport,char *pszWorkbookName,char *pszRelevantSheetName,char *pszRelevantRangeName);
       Excel::_Workbook *openExcelWorkbook(char *pszWorkbookName,bool *pWasOpen);
-      long loadExcelNamedRange(HWND hwndDestinationList,char *pszWorkbookName,char *pszRangeName);
+      long loadExcelNamedRange(HWND hwndDestinationList,HWND hwndErrorReport,char *pszWorkbookName,char *pszRangeName);
       long loadExcelCellRange(HWND hwndDestinationList,HWND hwndErrorReport,char *pszWorkbookName,char *pszWorksheetName,char *pszCellRange);
       Excel::_Worksheet *getExcelWorksheet(Excel::_Workbook *pIWorkbook,char *pszSheetName);
+      Excel::_Worksheet *getExcelWorksheet(Excel::_Workbook *pIWorkbook,WCHAR *pszwSheetName);
+      Excel::NamePtr findNamedRangeName(Excel::_Workbook *pIWorkbook,char *pszRangeName);
       long loadExcelWorksheet(char *pszWorkbookName,char *pszWorksheetName);
       long launchExcel(char *pszWorkbookName);
-      long populateData(HWND hwndListView,SAFEARRAY *pArray);
+      long populateData(HWND hwndListView,HWND hwndErrorReport,bool createColumns,SAFEARRAY *pArray);
       long exportToExcel(char *pszWorkbookName,char *pszWorksheetName,char *pszTopCell,bool isAutoCall = false);
-      static DWORD WINAPI threadedExportToExcel(void *pvArg);//char *pszWorkbookName,char *pszWorksheetName,char *pszTopCell,bool isAutoCall = false);
+      bool peekExcelCells(char *pszWorkbookName,char *pszRangeName,char *pszWorksheetName,char *pszCellRange,bool *pContainsHeaderRow);
+      bool dataHasHeaderRow(SAFEARRAY *pArray);
+      static DWORD WINAPI threadedExportToExcel(void *pvArg);
 
       bool cancelExcelExport{false};
 
@@ -544,6 +548,12 @@ using namespace VBIDE;
 
       HWND hwndSpecDialog{NULL};
 
+      HWND hwndMainPropertiesPage{NULL};
+      HWND hwndMainPropertiesPageError{NULL};
+      HWND hwndExcelSettings{NULL};
+      HWND hwndExcelSettingsError{NULL};
+      HWND hwndFunctionDataSettings{NULL};
+
       SIZEL containerSize{0L,0L};
 
       boundingBox *pBoundingBox{NULL};
@@ -567,6 +577,8 @@ using namespace VBIDE;
       char szEquations[1024];
       bool isFunction{false};
       bool isEmbedded{false};
+      bool hasHeaderRow{false};
+      bool hasHeaderRowDetermined{false};
       BYTE propertiesEnd{0};
 
       CLSID CLSID_excel;
@@ -588,10 +600,6 @@ using namespace VBIDE;
       IGSFunctioNater *pIFunction{NULL};
 
       IPlot *pIPlot{NULL};
-
-      HWND hwndMainPropertiesPage{NULL};
-      HWND hwndExcelSettings{NULL};
-      HWND hwndFunctionDataSettings{NULL};
 
       void (__stdcall *pWhenChangedCallback)(void *);
       void *pWhenChangedCallbackArg;

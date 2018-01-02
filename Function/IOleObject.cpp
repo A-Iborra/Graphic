@@ -157,7 +157,6 @@
       ShowWindow(hwndSpecDialog,SW_SHOW);
       break;
    case OLEIVERB_HIDE:
-      ShowWindow(GetParent(hwndSpecDialog),SW_HIDE);
       ShowWindow(hwndSpecDialog,SW_HIDE);
       break;
    case OLEIVERB_UIACTIVATE:

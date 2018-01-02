@@ -223,7 +223,7 @@
     <ClCompile Include="ConnectedEvaluator.cpp" />
     <ClCompile Include="defineFunction.cpp" />
     <ClCompile Include="Function.cpp" />
-    <ClCompile Include="functionHandler.cpp" />
+    <ClCompile Include="functionSpecDialogHandler.cpp" />
     <ClCompile Include="IConnectionPoint.cpp" />
     <ClCompile Include="IConnectionPointContainer.cpp" />
     <ClCompile Include="IDataObject.cpp" />

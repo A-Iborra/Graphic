@@ -21,7 +21,6 @@
    case WM_INITDIALOG: {
       p = (Function *)lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
       }
       return LRESULT(1);
 
@@ -155,9 +154,6 @@
          }
       }
 
-      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_PLOT_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
-      //EnableWindow(GetDlgItem(hwnd,IDDI_FUNCTION_DATASET_PROPERTIES),p -> pIPlot ? TRUE : FALSE);
-
       EndPaint(hwnd,&ps);
       }
       return LRESULT(TRUE);
@@ -227,9 +223,9 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> iProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
-         p -> resize();
-         if ( p -> pWhenChangedCallback )
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+         //p -> resize();
+         //if ( p -> pWhenChangedCallback )
+         //   p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          break;
 
@@ -250,33 +246,6 @@
          p -> Stop();
          return LRESULT(TRUE);
 
-      //case IDDI_FUNCTION_PLOT_PROPERTIES:
-      //   if ( ! p -> pIPlot )
-      //      break;
-      //   p -> pIPlot -> EditProperties();
-      //   return LRESULT(TRUE);
-
-      //case IDDI_FUNCTION_DATASET_PROPERTIES: {
-      //   if ( ! p -> pIPlot ) 
-      //      break;
-      //   IDataSet *pIDataSet = NULL;
-      //   p -> pIPlot -> get_IDataSet(&pIDataSet);
-      //   pIDataSet -> put_IsFunctionSource(VARIANT_TRUE);
-      //   BSTR bstrExpression = NULL;
-      //   p -> get_Expression(&bstrExpression);
-      //   pIDataSet -> put_DataSource(bstrExpression);
-      //   SysFreeString(bstrExpression);
-      //   IGSFunctioNater *pFunction = NULL;
-      //   p -> QueryInterface(IID_IGSFunctioNater,reinterpret_cast<void **>(&pFunction));
-      //   pIDataSet -> put_IFunction(reinterpret_cast<void *>(pFunction));
-      //   pFunction -> Release();
-      //   IUnknown* pIUnknown;
-      //   pIDataSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-      //   p -> iProperties -> ShowProperties(hwnd,pIUnknown);
-      //   pIUnknown -> Release();
-      //   }
-      //   return LRESULT(TRUE);
-   
       }
       }
       break;

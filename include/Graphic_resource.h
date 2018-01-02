@@ -152,6 +152,8 @@
    #define IDDI_DATASET_EXCEL_RANGE_LOAD                                   2241
    #define IDDI_DATASET_EXCEL_SELECTSHEET_LABEL1                           2242
    #define IDDI_DATASET_EXCEL_LOAD_ERROR                                   2243
+   #define IDDI_DATASET_EXCEL_HAS_HEADER_ROW_LABEL                         2244
+   #define IDDI_DATASET_EXCEL_HAS_HEADER_ROW                               2245
 
 #define IDDIALOG_DATASET_FUNCTION                                          2250
    #define IDDI_DATASET_FUNCTION_RUN                                       2251

@@ -10,8 +10,19 @@
 
    HRESULT DataSet::SavePrep() {
 
-   if ( szCellRange[0] )
+   if ( szCellRange[0] ) {
       memset(szNamedRange,0,sizeof(szNamedRange));
+      memset(szSpreadsheetName,0,sizeof(szSpreadsheetName));
+   }
+
+   long countPoints;
+
+   get_countPoints(&countPoints);
+
+   if ( szDataSource[0] && ( szNamedRange[0] || ( szSpreadsheetName[0] && szCellRange[0] ) ) && 0 < countPoints )
+      hasHeaderRowDetermined = true;
+   else
+      hasHeaderRowDetermined = false;
 
    if ( pPropertyPlots ) {
 
@@ -27,9 +38,6 @@
 
    if ( isEmbedded ) {
 
-      long countPoints = 0;
-
-      get_countPoints(&countPoints);
 
       long storageSize = countPoints * sizeof(DataPoint);
 
@@ -120,6 +128,10 @@
 
       isEmbedded = false;
 
+   if ( szDataSource[0] && ( szNamedRange[0] || ( szSpreadsheetName[0] && szCellRange[0] ) ) )
+      hasHeaderRowDetermined = true;
+   else
+      hasHeaderRowDetermined = false;
 
    return S_OK;
    }

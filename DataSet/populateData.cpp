@@ -1,7 +1,8 @@
 
 #include "DataSet.h"
+#include <vector>
 
-   long DataSet::populateData(HWND hwndListView,SAFEARRAY *pArray) {
+   long DataSet::populateData(HWND hwndListView,HWND hwndErrorReport,bool createColumns,SAFEARRAY *pArray) {
 
    LONG lowerBound[2],upperBound[2];
 
@@ -11,37 +12,37 @@
    SafeArrayGetLBound(pArray,1,&lowerBound[0]);
    SafeArrayGetLBound(pArray,2,&lowerBound[1]);
 
-   if ( hwndListView ) {
+   //if ( hwndListView && createColumns ) {
 
-      long columnCount = upperBound[1] - lowerBound[1] + 1;
+   //   long columnCount = upperBound[1] - lowerBound[1] + 1;
 
-      RECT rc;
+   //   RECT rc;
 
-      GetWindowRect(hwndListView,&rc);
+   //   GetWindowRect(hwndListView,&rc);
 
-      long cxColumns = rc.right - rc.left;
+   //   long cxColumns = rc.right - rc.left;
 
-      long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
+   //   long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
 
-      char szHeader[32];
+   //   char szHeader[32];
 
-      LVCOLUMN lvColumn;
-      memset(&lvColumn,0,sizeof(LVCOLUMN));
+   //   LVCOLUMN lvColumn;
+   //   memset(&lvColumn,0,sizeof(LVCOLUMN));
 
-      lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
-      lvColumn.fmt = LVCFMT_LEFT;
-      lvColumn.cx = cxOneColumn;
-      lvColumn.pszText = szHeader;
+   //   lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+   //   lvColumn.fmt = LVCFMT_LEFT;
+   //   lvColumn.cx = cxOneColumn;
+   //   lvColumn.pszText = szHeader;
 
-      for ( long k = 0; k < columnCount; k++ ) {
+   //   for ( long k = 0; k < columnCount; k++ ) {
 
-         sprintf(szHeader,"Col %ld",k + 1);
+   //      sprintf(szHeader,"Col %ld",k + 1);
 
-         SendMessage(hwndListView,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
+   //      SendMessage(hwndListView,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
 
-      }
+   //   }
 
-   }
+   //}
 
    VARIANT *pValues = NULL;
 
@@ -75,7 +76,49 @@
       break;
    }
 
-   for ( long rowIndex = 0; rowIndex < countRows; rowIndex++ ) {
+   long rowStart = 0;
+
+   if ( hasHeaderRow ) 
+      rowStart = 1;
+
+   if ( hwndListView && createColumns ) {
+
+      long columnCount = upperBound[1] - lowerBound[1] + 1;
+
+      RECT rc;
+
+      GetWindowRect(hwndListView,&rc);
+
+      long cxColumns = rc.right - rc.left;
+
+      long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
+
+      char szHeader[32];
+
+      LVCOLUMN lvColumn;
+      memset(&lvColumn,0,sizeof(LVCOLUMN));
+
+      lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
+      lvColumn.fmt = LVCFMT_LEFT;
+      lvColumn.cx = cxOneColumn;
+      lvColumn.pszText = szHeader;
+
+      for ( long k = 0; k < columnCount; k++ ) {
+
+         if ( hasHeaderRow ) {
+            pv = pValues + k * countRows;
+            VariantChangeTypeEx(pv,pv,NULL,0,VT_BSTR);
+            WideCharToMultiByte(CP_ACP,0,pv -> bstrVal,-1,szHeader,32,0,0);
+         } else
+            sprintf(szHeader,"Col %ld",k + 1);
+
+         SendMessage(hwndListView,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
+
+      }
+
+   }
+
+   for ( long rowIndex = rowStart; rowIndex < countRows; rowIndex++ ) {
 
       pv = pValues + rowIndex;
 
@@ -87,56 +130,21 @@
 
          try {
 
-#if 1
          if ( ! ( S_OK == VariantChangeTypeEx(pvt,pvt,NULL,0,VT_BSTR) ) ) 
             swprintf(szwValue,L"#error");
          else
             swprintf(szwValue,L"%ls",pvt -> bstrVal);
 
-#else
-
-         switch ( pvt -> vt ) {
-         case VT_INT:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> intVal); break;
-         case VT_I1:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%c",pvt -> cVal); break;
-         case VT_I2:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> iVal); break;
-         case VT_I4:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> lVal); break;
-         case VT_UI1:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%c",pvt -> cVal); break;
-         case VT_UI2:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%d",pvt -> iVal); break;
-         case VT_UI4:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ld",pvt -> uintVal); break;
-         case VT_UINT:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ld",pvt -> uintVal); break;
-         case VT_R4:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%f",pvt -> fltVal); break;
-         case VT_R8:  
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%lf",pvt -> dblVal); break;
-         case VT_BSTR:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ls",pvt -> bstrVal); break;
-         case VT_DATE: {
-            if ( ! ( S_OK == VariantChangeTypeEx(pvt,pvt,NULL,0,VT_BSTR) ) ) 
-               swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"#error");
-            else
-               swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"%ls",pvt -> bstrVal);
-            }
-            break;
-         default:
-            swprintf_s(szwValue,EXCEL_VALUE_SIZE,L"nan");
-            break;
-         }
-#endif
-
          } catch ( ... ) {
-OutputDebugString("\nhello world");
+
+            if ( hwndErrorReport ) {
+               char szMessage[256];
+               sprintf_s(szMessage,256,"There was an error in the datatype populating row %ld",rowIndex);
+               SetWindowText(hwndErrorReport,szMessage);
+            }
 
          }
 
-         bool ignoreData = false;
          switch ( columnIndex ) {
          case 0:
             dp.x = _wtof(szwValue);
@@ -153,13 +161,12 @@ OutputDebugString("\nhello world");
             pushDataPoint(&dp);
             break;
          default:
-            ignoreData = true;
             break;
          }
 
          if ( hwndListView ) {
 
-            lvItem.iItem = rowIndex;
+            lvItem.iItem = rowIndex - rowStart;
 
             lvItem.iSubItem = columnIndex;
 
@@ -171,6 +178,7 @@ OutputDebugString("\nhello world");
                SendMessageW(hwndListView,LVM_SETITEM,0L,(LPARAM)&lvItem);
 
          }
+
       }
 
    }

@@ -27,6 +27,7 @@
       p = (DataSet *)pPage -> lParam;
 
       p -> hwndMainPropertiesPage = hwnd;
+      p -> hwndMainPropertiesPageError = GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_ERROR);
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
@@ -39,14 +40,14 @@
       SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_NAME),p -> szName);
       SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE),p -> szDataSource);
 
-      DataSet::nativeStaticHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_ERROR),GWLP_WNDPROC,(ULONG_PTR)DataSet::statusAndErrorTextStaticHandler);
+      DataSet::nativeStaticHandler = (WNDPROC)SetWindowLongPtr(p -> hwndMainPropertiesPageError,GWLP_WNDPROC,(ULONG_PTR)DataSet::statusAndErrorTextStaticHandler);
 
-      SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_ERROR,"");
+      SetWindowText(p -> hwndMainPropertiesPageError,"");
       SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_STATUS,"");
 
       SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_STATUS),GWLP_WNDPROC,(ULONG_PTR)DataSet::statusAndErrorTextStaticHandler);
 
-      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_ERROR),GWLP_USERDATA,(ULONG_PTR)RGB(255,0,0));
+      SetWindowLongPtr(p -> hwndMainPropertiesPageError,GWLP_USERDATA,(ULONG_PTR)RGB(255,0,0));
 
       HDC hdc = GetDC(hwnd);
       COLORREF cr = GetTextColor(hdc);
@@ -63,7 +64,7 @@
       }
 
       if ( p -> szExportWorkbookName[0] ) {
-         p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> szExportWorkbookName,p -> szExportWorksheetName,NULL);
+         p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> hwndMainPropertiesPageError,p -> szExportWorkbookName,p -> szExportWorksheetName,NULL);
          SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szExportWorksheetName);
          SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_DEST,p -> szExportWorkbookName);
          SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_ADDSTRING,(WPARAM)0L,(LPARAM)"<new>");
@@ -139,6 +140,7 @@
 
    case WM_DESTROY:
       p -> hwndMainPropertiesPage = NULL;
+      p -> hwndMainPropertiesPageError = NULL;
       break;
 
    case WM_COMMAND: {
@@ -191,10 +193,10 @@
                sprintf_s(szTemp,512,"The input workbook has not been specified. Please select the data source workbook.");
             else if ( ! p -> szSpreadsheetName[0] )
                sprintf_s(szTemp,512,"The input worksheet has not been specified. Please visit the Excel Input page to specify it.");
-            else if ( ! p -> szCellRange[0] )
-               sprintf_s(szTemp,512,"The cell range in the worksheet has not been specified. Visit the Excel Input page to enter it.");
+            else if ( ! p -> szCellRange[0] && ! p -> szNamedRange[0] )
+               sprintf_s(szTemp,512,"The cell or named range in the worksheet has not been specified. Visit the Excel Input page to enter it.");
             if ( szTemp[0] )
-               SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_ERROR,szTemp);
+               SetWindowText(p -> hwndMainPropertiesPageError,szTemp);
             else {
                if ( 0 == strcmp(szButton,"Reload") ) 
                   p -> ReSet();
@@ -230,7 +232,7 @@
             break;
          SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szExportWorksheetName);
          if ( 0 == strcmp("<new>",p -> szExportWorksheetName) ) {
-            p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> szExportWorkbookName,"<new>",NULL);
+            p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> hwndMainPropertiesPageError,p -> szExportWorkbookName,"<new>",NULL);
             SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETLBTEXT,(WPARAM)SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_GETCURSEL,0L,0L),(LPARAM)p -> szExportWorksheetName);
          }
          break;
@@ -274,7 +276,7 @@
 
             SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_DEST,p -> szExportWorkbookName);
 
-            p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> szExportWorkbookName,p -> szExportWorksheetName,NULL);
+            p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST),NULL,p -> hwndMainPropertiesPageError,p -> szExportWorkbookName,p -> szExportWorksheetName,NULL);
 
             SendDlgItemMessage(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST,CB_ADDSTRING,(WPARAM)0L,(LPARAM)"<new>");
 
@@ -287,6 +289,8 @@
             memset(p -> szNamedRange,0,sizeof(p -> szNamedRange));
             memset(p -> szCellRange,0,sizeof(p -> szCellRange));
             memset(p -> szSpreadsheetName,0,sizeof(p -> szSpreadsheetName));
+            p -> hasHeaderRow = false;
+            p -> hasHeaderRowDetermined = false;
 
             SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE,p -> szDataSource);
 

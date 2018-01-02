@@ -138,6 +138,9 @@
     <ClCompile Include="populateData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="excelCommon.cpp">
+      <Filter>Source Files\Excel Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="DataSet.def">

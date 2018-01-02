@@ -4,14 +4,9 @@
 
 */
 
-#include <windows.h>
-#include <olectl.h>
-#include <CommCtrl.h>
-
+#include "DataSet.h"
 #include "Graphic_resource.h"
 
-#include "DataSet.h"
-#include "list.cpp"
 
    LRESULT EXPENTRY DataSet::dataSetDialogHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -26,7 +21,14 @@
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
       SetDlgItemText(hwnd,IDDI_DATASET_SPEC_NAME,p -> szName);
-      SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,p -> szDataSource);
+
+      char *psz = strrchr(p -> szDataSource,'\\');
+      if ( ! psz )
+         psz = strrchr(p -> szDataSource,'/');
+      if ( ! psz )
+         psz = p -> szDataSource - 1;
+
+      SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,psz + 1);
 
       p -> nativeEditHandler = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_DATASET_SPEC_DATASOURCE),GWLP_WNDPROC,(ULONG_PTR)DataSet::overrideEditHandler);
 
@@ -49,21 +51,16 @@
          p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
          SetDlgItemText(hwnd,IDDI_DATASET_SPEC_NAME,p -> szName);
-         SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,p -> szDataSource);
-         if ( p -> pWhenChangedCallback )
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+         char *psz = strrchr(p -> szDataSource,'\\');
+         if ( ! psz )
+            psz = strrchr(p -> szDataSource,'/');
+         if ( ! psz )
+         psz = p -> szDataSource - 1;
+         SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,psz + 1);
+         //if ( p -> pWhenChangedCallback )
+         //   p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          break;
-
-      //case IDDI_DATASET_SPEC_PLOT_PROPERTIES: {
-      //   IUnknown* pIUnknown;
-      //   p -> pIPlot -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-      //   p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
-      //   pIUnknown -> Release();
-      //   if ( p -> pWhenChangedCallback )
-      //      p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
-      //   }
-      //   break;
 
       case IDDI_DATASET_SPEC_PLOT:
          p -> Start();
