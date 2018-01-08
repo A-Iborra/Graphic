@@ -12,38 +12,6 @@
    SafeArrayGetLBound(pArray,1,&lowerBound[0]);
    SafeArrayGetLBound(pArray,2,&lowerBound[1]);
 
-   //if ( hwndListView && createColumns ) {
-
-   //   long columnCount = upperBound[1] - lowerBound[1] + 1;
-
-   //   RECT rc;
-
-   //   GetWindowRect(hwndListView,&rc);
-
-   //   long cxColumns = rc.right - rc.left;
-
-   //   long cxOneColumn = max(32,(cxColumns - 4)/ columnCount);
-
-   //   char szHeader[32];
-
-   //   LVCOLUMN lvColumn;
-   //   memset(&lvColumn,0,sizeof(LVCOLUMN));
-
-   //   lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
-   //   lvColumn.fmt = LVCFMT_LEFT;
-   //   lvColumn.cx = cxOneColumn;
-   //   lvColumn.pszText = szHeader;
-
-   //   for ( long k = 0; k < columnCount; k++ ) {
-
-   //      sprintf(szHeader,"Col %ld",k + 1);
-
-   //      SendMessage(hwndListView,LVM_INSERTCOLUMN,k,(LPARAM)&lvColumn);
-
-   //   }
-
-   //}
-
    VARIANT *pValues = NULL;
 
    SafeArrayAccessData(pArray,(void **)&pValues);
@@ -64,17 +32,17 @@
    long countRows = upperBound[0] - lowerBound[0] + 1;
    long countColumns = upperBound[1] - lowerBound[1] + 1;
 
-   switch ( countColumns ) {
-   case 1:
-      put_DataArity(DATA_ARITY_1D);
-      break;
-   case 2:
-      put_DataArity(DATA_ARITY_2D);
-      break;
-   default:
-      put_DataArity(DATA_ARITY_3D);
-      break;
-   }
+   //switch ( countColumns ) {
+   //case 1:
+   //   put_DataArity(DATA_ARITY_1D);
+   //   break;
+   //case 2:
+   //   put_DataArity(DATA_ARITY_2D);
+   //   break;
+   //default:
+   //   put_DataArity(DATA_ARITY_3D);
+   //   break;
+   //}
 
    long rowStart = 0;
 
@@ -118,6 +86,9 @@
 
    }
 
+   //bool anyYValue = false;
+   //bool anyZValue = false;
+
    for ( long rowIndex = rowStart; rowIndex < countRows; rowIndex++ ) {
 
       pv = pValues + rowIndex;
@@ -153,11 +124,15 @@
             break;
          case 1:
             dp.y = _wtof(szwValue);
+            //if ( ! ( 0.0 == dp.y ) )
+            //   anyYValue = true;
             if ( 2 == countColumns )
                pushDataPoint(&dp);
             break;
          case 2:
             dp.z = _wtof(szwValue);
+            //if ( ! ( 0.0 == dp.z ) )
+            //   anyZValue = true;
             pushDataPoint(&dp);
             break;
          default:
@@ -182,6 +157,12 @@
       }
 
    }
+
+   //if ( DATA_ARITY_3D == dataArity && ! anyZValue )
+   //   dataArity = DATA_ARITY_2D;
+
+   //if ( DATA_ARITY_2D == dataArity && ! anyYValue )
+   //   dataArity = DATA_ARITY_1D;
 
    SafeArrayUnaccessData(pArray);
 

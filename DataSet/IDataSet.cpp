@@ -38,8 +38,6 @@
    yMax = -DBL_MAX;
    zMax = -DBL_MAX;
 
-   dataArity = DATA_ARITY_UNKNOWN;
-
    if ( gdiData ) {
       delete [] gdiData;
       gdiData = NULL;
@@ -47,6 +45,10 @@
 
    for ( IDataSet *p : otherDomains )
       p -> ReSet();
+
+   countX = 0L;
+   countY = 0L;
+   countZ = 0L;
 
    return S_OK;
    }
@@ -341,16 +343,14 @@
    }
 
 
-   HRESULT DataSet::put_DataArity(DataArity arity) {
-   dataArity = arity;
-   return S_OK;
-   }
-
-
-   HRESULT DataSet::get_DataArity(DataArity *pArity) {
-   if ( ! pArity ) return E_POINTER;
-   *pArity = dataArity;
-   return S_OK;
+   enum DataArity DataSet::DataArity() {
+   if ( 0 < countZ )
+      return DATA_ARITY_3D;
+   if ( 0 < countY )
+      return DATA_ARITY_2D;
+   if ( 0 < countX )
+      return DATA_ARITY_1D;
+   return DATA_ARITY_UNKNOWN;
    }
 
 
@@ -370,14 +370,15 @@
          s = strtok((char *)NULL," ");
          if ( s ) {
             currentPoint.z = atof(s);
-            dataArity = DATA_ARITY_3D;
+            countZ++;
          } else  {
             currentPoint.z = -DBL_MAX;
-            dataArity = DATA_ARITY_2D;
+            countY++;
          }
       } else {
          currentPoint.y = -DBL_MAX;
          currentPoint.z = -DBL_MAX;
+         countX++;
       }
    } else {
       currentPoint.x = -DBL_MAX;
@@ -407,18 +408,44 @@
    topData -> data.x = data -> x;
    topData -> data.y = data -> y;
    topData -> data.z = data -> z;
-   if ( data -> x != -DBL_MAX ) resetLimits(*data);
+
+   if ( ! ( data -> x == -DBL_MAX ) )
+      resetLimits(*data);
+
+   if ( ! ( 0.0 == data -> x ) && ! ( -DBL_MAX == data -> x ) )
+      countX++;
+
+   if ( ! ( 0.0 == data -> y ) && ! ( -DBL_MAX == data -> y ) )
+      countY++;
+
+   if ( ! ( 0.0 == data -> z ) && ! ( -DBL_MAX == data -> z ) )
+      countZ++;
+
    return S_OK;
    }
  
  
    HRESULT DataSet::popDataPoint(DataPoint *data) {
-   if ( ! data ) return E_POINTER;
-   if ( ! topData ) return E_UNEXPECTED;
+   if ( ! data ) 
+      return E_POINTER;
+   if ( ! topData ) 
+      return E_UNEXPECTED;
+
    DataList *t = topData -> previous;
+
    data -> x = topData -> data.x;
    data -> y = topData -> data.y;
    data -> z = topData -> data.z;
+
+   if ( ! ( 0.0 == data -> x ) && ! ( -DBL_MAX == data -> x ) )
+      countX--;
+
+   if ( ! ( 0.0 == data -> y ) && ! ( -DBL_MAX == data -> y ) )
+      countY--;
+
+   if ( ! ( 0.0 == data -> z ) && ! ( -DBL_MAX == data -> z ) )
+      countZ--;
+
    delete topData;
    topData = t;
    if ( topData ) 
@@ -440,7 +467,7 @@
    int k;
    DataList *p = firstData;
    for ( k = 0; k < item; k++ ) 
-      if ( !(p = p -> next) ) {
+      if ( ! (p = p -> next) ) {
          *getItem = reinterpret_cast<DataList *>(NULL);
          return S_OK;
       }
@@ -472,17 +499,40 @@
    }
  
  
-   HRESULT DataSet::set(DataList *item,DataPoint *d) {
-   item -> data.x = d -> x;
-   item -> data.y = d -> y;
-   item -> data.z = d -> z;
+   HRESULT DataSet::set(DataList *pItem,DataPoint *pData) {
+
+   if ( ! ( 0.0 == pItem -> data.x ) && ! ( -DBL_MAX == pItem -> data.x ) )
+      countX--;
+
+   if ( ! ( 0.0 == pItem -> data.y ) && ! ( -DBL_MAX == pItem -> data.y ) )
+      countY--;
+
+   if ( ! ( 0.0 == pItem -> data.z ) && ! ( -DBL_MAX == pItem -> data.z ) )
+      countZ--;
+
+   pItem -> data.x = pData -> x;
+   pItem -> data.y = pData -> y;
+   pItem -> data.z = pData -> z;
+
+   if ( ! ( 0.0 == pItem -> data.x ) && ! ( -DBL_MAX == pItem -> data.x ) )
+      countX++;
+
+   if ( ! ( 0.0 == pItem -> data.y ) && ! ( -DBL_MAX == pItem -> data.y ) )
+      countY++;
+
+   if ( ! ( 0.0 == pItem -> data.z ) && ! ( -DBL_MAX == pItem -> data.z ) )
+      countZ++;
+
    return S_OK;
    }
  
  
    HRESULT DataSet::addXYZ(double *x,double *y,double *z) {
+
    DataList *t = new DataList;
+
    memcpy(t -> colorRGB,&currentColor,sizeof(currentColor));
+
    t -> previous = topData;
    t -> next = (DataList *)NULL;
    if ( topData )
@@ -492,20 +542,29 @@
       firstData -> previous = (DataList *)NULL;
       firstData -> next = (DataList *)NULL;
    }
+
    topData = t;
-   if ( x ) 
+
+   if ( x ) {
       topData -> data.x = *x;
-   else
+      countX++;
+   } else
       topData -> data.x = 0.0;
-   if ( y ) 
+
+   if ( y )  {
       topData -> data.y = *y;
-   else
+      countY++;
+   } else
       topData -> data.y = 0.0;
-   if ( z ) 
+
+   if ( z ) {
       topData -> data.z = *z;
-   else
+      countZ++;
+   } else
       topData -> data.z = 0.0;
-   if ( x && *x != -DBL_MAX ) resetLimits(topData -> data);
+
+   if ( x && *x != -DBL_MAX ) resetLimits
+      (topData -> data);
    
    return S_OK;
    }
@@ -532,7 +591,9 @@
 
 
    HRESULT DataSet::insert(DataList *insertBefore,DataPoint *d) {
+
    DataList *t = new DataList;
+
    memcpy(t -> colorRGB,&currentColor,sizeof(currentColor));
  
    t -> data.x = d -> x;
@@ -569,7 +630,10 @@
  
 
    HRESULT DataSet::ResetLimits(DataPoint *newPoint) {
-   if ( ! newPoint ) return E_POINTER;
+
+   if ( ! newPoint ) 
+      return E_POINTER;
+
    if ( newPoint -> x != DBL_MAX ) xMin = min(newPoint -> x,xMin);
    if ( newPoint -> y != DBL_MAX ) yMin = min(newPoint -> y,yMin);
    if ( newPoint -> z != DBL_MAX ) zMin = min(newPoint -> z,zMin);
@@ -695,12 +759,14 @@
    pMaxPoint -> y = yMax;
    pMaxPoint -> z = zMax;
 #endif
+
    if ( pMinPoint -> z == pMaxPoint -> z ) {
       if ( pPropertyFloor ) 
          pPropertyFloor -> get_doubleValue(&pMinPoint -> z);
       if ( pPropertyCeiling ) 
          pPropertyCeiling -> get_doubleValue(&pMaxPoint -> z);
    }
+
    return S_OK;
    }
 
@@ -854,8 +920,7 @@
 
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> Translate(f);
 
    return S_OK;
@@ -888,8 +953,7 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> TranslateGDI(f);
 
    return S_OK;
@@ -936,8 +1000,7 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> Rotate(axis,angle);
 
    return S_OK;
@@ -985,8 +1048,7 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> RotateVector(angle,vector);
 
    return S_OK;
@@ -1329,5 +1391,17 @@
       pIGSystemStatusBar = NULL;
    }
    pIGSystemStatusBar = p;
+   return S_OK;
+   }
+
+
+   STDMETHODIMP DataSet::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
+   if ( pIPlot )
+      pIPlot -> AdviseGSGraphicServices(pvIGSGraphicServices);
+   if ( ! pvIGSGraphicServices ) {
+      if ( ! pIGSGraphicServices ) return E_UNEXPECTED;
+      pIGSGraphicServices = NULL;
+   }
+   pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;
    return S_OK;
    }

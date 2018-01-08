@@ -122,7 +122,8 @@
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
  
-   p -> pIOpenGLImplementation -> SetLighting(p -> ppPropertyLightOn,p -> ppPropertyAmbientLight,p -> ppPropertyDiffuseLight,p -> ppPropertySpecularLight,p -> ppPropertyLightPos,p -> propertyCountLights,p -> propertyShinyness);
+   p -> ActivateLighting();
+   //p -> pIOpenGLImplementation -> SetLighting(p -> ppPropertyLightOn,p -> ppPropertyAmbientLight,p -> ppPropertyDiffuseLight,p -> ppPropertySpecularLight,p -> ppPropertyLightPos,p -> propertyCountLights,p -> propertyShinyness);
  
    p -> erase(); 
 

@@ -27,7 +27,6 @@
          propertyLineColor -> Release();
       }
       propertyLineColor = pPropColor;
-      pIProperties -> Include(propertyLineColor);
    }
 
    if ( pPropLineWeight ) {
@@ -51,7 +50,9 @@
 
    pOwnerProperty2DPlotType = parentDefault2DPlotType;
 
-   if ( ! pOwnerProperty2DPlotType )
+   pOwnerProperty3DPlotType = parentDefault3DPlotType;
+
+   if ( ! pOwnerProperty2DPlotType && ! pOwnerProperty3DPlotType )
       overrideOwnerType = true;
 
    pOwnerPropertyBackgroundColor = parentBackground;
@@ -161,6 +162,42 @@
    }
 
 
+/*
+   enum PlotTypes {	
+      gcPlotTypeNone =      0x00000000,
+      gcPlotTypeNatural =   0x00010003,
+      gcPlotTypeSurface =   0x00020002,
+      gcPlotTypeWireFrame = 0x00040002,
+      gcPlotTypeStacks =    0x00080003,
+      gcPlotTypeBlocks =    0x00100003,
+      gcPlotTypeBalls =     0x00200003,
+      gcPlotTypePie =       0x00400001,
+      gcPlotTypeContour =   0x00800003,
+      gcPlotTypeQuads =     0x01000003,
+      gcPlotTypeTriangles = 0x01200003
+      };
+*/
+
+   HRESULT Plot::get_PlotTypeHasSurfaces(enum gc3DPlotTypes theType,VARIANT_BOOL *pResult) {
+
+   if ( ! pResult )
+      return E_POINTER;
+
+   *pResult = VARIANT_FALSE;
+#if 1
+*pResult = VARIANT_TRUE;
+Beep(2000,100);
+#else
+   long pType = (long)plotType & gcPlotViewMask;
+
+   if ( (pType & gcPlotTypeSurface) || (pType & gcPlotTypeStacks) ||
+         (pType & gcPlotTypeBlocks) || (pType & gcPlotTypeBalls) )
+      *pResult = VARIANT_TRUE;
+#endif
+   return S_OK;
+   }
+
+
    HRESULT Plot::put_IDataSet(IDataSet *inDataSet) { 
    if ( propertyDataSet ) {
       propertyDataSet -> Release();
@@ -172,7 +209,7 @@
 
    HRESULT Plot::get_IDataSet(IDataSet **getDataSet) { return BasePlot::get_IDataSet(getDataSet); }
  
-   HRESULT Plot::get_DataArity(DataArity *pDataArity) { return BasePlot::get_DataArity(pDataArity); }
+   enum DataArity __stdcall Plot::DataArity() { return BasePlot::DataArity(); }
  
    HRESULT Plot::put_PlotNotify(IPlotNotify *setIPlotNotify) {
    if ( pIPlotNotify )
@@ -202,7 +239,6 @@
    propertyLineColor -> get_binaryValue(sizeof(fvColor),(BYTE**)&fvColor);
    DataPoint dpColor = {(double)fvColor[0],(double)fvColor[1],(double)fvColor[2]};
    return PutDataPointSafeArray(ppColor,&dpColor);
-   return S_OK;
    }
 
 
@@ -303,5 +339,15 @@
       pIGSystemStatusBar = NULL;
    }
    pIGSystemStatusBar = p;
+   return S_OK;
+   }
+
+
+   STDMETHODIMP Plot::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
+   if ( ! pvIGSGraphicServices ) {
+      if ( ! pIGSGraphicServices ) return E_UNEXPECTED;
+      pIGSGraphicServices = NULL;
+   }
+   pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;
    return S_OK;
    }

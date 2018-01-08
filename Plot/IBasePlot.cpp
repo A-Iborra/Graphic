@@ -62,7 +62,7 @@
  
    put_PlotView(gcPlotView2D);
 
-   put_PlotType(gcPlotTypeNone);
+   put_PlotType2D(gcPlotTypeNone);
  
    return S_OK;
    }
@@ -83,11 +83,10 @@
    return S_OK;
    }
  
-   HRESULT BasePlot::get_DataArity(DataArity *pDataArity) {
+   enum DataArity __stdcall BasePlot::DataArity() {
    if ( pIDataSet )
-      return pIDataSet -> get_DataArity(pDataArity);
-   *pDataArity = DATA_ARITY_UNKNOWN;
-   return S_OK;
+      return pIDataSet -> DataArity();
+   return DATA_ARITY_UNKNOWN;
    }
 
    HRESULT BasePlot::get_SegmentID(long* newID) {
@@ -114,12 +113,21 @@
    }
    
  
-   HRESULT BasePlot::put_PlotType(PlotTypes inType) {
-   plotType = (long)inType;
+   HRESULT BasePlot::put_PlotType2D(gc2DPlotTypes inType) {
+   plotType2D = (long)inType;
    return S_OK;
    }
-   HRESULT BasePlot::get_PlotType(PlotTypes *getPlotType) {
-   *getPlotType = (PlotTypes)plotType;
+   HRESULT BasePlot::get_PlotType2D(gc2DPlotTypes *getPlotType) {
+   *getPlotType = (gc2DPlotTypes)plotType2D;
+   return S_OK;
+   }
+
+   HRESULT BasePlot::put_PlotType3D(gc3DPlotTypes inType) {
+   plotType3D = (long)inType;
+   return S_OK;
+   }
+   HRESULT BasePlot::get_PlotType3D(gc3DPlotTypes *getPlotType) {
+   *getPlotType = (gc3DPlotTypes)plotType3D;
    return S_OK;
    }
 

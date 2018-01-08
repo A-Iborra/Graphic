@@ -25,36 +25,35 @@
 
 
    HRESULT Plot::TakeDataString(BSTR input) {
+
    int n = wcslen(input) + 1;
 
-   if ( 1 == n ) return S_FALSE;
+   if ( 1 == n ) 
+      return S_FALSE;
 
    DataPoint currentPoint;
 
-   char *data = new char[n];
- 
-   memset(data,0,n);
+   char *pszData = new char[n];
+   char *pszRoot = pszData;
 
-   WideCharToMultiByte(CP_ACP,0,input,-1,data,n,0,0);
+   memset(pszData,0,n);
+
+   WideCharToMultiByte(CP_ACP,0,input,-1,pszData,n,0,0);
  
-   if ( * data ) {
-      currentPoint.x = evalConsume(pIEvaluator,data);
-      if ( * data ) {
-         currentPoint.y = evalConsume(pIEvaluator,data);
-         if ( * data ) {
-            currentPoint.z = evalConsume(pIEvaluator,data);
-            pIDataSet -> put_DataArity(DATA_ARITY_3D);
-         }
-         else {
+   if ( pszData[0] ) {
+      currentPoint.x = evalConsume(pIEvaluator,pszData);
+      if ( pszData[0] ) {
+         currentPoint.y = evalConsume(pIEvaluator,pszData);
+         if ( pszData[0] ) 
+            currentPoint.z = evalConsume(pIEvaluator,pszData);
+         else 
             currentPoint.z = 0.0;
-            pIDataSet -> put_DataArity(DATA_ARITY_2D);
-         }
       } else {
-         delete [] data;
+         delete [] pszRoot;
          return S_FALSE;
       }
    } else {
-      delete [] data;
+      delete [] pszRoot;
       return S_FALSE;
    }
  
@@ -62,7 +61,7 @@
 
    haveAnyData = true;
  
-   delete [] data;
+   delete [] pszRoot;
 
    return S_OK;
    }

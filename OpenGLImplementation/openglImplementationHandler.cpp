@@ -1,8 +1,3 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
 
 #include <windows.h>
 
@@ -267,12 +262,15 @@
       break;
 
    case WM_OPENGLIMPLEMENTATION_NEWLINE: {
+
       DataPoint *dp = reinterpret_cast<DataPoint*>(wParam);
+
       if ( p -> plotWindow -> lineMode ) {
          glEnd();
          glGetError();
 //OPENGL_ERROR_CHECK
       }
+
       glBegin(GL_LINE_STRIP);
 OPENGL_ERROR_CHECK
       glVertex3d(dp -> x,dp -> y,dp -> z);  
@@ -304,11 +302,10 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_OPENSEGMENT: {
 
-OPENGL_ERROR_CHECK
-
       strCall_OpenSegment *ps = (strCall_OpenSegment *)wParam;
       
       float fvColor[] = {CLR_BLACK};
+
       if ( ps -> pPropColor ) {
          BYTE *pb = (BYTE *)fvColor;
          ps -> pPropColor -> get_binaryValue(sizeof(fvColor),(BYTE**)&pb);
@@ -318,32 +315,21 @@ OPENGL_ERROR_CHECK
       if ( ps -> pPropLineWeight )
          ps -> pPropLineWeight -> get_doubleValue(&lw);
 
-#if 1
       glDeleteLists(ps -> segmentID,1);
-OPENGL_ERROR_CHECK
 
       glNewList(ps -> segmentID,GL_COMPILE_AND_EXECUTE);
-OPENGL_ERROR_CHECK
-#endif
 
-#if 1
       glColor3f(fvColor[0],fvColor[1],fvColor[2]);
-OPENGL_ERROR_CHECK
 
       glLineWidth((float)lw);
-OPENGL_ERROR_CHECK
 
       glEnable(GL_LINE_SMOOTH);
-OPENGL_ERROR_CHECK
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-OPENGL_ERROR_CHECK
-#endif
 
       p -> plotWindow -> lineMode = true;
       
       glBegin(GL_LINE_STRIP);
-OPENGL_ERROR_CHECK
 
       delete ps;
 
@@ -449,6 +435,8 @@ OPENGL_ERROR_CHECK
 
       glEnable(GL_DEPTH_TEST);
 
+      p -> plotWindow -> enableLighting();
+
       glBegin(GL_QUADS);
 
       delete ps;
@@ -459,12 +447,14 @@ OPENGL_ERROR_CHECK
 
    case WM_OPENGLIMPLEMENTATION_ENDSURFACE: {
       long *pSegmentID = reinterpret_cast<long*>(wParam);
+OPENGL_ERROR_CHECK
       glEnd();
-      glDisable(GL_LIGHTING);
-      glFlush();
+OPENGL_ERROR_CHECK
       glEndList();
+OPENGL_ERROR_CHECK
       glCallList(*pSegmentID);
-      glFlush();
+OPENGL_ERROR_CHECK
+      p -> plotWindow -> disableLighting();
       delete pSegmentID;
       }
       break;
@@ -474,35 +464,48 @@ OPENGL_ERROR_CHECK
       strCall_BeginWireframe *ps = reinterpret_cast<strCall_BeginWireframe*>(wParam);
 
       glDeleteLists(ps -> segmentID,1);
-      glNewList(ps -> segmentID,GL_COMPILE);
 
-      float fvColor[] = {CLR_BLACK};
+      GLfloat fvColor[] = {CLR_BLACK};
       if ( ps -> pPropLineColor ) {
          BYTE *pb = (BYTE *)fvColor;
          ps -> pPropLineColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
       }
 
       long lineWeight;
-      ps -> pPropLineWeight -> get_longValue(&lineWeight);
+      if ( ps -> pPropLineWeight )
+         ps -> pPropLineWeight -> get_longValue(&lineWeight);
+      else
+         lineWeight = 1;
 
       glLineWidth((float)lineWeight);
+OPENGL_ERROR_CHECK
+
       glColor3fv(fvColor);
+OPENGL_ERROR_CHECK
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
       glFrontFace(GL_CCW);         
       glCullFace(GL_FRONT);
+
+      glNewList(ps -> segmentID,GL_COMPILE);
+
       glBegin(GL_QUADS);
+
+OPENGL_ERROR_CHECK
+
       delete ps;
       }
       break;
 
    case WM_OPENGLIMPLEMENTATION_ENDWIREFRAME: {
       long *pSegmentID = reinterpret_cast<long*>(wParam);
+OPENGL_ERROR_CHECK
       glEnd();
-      glFlush();
+OPENGL_ERROR_CHECK
       glEndList();
+OPENGL_ERROR_CHECK
       glCallList(*pSegmentID);
-      glFlush();
+OPENGL_ERROR_CHECK
       delete pSegmentID;
       }
       break;
@@ -528,22 +531,21 @@ OPENGL_ERROR_CHECK
 
       glNewList(ps -> segmentID,GL_COMPILE);
  
-      glEnable(GL_LIGHTING);
- 
-      glEnable(GL_DEPTH_TEST);
-
-      glFrontFace(GL_CCW);         
-
-      glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
- 
-      glBegin(GL_QUADS);
+      //glEnable(GL_DEPTH_TEST);
+      //glFrontFace(GL_CCW);         
+      //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
  
       glMaterialfv(GL_FRONT,GL_SPECULAR,fvTopColor);
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,fvTopColor);
       glMaterialfv(GL_BACK,GL_SPECULAR,fvBottomColor);
       glMaterialfv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,fvBottomColor);
  
-      glColor3fv(fvTopColor);
+      p -> plotWindow -> enableLighting();
+ 
+      glBegin(GL_QUADS);
+
+      //glColor3fv(fvTopColor);
+
       delete ps;
       }
       break;
@@ -551,11 +553,9 @@ OPENGL_ERROR_CHECK
    case WM_OPENGLIMPLEMENTATION_ENDSOLID: {
       long *pSegmentID = reinterpret_cast<long*>(wParam);
       glEnd();
-      glDisable(GL_LIGHTING);
-      glFlush();
       glEndList();
       glCallList(*pSegmentID);
-      glFlush();
+      p -> plotWindow -> disableLighting();
       delete pSegmentID;
       }
       break;

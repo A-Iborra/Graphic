@@ -288,6 +288,8 @@ import "ocidl.idl";
       [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
       HRESULT AdviseGSystemStatusBar(IGSystemStatusBar *);
 
+      HRESULT AdviseGSGraphicServices(/*IGSGraphicServices*/ void *);
+
    };
 
    [uuid(8CAEFD86-55E6-11d3-8365-006008BD5BC3),helpstring("Function Class Function"),control]

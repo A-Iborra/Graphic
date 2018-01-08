@@ -50,15 +50,15 @@
    }
  
  
-   STDMETHODIMP G::put_PlotType(PlotTypes setPlotType) {
-   propertyPlotType -> put_longValue(setPlotType);
+   STDMETHODIMP G::put_PlotType(gc2DPlotTypes setPlotType) {
+   propertyDefault2DPlotType -> put_longValue(setPlotType);
    //render(0);
    return S_OK;
    }
  
  
-   STDMETHODIMP G::get_PlotType(PlotTypes* getPlotType) {
-   *getPlotType = plotType;
+   STDMETHODIMP G::get_PlotType(gc2DPlotTypes* getPlotType) {
+   *getPlotType = default2DPlotType;
    return S_OK;
    }
  

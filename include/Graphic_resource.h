@@ -123,6 +123,12 @@
    #define IDDI_DATASET_DATA_BOX_DIMENSION1_RANGE                          2219
    #define IDDI_DATASET_DATA_BOX_DIMENSION2_RANGE                          2220
    #define IDDI_DATASET_DATA_BOX_DIMENSION3_RANGE                          2221
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL                        2222
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL2                       2223
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL3                       2224
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL4                       2225
+   #define IDDI_DATASET_DATA_BOX_FLOOR                                     2226
+   #define IDDI_DATASET_DATA_BOX_CEILING                                   2227
 
    #define IDDI_DATASET_EXPORT_BOX                                         2229
    #define IDDI_DATASET_DATASOURCE_EXPORT_DEST                             2230
@@ -367,20 +373,23 @@
 #define IDDI_LIGHT_POS_X                                                   7523
 #define IDDI_LIGHT_POS_Y                                                   7524
 #define IDDI_LIGHT_POS_Z                                                   7525
-#define IDDI_CHOOSE_LIGHT_NO                                               7526
-#define IDDI_LIGHT_ENABLED_LABEL                                           7527
-#define IDDI_LIGHT_AMBIENT_RED_SPIN                                        7528
-#define IDDI_LIGHT_AMBIENT_GREEN_SPIN                                      7529
-#define IDDI_LIGHT_AMBIENT_BLUE_SPIN                                       7530
-#define IDDI_LIGHT_DIFFUSE_RED_SPIN                                        7531
-#define IDDI_LIGHT_DIFFUSE_GREEN_SPIN                                      7532
-#define IDDI_LIGHT_DIFFUSE_BLUE_SPIN                                       7533
-#define IDDI_LIGHT_SPECULAR_RED_SPIN                                       7534
-#define IDDI_LIGHT_SPECULAR_GREEN_SPIN                                     7535
-#define IDDI_LIGHT_SPECULAR_BLUE_SPIN                                      7536
-#define IDDI_LIGHT_AMBIENT_CHOOSE                                          7537
-#define IDDI_LIGHT_DIFFUSE_CHOOSE                                          7538
-#define IDDI_LIGHT_SPECULAR_CHOOSE                                         7539
+#define IDDI_LIGHT_POS_X_EVALED                                            7526
+#define IDDI_LIGHT_POS_Y_EVALED                                            7527
+#define IDDI_LIGHT_POS_Z_EVALED                                            7528
+#define IDDI_CHOOSE_LIGHT_NO                                               7529
+#define IDDI_LIGHT_ENABLED_LABEL                                           7530
+#define IDDI_LIGHT_AMBIENT_RED_SPIN                                        7531
+#define IDDI_LIGHT_AMBIENT_GREEN_SPIN                                      7532
+#define IDDI_LIGHT_AMBIENT_BLUE_SPIN                                       7533
+#define IDDI_LIGHT_DIFFUSE_RED_SPIN                                        7534
+#define IDDI_LIGHT_DIFFUSE_GREEN_SPIN                                      7535
+#define IDDI_LIGHT_DIFFUSE_BLUE_SPIN                                       7536
+#define IDDI_LIGHT_SPECULAR_RED_SPIN                                       7537
+#define IDDI_LIGHT_SPECULAR_GREEN_SPIN                                     7538
+#define IDDI_LIGHT_SPECULAR_BLUE_SPIN                                      7539
+#define IDDI_LIGHT_AMBIENT_CHOOSE                                          7540
+#define IDDI_LIGHT_DIFFUSE_CHOOSE                                          7541
+#define IDDI_LIGHT_SPECULAR_CHOOSE                                         7542
                                                                            
 #define IDDIALOG_GRAPHIC_BACKGROUND                                        7600
 #define IDDI_LIGHT_BACKGROUND_RED                                          7601
@@ -398,6 +407,12 @@
 #define IDDI_GRAPHIC_PLOTS_EDIT                                            7730
 #define IDDI_GRAPHIC_PLOTS_GRAPHIC                                         7750
 #define IDDI_GRAPHIC_PLOTS_LIST                                            7760
+#define IDDI_GRAPHIC_PLOTS_DEFAULTS_BOX                                    7761
+#define IDDI_GRAPHIC_PLOTS_ARITY_TABS                                      7762
+#define IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_PANE                            7763
+#define IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_BAR                             7764
+#define IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_PANE                            7765
+#define IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_BAR                             7766
 #define IDDI_GRAPHIC_PLOTS_GROUP_ARITY                                     7770
 #define IDDI_GRAPHIC_PLOTS_GROUP_PLOTTYPE                                  7780
 
@@ -531,47 +546,50 @@
 
 #define IDDIALOG_PLOT_TYPE                                                 9270
    #define IDDI_PLOT_TYPE_OVERRIDE_OWNER                                   9271
-   #define IDDI_PLOT_TYPE_MIN                                              9272
-   #define IDDI_PLOT_TYPE_NATURAL                                          9272
-   #define IDDI_PLOT_TYPE_CONTOUR                                          9273
-   #define IDDI_PLOT_TYPE_PIE                                              9274
-   #define IDDI_PLOT_TYPE_STACKS                                           9275
-   #define IDDI_PLOT_TYPE_SURFACE                                          9276
-   #define IDDI_PLOT_TYPE_WIREFRAME                                        9277
-   #define IDDI_PLOT_TYPE_QUADS                                            9278
-   #define IDDI_PLOT_TYPE_TRIANGLES                                        9279
-   #define IDDI_PLOT_TYPE_MAX                                              9300
+   #define IDDI_PLOT_TYPE_ARITY_TABS                                       9272
+   #define IDDI_PLOT_TYPE_2D_TYPES_SCROLL_PANE                             9273
+   #define IDDI_PLOT_TYPE_3D_TYPES_SCROLL_PANE                             9274
+   #define IDDI_PLOT_TYPE_2D_TYPES_SCROLL_BAR                              9275
+   #define IDDI_PLOT_TYPE_3D_TYPES_SCROLL_BAR                              9276
+   #define IDDI_PLOT_TYPE_NONE_SELECTED                                    9277
 
-/*
-   #define IDDI_PLOT_STYLE_LINEWEIGHT                                      9252
-   #define IDDI_PLOT_STYLE_SAMPLE                                          9258
-*/
+   #define IDDI_PLOT_TYPE_2D_MIN                                           9280
+   #define IDDI_PLOT_TYPE_2D_MAX                                           9320
+
+   #define IDDI_PLOT_TYPE_3D_MIN                                           9321
+   #define IDDI_PLOT_TYPE_3D_MAX                                           9361
 
 #define IDDIALOG_PLOT_COLOR                                                9200
-   #define IDDI_PLOT_COLOR_LINE_RED                                        9210
-   #define IDDI_PLOT_COLOR_LINE_GREEN                                      9211
-   #define IDDI_PLOT_COLOR_LINE_BLUE                                       9212
-   #define IDDI_PLOT_COLOR_TOP_RED                                         9213
-   #define IDDI_PLOT_COLOR_TOP_GREEN                                       9214
-   #define IDDI_PLOT_COLOR_TOP_BLUE                                        9215
-   #define IDDI_PLOT_COLOR_BOTTOM_RED                                      9216
-   #define IDDI_PLOT_COLOR_BOTTOM_GREEN                                    9217
-   #define IDDI_PLOT_COLOR_BOTTOM_BLUE                                     9218
-   #define IDDI_PLOT_COLOR_LINE_BACKGROUND                                 9219
-   #define IDDI_PLOT_COLOR_TOP_BACKGROUND                                  9220
-   #define IDDI_PLOT_COLOR_BOTTOM_BACKGROUND                               9221
-   #define IDDI_PLOT_COLOR_LINE_RED_SPIN                                   9222
-   #define IDDI_PLOT_COLOR_LINE_GREEN_SPIN                                 9223
-   #define IDDI_PLOT_COLOR_LINE_BLUE_SPIN                                  9224
+   #define IDDI_PLOT_COLOR_GROUP_LINE                                      9210
+   #define IDDI_PLOT_COLOR_LINE_BACKGROUND                                 9211
+   #define IDDI_PLOT_COLOR_LINE_RED                                        9212
+   #define IDDI_PLOT_COLOR_LINE_GREEN                                      9213
+   #define IDDI_PLOT_COLOR_LINE_BLUE                                       9214
+   #define IDDI_PLOT_COLOR_LINE_RED_SPIN                                   9215
+   #define IDDI_PLOT_COLOR_LINE_GREEN_SPIN                                 9216
+   #define IDDI_PLOT_COLOR_LINE_BLUE_SPIN                                  9217
+   #define IDDI_PLOT_COLOR_LINE_CHOOSE                                     9218
+
+   #define IDDI_PLOT_COLOR_GROUP_TOP                                       9220
+   #define IDDI_PLOT_COLOR_TOP_BACKGROUND                                  9221
+   #define IDDI_PLOT_COLOR_TOP_RED                                         9222
+   #define IDDI_PLOT_COLOR_TOP_GREEN                                       9223
+   #define IDDI_PLOT_COLOR_TOP_BLUE                                        9224
    #define IDDI_PLOT_COLOR_TOP_RED_SPIN                                    9225
    #define IDDI_PLOT_COLOR_TOP_GREEN_SPIN                                  9226
    #define IDDI_PLOT_COLOR_TOP_BLUE_SPIN                                   9227
-   #define IDDI_PLOT_COLOR_BOTTOM_RED_SPIN                                 9228
-   #define IDDI_PLOT_COLOR_BOTTOM_GREEN_SPIN                               9229
-   #define IDDI_PLOT_COLOR_BOTTOM_BLUE_SPIN                                9230
-   #define IDDI_PLOT_COLOR_LINE_CHOOSE                                     9231
-   #define IDDI_PLOT_COLOR_TOP_CHOOSE                                      9232
-   #define IDDI_PLOT_COLOR_BOTTOM_CHOOSE                                   9233
+   #define IDDI_PLOT_COLOR_TOP_CHOOSE                                      9228
+
+   #define IDDI_PLOT_COLOR_GROUP_BOTTOM                                    9230
+   #define IDDI_PLOT_COLOR_BOTTOM_BACKGROUND                               9231
+   #define IDDI_PLOT_COLOR_BOTTOM_RED                                      9232
+   #define IDDI_PLOT_COLOR_BOTTOM_GREEN                                    9233
+   #define IDDI_PLOT_COLOR_BOTTOM_BLUE                                     9234
+   #define IDDI_PLOT_COLOR_BOTTOM_RED_SPIN                                 9235
+   #define IDDI_PLOT_COLOR_BOTTOM_GREEN_SPIN                               9236
+   #define IDDI_PLOT_COLOR_BOTTOM_BLUE_SPIN                                9237
+   #define IDDI_PLOT_COLOR_BOTTOM_CHOOSE                                   9238
+
 
 //
 // The following is for the properties page presented by the GraphicControl

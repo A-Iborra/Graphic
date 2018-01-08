@@ -63,20 +63,78 @@ library GSystems {
    enum PlotViews {
       gcPlotView2D =   0x00000001,
       gcPlotView3D =   0x00000002,
-      gcPlotViewMask = 0xFFFFFFF0 };
+      gcPlotViewMask = 0xFFFFFFFC };
 
-   enum PlotTypes {	
-      gcPlotTypeNone =      0x00000000,
-      gcPlotTypeNatural =   0x00010003,
-      gcPlotTypeSurface =   0x00020002,
-      gcPlotTypeWireFrame = 0x00040002,
-      gcPlotTypeStacks =    0x00080003,
-      gcPlotTypeBlocks =    0x00100003,
-      gcPlotTypeBalls =     0x00200003,
-      gcPlotTypePie =       0x00400001,
-      gcPlotTypeContour =   0x00800003,
-      gcPlotTypeQuads =     0x01000003,
-      gcPlotTypeTriangles = 0x01200003
+   enum gc2DPlotTypes {	
+      gcPlotTypeNone =         0x00000000,
+      gcPlotTypeNatural =      0x00000001,
+      gcPlotTypeStacks =       0x00000002,
+      gcPlotTypeBlocks =       0x00000004,
+      gcPlotTypeBalls =        0x00000008,
+      gcPlotTypePie =          0x00000010,
+      gcPlotTypeContour =      0x00000020,
+      gcPlotTypeQuads =        0x00000040,
+      gcPlotType2DExternal1 =  0x00000080,
+      gcPlotType2DExternal2 =  0x00000100,
+      gcPlotType2DExternal3 =  0x00000200,
+      gcPlotType2DExternal4 =  0x00000400,
+      gcPlotType2DExternal5 =  0x00000800,
+      gcPlotType2DExternal6 =  0x00001000,
+      gcPlotType2DExternal7 =  0x00002000,
+      gcPlotType2DExternal8 =  0x00004000,
+      gcPlotType2DExternal9 =  0x00008000,
+      gcPlotType2DExternal10 = 0x00010000,
+      gcPlotType2DExternal11 = 0x00020000,
+      gcPlotType2DExternal12 = 0x00040000,
+      gcPlotType2DExternal13 = 0x00080000,
+      gcPlotType2DExternal14 = 0x00100000,
+      gcPlotType2DExternal15 = 0x00200000,
+      gcPlotType2DExternal16 = 0x00400000,
+      gcPlotType2DExternal17 = 0x00800000,
+      gcPlotType2DExternal18 = 0x01000000,
+      gcPlotType2DExternal19 = 0x02000000,
+      gcPlotType2DExternal20 = 0x04000000,
+      gcPlotType2DExternal21 = 0x08000000,
+      gcPlotType2DExternal22 = 0x10000000,
+      gcPlotType2DExternal23 = 0x20000000,
+      gcPlotType2DExternal24 = 0x40000000,
+      gcPlotType2DExternal25 = 0x80000000
+      };
+
+   enum gc3DPlotTypes {	
+      gcPlotType3DNone =       0x00000000,
+      gcPlotType3DExternal1 =  0x00000001,
+      gcPlotType3DExternal2 =  0x00000002,
+      gcPlotType3DExternal3 =  0x00000004,
+      gcPlotType3DExternal4 =  0x00000008,
+      gcPlotType3DExternal5 =  0x00000010,
+      gcPlotType3DExternal6 =  0x00000020,
+      gcPlotType3DExternal7 =  0x00000040,
+      gcPlotType3DExternal8 =  0x00000080,
+      gcPlotType3DExternal9 =  0x00000100,
+      gcPlotType3DExternal10 = 0x00000200,
+      gcPlotType3DExternal11 = 0x00000400,
+      gcPlotType3DExternal12 = 0x00000800,
+      gcPlotType3DExternal13 = 0x00001000,
+      gcPlotType3DExternal14 = 0x00002000,
+      gcPlotType3DExternal15 = 0x00004000,
+      gcPlotType3DExternal16 = 0x00008000,
+      gcPlotType3DExternal17 = 0x00010000,
+      gcPlotType3DExternal18 = 0x00020000,
+      gcPlotType3DExternal19 = 0x00030000,
+      gcPlotType3DExternal20 = 0x00080000,
+      gcPlotType3DExternal21 = 0x00100000,
+      gcPlotType3DExternal22 = 0x00200000,
+      gcPlotType3DExternal23 = 0x00400000,
+      gcPlotType3DExternal24 = 0x00800000,
+      gcPlotType3DExternal25 = 0x01000000,
+      gcPlotType3DExternal26 = 0x02000000,
+      gcPlotType3DExternal27 = 0x04000000,
+      gcPlotType3DExternal28 = 0x08000000,
+      gcPlotType3DExternal29 = 0x10000000,
+      gcPlotType3DExternal30 = 0x20000000,
+      gcPlotType3DExternal31 = 0x40000000,
+      gcPlotType3DExternal32 = 0x80000000
       };
 
    enum PlotIdBands {
@@ -94,6 +152,23 @@ library GSystems {
 
    }
 
+   [uuid(8CAEFDCE-55E6-11d3-8365-006008BD5BC3)]
+   interface IGSystemPlotType : IUnknown {
+
+      [propget] HRESULT Count([out,retval] long *pCountProvided);
+
+      [propget] HRESULT Name([in] long item,[out,retval] BSTR *pBstr);
+
+      [propget] HRESULT Is3DOnly([in] long item,[out,retval] VARIANT_BOOL *);
+
+      [propput] HRESULT DataSet(void *pIDataSet);
+
+      [propput] HRESULT OpenGLImplementation(void *pIOpenGLImplementation);
+
+      HRESULT Execute([in] long item,long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
+
+   }
+   
    [ uuid(8CAEFD69-55E6-11d3-8365-006008BD5BC3) ]
    coclass GSystems {
    interface IUnknown;

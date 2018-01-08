@@ -636,3 +636,17 @@
    pIGSystemStatusBar = p;
    return S_OK;
    }
+
+   STDMETHODIMP Function::AdviseGSGraphicServices(void *pvGraphicServices) {
+   if ( pIDataSet )
+      pIDataSet -> AdviseGSGraphicServices(pvGraphicServices);
+   if ( pIPlot )
+      pIPlot -> AdviseGSGraphicServices(pvGraphicServices);
+   if ( ! pvGraphicServices ) {
+      if ( ! pIGSGraphicServices ) 
+         return E_UNEXPECTED;
+      pIGSGraphicServices = NULL;
+   }
+   pIGSGraphicServices = (IGSGraphicServices *)pvGraphicServices;
+   return S_OK;
+   }

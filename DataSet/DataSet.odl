@@ -78,8 +78,7 @@ library DataSet {
 
       [propget] HRESULT countPoints([out,retval]long *pCount);
 
-      [propput] HRESULT DataArity([in] enum DataArity );
-      [propget] HRESULT DataArity([out,retval] enum DataArity *);
+      enum DataArity DataArity();
 
       HRESULT peek([in] struct DataList *afterItem,[out,retval] struct DataList **getItem);
       HRESULT peekInt([in] int item, [out,retval] struct DataList **getItem);
@@ -152,6 +151,8 @@ library DataSet {
 
       [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
       HRESULT AdviseGSystemStatusBar(IGSystemStatusBar *);
+
+      HRESULT AdviseGSGraphicServices(/*IGSGraphicServices*/ void *);
 
    };
 

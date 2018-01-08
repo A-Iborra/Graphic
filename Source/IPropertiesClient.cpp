@@ -117,7 +117,7 @@
    pParent -> autoClear = true;
 
    pParent -> plotView = gcPlotView3D;
-   pParent -> plotType = gcPlotTypeNatural;
+   pParent -> default2DPlotType = gcPlotTypeNatural;
  
    pParent -> dataSetCount = 0;
    pParent -> textCount = 0;
@@ -381,10 +381,8 @@
       }
    }
 
-   if ( pParent -> hwndFrame ) {
+   if ( pParent -> hwndFrame ) 
       pParent -> setDataSourcesVisibility(NULL,NULL);
-      pParent -> render(0);
-   }
 
    return S_OK;
    }

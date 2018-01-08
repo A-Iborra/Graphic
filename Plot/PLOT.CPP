@@ -23,9 +23,20 @@
 
 #include "List.cpp"
 
-  HANDLE Plot::globalPlotThread = 0;
-  WNDPROC Plot::defaultPatchPainter = 0;
-  WNDPROC Plot::defaultStaticWindowHandler = 0;
+   long Plot::instanceCount = 0L;
+   std::list<CLSID *> Plot::plotTypeProviderGUIDs;
+   std::map<gc2DPlotTypes,IGSystemPlotType *> Plot::plotType2DProviderInstances;
+   std::map<gc2DPlotTypes,char *> Plot::plotType2DProviderNames;
+   std::map<gc3DPlotTypes,IGSystemPlotType *> Plot::plotType3DProviderInstances;
+   std::map<gc3DPlotTypes,char *> Plot::plotType3DProviderNames;
+
+   std::map<gc2DPlotTypes,long> Plot::plotType2DInstanceNumber;
+   std::map<gc3DPlotTypes,long> Plot::plotType3DInstanceNumber;
+
+   HANDLE Plot::globalPlotThread = NULL;
+   WNDPROC Plot::defaultPatchPainter = NULL;
+   HWND Plot::hwndSampleGraphic = NULL;
+   HWND Plot::hwndSampleGraphicSurface = NULL;
 
   int Plot::pCount = 0;
 
@@ -38,6 +49,7 @@
      pIPlotNotify(NULL),
      pIPlots(NULL),
      pIGSystemStatusBar(NULL),
+     pIGSGraphicServices(NULL),
 
      pOwnerProperty2DPlotType(NULL),
      pOwnerProperty3DPlotType(NULL),
@@ -46,6 +58,8 @@
 
      propertyLineColor(NULL),
      propertyLineWeight(NULL),
+     lineWeight(DEFAULT_LINE_WEIGHT),
+
      adviseSink_dwAspect(0),
      adviseSink_advf(0),
 
@@ -75,6 +89,8 @@
      BasePlot() { 
 
    refCount = 100;
+
+   instanceCount++;
 
    memset(&rectPropertiesPosition,0,sizeof(RECT));
 
@@ -109,18 +125,27 @@
    pIProperties -> Add(L"name",&propertyName);
 
    pIProperties -> Add(L"line color",&propertyLineColor);
+   propertyLineColor -> put_type(TYPE_BINARY);
+
    pIProperties -> Add(L"line weight",&propertyLineWeight);
    propertyLineWeight -> put_type(TYPE_LONG);
+   propertyLineWeight -> directAccess(TYPE_LONG,&lineWeight,sizeof(long));
 
    pIProperties -> Add(L"top surface color",&propertyTopSurfaceColor);
+   propertyTopSurfaceColor -> put_type(TYPE_BINARY);
  
    pIProperties -> Add(L"bottom surface color",&propertyBottomSurfaceColor);
+   propertyBottomSurfaceColor -> put_type(TYPE_BINARY);
  
    pIProperties -> Add(L"line end",&propertyLineEnd);
    pIProperties -> Add(L"line join",&propertyLineJoin);
 
    pIProperties -> Add(L"plot view",&propertyPlotView);
-   pIProperties -> Add(L"plot type",&propertyPlotType);
+   pIProperties -> Add(L"plot 2D type",&property2DPlotType);
+   pIProperties -> Add(L"plot 3D type",&property3DPlotType);
+
+   property2DPlotType -> directAccess(TYPE_LONG,&plotType2D,sizeof(plotType2D));
+   property3DPlotType -> directAccess(TYPE_LONG,&plotType3D,sizeof(plotType3D));
  
    pIProperties -> Add(L"custom colors",&propertyCustomColors);
  
@@ -138,7 +163,6 @@
 
    pIProperties -> DirectAccess(L"plot view",TYPE_LONG,&plotView,sizeof(enum PlotView));
 
-   pIProperties -> DirectAccess(L"plot type",TYPE_LONG,&plotType,sizeof(enum PlotType));
    pIProperties -> DirectAccess(L"properties position", TYPE_BINARY,&rectPropertiesPosition,sizeof(RECT));
    pIProperties -> DirectAccess(L"plot number",TYPE_LONG,&pID,sizeof(pID));
 
@@ -153,24 +177,47 @@
 
    refCount = 0;
 
-   WNDCLASS aClass;
- 
-   aClass.style = 0;
-   aClass.lpfnWndProc = handler;
-   aClass.cbClsExtra = 32;
-   aClass.cbWndExtra = 32;
-   aClass.hInstance = hModule;
-   aClass.hIcon = NULL;
-   aClass.hCursor = NULL;
-   aClass.hbrBackground = 0;
-   aClass.lpszMenuName = NULL;
-   aClass.lpszClassName = "p-handler";
- 
-   RegisterClass(&aClass);
- 
    hMainMenu = LoadMenu((HINSTANCE)hModule,MAKEINTRESOURCE(IDMENU_PLOT));
 
    hMenu = GetSubMenu(hMainMenu,0);
+
+   if ( 1 == instanceCount ) {
+
+      WNDCLASS aClass;
+ 
+      aClass.style = 0;
+      aClass.lpfnWndProc = Plot::handler;
+      aClass.cbClsExtra = 32;
+      aClass.cbWndExtra = 32;
+      aClass.hInstance = hModule;
+      aClass.hIcon = NULL;
+      aClass.hCursor = NULL;
+      aClass.hbrBackground = 0;
+      aClass.lpszMenuName = NULL;
+      aClass.lpszClassName = "p-handler";
+ 
+      RegisterClass(&aClass);
+ 
+      aClass.lpfnWndProc = Plot::sampleGraphicHandler;
+      aClass.cbClsExtra = 32;
+      aClass.cbWndExtra = 32;
+      aClass.hInstance = hModule;
+      aClass.hIcon = NULL;
+      aClass.hCursor = NULL;
+      aClass.hbrBackground = 0;
+      aClass.lpszMenuName = NULL;
+      aClass.lpszClassName = "plot-sample-graphic";
+ 
+      RegisterClass(&aClass);
+
+      aClass.lpfnWndProc = Plot::sampleGraphicSurfaceHandler;
+      aClass.lpszClassName = "plot-sample-graphic-surface";
+ 
+      RegisterClass(&aClass);
+
+      findKnownPlotTypeProviders();
+
+   }
 
    return;
    }
@@ -197,9 +244,161 @@
 
    DestroyMenu(hMainMenu);
 
+   --instanceCount;
+
+   if ( 0 == instanceCount ) {
+      for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> p : plotType2DProviderInstances )
+         if ( p.second )
+            p.second -> Release();
+      for ( std::pair<gc3DPlotTypes,IGSystemPlotType *> p : plotType3DProviderInstances )
+         if ( p.second )
+            p.second -> Release();
+      for ( CLSID *p : plotTypeProviderGUIDs )
+         delete p;
+      for ( std::pair<gc2DPlotTypes,char *> p : plotType2DProviderNames )
+         delete [] p.second;
+      for ( std::pair<gc3DPlotTypes,char *> p : plotType3DProviderNames )
+         delete [] p.second;
+
+   }
+
    return;
    }  
  
    HANDLE Plot::PlotThread() { return plotThread; }
 
 
+   long Plot::findKnownPlotTypeProviders() {
+
+   ICatInformation *pICatInformation = NULL;
+
+   CoCreateInstance(CLSID_StdComponentCategoriesMgr,NULL,CLSCTX_ALL,IID_ICatInformation,reinterpret_cast<void **>(&pICatInformation));
+
+   IEnumCLSID *pIEnumCLSID = NULL;
+
+   CATID catIds[] = { IID_IGSystemPlotType };
+
+   pICatInformation -> EnumClassesOfCategories(1,catIds,0,NULL,&pIEnumCLSID);
+
+   CATEGORYINFO catInfo;
+
+   memset(&catInfo,0,sizeof(CATEGORYINFO));
+
+   unsigned long countFound;
+   CLSID clsid;
+
+   long totalCount = 0;
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeNone] = NULL;
+   plotType2DProviderNames[gcPlotTypeNone] = "None";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeNatural] = NULL;
+   plotType2DProviderNames[gcPlotTypeNatural] = "Natural";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeStacks] = NULL;
+   plotType2DProviderNames[gcPlotTypeStacks] = "Histogram";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeBlocks] = NULL;
+   plotType2DProviderNames[gcPlotTypeBlocks] = "Blocks";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeBalls] = NULL;
+   plotType2DProviderNames[gcPlotTypeBalls] = "Balls";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypePie] = NULL;
+   plotType2DProviderNames[gcPlotTypePie] = "Pie";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeContour] = NULL;
+   plotType2DProviderNames[gcPlotTypeContour] = "Countour";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType2DProviderInstances[gcPlotTypeQuads] = NULL;
+   plotType2DProviderNames[gcPlotTypeQuads] = "Quads";
+
+#if 0
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType3DProviderInstances[gcPlotTypeSurface] = NULL;
+   plotType3DProviderNames[gcPlotTypeSurface] = "Surface";
+
+   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
+   plotType3DProviderInstances[gcPlotTypeWireFrame] = NULL;
+   plotType3DProviderNames[gcPlotTypeWireFrame] = "WireFrame";
+#endif
+
+   long external2DPlotType = (long)gcPlotType2DExternal1;
+   long external3DPlotType = (long)gcPlotType3DExternal1;
+
+   while ( S_OK == pIEnumCLSID -> Next(1,&clsid,&countFound) ) {
+
+      if ( ! countFound )
+         break;
+
+      totalCount++;
+
+      IGSystemPlotType *pIGSystemPlotType = NULL;
+
+      HRESULT rc = CoCreateInstance(clsid,NULL,CLSCTX_INPROC_SERVER,IID_IGSystemPlotType,reinterpret_cast<void **>(&pIGSystemPlotType));
+
+      if ( ! ( S_OK == rc ) )
+         continue;
+
+      long countProvided = 0L;
+
+      pIGSystemPlotType -> get_Count(&countProvided);
+
+      for ( long itemIndex = 0; itemIndex < countProvided; itemIndex++ ) {
+
+         VARIANT_BOOL is3DOnly = VARIANT_FALSE;
+
+         pIGSystemPlotType -> get_Is3DOnly(itemIndex + 1,&is3DOnly);
+
+         CLSID *pKeep = new CLSID(clsid);
+
+         plotTypeProviderGUIDs.push_back(pKeep);
+
+         BSTR bstrName;
+
+         pIGSystemPlotType -> get_Name(itemIndex + 1,&bstrName);
+
+         long n = wcslen(bstrName) + 1;
+
+         char *pszName = new char[n];
+
+         WideCharToMultiByte(CP_ACP,0,bstrName,-1,pszName,n,0,0);
+
+         SysFreeString(bstrName);
+
+         if ( VARIANT_TRUE == is3DOnly ) {
+ 
+            plotType3DProviderNames[(gc3DPlotTypes)external3DPlotType] = pszName;
+
+            plotType3DProviderInstances[(gc3DPlotTypes)external3DPlotType] = pIGSystemPlotType;
+
+            plotType3DInstanceNumber[(gc3DPlotTypes)external3DPlotType] = itemIndex + 1;
+
+            external3DPlotType = external3DPlotType << 1;
+ 
+         } else {
+
+            plotType2DProviderNames[(gc2DPlotTypes)external2DPlotType] = pszName;
+
+            plotType2DProviderInstances[(gc2DPlotTypes)external2DPlotType] = pIGSystemPlotType;
+
+            plotType2DInstanceNumber[(gc2DPlotTypes)external2DPlotType] = itemIndex + 1;
+
+            external2DPlotType = external2DPlotType << 1;
+
+         }
+
+      }
+
+   }
+
+   return totalCount;
+   }

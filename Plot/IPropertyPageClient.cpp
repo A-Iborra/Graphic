@@ -75,7 +75,6 @@
    pHeader -> pfnCallback = NULL;
 
    return S_OK;
-
    }
 
 
@@ -96,7 +95,7 @@
    pPropSheetPages[0].hInstance = hModule;
    pPropSheetPages[0].pszTemplate = MAKEINTRESOURCE(IDDIALOG_PLOT_DIMENSION);
    pPropSheetPages[0].pfnDlgProc = (DLGPROC)dimensionHandler;
-   pPropSheetPages[0].pszTitle = "Dimensions";
+   pPropSheetPages[0].pszTitle = "View";
    pPropSheetPages[0].lParam = (LPARAM)this;
    pPropSheetPages[0].pfnCallback = NULL;
 
@@ -105,7 +104,7 @@
    pPropSheetPages[1].hInstance = hModule;
    pPropSheetPages[1].pszTemplate = MAKEINTRESOURCE(IDDIALOG_PLOT_TYPE);
    pPropSheetPages[1].pfnDlgProc = (DLGPROC)typeHandler;
-   pPropSheetPages[1].pszTitle = "Plot Type";
+   pPropSheetPages[1].pszTitle = "Type";
    pPropSheetPages[1].lParam = (LPARAM)this;
    pPropSheetPages[1].pfnCallback = NULL;
 

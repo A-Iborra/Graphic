@@ -1,20 +1,11 @@
-/*
 
-                       Copyright (c) 1996,1997,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
-#include <olectl.h>
-#include <stdio.h>
+#include "Graphic.h"
 
 #include <list>
 
 #include "Graphic_resource.h"
+#include "GMessage.h"
 #include "utils.h"
-
-#include "Graphic.h"
 #include "List.cpp"
 
 
@@ -93,6 +84,11 @@
 
       }
       return LRESULT(FALSE);
+
+   case WM_SHOWWINDOW: {
+
+      }
+      break;
  
    case WM_NOTIFY:
       switch ( wParam ) {
@@ -112,12 +108,13 @@
 
       case IDDI_GRAPHIC_DATASETS_ADD: {
 
-         IDataSet *pDataSet;
+         IDataSet *pDataSet = p -> newDataSet(true);
          IUnknown* pIUnknown;
-         pDataSet = p -> newDataSet(true);
          pDataSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> pIGProperties -> ShowProperties(p -> hwndOwner,pIUnknown);
          pIUnknown -> Release();
+
+         G::sampleGraphicHandler(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,0L,(LPARAM)NULL);
 
          char szTemp[MAX_PROPERTY_SIZE];
          BSTR bstrExpression;
@@ -153,14 +150,7 @@
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_EDIT),TRUE);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_DELETE),TRUE);
 
-         //ContainedDataSet *pds = (ContainedDataSet *)NULL;
-         //while ( pds = p -> containedDataSetList.GetNext(pds) )
-         //   ShowWindow(pds -> HWNDSite(),SW_HIDE);
-
          SendMessage(p -> hwndDataSourcesDataSets,TCM_SETCURSEL,(WPARAM)(SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEMCOUNT,0L,0L) - 1),0L);
-
-         //pds = p -> containedDataSetList.Get(reinterpret_cast<long>(pDataSet));
-         //ShowWindow(pds -> HWNDSite(),SW_SHOW);
 
          }
          break;
@@ -194,9 +184,14 @@
                char szTemp[MAX_PROPERTY_SIZE];
                BSTR bstr;
                IDataSet * pds = (IDataSet *)lvItem.lParam;
+
                IUnknown* pIUnknown;
                pds -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
                p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
+               pIUnknown -> Release();
+
+               G::sampleGraphicHandler(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,1L,(LPARAM)NULL);
+
                lvItem.mask = LVIF_TEXT;
                lvItem.pszText = szTemp;
 
@@ -216,7 +211,6 @@
 
                SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_SETITEM,0L,(LPARAM)&lvItem);
 
-               pIUnknown -> Release();
                break;
             }
          }

@@ -25,7 +25,7 @@ library Plot {
 
    module PlotModule { };
 
-   [  uuid(8CAEFD7D-55E6-11d3-8365-006008BD5BC3),
+   [  uuid(8CAEFD7E-55E6-11d3-8365-006008BD5BC3),
       helpstring(""),
       pointer_default(unique)
    ] 
@@ -88,7 +88,7 @@ library Plot {
      [propget,helpstring("")]
      HRESULT IDataSet([out,retval] IDataSet **dataSet);
 
-     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+     enum DataArity DataArity();
 
      [propget,helpstring("")]
      HRESULT SegmentID([out,retval] long* getID);
@@ -104,9 +104,14 @@ library Plot {
      HRESULT PlotView([out,retval] enum PlotViews *getPlotView);
 
      [propput,helpstring("")]
-     HRESULT PlotType([in] enum PlotTypes newPlotSubTppe);
+     HRESULT PlotType2D([in] enum gc2DPlotTypes newPlotSubTppe);
      [propget,helpstring("")]
-     HRESULT PlotType([out,retval] enum PlotTypes *getPlotSubType);
+     HRESULT PlotType2D([out,retval] enum gc2DPlotTypes *getPlotSubType);
+
+     [propput,helpstring("")]
+     HRESULT PlotType3D([in] enum gc3DPlotTypes newPlotSubTppe);
+     [propget,helpstring("")]
+     HRESULT PlotType3D([out,retval] enum gc3DPlotTypes *getPlotSubType);
 
      [propput,helpstring("")]
      HRESULT ColorProperty([in] IGProperty* pIPropertyColor);
@@ -202,6 +207,9 @@ library Plot {
      HRESULT PlotTypeProperty([out,retval]IGProperty **ppPlotSubTypeProperty);
 
      [propget,helpstring("")]
+     HRESULT PlotTypeHasSurfaces([in] enum gc3DPlotTypes theType,[out,retval] VARIANT_BOOL *pHasSurfaces);
+
+     [propget,helpstring("")]
      HRESULT SegmentID([out,retval] long* getID);
 
      [propput,helpstring("")]
@@ -214,7 +222,7 @@ library Plot {
      [propget,helpstring("")]
      HRESULT IDataSet([out,retval] IDataSet **dataSet);
 
-     [propget] HRESULT DataArity([out,retval] enum DataArity *);
+     enum DataArity DataArity();
 
      [propput,helpstring("")]
      HRESULT PlotNotify([in] IPlotNotify *setIPlotNotify);
@@ -288,6 +296,15 @@ library Plot {
      [helpstring("Use this method to provide an implementation of IGSystemStatusBar to the object - the interface is not AddRef()ed")]
      HRESULT AdviseGSystemStatusBar(IGSystemStatusBar*);
 
+     HRESULT AdviseGSGraphicServices(/*IGSGraphicServices*/ void *);
+
+   };
+
+   [uuid(8CAEFD7D-55E6-11d3-8365-006008BD5BC3)] 
+   interface IPlotServices : IUnknown {
+
+      HRESULT GetPlotTypesInformation(SAFEARRAY(long) *pp2DTypeIDs,SAFEARRAY(long) *pp3DTypeIds,SAFEARRAY(BSTR) *pp2DTypeNames,SAFEARRAY(BSTR) *pp3DTypeNames);
+
    };
 
    [
@@ -304,6 +321,7 @@ library Plot {
    ]
    coclass Plot {
       [default] interface IPlot;
+      interface IPlotServices;
    };
 
    [

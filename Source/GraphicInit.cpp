@@ -56,20 +56,25 @@
    gClass.lpszClassName = "G-graphic-Frame";
   
    RegisterClass(&gClass);
- 
-   hwndFrame = CreateWindowEx(0*WS_EX_CONTROLPARENT,"G-graphic-Frame","Graphic",WS_CHILD,0,0,0,0,hwndOwner,NULL,hModule,(void *)this);
   
    gClass.lpfnWndProc = graphicHandler;
    gClass.lpszClassName = "G-graphic";
    
    RegisterClass(&gClass);
  
-   hwndGraphic = CreateWindowEx(0L,"G-graphic","Graph",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
-
    gClass.lpfnWndProc = sampleGraphicHandler;
    gClass.lpszClassName = "G-plotSettingsGraphic";
  
    RegisterClass(&gClass);
+
+   gClass.lpfnWndProc = sampleGraphicSurfaceHandler;
+   gClass.lpszClassName = "G-plotSettingsGraphic-Surface";
+ 
+   RegisterClass(&gClass);
+
+   hwndFrame = CreateWindowEx(0*WS_EX_CONTROLPARENT,"G-graphic-Frame","Graphic",WS_CHILD,0,0,0,0,hwndOwner,NULL,hModule,(void *)this);
+
+   hwndGraphic = CreateWindowEx(0L,"G-graphic","Graph",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
 
    hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,100,100,hwndFrame,NULL,hModule,(void *)this);
 
@@ -91,7 +96,7 @@
    hwndDataSourcesDataSets = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_DATASETS_TAB);
 
    put_PlotView(plotView);
-   put_PlotType(plotType);
+   put_PlotType(default2DPlotType);
 
    if ( containedFunctionList.Count() > 0 ) {
       SendMessage(hwndDataSourcesFunctions,TCM_SETCURSEL,0L,0L);

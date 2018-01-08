@@ -17,17 +17,9 @@
  
    Plot* pThis = (Plot *)pObject;
  
-   DataPoint v[5];
-   DataList *dlTemp,*dlNext,*dl;
-   DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
-   int endOfData,kAccross;
    long okToPlot,segmentID;
-   //PlotViews view;
+
    long plotTypes;
-   long allTypes[] = {(long)gcPlotTypeNatural,(long)gcPlotTypeSurface,(long)gcPlotTypeWireFrame,
-                        (long)gcPlotTypeStacks,(long)gcPlotTypeBlocks,(long)gcPlotTypeBalls,
-                        (long)gcPlotTypePie,(long)gcPlotTypeContour,
-                        (long)gcPlotTypeQuads,(long)gcPlotTypeTriangles,0};
 
    for (  int plotIndex = pThis -> currentPlotCount - 1; plotIndex > -1; plotIndex-- ) {
  
@@ -40,11 +32,6 @@
 
       p -> Create(&segmentID);
 
-      if ( p -> overrideOwnerType ) 
-         p -> propertyPlotType -> get_longValue(&plotTypes);
-      else
-         p -> pOwnerProperty2DPlotType -> get_longValue(&plotTypes);
-
       if ( p -> overrideOwnerView ) {
          //p -> propertyPlotView -> get_longValue((long *)&view);
          p -> pIOpenGLImplementation -> Push();
@@ -52,235 +39,76 @@
       } //else      
          //p -> pOwnerPropertyPlotView -> get_longValue((long *)&view);
 
-      for ( int typeIndex = 0; allTypes[typeIndex]; typeIndex++ ) {
+      if ( p -> overrideOwnerType || ( NULL == p -> pOwnerProperty2DPlotType ) ) 
+         p -> property2DPlotType -> get_longValue(&plotTypes);
+      else
+         p -> pOwnerProperty2DPlotType -> get_longValue(&plotTypes);
 
-         PlotTypes type = (PlotTypes)(plotTypes & allTypes[typeIndex]);
+      if ( ! ( gcPlotTypeNone == (gc2DPlotTypes)plotTypes ) ) {
 
-         switch ( type ) {
+         for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> pPair : plotType2DProviderInstances ) {
+
+            if ( ! ( NULL == pPair.second ) ) 
+               break;
+
+            if ( ! ( plotTypes & pPair.first ) )
+               continue;
+
+            switch ( (long)pPair.first ) {
+        
+            case gcPlotTypeStacks:
+               p -> stacks();
+               break;
+
+            case gcPlotTypeBalls:
+               p -> balls();
+               break;
     
-         case gcPlotTypeSurface: {
+            case gcPlotTypeBlocks:
+               p -> blocks();
+               break;
     
-            double xProd0[3],xProd1[3],xProd2[3],avgNormal[5][3];
-    
-            p -> pIOpenGLImplementation -> BeginSurface(segmentID,p -> propertyTopSurfaceColor,p -> propertyBottomSurfaceColor);
-   
-            kAccross = 0;
-            endOfData = FALSE;
-    
-            dl = (DataList *)NULL;
+            case gcPlotTypeNatural:
+               p -> BasePlot::Draw();
+               break;
 
-            p -> pIDataSet -> get(dl,&firstPoint,&dl);
-   
-            while ( dl ) {
-         
-               dlNext = dl;
+            }
 
-               p -> pIDataSet -> get(dlNext,&secondPoint,&dlTemp);
+            for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> pPair : plotType2DProviderInstances ) {
 
-               if ( ! dlTemp ) break;
-         
-               if ( secondPoint.x != firstPoint.x ) {
-                  kAccross = 0;
-                  p -> pIDataSet -> get(dl,&firstPoint,&dl);
+               if ( NULL == pPair.second ) 
                   continue;
-               }
-         
-               fourthPoint = secondPoint;
-         
-               while ( secondPoint.x == firstPoint.x ) {
-                  p -> pIDataSet -> get(dlNext,&secondPoint,&dlNext);
-                  if ( ! dlNext ) {
-                     endOfData = TRUE;
-                     break;
-                  }
-               }
-   
-               if ( endOfData ) break;
-         
-               for ( int j = 0; j < kAccross; j++ ) {
-                  if ( ! dlNext ) {
-                     endOfData = TRUE;
-                     break;
-                  }
-                  p -> pIDataSet -> get(dlNext,&secondPoint,&dlNext);
-               }
-   
-               if ( endOfData ) break;
-    
-               p -> pIDataSet -> get(dlNext,&thirdPoint,&dlTemp);
-         
-               v[0] = firstPoint;
-               v[1] = secondPoint;
-               v[2] = thirdPoint;
-               v[3] = fourthPoint;
-   
-               xProd0[0] = v[1].x - v[0].x; // x-product of the vector from 0->1 with 0->3
-               xProd0[1] = v[1].y - v[0].y;
-               xProd0[2] = v[1].z - v[0].z;
-               xProd1[0] = v[3].x - v[0].x;
-               xProd1[1] = v[3].y - v[0].y;
-               xProd1[2] = v[3].z - v[0].z;
 
-               VxV(xProd0,xProd1,xProd2);
-               unitVector(xProd2,xProd0);
-               avgNormal[0][0] = xProd0[0];
-               avgNormal[0][1] = xProd0[1];
-               avgNormal[0][2] = xProd0[2];
-    
-               xProd0[0] = v[2].x - v[1].x; // x-product of the vector from 1->2 with 1->0
-               xProd0[1] = v[2].y - v[1].y;
-               xProd0[2] = v[2].z - v[1].z;
-               xProd1[0] = v[0].x - v[1].x;
-               xProd1[1] = v[0].y - v[1].y;
-               xProd1[2] = v[0].z - v[1].z;
-
-               VxV(xProd0,xProd1,xProd2);
-               unitVector(xProd2,xProd0);
-               avgNormal[1][0] = xProd0[0];
-               avgNormal[1][1] = xProd0[1];
-               avgNormal[1][2] = xProd0[2];
-    
-               xProd0[0] = v[3].x - v[2].x; // x-product of the vector from 2->3 with 2->1
-               xProd0[1] = v[3].y - v[2].y;
-               xProd0[2] = v[3].z - v[2].z;
-               xProd1[0] = v[1].x - v[2].x;
-               xProd1[1] = v[1].y - v[2].y;
-               xProd1[2] = v[1].z - v[2].z;
-
-               VxV(xProd0,xProd1,xProd2);
-               unitVector(xProd2,xProd0);
-               avgNormal[2][0] = xProd0[0];
-               avgNormal[2][1] = xProd0[1];
-               avgNormal[2][2] = xProd0[2];
-    
-               xProd0[0] = v[0].x - v[3].x; // x-product of the vector from 3->0 with 3->2
-               xProd0[1] = v[0].y - v[3].y;
-               xProd0[2] = v[0].z - v[3].z;
-               xProd1[0] = v[2].x - v[3].x;
-               xProd1[1] = v[2].y - v[3].y;
-               xProd1[2] = v[2].z - v[3].z;
-
-               VxV(xProd0,xProd1,xProd2);
-               unitVector(xProd2,xProd0);
-               avgNormal[3][0] = xProd0[0];
-               avgNormal[3][1] = xProd0[1];
-               avgNormal[3][2] = xProd0[2];
-
-avgNormal[4][0] = 0.0;
-avgNormal[4][1] = 0.0;
-avgNormal[4][2] = 0.0;
-avgNormal[4][3] = 0.0;
-
-for ( int vk = 0; vk < 4; vk++ ) {
-    avgNormal[4][0] += avgNormal[vk][0];
-    avgNormal[4][1] += avgNormal[vk][1];
-    avgNormal[4][2] += avgNormal[vk][2];
-    avgNormal[4][3] += avgNormal[vk][3];
-    //unitVector(avgNormal[vk],avgNormal[vk]);
-}
-
-               p -> pIOpenGLImplementation -> Normal3dv(avgNormal[4]);
-               for ( int vk = 0; vk < 4; vk++ ) {
-                  //p -> pIOpenGLImplementation -> Normal3dv(avgNormal[vk]);
-                  p -> pIOpenGLImplementation -> Vertex(&v[vk]);
-               }
-
-               kAccross++;
-   
-               p -> pIDataSet -> get(dl,&firstPoint,&dl);
-    
-            }
-    
-            p -> pIOpenGLImplementation -> EndSurface(segmentID);
-   
-            break;
-            }
-       
-         case gcPlotTypeWireFrame: {
-   
-            p -> pIOpenGLImplementation -> BeginWireframe(segmentID,p -> propertyLineColor,p -> propertyLineWeight);
-    
-            kAccross = 0;
-            endOfData = FALSE;
-    
-            dl = (DataList *)NULL;
-            p -> pIDataSet -> get(dl,&firstPoint,&dl);
-            while ( dl ) {
-       
-               dlNext = dl;
-               p -> pIDataSet -> get(dlNext,&secondPoint,&dlTemp);
-               if ( !dlTemp ) break;
-       
-               if ( secondPoint.x != firstPoint.x ) {
-                  kAccross = 0;
-                  p -> pIDataSet -> get(dl,&firstPoint,&dl);
+               if ( ! ( plotTypes & pPair.first ) )
                   continue;
-               }
-       
-               fourthPoint = secondPoint;
-       
-               while ( secondPoint.x == firstPoint.x ) {
-                  p -> pIDataSet -> get(dlNext,&secondPoint,&dlNext);
-                  if ( !dlNext ) {
-                     endOfData = TRUE;
-                     break;
-                  }
-               }
-               if ( endOfData ) break;
-       
-               for ( int j = 0; j < kAccross; j++ ) {
-                  if ( !dlNext ) {
-                     endOfData = TRUE;
-                     break;
-                  }
-                  p -> pIDataSet -> get(dlNext,&secondPoint,&dlNext);
-               }
-               if ( endOfData ) break;
-    
-               p -> pIDataSet -> get(dlNext,&thirdPoint,&dlTemp);
-       
-               v[0] = firstPoint;
-               v[1] = secondPoint;
-               v[2] = thirdPoint;
-               v[3] = fourthPoint;
-       
-               for ( int vk = 0; vk < 4; vk++ ) p -> pIOpenGLImplementation -> Vertex(&v[vk]);
-       
-               kAccross++;
-       
-               p -> pIDataSet -> get(dl,&firstPoint,&dl);
-    
-            }
-       
-            p -> pIOpenGLImplementation -> EndWireframe(segmentID);
-    
-            }
-            break;
-    
-         case gcPlotTypeStacks:
-            p -> stacks();
-            break;
 
-         case gcPlotTypeBalls:
-            p -> balls();
-            break;
-    
-         case gcPlotTypeBlocks:
-            p -> blocks();
-            break;
-    
-         case gcPlotTypeNatural:
-            p -> BasePlot::Draw();
-            break;
-     
+               pPair.second -> Execute(plotType2DInstanceNumber[pPair.first],segmentID,(void *)p,(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
+
+            }
+
          }
 
       }
 
-      //if ( p -> overrideOwnerView ) 
-      //   p -> pIOpenGLImplementation -> Pop();
- 
+      if ( p -> overrideOwnerType || ( NULL == p -> pOwnerProperty3DPlotType ) ) 
+         p -> property3DPlotType -> get_longValue(&plotTypes);
+      else
+         p -> pOwnerProperty3DPlotType -> get_longValue(&plotTypes);
+
+      if ( ( gcPlotType3DNone == (gc3DPlotTypes)plotTypes ) ) 
+         continue;
+
+      for ( std::pair<gc3DPlotTypes,IGSystemPlotType *> pPair : plotType3DProviderInstances ) {
+
+         if ( ! ( plotTypes & pPair.first ) )
+            continue;
+
+         pPair.second -> Execute(plotType3DInstanceNumber[pPair.first],segmentID,(void *)p,(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
+
+      }
+
    }
+
  
    for ( int k = 0; k < pThis -> currentPlotCount; k++ ) 
       (pThis -> pIPlots[k]) -> Release();

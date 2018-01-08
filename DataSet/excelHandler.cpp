@@ -93,10 +93,16 @@ EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> sz
       if ( ignoreCommands )
          break;
 
-      SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE),p -> szDataSource);
-
       if ( ! p -> szDataSource[0] )
          break;
+
+      char *psz = strrchr(p -> szDataSource,'\\');
+      if ( ! psz )
+         psz = strrchr(p -> szDataSource,'/');
+      if ( ! psz )
+         psz = p -> szDataSource - 1;
+
+      SetWindowText(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE),psz + 1);
 
       ENABLE_LOAD_BUTTON
 
@@ -138,7 +144,7 @@ EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> sz
 
       long countData = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS,LVM_GETITEMCOUNT,0L,0L);
 
-      if ( 0 == countData ) {
+      if ( 0 == countData && ! p -> isEmbedded ) {
          if ( p -> szCellRange[0] && p -> szSpreadsheetName[0] && ! p -> szNamedRange[0] ) {
             if ( ! p -> hasHeaderRowDetermined ) 
                p -> hasHeaderRowDetermined = p -> peekExcelCells(p -> szDataSource,NULL,p -> szSpreadsheetName,p -> szCellRange,&p -> hasHeaderRow);

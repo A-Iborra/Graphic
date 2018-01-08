@@ -134,10 +134,15 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\source\utilities.cpp" />
+    <ClCompile Include="..\..\Common\source\Utils.cpp" />
+    <ClCompile Include="IGSystemPlotType.cpp" />
+    <ClCompile Include="IGSystemPlotType_Surface.cpp" />
+    <ClCompile Include="IGSystemPlotType_WireFrame.cpp" />
+    <ClCompile Include="IPlotServices.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="\Common\Utils\registryUtils.cpp" />
-    <ClCompile Include="\Common\Utils\Utils.cpp" />
     <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
     <ClCompile Include="balls.cpp" />
     <ClCompile Include="BasePlot.cpp" />
@@ -167,6 +172,7 @@
     <None Include="PlotControl.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Graphic_resource.h" />
     <ClInclude Include="BasePlot.h" />
     <ClInclude Include="GraphicSegment.h" />
     <ClInclude Include="Plot.h" />

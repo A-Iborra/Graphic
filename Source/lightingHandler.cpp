@@ -36,7 +36,7 @@
          EnableWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Z),enabled);                        \
       } 
                                                                                         
-#define GET_VALUES(k)      {                                                                             \
+#define GET_VALUES(k)  {                                                                                 \
       float fv[4];                                                                                       \
       p -> ppPropertyLightOn[k] -> getWindowItemChecked(hwnd,IDDI_LIGHT_ENABLED);                        \
       char szTemp[32];                                                                                   \
@@ -64,7 +64,7 @@
       p -> ppPropertyLightPos[k] -> put_szValue(szPosition);                                             \
       }                                                 
                                                                                          
-#define SET_WINDOWS(k)                                                                                   \
+#define SET_WINDOWS(k,noUpdate)                                                                          \
       {                                                                                                  \
       SHORT v;                                                                                           \
       float fv[4];                                                                                       \
@@ -96,24 +96,47 @@
       char *pszTemp = new char[n];                                                                       \
       p -> ppPropertyLightPos[k] -> get_szValue(pszTemp);                                                \
       char *pp = strtok(pszTemp,",");                                                                    \
+      double dValue;                                                                                     \
       if ( pp ) {                                                                                        \
-         SetDlgItemText(hwnd,IDDI_LIGHT_POS_X,pp);                                                       \
+         if ( ! ( noUpdate == IDDI_LIGHT_POS_X ) )                                                       \
+            SetDlgItemText(hwnd,IDDI_LIGHT_POS_X,pp);                                                    \
+         p -> pIEvaluator -> Evaluate_szExpression(pp,&dValue);                                          \
+         sprintf_s(szPosition,64,szPositionFormat,dValue);                                               \
+         SetDlgItemText(hwnd,IDDI_LIGHT_POS_X_EVALED,szPosition);                                        \
+         ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_X_EVALED),SW_SHOW);                                   \
          pp = strtok(NULL,",");                                                                          \
          if ( pp ) {                                                                                     \
-            SetDlgItemText(hwnd,IDDI_LIGHT_POS_Y,pp);                                                    \
+            if ( ! ( noUpdate == IDDI_LIGHT_POS_Y ) )                                                    \
+               SetDlgItemText(hwnd,IDDI_LIGHT_POS_Y,pp);                                                 \
+            p -> pIEvaluator -> Evaluate_szExpression(pp,&dValue);                                       \
+            sprintf_s(szPosition,64,szPositionFormat,dValue);                                            \
+            SetDlgItemText(hwnd,IDDI_LIGHT_POS_Y_EVALED,szPosition);                                     \
+            ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Y_EVALED),SW_SHOW);                                \
             pp = strtok(NULL,",");                                                                       \
-            if ( pp )                                                                                    \
-               SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z,pp);                                                 \
-            else                                                                                         \
+            if ( pp ) {                                                                                  \
+               if ( ! ( noUpdate == IDDI_LIGHT_POS_Z ) )                                                 \
+                  SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z,pp);                                              \
+               p -> pIEvaluator -> Evaluate_szExpression(pp,&dValue);                                    \
+               sprintf_s(szPosition,64,szPositionFormat,dValue);                                         \
+               SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z_EVALED,szPosition);                                  \
+               ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Z_EVALED),SW_SHOW);                             \
+            } else {                                                                                     \
                SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z,"0.0");                                              \
+               ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Z_EVALED),SW_HIDE);                             \
+            }                                                                                            \
          } else {                                                                                        \
             SetDlgItemText(hwnd,IDDI_LIGHT_POS_Y,"0.0");                                                 \
             SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z,"0.0");                                                 \
+            ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Y_EVALED),SW_HIDE);                                \
+            ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Z_EVALED),SW_HIDE);                                \
          }                                                                                               \
       } else {                                                                                           \
          SetDlgItemText(hwnd,IDDI_LIGHT_POS_X,"0.0");                                                    \
          SetDlgItemText(hwnd,IDDI_LIGHT_POS_Y,"0.0");                                                    \
          SetDlgItemText(hwnd,IDDI_LIGHT_POS_Z,"0.0");                                                    \
+         ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_X_EVALED),SW_HIDE);                                   \
+         ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Y_EVALED),SW_HIDE);                                   \
+         ShowWindow(GetDlgItem(hwnd,IDDI_LIGHT_POS_Z_EVALED),SW_HIDE);                                   \
       }                                                                                                  \
                                                                                                          \
       p -> ppPropertyLightOn[k] -> setWindowItemChecked(hwnd,IDDI_LIGHT_ENABLED);                        \
@@ -122,6 +145,9 @@
  
    static int holdUpdates = FALSE;
  
+   char szPosition[64];
+   char szPositionFormat[64];
+
    LRESULT CALLBACK G::lightingHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
    G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -159,8 +185,10 @@
  
       SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_DIFFUSE_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
       SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_SPECULAR_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
+
+      GetWindowText(GetDlgItem(hwnd,IDDI_LIGHT_POS_X_EVALED),szPositionFormat,64);
  
-      SET_WINDOWS(0)
+      SET_WINDOWS(0,0)
 
       holdUpdates = FALSE;
  
@@ -225,7 +253,7 @@
          si.nPos = si.nMax;
 
       holdUpdates = TRUE;
-      SET_WINDOWS(si.nPos);
+      SET_WINDOWS(si.nPos,0);
       holdUpdates = FALSE;
 
       si.fMask = SIF_POS;
@@ -327,8 +355,8 @@
       }
       }
 
-if ( IsWindowVisible(hwnd) )
-p -> render(0);
+//if ( IsWindowVisible(hwnd) )
+//p -> render(0);
 
       return LRESULT(FALSE);
  
@@ -354,6 +382,9 @@ p -> render(0);
              if ( holdUpdates ) break;
              int k = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
              GET_VALUES(k)
+             holdUpdates = true;
+             SET_WINDOWS(k,LOWORD(wParam));
+             holdUpdates = false;
          }
          break;
  
@@ -401,7 +432,7 @@ p -> render(0);
             fv[2] = (float)GetBValue(ci.rgbResult) / 255.0f;
             pp -> put_binaryValue(4 * sizeof(float),(BYTE*)fv);
             holdUpdates = TRUE;
-            SET_WINDOWS(k)
+            SET_WINDOWS(k,0)
             holdUpdates = FALSE;
             RECT rect,rect2;
             long cx,cy;
@@ -489,8 +520,8 @@ p -> render(0);
          break;
       }
 
-if ( IsWindowVisible(hwnd) )
-p -> render(0);
+//if ( IsWindowVisible(hwnd) )
+//p -> render(0);
 
       }
       return LRESULT(FALSE);

@@ -224,8 +224,8 @@
          p -> iProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
          //p -> resize();
-         //if ( p -> pWhenChangedCallback )
-         //   p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+         if ( p -> pWhenChangedCallback )
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          break;
 

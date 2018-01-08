@@ -50,9 +50,8 @@
 
        pSaved_BackgroundColor(NULL) {
 
-   memset(fvAmbientLight,0,sizeof(fvAmbientLight));
-   memset(fvSpecularLight,0,sizeof(fvSpecularLight));
-   memset(fvDiffuseLight,0,sizeof(fvDiffuseLight));
+   memset(&openGLLighting,0,sizeof(lightingParameters));
+
    memset(&openGLState,0,sizeof(openGLState));
 
    openGLState.extentsXMin = openGLState.extentsYMin = openGLState.extentsZMin = DBL_MAX;
@@ -61,7 +60,7 @@
    openGLState.yScaleFactor = 1.0;
    openGLState.zScaleFactor = 1.0;
 
-   shinyness = 25;
+   openGLLighting.shinyness = 25;
 
    RECT rect;
    GetWindowRect(h,&rect);
@@ -143,15 +142,10 @@
    renderingContext = wglCreateContext(deviceContext);
 
    wglMakeCurrent(deviceContext,renderingContext);
-WINDOWS_ERROR_CHECK
-OPENGL_ERROR_CHECK
 
-   //glClear(GL_COLOR_BUFFER_BIT);// | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-OPENGL_ERROR_CHECK
 
    glDrawBuffer(GL_BACK);
-OPENGL_ERROR_CHECK
 
    return TRUE;
    }
@@ -758,6 +752,17 @@ OPENGL_ERROR_CHECK
    }
 
 
+   void PlotWindow::disableLighting() {
+
+   for ( int k = 0; k < SUPPORTED_LIGHT_COUNT; k++ )
+      glDisable(GL_LIGHT0 + k);
+
+   glDisable(GL_LIGHTING);
+
+   return;
+   }
+
+
    HRESULT PlotWindow::setLighting(
                 IGProperty *pPropLightEnabled[],
                 IGProperty *pPropAmbientLight[],
@@ -767,27 +772,110 @@ OPENGL_ERROR_CHECK
                 IGProperty *pPropCountLights,
                 IGProperty *pPropShinyness) {
 
+   memset(&openGLLighting,0,sizeof(lightingParameters));
+
    if ( ! pPropLightEnabled ) {
-      for ( int k = 0; k < SUPPORTED_LIGHT_COUNT; k++ )
-         glDisable(GL_LIGHT0 + k);
+      disableLighting();
       return S_OK;
    }
-
-   long lightCount;
 
    if ( pPropCountLights ) 
-      pPropCountLights -> get_longValue(&lightCount);
+      pPropCountLights -> get_longValue(&openGLLighting.lightCount);
    else {
-      for ( int k = 0; k < SUPPORTED_LIGHT_COUNT; k++ )
-         glDisable(GL_LIGHT0 + k);
+      disableLighting();
       return S_OK;
    }
 
-   if ( ! lightCount ) {
-      for ( int k = 0; k < SUPPORTED_LIGHT_COUNT; k++ )
-         glDisable(GL_LIGHT0 + k);
+   if ( ! openGLLighting.lightCount ) {
+      disableLighting();
       return S_OK;
    }
+
+   short anyEnabled = false;
+
+   for ( int k = 0; k < openGLLighting.lightCount && k < openGLLighting.lightCount; k ++ ) {
+
+      if ( ! pPropLightEnabled[k] )
+         continue;
+
+      short b;
+
+      pPropLightEnabled[k] -> get_boolValue(&b);
+
+      anyEnabled = anyEnabled | b;
+
+   }
+
+   if ( ! anyEnabled ) {
+      openGLLighting.lightCount = 0;
+      disableLighting();
+      return S_OK;
+   }
+
+   for ( int k = 0; k < openGLLighting.lightCount && k < openGLLighting.lightCount; k ++ ) {
+
+      if ( ! pPropLightEnabled[k] ) 
+         continue;
+
+      short b;
+
+      pPropLightEnabled[k] -> get_boolValue(&b);
+
+      if ( ! b ) 
+         continue;
+
+      if ( pPropAmbientLight && pPropAmbientLight[k] ) {
+         BYTE *pb = (BYTE *)&openGLLighting.fvAmbientLight[k][0];
+         pPropAmbientLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+openGLLighting.fvAmbientLight[k][3] = 0.0;
+         openGLLighting.hasAmbient[k] = true;
+      }
+
+      if ( pPropDiffuseLight && pPropDiffuseLight[k] ) {
+         BYTE *pb = (BYTE *)&openGLLighting.fvDiffuseLight[k][0];
+         pPropDiffuseLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+openGLLighting.fvDiffuseLight[k][3] = 0.0;
+         openGLLighting.hasDiffuse[k] = true;
+      }
+
+      if ( pPropSpecularLight && pPropSpecularLight[k] ) {
+         BYTE *pb = (BYTE *)&openGLLighting.fvSpecularLight[k][0];
+         pPropSpecularLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+openGLLighting.fvSpecularLight[k][3] = 0.0;
+         openGLLighting.hasSpecular[k] = true;
+      }
+
+      if ( pPropLightPos && pPropLightPos[k] ) {
+         memset(&openGLLighting.lightPosition[k],0,4 * sizeof(float));
+         long n;
+         pPropLightPos[k] -> get_size(&n);
+         char *pszValues = new char[n];
+         pPropLightPos[k] -> get_szValue(pszValues);
+         if ( pszValues ) 
+            openGLLighting.lightPosition[k][0] = (float)evalConsume(pIEvaluator,pszValues);
+         if ( pszValues ) 
+            openGLLighting.lightPosition[k][1] = (float)evalConsume(pIEvaluator,pszValues);
+         if ( pszValues ) 
+            openGLLighting.lightPosition[k][2] = (float)evalConsume(pIEvaluator,pszValues);
+openGLLighting.lightPosition[k][3] = 1.0;
+         delete [] pszValues;
+      }
+
+   }
+
+   if ( pPropShinyness ) {
+      openGLLighting.hasShinyness = true;
+      pPropShinyness -> get_longValue(&openGLLighting.shinyness);
+   }
+
+   //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+   //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+
+   return S_OK;
+   }
+ 
+
+   void PlotWindow::enableLighting() {
 
    glShadeModel(GL_SMOOTH);
    glEnable(GL_LIGHTING);
@@ -798,90 +886,36 @@ OPENGL_ERROR_CHECK
  
    glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1.0f);
 
-OPENGL_ERROR_CHECK
+   for ( int k = 0; k < openGLLighting.lightCount && k < openGLLighting.lightCount; k ++ ) {
 
-   for ( int k = 0; k < lightCount && k < lightCount; k ++ ) {
-
-      if ( pPropLightEnabled[k] ) {
-
-         short b;
-
-         pPropLightEnabled[k] -> get_boolValue(&b);
-
-         if ( b ) {
-
-            glEnable(GL_LIGHT0 + k);
-
-            if ( pPropAmbientLight ) {
-               if ( pPropAmbientLight[k] ) {
-                  BYTE *pb = (BYTE *)&fvAmbientLight[k][0];
-                  pPropAmbientLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-fvAmbientLight[k][3] = 0.0;
-                  glLightfv(GL_LIGHT0 + k,GL_AMBIENT,fvAmbientLight[k]);
-               }
-            }
-
-            if ( pPropDiffuseLight ) {
-               if ( pPropDiffuseLight[k] ) {
-                  BYTE *pb = (BYTE *)&fvDiffuseLight[k][0];
-                  pPropDiffuseLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-fvDiffuseLight[k][3] = 0.0;
-                  glLightfv(GL_LIGHT0 + k,GL_DIFFUSE,fvDiffuseLight[k]);
-               }
-            }
-
-            if ( pPropSpecularLight ) {
-               if ( pPropSpecularLight[k] ) {
-                  BYTE *pb = (BYTE *)&fvSpecularLight[k][0];
-                  pPropSpecularLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-fvSpecularLight[k][3] = 0.0;
-                  glLightfv(GL_LIGHT0 + k,GL_SPECULAR,fvSpecularLight[k]);
-               }
-            }
-
-            if ( pPropLightPos ) {
-               if ( pPropLightPos[k] ) {
-                  memset(&lightPosition[k],0,4 * sizeof(float));
-                  long n;
-                  pPropLightPos[k] -> get_size(&n);
-                  char *pszValues = new char[n];
-                  pPropLightPos[k] -> get_szValue(pszValues);
-                  if ( pszValues ) 
-                     lightPosition[k][0] = (float)evalConsume(pIEvaluator,pszValues);
-                  if ( pszValues ) 
-                     lightPosition[k][1] = (float)evalConsume(pIEvaluator,pszValues);
-                  if ( pszValues ) 
-                     lightPosition[k][2] = (float)evalConsume(pIEvaluator,pszValues);
-lightPosition[k][3] = 1.0;
-                  delete [] pszValues;
-                  glLightfv(GL_LIGHT0 + k,GL_POSITION,lightPosition[k]);
-                  glLightf(GL_LIGHT0 + k,GL_SPOT_CUTOFF,90.0f);
-               }
-            }
-
-         }
-
-         else
-            glDisable(GL_LIGHT0 + k);
-
+      if ( ! openGLLighting.hasAmbient[k] && ! openGLLighting.hasDiffuse[k] && ! openGLLighting.hasSpecular[k] ) {
+         glDisable(GL_LIGHT0 + k);
+         continue;
       }
 
+      glEnable(GL_LIGHT0 + k);
+
+      if ( openGLLighting.hasAmbient[k] ) 
+         glLightfv(GL_LIGHT0 + k,GL_AMBIENT,openGLLighting.fvAmbientLight[k]);
+
+      if ( openGLLighting.hasDiffuse[k] ) 
+         glLightfv(GL_LIGHT0 + k,GL_DIFFUSE,openGLLighting.fvDiffuseLight[k]);
+
+      if ( openGLLighting.hasSpecular[k] ) 
+         glLightfv(GL_LIGHT0 + k,GL_SPECULAR,openGLLighting.fvSpecularLight[k]);
+
+      glLightfv(GL_LIGHT0 + k,GL_POSITION,openGLLighting.lightPosition[k]);
+      glLightf(GL_LIGHT0 + k,GL_SPOT_CUTOFF,90.0f);
+
    }
 
-   if ( pPropShinyness ) {
-      pPropShinyness -> get_longValue(&shinyness);
-      glMateriali(GL_FRONT,GL_SHININESS,shinyness);
-      glMateriali(GL_BACK,GL_SHININESS,shinyness);
+   if ( openGLLighting.hasShinyness ) {
+      glMateriali(GL_FRONT,GL_SHININESS,openGLLighting.shinyness);
+      glMateriali(GL_BACK,GL_SHININESS,openGLLighting.shinyness);
    }
 
-   //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-   //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-
-OPENGL_ERROR_CHECK
-   return S_OK;
-
+   return;
    }
- 
  
    HRESULT PlotWindow::erase(IGProperty *pPropBackgroundColor) {
 
@@ -903,10 +937,8 @@ OPENGL_ERROR_CHECK
    }
 
    glClearColor(fv[0],fv[1],fv[2],0.0);
-OPENGL_ERROR_CHECK
 
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-OPENGL_ERROR_CHECK
 
    if ( ! pSaved_BackgroundColor )
       pSaved_BackgroundColor = pPropBackgroundColor;
@@ -1007,12 +1039,6 @@ OPENGL_ERROR_CHECK
 
 
    HBITMAP PlotWindow::getMergedBackground(HWND hwndTarget,HDC hdc) {
-
-   //RECT rc;
-   //GetWindowRect(hwndTarget,&rc);
-
-   //long cxWindow = rc.right - rc.left;
-   //long cyWindow = rc.bottom - rc.top;
 
    GLint bufferSize[4] = {0};
 

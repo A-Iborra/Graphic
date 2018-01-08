@@ -43,6 +43,7 @@
         public IAdviseSink,
         public ISpecifyPropertyPages,
         public IGSGraphic, 
+        public IGSGraphicServices,
         public IGSystemStatusBar  {
 
 //      IDispatch
@@ -73,8 +74,8 @@
 
      STDMETHOD(put_PlotView)(PlotViews plotView);
      STDMETHOD(get_PlotView)(PlotViews* plotView);
-     STDMETHOD(put_PlotType)(PlotTypes plotType);
-     STDMETHOD(get_PlotType)(PlotTypes* plotType);
+     STDMETHOD(put_PlotType)(gc2DPlotTypes plotType);
+     STDMETHOD(get_PlotType)(gc2DPlotTypes* plotType);
 
      STDMETHOD(put_ViewTheta)(float);
      STDMETHOD(get_ViewTheta)(float*);
@@ -161,6 +162,10 @@
      STDMETHOD(RemoveAllPlots)();
 
      STDMETHOD(Synchronise)();
+
+// IGSGraphicServices
+
+     STDMETHOD(ActivateLighting)();
 
 //  IGSystemStatusBar
 
@@ -459,6 +464,11 @@
       HWND hwndAxisSettings;
       HWND hwndDataSourcesDialog,hwndDataSourcesTab,hwndDataSourcesFunctions,hwndDataSourcesDataSets;
 
+      static HWND hwndSampleGraphic;
+      static HWND hwndSampleGraphicSurface;
+
+      SIZEL sizeMainGraphic{0L,0L};
+
       POINTL ptlZoomAnchor,ptlZoomFloat,ptlPickBox,ptlLastMouse;
       BOOL trackedMouse;
       POINTL rightMouseClickPosition;
@@ -495,11 +505,10 @@
       RECT rectStatusText;
       RECT margins;
       PlotViews plotView;
-      PlotTypes plotType;
       PlotViews defaultPlotView;
 
-      long default2DPlotType;
-      long default3DPlotType;
+      gc2DPlotTypes default2DPlotType;
+      gc3DPlotTypes default3DPlotType;
 
       long textCount{0};
       long functionCount{0};
@@ -528,6 +537,8 @@
       IGraphicSegmentAction* pSelectedGraphicSegmentAction;
       IGSystemStatusBar* pIGSystemStatusBar;
 
+      IPlotServices *pIPlotServicesObject;
+
       IOpenGLImplementation *pIOpenGLImplementation;
 
       IEvaluator *pIEvaluator;
@@ -540,7 +551,7 @@
       IGProperty* propertyDefault2DPlotType;
       IGProperty *propertyDefault3DPlotType;
 
-      IGProperty* propertyPlotType;
+      IGProperty* propertyPlotType_NoUse;
 
       IGProperty* propertyBackgroundColor;
 
@@ -597,6 +608,7 @@
 
       static void __stdcall someObjectChanged(void *);
       static void __stdcall styleHandlerSomeObjectChanged(void *);
+      static void __stdcall menuHandlerSomeObjectChanged(void *);
 
       static LRESULT CALLBACK graphicFrameHandler(HWND,UINT,WPARAM,LPARAM);
       static LRESULT CALLBACK graphicHandler(HWND,UINT,WPARAM,LPARAM);
@@ -610,7 +622,10 @@
       static LRESULT CALLBACK dataSetHandler(HWND,UINT,WPARAM,LPARAM);
       static LRESULT CALLBACK functionHandler(HWND,UINT,WPARAM,LPARAM);
       static LRESULT CALLBACK dataSourcesHandler(HWND,UINT,WPARAM,LPARAM);
+
       static LRESULT CALLBACK sampleGraphicHandler(HWND,UINT,WPARAM,LPARAM);
+      static LRESULT CALLBACK sampleGraphicSurfaceHandler(HWND,UINT,WPARAM,LPARAM);
+
       static LRESULT CALLBACK patchPainterProc(HWND,UINT,WPARAM,LPARAM);
       static LRESULT CALLBACK statusBarHandler(HWND,UINT,WPARAM,LPARAM);
 

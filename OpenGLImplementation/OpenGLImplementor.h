@@ -32,6 +32,18 @@
       double extentsXMin,extentsYMin,extentsZMin,extentsXMax,extentsYMax,extentsZMax;
    };
 
+   struct lightingParameters {
+      long lightCount;
+      GLfloat lightPosition[SUPPORTED_LIGHT_COUNT][4];
+      GLfloat fvSpecularLight[SUPPORTED_LIGHT_COUNT][4];
+      GLfloat fvAmbientLight[SUPPORTED_LIGHT_COUNT][4];
+      GLfloat fvDiffuseLight[SUPPORTED_LIGHT_COUNT][4];
+      bool hasSpecular[SUPPORTED_LIGHT_COUNT];
+      bool hasAmbient[SUPPORTED_LIGHT_COUNT];
+      bool hasDiffuse[SUPPORTED_LIGHT_COUNT];
+      bool hasShinyness;
+      long shinyness;
+   };
 
    class PlotWindow {
    public:
@@ -89,6 +101,10 @@
 
       HBITMAP getMergedBackground(HWND,HDC);
 
+      void disableLighting();
+
+      void enableLighting();
+
       HRESULT GetPixels(long x1,long y1,long x2,long y2,long cyWindow,BYTE *pResult);
 
    private:
@@ -131,9 +147,8 @@
    protected:
 
       double xPixelsPerUnit,yPixelsPerUnit;
-      float lightPosition[SUPPORTED_LIGHT_COUNT][4];
-      float fvSpecularLight[SUPPORTED_LIGHT_COUNT][4],fvAmbientLight[SUPPORTED_LIGHT_COUNT][4],fvDiffuseLight[SUPPORTED_LIGHT_COUNT][4];
-      long shinyness;
+
+      lightingParameters openGLLighting;
 
       transformationMatrixes openGLState;
 

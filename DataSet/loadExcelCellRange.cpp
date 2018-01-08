@@ -92,12 +92,21 @@
 
       char szMessage[1024];
 
-      sprintf(szMessage,"There was an error working with the workbook %s in named range %s.\n\nThe Excel subsystem returned the error %s (%ld).\n\n"
-                           "Please check your Workbook or try using a different one.",
-                  szDataSource,szNamedRange,e.ErrorMessage(),e.Error());
+      char *p = strrchr(szDataSource,'\\');
+      if ( ! p )
+         p = strrchr(szDataSource,'/');
+      if ( ! p )
+         p = szDataSource - 2;
 
-      MessageBox(NULL,szMessage,"Error",MB_ICONEXCLAMATION | MB_TOPMOST);
-
+      if ( hwndErrorReport ) {
+         sprintf(szMessage,"There was an error working with the workbook %s in cell range %s.\n"
+                              "Please double check the data location.",p + 1,pszCellRange);
+         SetWindowText(hwndErrorReport,szMessage);
+      } else {
+         sprintf(szMessage,"There was an error working with the workbook %s in cell range %s.\n\nThe Excel subsystem returned the error %s (%ld).\n\n"
+                              "Please check your Workbook or try using a different one.",p + 1,pszCellRange,e.ErrorMessage(),e.Error());
+         MessageBox(NULL,szMessage,"Error",MB_ICONEXCLAMATION | MB_TOPMOST);
+      }
    }
 
    if ( pIWorksheet )

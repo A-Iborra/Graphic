@@ -40,14 +40,7 @@
    } 
  
        
-   long __stdcall G::Invoke(DISPID dispidMember,
-                            REFIID riid,
-                            LCID lcid,
-                            WORD wFlags, 
-                            DISPPARAMS *pdispparams,
-                            VARIANT *pvarResult,
-                            EXCEPINFO *pexcepinfo, 
-                            UINT *puArgErr) { 
+   long __stdcall G::Invoke(DISPID dispidMember,REFIID riid,LCID lcid,WORD wFlags, DISPPARAMS *pdispparams,VARIANT *pvarResult,EXCEPINFO *pexcepinfo, UINT *puArgErr) { 
 
    if ( DISPATCH_PROPERTYGET == wFlags ) {
 

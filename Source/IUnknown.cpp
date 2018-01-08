@@ -109,6 +109,10 @@
          *ppv = static_cast<IGSystemStatusBar *>(this);
       else
 
+      if ( riid == IID_IGSGraphicServices )
+         *ppv = static_cast<IGSGraphicServices *>(this);
+      else
+
       // Container Interfaces
 
 /*

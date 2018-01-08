@@ -256,10 +256,9 @@
 
    char *pszResults = new char[cntChars + 1];
    memset(pszResults,0,cntChars + 1);
-   //char *pName = NULL;
    p = pszResults;
    int k = 0;
-   for ( char *pName : szNames ) { //while ( pName = szNames.GetNext(pName) ) {
+   for ( char *pName : szNames ) {
       char *pValue = szValues[k];
       p += sprintf(p,"%s = %s ",pName,pValue);
       k++;

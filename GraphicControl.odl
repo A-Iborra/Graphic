@@ -117,9 +117,9 @@ library Graphic {
       HRESULT PlotView([out,retval] enum PlotViews* plotView);
 
       [propput,id(gcPropPlotType),helpstring("Sets the plot type of the Graphic Control, From the enum PlotTypes")]
-      HRESULT PlotType([in] enum PlotTypes plotType);
+      HRESULT PlotType([in] enum gc2DPlotTypes plotType);
       [propget,id(gcPropPlotType),helpstring("Gets the plot type of the Graphic Control, From the enum PlotTypes")]
-      HRESULT PlotType([out,retval] enum PlotTypes* plotType);
+      HRESULT PlotType([out,retval] enum gc2DPlotTypes* plotType);
 
       [propput,id(gcPropFloor),helpstring("Sets the value to use as minimum Z when data does not supply a Z value")]
       HRESULT Floor([in] double floorZValue);
@@ -312,14 +312,23 @@ library Graphic {
 
    };
 
+   [ uuid(8CAEFD73-55E6-11d3-8365-006008BD5BC3),
+      helpstring("GSystems Graphic Control Services Interface")] 
+   interface IGSGraphicServices : IUnknown {
+
+      HRESULT ActivateLighting();
+
+   };
+
    [
-      uuid(8CAEFD73-55E6-11d3-8365-006008BD5BC3),
+      uuid(8CAEFD74-55E6-11d3-8365-006008BD5BC3),
       helpstring("GSystems Graphic Class G"),
       control
    ]
    coclass GSystemGraphic {
       [default] interface IGSGraphic;
       [default,source] interface IGSGraphicEvents;
+      interface IGSGraphicServices;
       interface IOleInPlaceSite;
       interface IOleClientSite;
       interface ISpecifyPropertyPages;

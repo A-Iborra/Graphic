@@ -11,9 +11,7 @@
 #include "plot.h"
 
    int Plot::blocks() {
-   DataArity dataArity;
-   pIDataSet -> get_DataArity(&dataArity);
-   if ( dataArity == DATA_ARITY_2D ) 
+   if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
       return blocks2D();
    else
       return blocks3D();

@@ -8,7 +8,6 @@
 #include "GraphicControl_i.h"
 
    static bool holdTextUpdate = false;
-   static bool isActivated = false;
 
    LRESULT CALLBACK ViewSet::viewsetHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -19,7 +18,6 @@
    case WM_INITDIALOG: {
       p = (ViewSet *)lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-      isActivated = false;
       }
       return LRESULT(FALSE);
  
@@ -27,12 +25,16 @@
       p -> size();
       return LRESULT(0);
 
-   case WM_ACTIVATE:
-      if ( LOWORD(wParam) == WA_ACTIVE || LOWORD(wParam) == WA_CLICKACTIVE ) {
-         isActivated = true;
-         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
-      } else
-         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndOwner);
+   case WM_SHOWWINDOW:
+
+      if ( ! wParam )
+         break;
+
+      if ( lParam )
+         break;
+
+      p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+
       break;
 
    case WM_VSCROLL:
@@ -250,12 +252,8 @@
       PAINTSTRUCT ps;
       BeginPaint(hwnd,&ps);
       EndPaint(hwnd,&ps);
-      if ( ! p ) 
-         break;
-      if ( ! isActivated )
-         break;
-      p -> pIOpenGLImplementation -> SetTargetWindow(hwnd);
-      p -> render();
+      if ( p ) 
+         p -> render();
       }
       return LRESULT(FALSE);
  

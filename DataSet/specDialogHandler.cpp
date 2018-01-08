@@ -7,6 +7,7 @@
 #include "DataSet.h"
 #include "Graphic_resource.h"
 
+   static bool ignoreTextSetting = false;
 
    LRESULT EXPENTRY DataSet::dataSetDialogHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -45,6 +46,24 @@
          GetDlgItemText(hwnd,IDDI_DATASET_SPEC_NAME,p -> szName,64);
          break;
 
+      case IDDI_DATASET_SPEC_DATASOURCE: {
+         if ( ignoreTextSetting )
+            break;
+         if ( ! ( EN_CHANGE == notifyCode ) )
+            break;
+         char szTemp[MAX_PATH];
+         GetWindowText((HWND)lParam,szTemp,MAX_PATH);
+         char *psz = strrchr(szTemp,'\\');
+         if ( ! psz )
+            psz = strrchr(szTemp,'/');
+         if ( ! psz )
+            psz = szTemp - 1;
+         ignoreTextSetting = true;
+         SetWindowText((HWND)lParam,psz + 1);
+         ignoreTextSetting = false;
+         }
+         break;
+
       case IDDI_DATASET_SPEC_PROPERTIES: {
          IUnknown* pIUnknown;
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
@@ -57,8 +76,8 @@
          if ( ! psz )
          psz = p -> szDataSource - 1;
          SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,psz + 1);
-         //if ( p -> pWhenChangedCallback )
-         //   p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+         if ( p -> pWhenChangedCallback )
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
          }
          break;
 

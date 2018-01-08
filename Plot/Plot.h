@@ -2,9 +2,14 @@
 #pragma once
 
 #include "basePlot.h"
+#include <list>
+#include <map>
+
+#include "GMessage.h"
 
   class Plot : public BasePlot, 
                public IPlot, 
+               public IPlotServices,
                public IGraphicSegmentAction,
                public IGPropertiesClient,
                public IGPropertyPageClient,
@@ -68,6 +73,8 @@
      STDMETHOD(put_PlotTypeProperty)(IGProperty*);
      STDMETHOD(get_PlotTypeProperty)(IGProperty**);
 
+     STDMETHOD(get_PlotTypeHasSurfaces)(gc3DPlotTypes theType,VARIANT_BOOL *);
+
      STDMETHOD(get_SegmentID)(long*);
 
      STDMETHOD(put_ActionTable)(IGraphicSegmentAction *);
@@ -76,7 +83,7 @@
      STDMETHOD(put_IDataSet)(IDataSet *newDataSet);
      STDMETHOD(get_IDataSet)(IDataSet **getDataSet);
 
-     STDMETHOD(get_DataArity)(enum DataArity *);
+     enum DataArity __stdcall DataArity();
 
      STDMETHOD(put_PlotNotify)(IPlotNotify *);
      STDMETHOD(get_PlotNotify)(IPlotNotify **);
@@ -98,6 +105,12 @@
      STDMETHOD(EditProperties)();
 
      STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar*);
+
+     STDMETHOD(AdviseGSGraphicServices)(void *);
+
+//       IPlotServices
+
+     STDMETHOD(GetPlotTypesInformation)(SAFEARRAY **pp2DTypeIDs,SAFEARRAY **pp3DTypeIds,SAFEARRAY **pp2DTypeNames,SAFEARRAY **pp3DTypeNames);
 
 //       IGraphicSegmentAction
 
@@ -136,24 +149,57 @@
 
 //      IViewObject
 
-     STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
-     STDMETHOD(GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
-     STDMETHOD(Freeze)(DWORD,long,void *,DWORD *);
-     STDMETHOD(Unfreeze)(DWORD);
-     STDMETHOD(SetAdvise)(DWORD,DWORD,IAdviseSink *);
-     STDMETHOD(GetAdvise)(DWORD *,DWORD *,IAdviseSink **);
+      STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+      STDMETHOD(GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
+      STDMETHOD(Freeze)(DWORD,long,void *,DWORD *);
+      STDMETHOD(Unfreeze)(DWORD);
+      STDMETHOD(SetAdvise)(DWORD,DWORD,IAdviseSink *);
+      STDMETHOD(GetAdvise)(DWORD *,DWORD *,IAdviseSink **);
 
-//      IViewObject2
+      //      IViewObject2
 
-     STDMETHOD(GetExtent)(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *);
+      STDMETHOD(GetExtent)(unsigned long,long,DVTARGETDEVICE *,struct tagSIZE *);
 
 //      IViewObjectEx
 
-     STDMETHOD(GetRect)(DWORD dwAspect,RECTL *);
-     STDMETHOD(GetViewStatus)(DWORD *);
-     STDMETHOD(QueryHitPoint)(DWORD dwAspect,const struct tagRECT *pRectBounds,POINT ptlHit,long lCloseHint,DWORD *dwHitResult);
-     STDMETHOD(QueryHitRect)(DWORD dwAspect,const struct tagRECT *pRectBounds,const struct tagRECT *rctHit,long lCloseHint,DWORD *dwHitResult);
-     STDMETHOD(GetNaturalExtent)(DWORD dwExtent,LONG lIndex,DVTARGETDEVICE *ptd,HDC hicTargetDev,DVEXTENTINFO *extentInfo,SIZEL *);
+      STDMETHOD(GetRect)(DWORD dwAspect,RECTL *);
+      STDMETHOD(GetViewStatus)(DWORD *);
+      STDMETHOD(QueryHitPoint)(DWORD dwAspect,const struct tagRECT *pRectBounds,POINT ptlHit,long lCloseHint,DWORD *dwHitResult);
+      STDMETHOD(QueryHitRect)(DWORD dwAspect,const struct tagRECT *pRectBounds,const struct tagRECT *rctHit,long lCloseHint,DWORD *dwHitResult);
+      STDMETHOD(GetNaturalExtent)(DWORD dwExtent,LONG lIndex,DVTARGETDEVICE *ptd,HDC hicTargetDev,DVEXTENTINFO *extentInfo,SIZEL *);
+
+//    IGSystemPlotType
+
+      class _IGSystemPlotType : public IGSystemPlotType {
+      public:
+
+         _IGSystemPlotType(Plot *pParent);
+         ~_IGSystemPlotType();
+                                                      
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
+
+      private:
+
+         STDMETHOD(get_Count)(long *pCountProvided);
+         STDMETHOD(get_Name)(long item,BSTR *pBstr);
+         STDMETHOD(get_Is3DOnly)(long item,VARIANT_BOOL *);
+         STDMETHOD(put_DataSet)(void *pvIDataSet);
+         STDMETHOD(put_OpenGLImplementation)(void *pvIOpenGLImplementation);
+
+         STDMETHOD(Execute)(long item,long segmentId,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
+
+         void doSurface(long segmentID,Plot *pIPlot);
+         void doWireFrame(long segmentID,Plot *pIPlot);
+
+         Plot *pParent{NULL};
+         IDataSet *pIDataSet{NULL};
+         IOpenGLImplementation *pIOpenGLImplementation{NULL};
+
+         long refCount{0};
+
+      } *pIGSystemPlotType_Provider{NULL};
 
      __declspec(dllexport) static HANDLE PlotData(List<Plot> *pList);
 
@@ -165,10 +211,13 @@
      HWND hwndParentWindow,hwndObjectWindow;
      HWND hwndDimensionSettings,hwndTypeSettings,hwndColorSettings;
      HMENU hMainMenu,hMenu;
-     BSTR bstrName;
 
-     static WNDPROC defaultPatchPainter;
-     static WNDPROC defaultStaticWindowHandler;
+     static HWND hwndSampleGraphic;
+     static HWND hwndSampleGraphicSurface;
+
+     SIZEL sizeMainGraphic{0L,0L};
+
+     BSTR bstrName;
 
      IDataSet *baselineDataSet;
 
@@ -180,6 +229,8 @@
 
      int okToPlot,autoViewDetection,haveAnyData,selected;
      bool overrideOwnerView,overrideOwnerType;
+
+long lineWeight;
 
      IPlot** pIPlots;
      long currentPlotCount;
@@ -199,7 +250,8 @@
      IGProperty *pOwnerPropertyBackgroundColor;
 
      IPlotNotify *pIPlotNotify;
-     IGSystemStatusBar* pIGSystemStatusBar;
+     IGSystemStatusBar *pIGSystemStatusBar;
+     IGSGraphicServices *pIGSGraphicServices;
 
      DWORD adviseSink_dwAspect;
      DWORD adviseSink_advf;
@@ -210,7 +262,8 @@
      IGProperty *propertyOverrideOwnerType;
 
      IGProperty *propertyPlotView;
-     IGProperty *propertyPlotType;
+     IGProperty *property2DPlotType;
+     IGProperty *property3DPlotType;
 
      IGProperty *propertyTopSurfaceColor;
      IGProperty *propertyBottomSurfaceColor;
@@ -228,10 +281,9 @@
 
      IGProperty* propertyDataSet{NULL};
 
-
      HANDLE PlotThread();
 
-     int init();
+     //int init();
      int stacks();
      int stacks2D();
      int stacks3D();
@@ -242,12 +294,31 @@
      int balls2D();
      int balls3D();
 
+     static long instanceCount;
+
+     static long findKnownPlotTypeProviders();
+     static std::list<CLSID *> plotTypeProviderGUIDs;
+     static std::map<gc2DPlotTypes,IGSystemPlotType *> plotType2DProviderInstances;
+     static std::map<gc2DPlotTypes,char *> plotType2DProviderNames;
+     static std::map<gc3DPlotTypes,IGSystemPlotType *> plotType3DProviderInstances;
+     static std::map<gc3DPlotTypes,char *> plotType3DProviderNames;
+     static std::map<gc2DPlotTypes,long> plotType2DInstanceNumber;
+     static std::map<gc3DPlotTypes,long> plotType3DInstanceNumber;
+
      static LRESULT CALLBACK handler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK dimensionHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK typeHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK colorHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK patchPainterProc(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
+
      static LRESULT CALLBACK sampleGraphicHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
+     static LRESULT CALLBACK sampleGraphicSurfaceHandler(HWND,UINT,WPARAM,LPARAM);
+
+     static DWORD WINAPI sampleGraphicThread(void *pvArg);
+
+     static LRESULT CALLBACK scrollPaneHandler(HWND,UINT,WPARAM,LPARAM);
+
+     static WNDPROC defaultPatchPainter;
 
      static __declspec(dllexport) unsigned int __stdcall plotter(void*);
      friend unsigned int __stdcall redrawThread(void *);

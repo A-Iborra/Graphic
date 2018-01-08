@@ -17,6 +17,8 @@
 
    WNDPROC G::defaultStatusBarHandler = NULL;
    WNDPROC G::defaultPatchPainter = NULL;
+   HWND G::hwndSampleGraphic = NULL;
+   HWND G::hwndSampleGraphicSurface = NULL;
 
    G::G(IUnknown *pUnkOuter) :
 
@@ -51,6 +53,8 @@
       pPlot_IClassFactory(NULL),
       pFunction_IClassFactory(NULL),
       pDataSet_IClassFactory(NULL),
+
+      pIPlotServicesObject(NULL),
 
       pIViewSet(NULL),
 
@@ -97,11 +101,10 @@
       zaxis(0),
 
       plotView(gcPlotView2D),
-      plotType(gcPlotTypeNone),
 
       defaultPlotView(gcPlotView2D),
-      default2DPlotType((long)gcPlotTypeNatural),
-      default3DPlotType((long)gcPlotTypeWireFrame),
+      default2DPlotType(gcPlotTypeNatural),
+      default3DPlotType(gcPlotType3DNone),
 
       dataSetCount(0),
       textCount(0),
@@ -197,7 +200,6 @@
    pIGProperties -> Add(L"plot view",&propertyPlotView);
    propertyPlotView -> directAccess(TYPE_LONG,&defaultPlotView,sizeof(long));
 
-   pIGProperties -> Add(L"plot type",&propertyPlotType);
    pIGProperties -> Add(L"auto plotView detection",&propertyAutoPlotViewDetection);
 
    pIGProperties -> Add(L"default 2d plot type",&propertyDefault2DPlotType);
@@ -205,7 +207,6 @@
 
    propertyDefault2DPlotType -> directAccess(TYPE_LONG,&default2DPlotType,sizeof(long));
    propertyDefault3DPlotType -> directAccess(TYPE_LONG,&default3DPlotType,sizeof(long));
-
 
    pIGProperties -> Add(L"plot width",NULL);
    pIGProperties -> Add(L"plot height",NULL);
@@ -326,7 +327,7 @@
    
    pIGProperties -> DirectAccess(L"auto clear",TYPE_BOOL,&autoClear,sizeof(autoClear));
    pIGProperties -> DirectAccess(L"plot view",TYPE_LONG,&plotView,sizeof(plotView));
-   pIGProperties -> DirectAccess(L"plot type",TYPE_LONG,&plotType,sizeof(plotType));
+
    pIGProperties -> DirectAccess(L"plot width",TYPE_LONG,&containerSize.cx,sizeof(containerSize.cx));
    pIGProperties -> DirectAccess(L"plot height",TYPE_LONG,&containerSize.cy,sizeof(containerSize.cy));
    pIGProperties -> DirectAccess(L"dataset count",TYPE_LONG,&dataSetCount,sizeof(dataSetCount));
@@ -386,6 +387,8 @@
    pIPropertyPage[7] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesDataSets);
    pIPropertyPage[8] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesFunctions);
 
+   pPlot_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IPlotServices,reinterpret_cast<void **>(&pIPlotServicesObject));
+
    return;
    }
  
@@ -399,6 +402,8 @@
    delete [] ppPropertyDiffuseLight;
    delete [] ppPropertySpecularLight;
    delete [] ppPropertyLightPos;
+
+   pIPlotServicesObject -> Release();
 
    IPlot *p;
    while ( p = plotList.GetFirst() ) { 
@@ -495,6 +500,9 @@
  
  
    void G::changeType() {
+
+Beep(2000,100);
+#if 0
    MENUITEMINFO mi;
    memset(&mi,0,sizeof(mi));
    mi.cbSize = sizeof(mi);
@@ -519,7 +527,7 @@
 
       SetMenuItemInfo(hwndMenuPlot(),IDMI_GRAPHIC_VIEW_3D,MF_BYCOMMAND,&mi);
 
-      switch ( plotType ) {
+      switch ( default2DPlotType ) {
       case gcPlotTypeSurface:
          SetMenuItemInfo(hwndMenuPlot(),IDDI_GRAPHIC_SUB_STYLE_SURFACE,MF_BYCOMMAND,&mi);
          break;
@@ -540,6 +548,7 @@
  
       break;
    }
+#endif
    return;
    }
  
@@ -571,6 +580,14 @@
    dataSetList.Add(pIDataSet,NULL,dataSetID);
 
    pIDataSet -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+
+   IGSGraphicServices *pIGSGraphicServices = NULL;
+
+   QueryInterface(IID_IGSGraphicServices,reinterpret_cast<void **>(&pIGSGraphicServices));
+
+   pIDataSet -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
+   pIGSGraphicServices -> Release();
 
    if ( connectNow ) 
       connectDataSet(pIDataSet);
@@ -615,6 +632,13 @@
    pIOleObject -> SetClientSite(NULL);
    pIOleObject -> Release();
 
+   IPlot *pIPlot = NULL;
+
+   pIDataSet -> get_IPlot((void **)&pIPlot);
+
+   if ( pIPlot )
+      plotList.Remove(pIPlot);
+
    ContainedDataSet *pContainedDataSet = containedDataSetList.Get(reinterpret_cast<long>(pIDataSet));
 
    containedDataSetList.Remove(pContainedDataSet);
@@ -656,6 +680,14 @@
    plotList.Add(pIPlot,NULL,functionID);
 
    pIFunction -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+
+   IGSGraphicServices *pIGSGraphicServices = NULL;
+
+   QueryInterface(IID_IGSGraphicServices,reinterpret_cast<void **>(&pIGSGraphicServices));
+
+   pIFunction -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
+   pIGSGraphicServices -> Release();
 
    functionList.Add(pIFunction,NULL,functionID);
 
@@ -792,7 +824,15 @@
 
    pIPlot -> put_PlotViewProperty(propertyPlotView);
 
-   pIPlot -> put_PlotTypeProperty(propertyPlotType);
+   pIPlot -> put_PlotTypeProperty(propertyDefault2DPlotType);
+
+   IGSGraphicServices *pIGSGraphicServices = NULL;
+
+   QueryInterface(IID_IGSGraphicServices,reinterpret_cast<void **>(&pIGSGraphicServices));
+
+   pIPlot -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
+   pIGSGraphicServices -> Release();
 
    return pIPlot;
    }
@@ -912,8 +952,19 @@
    return;
    }
 
+   void G::menuHandlerSomeObjectChanged(void *pArg) {
+   G *p = (G *)pArg;
+   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+   p -> render(0);
+   return;
+   }
+
    void G::styleHandlerSomeObjectChanged(void *pArg) {
    G *p = (G *)pArg;
-   InvalidateRect(p -> hwndStyleSettings,NULL,TRUE);
+   if ( ! ( NULL == p -> hwndSampleGraphic ) ) {
+      p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndSampleGraphic);
+      InvalidateRect(p -> hwndSampleGraphic,NULL,TRUE);
+   }
+   EnableWindow(p -> hwndStyleSettings,TRUE);
    return;
    }

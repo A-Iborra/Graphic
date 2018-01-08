@@ -10,10 +10,8 @@
 
    HRESULT DataSet::SavePrep() {
 
-   if ( szCellRange[0] ) {
+   if ( szCellRange[0] ) 
       memset(szNamedRange,0,sizeof(szNamedRange));
-      memset(szSpreadsheetName,0,sizeof(szSpreadsheetName));
-   }
 
    long countPoints;
 
@@ -37,7 +35,6 @@
    }
 
    if ( isEmbedded ) {
-
 
       long storageSize = countPoints * sizeof(DataPoint);
 

@@ -1,18 +1,7 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
-#include <stdio.h>
-
-#include "Graphic_resource.h"
-#include "utils.h"
 
 #include "plot.h"
 
+#include "Graphic_resource.h"
 
    LRESULT EXPENTRY Plot::handler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 

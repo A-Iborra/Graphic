@@ -136,12 +136,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\source\utilities.cpp" />
     <ClCompile Include="Source\axisHandler.cpp" />
     <ClCompile Include="Source\backgroundHandler.cpp" />
     <ClCompile Include="Source\ContainedDataSet.cpp" />
     <ClCompile Include="Source\dataSetHandler.cpp" />
     <ClCompile Include="Source\dataSourcesVisibility.cpp" />
     <ClCompile Include="Source\graphicCursor.cpp" />
+    <ClCompile Include="Source\IGraphicServices.cpp" />
     <ClCompile Include="Source\IPropertyPage.cpp" />
     <ClCompile Include="Source\ISpecifyPropertyPages.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
@@ -204,6 +206,7 @@
     <ClInclude Include="include\ContainedFunction.h" />
     <ClInclude Include="include\ContainedObject.h" />
     <ClInclude Include="include\General.h" />
+    <ClInclude Include="include\GMessage.H" />
     <ClInclude Include="include\graphic.h" />
     <ClInclude Include="include\Graphic_resource.h" />
   </ItemGroup>

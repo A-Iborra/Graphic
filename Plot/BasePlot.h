@@ -48,7 +48,7 @@
      STDMETHOD(put_IDataSet)(IDataSet *newDataSet);
      STDMETHOD(get_IDataSet)(IDataSet **getDataSet);
 
-     STDMETHOD(get_DataArity)(enum DataArity *);
+     enum DataArity __stdcall DataArity();
 
      STDMETHOD(get_SegmentID)(long*);
 
@@ -58,8 +58,11 @@
      STDMETHOD(put_PlotView)(PlotViews plotView);
      STDMETHOD(get_PlotView)(PlotViews *plotView);
 
-     STDMETHOD(put_PlotType)(PlotTypes plotType);
-     STDMETHOD(get_PlotType)(PlotTypes *plotType);
+     STDMETHOD(put_PlotType2D)(gc2DPlotTypes plotType);
+     STDMETHOD(get_PlotType2D)(gc2DPlotTypes *plotType);
+
+     STDMETHOD(put_PlotType3D)(gc3DPlotTypes plotType);
+     STDMETHOD(get_PlotType3D)(gc3DPlotTypes *plotType);
 
      STDMETHOD(put_ColorProperty)(IGProperty*);
      STDMETHOD(get_ColorProperty)(IGProperty**);
@@ -95,7 +98,8 @@
      void *pWhenChangedCallbackArg;
 
      PlotViews plotView;
-     long plotType;
+     long plotType2D;
+     long plotType3D;
      USHORT externalDataSet,eraseMode;
 
      List<IText> textList;

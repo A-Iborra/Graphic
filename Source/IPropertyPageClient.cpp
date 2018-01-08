@@ -131,7 +131,7 @@
    pPropSheetPages[1].hInstance = hModule;
    pPropSheetPages[1].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_STYLE);
    pPropSheetPages[1].pfnDlgProc = (DLGPROC)G::styleHandler;
-   pPropSheetPages[1].pszTitle = "Style";
+   pPropSheetPages[1].pszTitle = "View";
    pPropSheetPages[1].lParam = (LPARAM)pParent;
    pPropSheetPages[1].pfnCallback = NULL;
 
@@ -203,6 +203,8 @@
    pPropSheetPages[nextIndex].pszTitle = "Functions";
    pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
    pPropSheetPages[nextIndex].pfnCallback = NULL;
+
+   hwndSampleGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_CHILD,0,0,0,0,pParent -> hwndGraphic,NULL,hModule,(void *)pParent);
 
    return S_OK;
    }

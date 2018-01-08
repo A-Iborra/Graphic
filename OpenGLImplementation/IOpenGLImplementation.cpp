@@ -225,7 +225,8 @@ Sleep(10);
                 IGProperty *pPropCountLights,
                 IGProperty *pPropShinyness) {
  
-   if ( ! plotWindow ) return E_UNEXPECTED;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
    strCall_SetLighting *ps = new strCall_SetLighting;
    ps -> pPropLightEnabled = pPropLightEnabled;
    ps -> pPropAmbientLight = pPropAmbientLight;

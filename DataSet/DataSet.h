@@ -35,6 +35,7 @@ using namespace VBIDE;
 #include "Function_i.h"
 
 #include "Plot_i.h"
+#include "GraphicControl_i.h"
 
 #include "Graphic_resource.h"
 
@@ -129,8 +130,7 @@ using namespace VBIDE;
  
       STDMETHOD(get_countPoints)(long*);
  
-      STDMETHOD(put_DataArity)(DataArity);
-      STDMETHOD(get_DataArity)(DataArity *);
+      enum DataArity __stdcall DataArity();
 
       STDMETHOD(peek)(DataList *afterItem,DataList **getItem);                     
       STDMETHOD(peekInt)(int item,DataList **getItem);
@@ -201,6 +201,8 @@ using namespace VBIDE;
       STDMETHOD(Start)();
  
       STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar*);
+
+      STDMETHOD(AdviseGSGraphicServices)(/*IGSGraphicServices*/ void *);
 
    private:
  
@@ -536,7 +538,9 @@ using namespace VBIDE;
       IOleInPlaceSite *pIOleInPlaceSite{NULL};
       IAdviseSink *pAdviseSink{NULL};
       IPropertyNotifySink *pIPropertyNotifySink{NULL};
-      IGSystemStatusBar* pIGSystemStatusBar{NULL};
+      IGSystemStatusBar *pIGSystemStatusBar{NULL};
+      IGSGraphicServices *pIGSGraphicServices{NULL};
+
       int freezeEvents{0};
 
       DWORD adviseSink_dwAspect{0L};
@@ -579,7 +583,12 @@ using namespace VBIDE;
       bool isEmbedded{false};
       bool hasHeaderRow{false};
       bool hasHeaderRowDetermined{false};
+
       BYTE propertiesEnd{0};
+
+      long countX{0};
+      long countY{0};
+      long countZ{0};
 
       CLSID CLSID_excel;
 
@@ -594,7 +603,6 @@ using namespace VBIDE;
       DataList *firstData{NULL};
       DataList *topData{NULL};
       DataList *gdiData{NULL};
-      DataArity dataArity{DATA_ARITY_UNKNOWN};
 
       IEvaluator *pIEvaluator{NULL};
       IGSFunctioNater *pIFunction{NULL};

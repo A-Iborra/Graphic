@@ -11,9 +11,7 @@
 #include "plot.h"
 
    int Plot::stacks() {
-   DataArity dataArity;
-   pIDataSet -> get_DataArity(&dataArity);
-   if ( dataArity == DATA_ARITY_2D ) 
+   if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
       return stacks2D();
    else
       return stacks3D();

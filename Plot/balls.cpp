@@ -12,9 +12,7 @@
 #include "plot.h"
 
    int Plot::balls() {
-   DataArity dataArity;
-   pIDataSet -> get_DataArity(&dataArity);
-   if ( dataArity == DATA_ARITY_2D ) 
+   if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
       return balls2D();
    else
       return balls3D();

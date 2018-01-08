@@ -1,16 +1,10 @@
-/*
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
+#include "Axis.h"
 
-*/
-#include <windows.h>
 #include <CommCtrl.h>
-#include <stdio.h>
 
 #include "utils.h"
 #include "Graphic_resource.h"
-
-#include "Axis.h"
  
 #define GET_VALUES(prop,redindex)    {               \
       float v[] = {0.0f,0.0f,0.0f,0.0f};             \

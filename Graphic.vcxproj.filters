@@ -192,6 +192,12 @@
     <ClCompile Include="Source\dataSourcesHandler.cpp">
       <Filter>Source Files\Window Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\IGraphicServices.cpp">
+      <Filter>Source Files\COM Interface Files\IGraphic Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\source\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Graphic.def">
@@ -220,6 +226,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ContainedDataSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GMessage.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

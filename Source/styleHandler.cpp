@@ -1,15 +1,9 @@
-/*
 
-                       Copyright (c) 1996,1997,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
+#include "graphic.h"
 
 #include "utils.h"
 #include "Graphic_resource.h"
-
-#include "Graphic.h"
+#include "GMessage.h"
 
    LRESULT CALLBACK G::styleHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -27,17 +21,7 @@
 
       p -> hwndStyleSettings = hwnd;
 
-      RECT rect;
-      GetClientRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),&rect);
-      MapWindowPoints(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),hwnd,reinterpret_cast<POINT *>(&rect),2);
-      HWND hwndTemp = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_VISIBLE | WS_CHILD,
-                                       rect.left,rect.top,rect.right - rect.left,rect.bottom - rect.top,hwnd,NULL,hModule,(void *)p);
-   
-      DestroyWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE));
-
-      SetWindowLongPtr(hwndTemp,GWLP_ID,IDDI_GRAPHIC_STYLE_SAMPLE);
-
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SETVIEW),p -> plotView == gcPlotView3D ? TRUE : FALSE);
+      //EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SETVIEW),p -> plotView == gcPlotView3D ? TRUE : FALSE);
 
 
 #if 0
@@ -69,6 +53,36 @@
 
       }
       return LRESULT(FALSE);
+
+   case WM_DESTROY:
+      p -> hwndSampleGraphic = NULL;
+      break;
+
+   case WM_SHOWWINDOW: {
+
+      if ( ! wParam )
+         break;
+
+      if ( lParam )
+         break;
+
+      SetParent(hwndSampleGraphic,hwnd);
+
+      RECT rcSample,rcParent;
+      GetWindowRect(hwnd,&rcParent);
+      GetWindowRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),&rcSample);
+
+      long cx = rcParent.right - rcParent.left - (rcSample.left - rcParent.left) - 32;
+      long cy = rcParent.bottom - rcParent.top - 32;
+      rcSample.left = (rcSample.left - rcParent.left) + 16;
+      rcSample.top = 16;
+      rcSample.right = rcSample.left + cx;
+      rcSample.bottom = rcSample.top + cy;
+
+      SendMessage(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,0L,(LPARAM)&rcSample);
+
+      }
+      break;
 
    case WM_ERASEBKGND:
 
@@ -137,20 +151,23 @@
 
       case IDDI_GRAPHIC_STYLE_SETVIEW: {
          p -> pIViewSet -> Properties(styleHandlerSomeObjectChanged,(void *)p);
+         EnableWindow(hwnd,FALSE);
          }
-         return (LRESULT)FALSE;
+         return (LRESULT)0L;
 
       default:
          break;
       }
+
       EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SETVIEW),p -> plotView == gcPlotView3D ? TRUE : FALSE);
-      InvalidateRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),NULL,TRUE);
-      UpdateWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE));
+      InvalidateRect(hwndSampleGraphic,NULL,TRUE);
+
       }
       return LRESULT(FALSE);
 
    default:
       break;
    }
+
    return LRESULT(FALSE);
    }

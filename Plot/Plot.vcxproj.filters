@@ -28,6 +28,9 @@
       <UniqueIdentifier>{0dc9e03c-8511-4c5a-80b9-af8981d7d41f}</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
     </Filter>
+    <Filter Include="Source Files\COM Interface Files\IGSystemPlotProviders">
+      <UniqueIdentifier>{8684ff88-62ba-44f3-b41d-0aed24b3d487}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="balls.cpp">
@@ -105,14 +108,29 @@
     <ClCompile Include="\Common\Utils\registryUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="\Common\Utils\VariantUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="typeHandler.cpp">
       <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPlotServices.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IGSystemPlotType.cpp">
+      <Filter>Source Files\COM Interface Files\IGSystemPlotProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="IGSystemPlotType_Surface.cpp">
+      <Filter>Source Files\COM Interface Files\IGSystemPlotProviders</Filter>
+    </ClCompile>
+    <ClCompile Include="IGSystemPlotType_WireFrame.cpp">
+      <Filter>Source Files\COM Interface Files\IGSystemPlotProviders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +146,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Plot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Graphic_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

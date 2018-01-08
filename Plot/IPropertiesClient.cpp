@@ -25,6 +25,7 @@
       propertyDataSet -> clearStorageObjects();
 
    }
+
    return S_OK;
    }
 
@@ -76,7 +77,8 @@
    propertyLineEnd -> put_longValue(1L);
    propertyLineJoin -> put_longValue(1L);
    propertyPlotView -> put_longValue((LONG)gcPlotView2D);
-   propertyPlotType -> put_longValue((LONG)gcPlotTypeNatural);
+   property2DPlotType -> put_longValue((LONG)gcPlotTypeNatural);
+   property3DPlotType -> put_longValue((LONG)gcPlotType3DNone);
    propertyLineWeight -> put_longValue((LONG)DEFAULT_LINE_WEIGHT);
    propertyCustomColors -> put_binaryValue(9 * sizeof(double),(BYTE*)dm);
    propertyPropertiesPosition -> put_binaryValue(4 * sizeof(long),(BYTE*)lv);
@@ -110,8 +112,11 @@
    propertyPlotView -> get_longValue(&v);
    put_PlotView(static_cast<PlotViews>(v));
 
-   propertyPlotType -> get_longValue(&v);
-   put_PlotType(static_cast<PlotTypes>(v));
+   property2DPlotType -> get_longValue(&v);
+   put_PlotType2D(static_cast<gc2DPlotTypes>(v));
+ 
+   property3DPlotType -> get_longValue(&v);
+   put_PlotType3D(static_cast<gc3DPlotTypes>(v));
  
    put_ColorProperty(propertyLineColor);
 

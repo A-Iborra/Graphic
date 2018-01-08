@@ -38,14 +38,13 @@
    long __stdcall Plot::QueryInterface(REFIID riid,void **ppv) {
    *ppv = NULL; 
     
-   if ( riid == IID_IBasePlot ) {
+   if ( riid == IID_IBasePlot ) 
       return BasePlot::QueryInterface(riid,ppv);
-   }
  
    if ( riid == IID_IUnknown ) 
       *ppv = this;
    else
- 
+
    if ( riid == IID_IDispatch) 
       *ppv = static_cast<IDispatch *>(this);
    else
@@ -54,6 +53,10 @@
       *ppv = static_cast<IPlot *>(this);
    else
  
+   if ( riid == IID_IPlotServices ) 
+      *ppv = static_cast<IPlotServices *>(this);
+   else
+
    if ( riid == IID_IGProperties ) 
       return pIUnknownProperties -> QueryInterface(riid,ppv);
    else
@@ -90,6 +93,15 @@
       *ppv = static_cast<IViewObjectEx *>(this);
    else
  
+   if ( riid == IID_IGSystemPlotType ) {
+
+      if ( ! pIGSystemPlotType_Provider )
+         pIGSystemPlotType_Provider = new _IGSystemPlotType(this);
+
+      return pIGSystemPlotType_Provider -> QueryInterface(riid,ppv);
+
+   } else
+
       return E_NOINTERFACE;
  
    static_cast<IUnknown*>(*ppv) -> AddRef(); 

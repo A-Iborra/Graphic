@@ -25,6 +25,7 @@
 #include "Evaluator_i.h"
 #include "DataSet_i.h"
 #include "OpenGLImplementation_i.h"
+#include "GraphicControl_i.h"
 
 #include "Function_i.h"
 #include "Plot_i.h"
@@ -139,6 +140,8 @@
      STDMETHOD(get_AnyControlVisible)(VARIANT_BOOL* pbAnyVisible);
 
      STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar *);
+
+     STDMETHOD(AdviseGSGraphicServices)(/*IGSGraphicServices*/ void *);
 
 //     IOleObject 
 
@@ -433,7 +436,8 @@
      IAdviseSink *pAdviseSink;
      IOleInPlaceSite *pIOleInPlaceSite;
      IPropertyNotifySink *pIPropertyNotifySink;
-     IGSystemStatusBar* pIGSystemStatusBar{NULL};
+     IGSystemStatusBar *pIGSystemStatusBar{NULL};
+     IGSGraphicServices *pIGSGraphicServices{NULL};
 
      IPlot *pIPlot;
      IDataSet *pIDataSet;

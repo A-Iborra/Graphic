@@ -354,7 +354,7 @@
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_VIEW_SET:
-         p -> pIViewSet -> Properties(G::someObjectChanged,(void *)p);
+         p -> pIViewSet -> Properties(G::menuHandlerSomeObjectChanged,(void *)p);
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_ZOOM_FULL: {
