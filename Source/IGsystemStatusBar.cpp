@@ -1,14 +1,7 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
 
 #include "Graphic.h"
-
+#include <CommCtrl.h>
+#include <stdio.h>
 
    HRESULT G::put_StatusText(long paneIndex,char* pText) { 
 
@@ -41,5 +34,6 @@
 
 
    HRESULT G::get_StatusText(long paneIndex,char** ppText) { 
+   SendMessage(hwndStatusBar,SB_GETTEXT,(WPARAM)paneIndex,(LPARAM)*ppText);
    return S_OK; 
    } 

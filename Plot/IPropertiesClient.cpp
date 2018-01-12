@@ -1,21 +1,13 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
 
 #include "Plot.h"
 
    HRESULT Plot::SavePrep() {
 
-   if ( ! pIDataSet )
-      return S_OK;
-
-   DataPoint dp[2];
-
-   pIDataSet -> GetDomain(&dp[0],&dp[1]);
-
-   propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<byte *>(dp));
+   if ( pIDataSet ) {
+      DataPoint dp[2];
+      pIDataSet -> GetDomain(&dp[0],&dp[1]);
+      propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<byte *>(dp));
+   }
 
    if ( propertyDataSet ) {
 
@@ -26,13 +18,36 @@
 
    }
 
+   if ( propertyPlotTypes ) {
+
+      propertyPlotTypes -> clearStorageObjects();
+
+      for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> pair : Plot::plotType2DProviderInstances ) {
+         IUnknown *pIUnknown = NULL;
+         pair.second -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+         propertyPlotTypes -> addStorageObject(pIUnknown);
+         pIUnknown -> Release();
+      }
+
+      for ( std::pair<gc3DPlotTypes,IGSystemPlotType *> pair : Plot::plotType3DProviderInstances ) {
+         IUnknown *pIUnknown = NULL;
+         pair.second -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+         propertyPlotTypes -> addStorageObject(pIUnknown);
+         pIUnknown -> Release();
+      }
+
+      propertyPlotTypes -> writeStorageObjects();
+      propertyPlotTypes -> clearStorageObjects();
+
+   }
+
    return S_OK;
    }
 
 
    HRESULT Plot::InitNew() {
 
-   pID = ++pCount;
+   pID = instanceCount;
 
    float fvBlack[] = {CLR_BLACK};
    float fvBlue[] = {CLR_BLUE};
@@ -77,7 +92,7 @@
    propertyLineEnd -> put_longValue(1L);
    propertyLineJoin -> put_longValue(1L);
    propertyPlotView -> put_longValue((LONG)gcPlotView2D);
-   property2DPlotType -> put_longValue((LONG)gcPlotTypeNatural);
+   property2DPlotType -> put_longValue((LONG)gcPlotTypeNone);
    property3DPlotType -> put_longValue((LONG)gcPlotType3DNone);
    propertyLineWeight -> put_longValue((LONG)DEFAULT_LINE_WEIGHT);
    propertyCustomColors -> put_binaryValue(9 * sizeof(double),(BYTE*)dm);
@@ -131,6 +146,37 @@
          propertyDataSet -> addStorageObject(pIDataSet);
          propertyDataSet-> readStorageObjects();
          propertyDataSet -> clearStorageObjects();
+      }
+
+   }
+
+   if ( propertyPlotTypes ) {
+
+      long cntObjects;
+
+      propertyPlotTypes -> get_storedObjectCount(&cntObjects);
+
+      if ( cntObjects ) {
+
+         propertyPlotTypes -> clearStorageObjects();
+
+         for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> pair : Plot::plotType2DProviderInstances ) {
+            IUnknown *pIUnknown = NULL;
+            pair.second -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+            propertyPlotTypes -> addStorageObject(pIUnknown);
+            pIUnknown -> Release();
+         }
+
+         for ( std::pair<gc3DPlotTypes,IGSystemPlotType *> pair : Plot::plotType3DProviderInstances ) {
+            IUnknown *pIUnknown = NULL;
+            pair.second -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+            propertyPlotTypes -> addStorageObject(pIUnknown);
+            pIUnknown -> Release();
+         }
+
+         propertyPlotTypes -> readStorageObjects();
+         propertyPlotTypes -> clearStorageObjects();
+
       }
 
    }

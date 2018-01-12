@@ -207,7 +207,7 @@ library Plot {
      HRESULT PlotTypeProperty([out,retval]IGProperty **ppPlotSubTypeProperty);
 
      [propget,helpstring("")]
-     HRESULT PlotTypeHasSurfaces([in] enum gc3DPlotTypes theType,[out,retval] VARIANT_BOOL *pHasSurfaces);
+     HRESULT PlotTypeUsesMaterialShading([in] long the2DTypes_ORd_enum_gc2DTypes,[in] long the3DTypes_ORd_enum_gc3DTypes,[out,retval] VARIANT_BOOL *pHasSurfaces);
 
      [propget,helpstring("")]
      HRESULT SegmentID([out,retval] long* getID);
@@ -234,15 +234,28 @@ library Plot {
      [propget,helpstring("")] 
      HRESULT Color([out,retval]SAFEARRAY(double) *pColor);
 
-     [propput,helpstring("")]
-     HRESULT ColorProperty([in] IGProperty* pIPropertyColor);
-     [propget,helpstring("")]
-     HRESULT ColorProperty([out,retval] IGProperty** ppIPropertyColor);
 
      [propput,helpstring("")]
-     HRESULT LineWeight([in] IGProperty* pIPropertyLineWeightInPixels);
+     HRESULT LineColorProperty([in] IGProperty* pIPropertyColor);
      [propget,helpstring("")]
-     HRESULT LineWeight([out,retval] IGProperty** ppIPropertyLineWeightInPixels);
+     HRESULT LineColorProperty([out,retval] IGProperty** ppIPropertyColor);
+
+     [propput,helpstring("")]
+     HRESULT LineWeightProperty([in] IGProperty* pIPropertyLineWeightInPixels);
+     [propget,helpstring("")]
+     HRESULT LineWeightProperty([out,retval] IGProperty** ppIPropertyLineWeightInPixels);
+
+     [propput,helpstring("")]
+     HRESULT TopSurfaceColorProperty([in] IGProperty* pIPropertyColor);
+     [propget,helpstring("")]
+     HRESULT TopSurfaceColorProperty([out,retval] IGProperty** ppIPropertyColor);
+
+     [propput,helpstring("")]
+     HRESULT BottomSurfaceColorProperty([in] IGProperty* pIPropertyColor);
+     [propget,helpstring("")]
+     HRESULT BottomSurfaceColorProperty([out,retval] IGProperty** ppIPropertyColor);
+
+
 
      [propput,helpstring("")] 
      HRESULT ParentWindow([in]HWND hwndParent);
@@ -261,7 +274,7 @@ library Plot {
                            IGProperty *parentPropertyBackgroundColor,
                            IGProperty *parentPropertyFloor,
                            IGProperty *parentPropertyCeiling,
-                           [in] void (*pCallback)(void *),[in] void *pArg);
+                           [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
 
      HRESULT PrepareForData();
 
@@ -303,7 +316,10 @@ library Plot {
    [uuid(8CAEFD7D-55E6-11d3-8365-006008BD5BC3)] 
    interface IPlotServices : IUnknown {
 
-      HRESULT GetPlotTypesInformation(SAFEARRAY(long) *pp2DTypeIDs,SAFEARRAY(long) *pp3DTypeIds,SAFEARRAY(BSTR) *pp2DTypeNames,SAFEARRAY(BSTR) *pp3DTypeNames);
+      HRESULT GetPlotTypesInformation(SAFEARRAY(long) *pp2DTypeIDs,SAFEARRAY(long) *pp3DTypeIds,
+                                       SAFEARRAY(BSTR) *pp2DTypeNames,SAFEARRAY(BSTR) *pp3DTypeNames,
+                                       SAFEARRAY(long) *pp2DTypeInstanceNumbers,SAFEARRAY(long) *pp3DTypeInstanceNumbers,
+                                       SAFEARRAY(IUnknown) *pp2DTypeInstances,SAFEARRAY(IUnknown) *pp3DTypeInstances);
 
    };
 

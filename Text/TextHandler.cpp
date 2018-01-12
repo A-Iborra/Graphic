@@ -37,7 +37,7 @@
          p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();       
          if ( p -> pWhenChangedCallback ) 
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          return LRESULT(TRUE);
  
@@ -49,7 +49,7 @@
             p -> pITextNotify -> DeleteText(pIText);
          }
          if ( p -> pWhenChangedCallback ) 
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          return LRESULT(TRUE);
  

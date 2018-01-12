@@ -489,6 +489,7 @@
       ULONG windowStyle,windowFrameFlags,windowStorageBytes;
 
       List<IPlot> plotList;
+      List<IPlot> visiblePlotList;
       List<IAxis> axisList;
       List<IText> textList;
       List<IGSFunctioNater> functionList;
@@ -603,10 +604,12 @@
 
       IGProperty* propertyRenderOpenGLAxisText;
 
+      IGProperty* propertyPlotServicesObject{NULL};
+
       HBITMAP boxBitmaps[5] { NULL, NULL, NULL, NULL , NULL};
       HBITMAP pickBoxBitmap {NULL};
 
-      static void __stdcall someObjectChanged(void *);
+      static void __stdcall someObjectChanged(void *pvThis,ULONG_PTR cookie);
       static void __stdcall styleHandlerSomeObjectChanged(void *);
       static void __stdcall menuHandlerSomeObjectChanged(void *);
 

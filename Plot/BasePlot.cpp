@@ -1,10 +1,3 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
 
 #include "plot.h"
 
@@ -17,6 +10,7 @@
       pIOpenGLImplementation(NULL),
       pWhenChangedCallback(NULL),
       pWhenChangedCallbackArg(NULL),
+      whenChangedCallbackCookie(0L),
       pIEvaluator(NULL),
       pPropertyLastDrawLineWeight(NULL),
       externalDataSet(FALSE),
@@ -27,6 +21,8 @@
 
    pPropertyLastDrawLineWeight -> put_type(TYPE_LONG);
 
+   CoCreateInstance(CLSID_GraphicSegment,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGraphicSegment,reinterpret_cast<void **>(&pIGraphicSegment));
+ 
    return;
    }
  

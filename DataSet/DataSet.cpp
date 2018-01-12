@@ -18,6 +18,7 @@
 
      pWhenChangedCallback(NULL),
      pWhenChangedCallbackArg(NULL),
+     whenChangedCallbackCookie(0L),
 
      isFunction(false),
 

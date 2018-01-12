@@ -128,7 +128,7 @@
    // Methods
 
      STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
-                              IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *),void *pWhenChangedArg);
+                              IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
      STDMETHOD(get_DataSet)(IDataSet **);
 
@@ -178,8 +178,9 @@
 
      USHORT selected,expectingCommands;
 
-     void (__stdcall *pWhenChangedCallback)(void *);
+     void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
      void *pWhenChangedCallbackArg;
+     ULONG_PTR whenChangedCallbackCookie;
 
      IPlot *pIPlot;
 

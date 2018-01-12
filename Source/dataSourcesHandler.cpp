@@ -70,7 +70,7 @@
 
       if ( 0 < functionCount )
          SetWindowPos(p -> hwndDataSourcesFunctions,HWND_TOP,8,32,sizelFunctionsUI.cx + 16,min(cy - 74,sizelFunctionsUI.cy + 32),SWP_NOREDRAW);
-#if 1
+
       for ( int k = 0; k < functionCount; k++ ) {
 
          TC_ITEM tie = {0};
@@ -82,7 +82,6 @@
          ((ContainedFunction *)tie.lParam) -> ReSize();
 
       }
-#endif
 
       long dataSetCount = SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEMCOUNT,0L,0L);
 

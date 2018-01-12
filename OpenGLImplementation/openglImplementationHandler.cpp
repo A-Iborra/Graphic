@@ -317,7 +317,7 @@ OPENGL_ERROR_CHECK
 
       glDeleteLists(ps -> segmentID,1);
 
-      glNewList(ps -> segmentID,GL_COMPILE_AND_EXECUTE);
+      glNewList(ps -> segmentID,GL_COMPILE);//_AND_EXECUTE);
 
       glColor3f(fvColor[0],fvColor[1],fvColor[2]);
 
@@ -326,10 +326,10 @@ OPENGL_ERROR_CHECK
       glEnable(GL_LINE_SMOOTH);
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-
-      p -> plotWindow -> lineMode = true;
       
       glBegin(GL_LINE_STRIP);
+
+      p -> plotWindow -> lineMode = true;
 
       delete ps;
 
@@ -378,15 +378,17 @@ OPENGL_ERROR_CHECK
       strCall_CloseSegment *ps = (strCall_CloseSegment *)wParam;
 
       glEnd();
-glGetError();
-OPENGL_ERROR_CHECK
+
 #if 1
+glGetError();
+//OPENGL_ERROR_CHECK
       glEndList();
 OPENGL_ERROR_CHECK
       if ( ps -> drawOnClose ) 
-         glCallList(ps -> segmentID);
+         glCallList((GLuint)ps -> segmentID);
 #endif
-OPENGL_ERROR_CHECK
+//OPENGL_ERROR_CHECK
+
       p -> plotWindow -> polygonMode = false;
       p -> plotWindow -> lineMode = false;
 
@@ -458,6 +460,7 @@ OPENGL_ERROR_CHECK
       delete pSegmentID;
       }
       break;
+
 
    case WM_OPENGLIMPLEMENTATION_BEGINWIREFRAME: {
 
@@ -531,9 +534,10 @@ OPENGL_ERROR_CHECK
 
       glNewList(ps -> segmentID,GL_COMPILE);
  
-      //glEnable(GL_DEPTH_TEST);
-      //glFrontFace(GL_CCW);         
-      //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+      glEnable(GL_DEPTH_TEST);
+      glFrontFace(GL_CCW);
+      glDisable(GL_CULL_FACE);
+      glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
  
       glMaterialfv(GL_FRONT,GL_SPECULAR,fvTopColor);
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,fvTopColor);
@@ -557,6 +561,66 @@ OPENGL_ERROR_CHECK
       glCallList(*pSegmentID);
       p -> plotWindow -> disableLighting();
       delete pSegmentID;
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_BEGINTRIANGLESOLID: {
+
+      strCall_BeginSolid *ps = reinterpret_cast<strCall_BeginSolid *>(wParam);
+
+      float fvTopColor[] = {CLR_BLACK};
+      float fvBottomColor[] = {CLR_BLACK};
+
+      if ( ps -> pPropTopColor ) {
+         BYTE *pb = (BYTE *)fvTopColor;
+         ps -> pPropTopColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+      }
+
+      if ( ps -> pPropBottomColor ) {
+         BYTE *pb = (BYTE *)fvBottomColor;
+         ps -> pPropBottomColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
+      }
+
+      glDeleteLists(ps -> segmentID,1);
+
+      glNewList(ps -> segmentID,GL_COMPILE);
+ 
+      //glEnable(GL_DEPTH_TEST);
+      //glFrontFace(GL_CCW);         
+      //glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+ 
+      glMaterialfv(GL_FRONT,GL_SPECULAR,fvTopColor);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,fvTopColor);
+      glMaterialfv(GL_BACK,GL_SPECULAR,fvBottomColor);
+      glMaterialfv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,fvBottomColor);
+ 
+      p -> plotWindow -> enableLighting();
+ 
+      glBegin(GL_TRIANGLE_STRIP);
+
+      //glColor3fv(fvTopColor);
+
+      delete ps;
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_ENDTRIANGLESOLID: {
+      long *pSegmentID = reinterpret_cast<long*>(wParam);
+      glEnd();
+      glEndList();
+      glCallList(*pSegmentID);
+      p -> plotWindow -> disableLighting();
+      delete pSegmentID;
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_BEGINMODE: {
+      glBegin((GLint)wParam);
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_ENDMODE: {
+      glEnd();
       }
       break;
 

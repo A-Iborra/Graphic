@@ -154,12 +154,16 @@ OutputDebugString(szX); \
 
       SetParent(hwndSampleGraphic,hwnd);
 
-      gc3DPlotTypes pType3D;
+      long pType3D;
+      long pType2D;
 
-      if ( p -> overrideOwnerType )
-         pType3D = (gc3DPlotTypes)p -> plotType3D;
-      else
-         p -> pOwnerProperty3DPlotType -> get_longValue(reinterpret_cast<long*>(&pType3D));
+      if ( p -> overrideOwnerType ) {
+         pType3D = p -> plotType3D;
+         pType2D = p -> plotType2D;
+      } else {
+         p -> pOwnerProperty3DPlotType -> get_longValue(&pType3D);
+         p -> pOwnerProperty2DPlotType -> get_longValue(&pType2D);
+      }
 
       RECT rcColors,rcDialog;
 
@@ -171,14 +175,7 @@ OutputDebugString(szX); \
       RECT rcSample;
       VARIANT_BOOL hasSurfaces;
 
-#if 0
-      p -> get_PlotTypeHasSurfaces(pType,&hasSurfaces);
-#else
-{
-hasSurfaces = VARIANT_TRUE;
-}
-Beep(2000,100);
-#endif
+      p -> get_PlotTypeUsesMaterialShading(pType2D,pType3D,&hasSurfaces);
 
       if ( VARIANT_TRUE == hasSurfaces ) {
 

@@ -124,6 +124,7 @@
 
        pWhenChangedCallback(NULL),
        pWhenChangedCallbackArg(NULL),
+       whenChangedCallbackCookie(0L),
 
        refCount(0)
  

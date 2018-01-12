@@ -1,14 +1,14 @@
 
-#include "Plot.h"
+#include "PlotTypes.h"
 
-   void Plot::_IGSystemPlotType::doWireFrame(long segmentID,Plot *pPlot) {
+   void PlotTypes::wireFrame(long segmentID) {
 
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;
    DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
    int endOfData,kAccross;
    
-   pIOpenGLImplementation -> BeginWireframe(segmentID,pPlot -> propertyLineColor,pPlot -> propertyLineWeight);
+   pIOpenGLImplementation -> BeginWireframe(segmentID,propertyLineColor,propertyLineWeight);
 
    kAccross = 0;
    endOfData = FALSE;    

@@ -56,8 +56,6 @@
       pIDataSetDomain -> IncludeDomain(pIDataSet);
 #endif
 
-   CoCreateInstance(CLSID_GraphicSegment,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGraphicSegment,reinterpret_cast<void **>(&pIGraphicSegment));
- 
    pIGraphicSegment -> Initialize(pIOpenGLImplementation,propLineColor,propLineWeight);
  
    put_PlotView(gcPlotView2D);

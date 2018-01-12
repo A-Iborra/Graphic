@@ -116,9 +116,10 @@ actionFunction((void*)this);
  
          pTable++;
  
-         if ( hitList.Get((int)hitID) ) continue;
+         if ( hitList.Get((int)hitID) ) 
+            continue;
  
-         IAxis *pAxis = reinterpret_cast<IAxis *>(NULL);
+         IAxis *pAxis = NULL;
          while ( pAxis = p -> axisList.GetNext(pAxis) ) {
             pAxis -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
@@ -127,10 +128,11 @@ actionFunction((void*)this);
             }
          }
  
-         if ( hitList.Get((int)hitID) ) continue;
+         if ( hitList.Get((int)hitID) ) 
+            continue;
  
-         IPlot* pPlot = reinterpret_cast<IPlot *>(NULL);
-         while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+         IPlot* pPlot = NULL;
+         while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
             pPlot -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
                hitList.Add(pTable - 1,(char *)NULL,hitID);
@@ -138,9 +140,10 @@ actionFunction((void*)this);
             }
          }
  
-         if ( hitList.Get((int)hitID) ) continue;
+         if ( hitList.Get((int)hitID) ) 
+            continue;
  
-         pAxis = reinterpret_cast<IAxis *>(NULL);
+         pAxis = NULL;
          while ( pAxis = p -> axisList.GetNext(pAxis) ) {
             List<IText> *pTextList;
             pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
@@ -155,9 +158,10 @@ actionFunction((void*)this);
             if ( hitList.Get((int)hitID) ) break;
          }
  
-         if ( hitList.Get((int)hitID) ) continue;
+         if ( hitList.Get((int)hitID) ) 
+            continue;
  
-         IText *pText = reinterpret_cast<IText*>(NULL);
+         IText *pText = NULL;
          while ( pText = p -> textList.GetNext(pText) ) {
             pText -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
@@ -177,10 +181,11 @@ actionFunction((void*)this);
  
       long objectID = *pID;
  
-      IPlot* pPlot = reinterpret_cast<IPlot *>(NULL);
-      while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+      IPlot* pPlot = NULL;
+      while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
          pPlot -> get_SegmentID(&segID);
-         if ( segID == objectID ) break;
+         if ( segID == objectID ) 
+            break;
       }
  
       if ( pPlot ) {
@@ -190,7 +195,7 @@ actionFunction((void*)this);
          continue;
       }
  
-      IAxis *pAxis = reinterpret_cast<IAxis *>(NULL);
+      IAxis *pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          pAxis -> get_SegmentID(&segID);
          if ( segID == objectID ) break;
@@ -203,13 +208,13 @@ actionFunction((void*)this);
          continue;
       }
  
-      IText *pIText = reinterpret_cast<IText *>(NULL);
-      pAxis = reinterpret_cast<IAxis *>(NULL);
+      IText *pIText = NULL;
+      pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          int found = 0;
          List<IText> *pTextList;
          pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
-         pIText = reinterpret_cast<IText *>(NULL);
+         pIText = NULL;
          while ( pIText = pTextList -> GetNext(pIText) ) {
             pIText -> get_SegmentID(&segID);
             if ( segID == objectID ) {
@@ -229,7 +234,8 @@ actionFunction((void*)this);
  
       while ( pIText = p -> textList.GetNext(pIText) ) {
          pIText -> get_SegmentID(&segID);
-         if ( segID == objectID ) break;
+         if ( segID == objectID ) 
+            break;
       }
     
       if ( pIText ) {
@@ -290,10 +296,11 @@ actionFunction((void*)this);
             }
          }
  
-         if ( found ) continue;
+         if ( found ) 
+            continue;
  
          pPlot = NULL;
-         while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+         while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
             pPlot -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {
                hitList.Add(pTable - 1,(char *)NULL,hitID);
@@ -302,7 +309,8 @@ actionFunction((void*)this);
             }
          }
  
-         if ( found ) continue;
+         if ( found ) 
+            continue;
  
          pAxis = NULL;
          List<IText> *pTextList;
@@ -318,10 +326,12 @@ actionFunction((void*)this);
                }
             }
  
-            if ( found ) break;
+            if ( found ) 
+               break;
          }
  
-         if ( found ) continue;
+         if ( found ) 
+            continue;
  
          IText *pText = (IText *)NULL;
          while ( pText = p -> textList.GetNext(pText) ) {
@@ -344,7 +354,7 @@ actionFunction((void*)this);
       long objectID = *pID;
  
       pPlot = (IPlot *)NULL;
-      while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+      while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
          pPlot -> get_SegmentID(&segID);
          if ( segID == objectID ) 
             break;

@@ -1153,6 +1153,7 @@ openGLLighting.lightPosition[k][3] = 1.0;
 
    memset(pSwap,0,cy * rowSize);
 
+glGetError();
    glReadPixels(x1,cyWindow - y2,cx,cy,GL_RGBA,GL_FLOAT,pSwap);
 OPENGL_ERROR_CHECK
 

@@ -1,0 +1,18 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[ uuid(8CBEFD70-55E6-11d3-8365-006008BD5BC3),
+  helpstring("G System, Plot Types implementation Library"), 
+  lcid(0x00000000), 
+  version(1.0)
+] 
+library PlotTypes { 
+
+   importlib("GSystem.tlb");
+
+   [ uuid(8CBEFD7F-55E6-11d3-8365-006008BD5BC3),helpstring("G System Plot Types Implementation Object") ]
+   coclass PlotTypes {
+      [default] interface IGSystemPlotType;
+   };
+
+};

@@ -195,7 +195,7 @@
       BeginPaint(hwnd,&ps);
       HWND hwndCurrent = p -> pIOpenGLImplementation -> TargetHWND();
       if ( hwndCurrent == hwnd )
-         p -> render(0);
+         p -> render(-1);
       p -> ptlPickBox.x = -1L;
       p -> ptlPickBox.y = -1L;
       EndPaint(hwnd,&ps);

@@ -150,6 +150,11 @@ library OpenGLImplementor {
       HRESULT EndWireframe(long segmentID);
       HRESULT BeginSolids(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
       HRESULT EndSolids(long segmentID);
+      HRESULT BeginTriangleSolids(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
+      HRESULT EndTriangleSolids(long segmentID);
+
+      HRESULT BeginOpenGLMode(long mode);
+      HRESULT EndOpenGLMode();
 
       HRESULT ClipPlane(struct DataPoint *dpStartLine,struct DataPoint *dpEndLine,struct DataPoint *dpCorner1,struct DataPoint *dpCorner2);
 

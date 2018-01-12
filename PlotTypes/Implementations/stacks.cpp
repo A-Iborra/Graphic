@@ -1,34 +1,27 @@
-/*
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
+#include "PlotTypes.h"
 
 #include "utils.h"
 
-#include "plot.h"
+//#include "plot.h"
 
-   int Plot::stacks() {
+   void PlotTypes::stacks(long segmentID) {
    if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
-      return stacks2D();
+      stacks2D(segmentID);
    else
-      return stacks3D();
+      stacks3D(segmentID);
+   return;
    }
 
 
-   int Plot::stacks2D() {
-
+   void PlotTypes::stacks2D(long segmentID) {
+   
    DECLARE_PLANE
 
    double minx,maxx,miny,maxy,minz,maxz;
-   long segmentID;
    BOOL endOfData;
    DataList *dl;
 
-   get_SegmentID(&segmentID);
-   
    pIOpenGLImplementation -> BeginSolids(segmentID,propertyTopSurfaceColor,propertyBottomSurfaceColor);
 
    pIDataSet -> get_minX(&minx);
@@ -152,20 +145,17 @@
     
    pIOpenGLImplementation -> EndSolids(segmentID);
 
-   return 0;
+   return;
    }
 
 
-   int Plot::stacks3D() {
+   void PlotTypes::stacks3D(long segmentID) {
 
    DECLARE_PLANE
 
    double minx,maxx,miny,maxy,minz,maxz;
-   long segmentID;
    BOOL endOfData;
    DataList *dl;
-
-   get_SegmentID(&segmentID);
    
    pIOpenGLImplementation -> BeginSolids(segmentID,propertyTopSurfaceColor,propertyBottomSurfaceColor);
 
@@ -284,5 +274,5 @@
     
    pIOpenGLImplementation -> EndSolids(segmentID);
 
-   return 0;
+   return;
    }

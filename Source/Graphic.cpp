@@ -103,7 +103,7 @@
       plotView(gcPlotView2D),
 
       defaultPlotView(gcPlotView2D),
-      default2DPlotType(gcPlotTypeNatural),
+      default2DPlotType(gcPlotTypeNone),
       default3DPlotType(gcPlotType3DNone),
 
       dataSetCount(0),
@@ -172,6 +172,8 @@
    long rc = CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
  
    rc = CoGetClassObject(CLSID_Plot,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pPlot_IClassFactory));
+
+   pPlot_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IPlotServices,reinterpret_cast<void **>(&pIPlotServicesObject));
 
    rc = CoGetClassObject(CLSID_DataSet,CLSCTX_INPROC_SERVER | CLSCTX_LOCAL_SERVER,NULL,IID_IClassFactory,reinterpret_cast<void **>(&pDataSet_IClassFactory));
 
@@ -373,6 +375,8 @@
    pIGProperties -> AddPropertyPage(pIViewSet_Unknown);
    pIViewSet_Unknown -> Release();
 
+   pIGProperties -> Add(L"plot types persistence storage",&propertyPlotServicesObject);
+
    pIPropertiesClient -> InitNew();
 
    refCount = 0;
@@ -386,8 +390,6 @@
    pIPropertyPage[6] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesPlot);
    pIPropertyPage[7] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesDataSets);
    pIPropertyPage[8] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesFunctions);
-
-   pPlot_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IPlotServices,reinterpret_cast<void **>(&pIPlotServicesObject));
 
    return;
    }
@@ -567,7 +569,7 @@ Beep(2000,100);
                               propertyDefault3DPlotType,
                               propertyBackgroundColor,
                               propertyFloor,
-                              propertyCeiling,someObjectChanged,(void *)this);
+                              propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIDataSet);
 
    IPlot *pIPlot = NULL;
 
@@ -602,7 +604,7 @@ Beep(2000,100);
    ContainedDataSet *pContainedDataSet = new ContainedDataSet(this,dataSetList.ID(pIDataSet),hwndDataSourcesDataSets,pIDataSet,pIUnknownDataSet,IID_IDataSetEvents);
    pIUnknownDataSet -> Release();
 
-   pIDataSet -> put_OnChangeCallback(someObjectChanged,(void *)this);
+   pIDataSet -> put_OnChangeCallback(someObjectChanged,(void *)this,(ULONG_PTR)pIDataSet);
 
    IOleObject* pIOleObject;
    IOleClientSite* pIOleClientSite;
@@ -669,7 +671,7 @@ Beep(2000,100);
                               propertyDefault3DPlotType,
                               propertyBackgroundColor,
                               propertyFloor,
-                              propertyCeiling,someObjectChanged,(void *)this);
+                              propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIFunction);
  
    IPlot *pIPlot = NULL;
 
@@ -709,7 +711,7 @@ Beep(2000,100);
 
    pIFunction -> put_AllowControlVisibilitySettings(allowUserFunctionControlVisibilityAccess);
 
-   pIFunction -> put_OnChangeCallback(someObjectChanged,(void *)this);
+   pIFunction -> put_OnChangeCallback(someObjectChanged,(void *)this,(ULONG_PTR)pIFunction);
 
    IOleObject* pIOleObject;
    IOleClientSite* pIOleClientSite;
@@ -775,7 +777,7 @@ Beep(2000,100);
 
    pIText -> put_PartOfWorldDomain(FALSE);
 
-   pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this);
+   pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
 
    pIText -> AdviseGSystemStatusBar(pIGSystemStatusBar);
 
@@ -797,7 +799,7 @@ Beep(2000,100);
                            propertyDefault3DPlotType,
                            propertyBackgroundColor,
                            propertyFloor,
-                           propertyCeiling,someObjectChanged,(void *)this);
+                           propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIPlot);
  
    IPlotNotify *pIPlotNotify;
    QueryInterface(IID_IPlotNotify,reinterpret_cast<void **>(&pIPlotNotify));
@@ -897,22 +899,22 @@ Beep(2000,100);
 
    long cntSegments = 0;
    long k;
-   IAxis *ia = reinterpret_cast<IAxis *>(NULL);
-   IPlot *ap = reinterpret_cast<IPlot *>(NULL);
-   IText *it = reinterpret_cast<IText *>(NULL);
 
-   while ( ia = axisList.GetNext(ia) ) {
-      ia -> get_SegmentCount(&k);
+   IAxis *pIAxis = NULL;
+   while ( pIAxis = axisList.GetNext(pIAxis) ) {
+      pIAxis -> get_SegmentCount(&k);
       cntSegments += k;
    }
 
-   while ( ap = plotList.GetNext(ap) ) {
-      ap -> get_SegmentCount(&k);
+   IPlot *pIPlot = NULL;
+   while ( pIPlot = visiblePlotList.GetNext(pIPlot) ) {
+      pIPlot -> get_SegmentCount(&k);
       cntSegments += k;
    }
 
-   while ( it = textList.GetNext(it) ) {
-      it -> get_SegmentCount(&k);
+   IText *pIText = NULL;
+   while ( pIText = textList.GetNext(pIText) ) {
+      pIText -> get_SegmentCount(&k);
       cntSegments += k;
    }
 
@@ -924,31 +926,84 @@ Beep(2000,100);
    long *pLong = *pSegments;
 
    k = 0;
-   while ( ia = axisList.GetNext(ia) ) {
-      ia -> get_SegmentCount(&k);
-      ia -> GetSegments(pLong);
+   while ( pIAxis = axisList.GetNext(pIAxis) ) {
+      pIAxis -> get_SegmentCount(&k);
+      pIAxis -> GetSegments(pLong);
       pLong += k;
    }
 
-   while ( ap = plotList.GetNext(ap) ) {
-      ap -> get_SegmentCount(&k);
-      ap -> GetSegments(pLong);
+   while ( pIPlot = visiblePlotList.GetNext(pIPlot) ) {
+      pIPlot -> get_SegmentCount(&k);
+      pIPlot -> GetSegments(pLong);
+char szZ[32];
+sprintf(szZ,"PlotID: %ld count:%ld\n",*pLong,k);
+OutputDebugString(szZ);
       pLong += k;
    }
 
-   while ( it = textList.GetNext(it) ) {
-      it -> get_SegmentCount(&k);
-      it -> GetSegments(pLong);
+   while ( pIText = textList.GetNext(pIText) ) {
+      pIText -> get_SegmentCount(&k);
+      pIText -> GetSegments(pLong);
       pLong += k;
    }
 
    return cntSegments;
    }
 
-   void G::someObjectChanged(void *pArg) {
+
+   void G::someObjectChanged(void *pArg,ULONG_PTR cookie) {
+
    G *p = (G *)pArg;
-   p -> setDataSourcesVisibility(NULL,NULL);
+
    p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+
+   long k = p -> plotList.ID((IPlot *)cookie);
+
+   if ( 0 < k ) {
+      p -> render(k);
+      return;
+   }
+
+   k = p -> dataSetList.ID((IDataSet *)cookie);
+
+   if ( 0 < k ) {
+
+      IDataSet *pIDataSet = (IDataSet *)cookie;
+
+      IPlot *pIPlot = NULL;
+
+      pIDataSet -> get_IPlot((void **)&pIPlot);
+
+      if ( ! pIPlot )
+         return;
+
+      p -> render(p -> plotList.ID(pIPlot));
+
+      return;
+   }
+
+   k = p -> functionList.ID((IGSFunctioNater *)cookie);
+
+   if ( 0 < k ) {
+
+      IGSFunctioNater *pIFunction = (IGSFunctioNater *)cookie;
+
+      IPlot *pIPlot = NULL;
+
+      pIFunction -> get_IPlot((void **)&pIPlot);
+
+      if ( ! pIPlot )
+         return;
+
+      p -> render(p -> plotList.ID(pIPlot));
+
+      return;
+   }
+
+   p -> setDataSourcesVisibility(NULL,NULL);
+
+   p -> render(0);
+
    return;
    }
 

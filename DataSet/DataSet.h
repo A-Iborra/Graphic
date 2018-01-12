@@ -105,9 +105,9 @@ using namespace VBIDE;
                               IGProperty *parentPropertyBackgroundColor,
                               IGProperty *parentPropertyFloor,
                               IGProperty *parentPropertyCeiling,
-                              void (__stdcall *pCallback)(void *),void *pArg);
+                              void (__stdcall *pCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
-      STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
+      STDMETHOD(put_OnChangeCallback)(void (__stdcall *)(void *,ULONG_PTR),void *,ULONG_PTR);
 
       STDMETHOD(put_maxX)(double);                     
       STDMETHOD(get_maxX)(double *getVal);                     
@@ -609,8 +609,9 @@ using namespace VBIDE;
 
       IPlot *pIPlot{NULL};
 
-      void (__stdcall *pWhenChangedCallback)(void *);
+      void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
       void *pWhenChangedCallbackArg;
+      ULONG_PTR whenChangedCallbackCookie;
 
       std::function<void()> *pOneShotOnFinishedLambda{NULL};
 

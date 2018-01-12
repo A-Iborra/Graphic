@@ -445,7 +445,34 @@ Sleep(10);
    return S_OK;
    }
  
+   HRESULT OpenGLImplementor::BeginTriangleSolids(long segmentID,IGProperty *pPropTopColor,IGProperty *pPropBottomColor) {
+   strCall_BeginSolid *ps = new strCall_BeginSolid();
+   ps -> segmentID = segmentID;
+   ps -> pPropTopColor = pPropTopColor;
+   ps -> pPropBottomColor = pPropBottomColor;
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_BEGINTRIANGLESOLID,ps)
+   return S_OK;
+   }
  
+ 
+   HRESULT OpenGLImplementor::EndTriangleSolids(long segmentID) {
+   long *pSegment = new long(segmentID);
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_ENDTRIANGLESOLID,pSegment)
+   return S_OK;
+   }
+ 
+
+   HRESULT OpenGLImplementor::BeginOpenGLMode(long mode) {
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_BEGINMODE,mode)
+   return S_OK;
+   }
+
+
+   HRESULT OpenGLImplementor::EndOpenGLMode() {
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_ENDMODE,0)
+   return S_OK;
+   }
+
 #define TOP 0x8
 #define RIGHT 0x2
 #define BOTTOM 0x4

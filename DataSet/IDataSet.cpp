@@ -140,7 +140,7 @@
                                           IGProperty *parentPropertyBackgroundColor,
                                           IGProperty *parentPropertyFloor,
                                           IGProperty *parentPropertyCeiling,
-                                          void (__stdcall *pCallback)(void *),void *pArg) {
+                                          void (__stdcall *pCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR callbackCookie) {
 
    IDataSet *pds = NULL;
 
@@ -148,16 +148,21 @@
    pIPlot -> put_IDataSet(pds);
    pds -> Release();
 
+   pWhenChangedCallback = pCallback;
+   pWhenChangedCallbackArg = pArg;
+   whenChangedCallbackCookie = callbackCookie;
+
    HRESULT rc = pIPlot -> Initialize((IDataSet *)pvIDataSet_Domain,(IOpenGLImplementation *)pvIOpenGLImplementation,
                                        NULL/*evaluator*/,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
-                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg);
+                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg,callbackCookie);
 
    return rc;
    }
 
-   STDMETHODIMP DataSet::put_OnChangeCallback(void (__stdcall *pCallback)(void *),void *pArg) {
+   STDMETHODIMP DataSet::put_OnChangeCallback(void (__stdcall *pCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR callbackCookie) {
    pWhenChangedCallback = pCallback;
    pWhenChangedCallbackArg = pArg;
+   whenChangedCallbackCookie = callbackCookie;
    return S_OK;
    }
 

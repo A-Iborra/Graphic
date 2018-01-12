@@ -225,7 +225,7 @@
          pIUnknown -> Release();
          //p -> resize();
          if ( p -> pWhenChangedCallback )
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          break;
 

@@ -1,17 +1,17 @@
 
-#include "Plot.h"
+#include "PlotTypes.h"
 #include "utils.h"
 
-   void Plot::_IGSystemPlotType::doSurface(long segmentID,Plot *pPlot) {
-
+   void PlotTypes::surface(long segmentID) {
+   
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;
    DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
    int endOfData,kAccross;
 
-   double xProd0[3],xProd1[3],xProd2[3],avgNormal[5][3];
-    
-   pIOpenGLImplementation -> BeginSurface(segmentID,pPlot -> propertyTopSurfaceColor,pPlot -> propertyBottomSurfaceColor);
+   double xProd0[3],xProd1[3],xProd2[3],avgNormal[5][4];
+
+   pIOpenGLImplementation -> BeginSurface(segmentID,propertyTopSurfaceColor,propertyBottomSurfaceColor);
    
    kAccross = 0;
    endOfData = FALSE;
@@ -115,22 +115,21 @@
       avgNormal[3][1] = xProd0[1];
       avgNormal[3][2] = xProd0[2];
 
-   avgNormal[4][0] = 0.0;
-   avgNormal[4][1] = 0.0;
-   avgNormal[4][2] = 0.0;
-   avgNormal[4][3] = 0.0;
+      avgNormal[4][0] = 0.0;
+      avgNormal[4][1] = 0.0;
+      avgNormal[4][2] = 0.0;
+      avgNormal[4][3] = 0.0;
 
-   for ( int vk = 0; vk < 4; vk++ ) {
-   avgNormal[4][0] += avgNormal[vk][0];
-   avgNormal[4][1] += avgNormal[vk][1];
-   avgNormal[4][2] += avgNormal[vk][2];
-   avgNormal[4][3] += avgNormal[vk][3];
-   //unitVector(avgNormal[vk],avgNormal[vk]);
-   }
+      for ( int vk = 0; vk < 4; vk++ ) {
+         avgNormal[4][0] += avgNormal[vk][0];
+         avgNormal[4][1] += avgNormal[vk][1];
+         avgNormal[4][2] += avgNormal[vk][2];
+         avgNormal[4][3] += avgNormal[vk][3];
+      }
 
       pIOpenGLImplementation -> Normal3dv(avgNormal[4]);
       for ( int vk = 0; vk < 4; vk++ ) {
-         //p -> pIOpenGLImplementation -> Normal3dv(avgNormal[vk]);
+         //pIOpenGLImplementation -> Normal3dv(avgNormal[vk]);
          pIOpenGLImplementation -> Vertex(&v[vk]);
       }
 

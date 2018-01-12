@@ -37,7 +37,7 @@
          p -> pIGProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
          pIUnknown -> Release();
          if ( p -> pWhenChangedCallback ) 
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          }
          return LRESULT(TRUE);

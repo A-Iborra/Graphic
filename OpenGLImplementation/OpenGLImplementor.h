@@ -283,6 +283,10 @@
       STDMETHOD(EndWireframe)(long segmentID);
       STDMETHOD(BeginSolids)(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
       STDMETHOD(EndSolids)(long segmentID);
+      STDMETHOD(BeginTriangleSolids)(long segmentID,IGProperty* pPropTopColor,IGProperty* pPropBottomColor);
+      STDMETHOD(EndTriangleSolids)(long segmentID);
+      STDMETHOD(BeginOpenGLMode)(long mode);
+      STDMETHOD(EndOpenGLMode)();
 
       STDMETHOD(ClipPlane)(DataPoint *,DataPoint *,DataPoint *,DataPoint *);
  
@@ -623,6 +627,12 @@
 
 #define WM_OPENGLIMPLEMENTATION_BEGINSOLID               WM_USER + 74
 #define WM_OPENGLIMPLEMENTATION_ENDSOLID                 WM_USER + 75
+
+#define WM_OPENGLIMPLEMENTATION_BEGINTRIANGLESOLID       WM_USER + 76
+#define WM_OPENGLIMPLEMENTATION_ENDTRIANGLESOLID         WM_USER + 77
+
+#define WM_OPENGLIMPLEMENTATION_BEGINMODE                WM_USER + 78
+#define WM_OPENGLIMPLEMENTATION_ENDMODE                  WM_USER + 79
 
    struct strCall_GetPickBoxHits {
       POINTL *ptl;

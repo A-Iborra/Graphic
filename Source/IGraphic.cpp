@@ -77,7 +77,7 @@
    pAxis -> QueryInterface(IID_IAxis,reinterpret_cast<void**>(&pIAxis));
    axisList.Add(pIAxis);
    pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,
-                           propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this);
+                           propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)pIAxis);
    return S_OK;
    }
 

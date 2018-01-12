@@ -34,7 +34,7 @@
 
      STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
                            IGProperty*,IGProperty *pPropertyFloor,IGProperty *pPropertyCeiling,
-                              void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
+                              void (__stdcall *pWhenDoneCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR);
 
      STDMETHOD(PrepareForData)();
      STDMETHOD(TakeDataPoint)(DataPoint*);
@@ -73,7 +73,7 @@
      STDMETHOD(put_PlotTypeProperty)(IGProperty*);
      STDMETHOD(get_PlotTypeProperty)(IGProperty**);
 
-     STDMETHOD(get_PlotTypeHasSurfaces)(gc3DPlotTypes theType,VARIANT_BOOL *);
+     STDMETHOD(get_PlotTypeUsesMaterialShading)(long the2DTypes,long the3DTypes,VARIANT_BOOL *);
 
      STDMETHOD(get_SegmentID)(long*);
 
@@ -91,11 +91,21 @@
      STDMETHOD(put_Color)(SAFEARRAY *);
      STDMETHOD(get_Color)(SAFEARRAY **);
 
-     STDMETHOD(put_ColorProperty)(IGProperty*);
-     STDMETHOD(get_ColorProperty)(IGProperty**);
 
-     STDMETHOD(put_LineWeight)(IGProperty*);
-     STDMETHOD(get_LineWeight)(IGProperty**);
+     STDMETHOD(put_LineColorProperty)(IGProperty*);
+     STDMETHOD(get_LineColorProperty)(IGProperty**);
+
+     STDMETHOD(put_LineWeightProperty)(IGProperty*);
+     STDMETHOD(get_LineWeightProperty)(IGProperty**);
+
+
+     STDMETHOD(put_TopSurfaceColorProperty)(IGProperty*);
+     STDMETHOD(get_TopSurfaceColorProperty)(IGProperty**);
+
+
+     STDMETHOD(put_BottomSurfaceColorProperty)(IGProperty*);
+     STDMETHOD(get_BottomSurfaceColorProperty)(IGProperty**);
+
 
      STDMETHOD(put_ParentWindow)(HWND);
 
@@ -110,7 +120,10 @@
 
 //       IPlotServices
 
-     STDMETHOD(GetPlotTypesInformation)(SAFEARRAY **pp2DTypeIDs,SAFEARRAY **pp3DTypeIds,SAFEARRAY **pp2DTypeNames,SAFEARRAY **pp3DTypeNames);
+     STDMETHOD(GetPlotTypesInformation)(SAFEARRAY **pp2DTypeIDs,SAFEARRAY **pp3DTypeIds,
+                                          SAFEARRAY **pp2DTypeNames,SAFEARRAY **pp3DTypeNames,
+                                          SAFEARRAY **pp2DTypeInstanceNumbers,SAFEARRAY **pp3DTypeInstanceNumbers,
+                                          SAFEARRAY **pp2DTypeInstances,SAFEARRAY **pp3DTypeInstances);
 
 //       IGraphicSegmentAction
 
@@ -168,43 +181,6 @@
       STDMETHOD(QueryHitRect)(DWORD dwAspect,const struct tagRECT *pRectBounds,const struct tagRECT *rctHit,long lCloseHint,DWORD *dwHitResult);
       STDMETHOD(GetNaturalExtent)(DWORD dwExtent,LONG lIndex,DVTARGETDEVICE *ptd,HDC hicTargetDev,DVEXTENTINFO *extentInfo,SIZEL *);
 
-//    IGSystemPlotType
-
-      class _IGSystemPlotType : public IGSystemPlotType {
-      public:
-
-         _IGSystemPlotType(Plot *pParent);
-         ~_IGSystemPlotType();
-                                                      
-         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
-         STDMETHOD_ (ULONG, AddRef)();
-         STDMETHOD_ (ULONG, Release)();
-
-      private:
-
-         STDMETHOD(get_Count)(long *pCountProvided);
-         STDMETHOD(get_Name)(long item,BSTR *pBstr);
-         STDMETHOD(get_Is3DOnly)(long item,VARIANT_BOOL *);
-         STDMETHOD(put_DataSet)(void *pvIDataSet);
-         STDMETHOD(put_OpenGLImplementation)(void *pvIOpenGLImplementation);
-
-         STDMETHOD(Execute)(long item,long segmentId,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
-
-         void doSurface(long segmentID,Plot *pIPlot);
-         void doWireFrame(long segmentID,Plot *pIPlot);
-
-         Plot *pParent{NULL};
-         IDataSet *pIDataSet{NULL};
-         IOpenGLImplementation *pIOpenGLImplementation{NULL};
-
-         long refCount{0};
-
-      } *pIGSystemPlotType_Provider{NULL};
-
-     __declspec(dllexport) static HANDLE PlotData(List<Plot> *pList);
-
-     static int pCount;
-
      int pID;
 
      HANDLE plotThread;
@@ -229,8 +205,6 @@
 
      int okToPlot,autoViewDetection,haveAnyData,selected;
      bool overrideOwnerView,overrideOwnerType;
-
-long lineWeight;
 
      IPlot** pIPlots;
      long currentPlotCount;
@@ -281,28 +255,24 @@ long lineWeight;
 
      IGProperty* propertyDataSet{NULL};
 
+     IGProperty *propertyPlotTypes{NULL};
+
      HANDLE PlotThread();
 
-     //int init();
-     int stacks();
-     int stacks2D();
-     int stacks3D();
-     int blocks();
-     int blocks2D();
-     int blocks3D();
-     int balls();
-     int balls2D();
-     int balls3D();
+     std::map<long,GUID> plotType2DInstanceIdentifiers;
+     std::map<long,GUID> plotType3DInstanceIdentifiers;
 
      static long instanceCount;
 
      static long findKnownPlotTypeProviders();
      static std::list<CLSID *> plotTypeProviderGUIDs;
+
      static std::map<gc2DPlotTypes,IGSystemPlotType *> plotType2DProviderInstances;
      static std::map<gc2DPlotTypes,char *> plotType2DProviderNames;
+     static std::map<gc2DPlotTypes,long> plotType2DInstanceNumber;
+
      static std::map<gc3DPlotTypes,IGSystemPlotType *> plotType3DProviderInstances;
      static std::map<gc3DPlotTypes,char *> plotType3DProviderNames;
-     static std::map<gc2DPlotTypes,long> plotType2DInstanceNumber;
      static std::map<gc3DPlotTypes,long> plotType3DInstanceNumber;
 
      static LRESULT CALLBACK handler(HWND,UINT,WPARAM,LPARAM);
@@ -334,73 +304,3 @@ long lineWeight;
   extern ITypeInfo *pITypeInfo;
 
   extern bool isSampleInUse;
-
-#define DECLARE_PLANE \
-   DataPoint homePoint,firstPoint,secondPoint,thirdPoint,fourthPoint,v[4]; \
-   double xProd0[3],xProd1[3],xProd2[3],avgNormal[3];                      \
-   int vk; 
-
-#define DRAW_PLANE                 \
-   v[0] = firstPoint;               \
-   v[1] = secondPoint;              \
-   v[2] = thirdPoint;               \
-   v[3] = fourthPoint;              \
-                                    \
-   xProd0[0] = v[1].x - v[0].x;     \
-   xProd0[1] = v[1].y - v[0].y;     \
-   xProd0[2] = v[1].z - v[0].z;     \
-   xProd1[0] = v[3].x - v[0].x;     \
-   xProd1[1] = v[3].y - v[0].y;     \
-   xProd1[2] = v[3].z - v[0].z;     \
-   VxV(xProd0,xProd1,xProd2);       \
-   unitVector(xProd2,xProd0);       \
-   avgNormal[0] = xProd0[0];        \
-   avgNormal[1] = xProd0[1];        \
-   avgNormal[2] = xProd0[2];        \
-                                    \
-   xProd0[0] = v[2].x - v[1].x;     \
-   xProd0[1] = v[2].y - v[1].y;     \
-   xProd0[2] = v[2].z - v[1].z;     \
-   xProd1[0] = v[0].x - v[1].x;     \
-   xProd1[1] = v[0].y - v[1].y;     \
-   xProd1[2] = v[0].z - v[1].z;     \
-   VxV(xProd0,xProd1,xProd2);       \
-   unitVector(xProd2,xProd0);       \
-   avgNormal[0] += xProd0[0];       \
-   avgNormal[1] += xProd0[1];       \
-   avgNormal[2] += xProd0[2];       \
-                                    \
-   xProd0[0] = v[3].x - v[2].x;     \
-   xProd0[1] = v[3].y - v[2].y;     \
-   xProd0[2] = v[3].z - v[2].z;     \
-   xProd1[0] = v[1].x - v[2].x;     \
-   xProd1[1] = v[1].y - v[2].y;     \
-   xProd1[2] = v[1].z - v[2].z;     \
-   VxV(xProd0,xProd1,xProd2);       \
-   unitVector(xProd2,xProd0);       \
-   avgNormal[0] += xProd0[0];       \
-   avgNormal[1] += xProd0[1];       \
-   avgNormal[2] += xProd0[2];       \
-                                    \
-   xProd0[0] = v[1].x - v[3].x;     \
-   xProd0[1] = v[1].y - v[3].y;     \
-   xProd0[2] = v[1].z - v[3].z;     \
-   xProd1[0] = v[2].x - v[3].x;     \
-   xProd1[1] = v[2].y - v[3].y;     \
-   xProd1[2] = v[2].z - v[3].z;     \
-   VxV(xProd0,xProd1,xProd2);       \
-   unitVector(xProd2,xProd0);       \
-   avgNormal[0] += xProd0[0];       \
-   avgNormal[1] += xProd0[1];       \
-   avgNormal[2] += xProd0[2];       \
-                                    \
-   avgNormal[0] /= 4.0;             \
-   avgNormal[1] /= 4.0;             \
-   avgNormal[2] /= 4.0;             \
-                                    \
-   pIOpenGLImplementation -> Normal3dv(avgNormal);                          \
-                                                                            \
-   for ( vk = 0; vk < 4; vk++ ) pIOpenGLImplementation -> Vertex(&v[vk]);   \
-
-
-

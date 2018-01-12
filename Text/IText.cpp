@@ -55,7 +55,8 @@
 
 
    HRESULT Text::Initialize(HWND ho,IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
-                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,void (__stdcall *pWhenChanged)(void *),void *pWhenChangedArg) {
+                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,
+                                    void (__stdcall *pWhenChanged)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR changedCallbackCookie) {
  
    hwndOwner = ho;
 
@@ -70,6 +71,7 @@
 
    pWhenChangedCallback = pWhenChanged;
    pWhenChangedCallbackArg = pWhenChangedArg;
+   whenChangedCallbackCookie = changedCallbackCookie;
 
    if ( pPropRenderUsingOpenGL ) {
       short v;
@@ -829,7 +831,7 @@
    pIProperties -> ShowProperties(NULL,pUnknown);
    pUnknown -> Release();
    if ( pWhenChangedCallback )
-      pWhenChangedCallback(pWhenChangedCallbackArg);
+      pWhenChangedCallback(pWhenChangedCallbackArg,whenChangedCallbackCookie);
    return S_OK;
    }
 

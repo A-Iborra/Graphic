@@ -64,26 +64,14 @@
 
 
    STDAPI DllRegisterServer() {	
-
    utilsDllRegisterObject(CLSID_Plot,LIBID_Plot,hModule,szModuleName,"GSystem Plot Object","GSystem.Plot","GSystem.Plot.1",(CATID*)NULL,0,0,false,false,true);
-
    utilsDllRegisterObject(CLSID_BasePlot,LIBID_Plot,hModule,szModuleName,"GSystem Base Plot Object","GSystem.BasePlot","GSystem.BasePlot.1",(CATID*)NULL,0,0,false,false,true);
-
-   ICatRegister *pICatRegister;
-
-   HRESULT rc = CoCreateInstance(CLSID_StdComponentCategoriesMgr,NULL,CLSCTX_ALL,IID_ICatRegister,reinterpret_cast<void **>(&pICatRegister));
-
-   CATID categoryId = IID_IGSystemPlotType;
-
-   pICatRegister -> RegisterClassImplCategories(CLSID_Plot,1,&categoryId);
-
-   pICatRegister -> Release();
-
    return DllRegisterServer_Segment();
    }
 
 
   STDAPI DllUnregisterServer() {
+  utilsDllUnregisterObject(CLSID_Plot,"GSystem.Plot","GSystem.Plot.1");
   return TRUE;
   }
 

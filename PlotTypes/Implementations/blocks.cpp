@@ -1,34 +1,23 @@
-/*
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
+#include <PlotTypes.h>
 
-*/
-
-#include <windows.h>
-
-#include "utils.h"
-
-#include "plot.h"
-
-   int Plot::blocks() {
+   void PlotTypes::blocks(long segmentID) {
    if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
-      return blocks2D();
+      blocks2D(segmentID);
    else
-      return blocks3D();
+      blocks3D(segmentID);
+   return;
    }
 
 
-   int Plot::blocks2D() {
+   void PlotTypes::blocks2D(long segmentID) {
 
    DECLARE_PLANE
 
    double minx,maxx,miny,maxy,minz,maxz;
-   long segmentID;
    BOOL endOfData;
    DataList *dl;
 
-   get_SegmentID(&segmentID);
-   
    pIOpenGLImplementation -> BeginSolids(segmentID,propertyTopSurfaceColor,propertyBottomSurfaceColor);
 
    pIDataSet -> get_minX(&minx);
@@ -152,21 +141,18 @@
     
    pIOpenGLImplementation -> EndSolids(segmentID);
 
-   return 0;
+   return;
    }
 
 
-   int Plot::blocks3D() {
-
+   void PlotTypes::blocks3D(long segmentID) {
+   
    DECLARE_PLANE
 
    double minx,maxx,miny,maxy,minz,maxz;
-   long segmentID;
    BOOL endOfData;
    DataList *dl;
 
-   get_SegmentID(&segmentID);
-   
    pIOpenGLImplementation -> BeginSolids(segmentID,propertyTopSurfaceColor,propertyBottomSurfaceColor);
 
    pIDataSet -> get_minX(&minx);
@@ -286,5 +272,5 @@
     
    pIOpenGLImplementation -> EndSolids(segmentID);
 
-   return 0;
+   return;
    }

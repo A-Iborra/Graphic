@@ -21,12 +21,7 @@
   extern BSTR wstrModuleName;
 
   STDAPI DllRegisterServer_Segment() {   
-  return utilsDllRegisterObject(CLSID_GraphicSegment,LIBID_Plot,hModule,
-                                 szModuleName,
-                                 "GSystem Segment Object",
-                                 "GSystem.Segment",
-                                 "GSystem.Segment.1",
-                                 (CATID*)NULL,0,0,false,false,false);
+  return utilsDllRegisterObject(CLSID_GraphicSegment,LIBID_Plot,hModule,szModuleName,"GSystem Segment Object","GSystem.Segment","GSystem.Segment.1",(CATID*)NULL,0,0,false,false,false);
   }
 
 

@@ -77,7 +77,7 @@
          psz = p -> szDataSource - 1;
          SetDlgItemText(hwnd,IDDI_DATASET_SPEC_DATASOURCE,psz + 1);
          if ( p -> pWhenChangedCallback )
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          break;
 

@@ -51,10 +51,10 @@ library DataSet {
                            IGProperty *parentPropertyBackgroundColor,
                            IGProperty *parentPropertyFloor,
                            IGProperty *parentPropertyCeiling,
-                           [in] void (*pCallback)(void *),[in] void *pArg);
+                           [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,ULONG_PTR cookie);
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
-      [propput] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
+      [propput] HRESULT OnChangeCallback([in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR cookie);
 
       [propput] HRESULT maxX([in] double maxVal);
       [propget] HRESULT maxX([out,retval] double *getVal);

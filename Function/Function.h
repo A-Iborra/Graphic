@@ -133,9 +133,9 @@
                               IGProperty *parentPropertyBackgroundColor,
                               IGProperty *parentPropertyFloor,
                               IGProperty *parentPropertyCeiling,
-                              void (__stdcall *pCallback)(void *),void *pArg);
+                              void (__stdcall *pCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
-     STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *),void *pArg);
+     STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *,ULONG_PTR),void *,ULONG_PTR);
 
      STDMETHOD(get_AnyControlVisible)(VARIANT_BOOL* pbAnyVisible);
 
@@ -442,8 +442,9 @@
      IPlot *pIPlot;
      IDataSet *pIDataSet;
 
-     void (__stdcall *pWhenChangedCallback)(void *);
+     void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
      void *pWhenChangedCallbackArg;
+     ULONG_PTR whenChangedCallbackCookie;
 
      DWORD adviseSink_dwAspect,adviseSink_advf;
 

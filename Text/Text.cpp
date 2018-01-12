@@ -63,6 +63,7 @@
 
        pWhenChangedCallback(NULL),
        pWhenChangedCallbackArg(NULL),
+       whenChangedCallbackCookie(0L),
 
        hFont(0),
        hOriginalFont(0),

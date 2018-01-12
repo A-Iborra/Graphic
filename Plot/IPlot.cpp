@@ -19,7 +19,7 @@
                                  IGProperty *parentBackground,
                                  IGProperty *parentFloor,
                                  IGProperty *parentCeiling,
-                                 void (__stdcall *pCallback)(void *),void *pCallbarkArg) {
+                                 void (__stdcall *pCallback)(void *,ULONG_PTR),void *pCallbarkArg,ULONG_PTR callbackCookie) {
  
    if ( pPropColor ) {
       if ( propertyLineColor ) {
@@ -39,6 +39,7 @@
 
    pWhenChangedCallback = pCallback;
    pWhenChangedCallbackArg = pCallbarkArg;
+   whenChangedCallbackCookie = callbackCookie;
 
    BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentFloor,parentCeiling);
 
@@ -162,38 +163,49 @@
    }
 
 
-/*
-   enum PlotTypes {	
-      gcPlotTypeNone =      0x00000000,
-      gcPlotTypeNatural =   0x00010003,
-      gcPlotTypeSurface =   0x00020002,
-      gcPlotTypeWireFrame = 0x00040002,
-      gcPlotTypeStacks =    0x00080003,
-      gcPlotTypeBlocks =    0x00100003,
-      gcPlotTypeBalls =     0x00200003,
-      gcPlotTypePie =       0x00400001,
-      gcPlotTypeContour =   0x00800003,
-      gcPlotTypeQuads =     0x01000003,
-      gcPlotTypeTriangles = 0x01200003
-      };
-*/
-
-   HRESULT Plot::get_PlotTypeHasSurfaces(enum gc3DPlotTypes theType,VARIANT_BOOL *pResult) {
+   HRESULT Plot::get_PlotTypeUsesMaterialShading(long the2DTypes,long the3DTypes,VARIANT_BOOL *pResult) {
 
    if ( ! pResult )
       return E_POINTER;
 
-   *pResult = VARIANT_FALSE;
-#if 1
-*pResult = VARIANT_TRUE;
-Beep(2000,100);
-#else
-   long pType = (long)plotType & gcPlotViewMask;
+   IGSystemPlotType *pProvider = NULL;
 
-   if ( (pType & gcPlotTypeSurface) || (pType & gcPlotTypeStacks) ||
-         (pType & gcPlotTypeBlocks) || (pType & gcPlotTypeBalls) )
-      *pResult = VARIANT_TRUE;
-#endif
+   for ( std::pair<gc3DPlotTypes,IGSystemPlotType *> pair : plotType3DProviderInstances ) {
+
+      if ( NULL == pair.second )
+         continue;
+
+      if ( ! ( pair.first & the3DTypes ) )
+         continue;
+
+      long item = plotType3DInstanceNumber[pair.first];
+
+      pair.second -> get_UsesMaterialShading(item,pResult);
+
+      if ( VARIANT_TRUE == *pResult )
+         return S_OK;
+
+   }
+
+   for ( std::pair<gc2DPlotTypes,IGSystemPlotType *> pair : plotType2DProviderInstances ) {
+
+      if ( NULL == pair.second )
+         continue;
+
+      if ( ! ( pair.first & the2DTypes ) )
+         continue;
+
+      long item = plotType2DInstanceNumber[pair.first];
+
+      pair.second -> get_UsesMaterialShading(item,pResult);
+
+      if ( VARIANT_TRUE == *pResult )
+         return S_OK;
+
+   }
+
+   *pResult = VARIANT_FALSE;
+
    return S_OK;
    }
 
@@ -243,26 +255,54 @@ Beep(2000,100);
 
 
 
-   HRESULT Plot::put_ColorProperty(IGProperty* pColor) {
+   HRESULT Plot::put_LineColorProperty(IGProperty* pColor) {
    if ( ! pColor ) 
       return BasePlot::put_ColorProperty(pColor);
    propertyLineColor = pColor;
    return BasePlot::put_ColorProperty(pColor);
    }
 
-   HRESULT Plot::get_ColorProperty(IGProperty** ppColor) {
-   return BasePlot::get_ColorProperty(ppColor);
+   HRESULT Plot::get_LineColorProperty(IGProperty** ppProperty) {
+   return BasePlot::get_ColorProperty(ppProperty);
    }
 
 
-   HRESULT Plot::put_LineWeight(IGProperty* pLineWeight) {
-   propertyLineWeight = pLineWeight;
-   return BasePlot::put_LineWeight(pLineWeight);
+   HRESULT Plot::put_LineWeightProperty(IGProperty* pProperty) {
+   propertyLineWeight = pProperty;
+   return BasePlot::put_LineWeight(pProperty);
    }
 
-   HRESULT Plot::get_LineWeight(IGProperty** ppLineWeight) {
-   return BasePlot::get_LineWeight(ppLineWeight);
+   HRESULT Plot::get_LineWeightProperty(IGProperty** ppProperty) {
+   if ( ! ppProperty )
+      return E_POINTER;
+   return BasePlot::get_LineWeight(ppProperty);
    }
+
+
+   HRESULT Plot::put_TopSurfaceColorProperty(IGProperty* pProperty) {
+   propertyTopSurfaceColor = pProperty;
+   return S_OK;
+   }
+
+   HRESULT Plot::get_TopSurfaceColorProperty(IGProperty** ppProperty) {
+   if ( ! ppProperty )
+      return E_POINTER;
+   *ppProperty = propertyTopSurfaceColor;
+   return S_OK;
+   }
+
+   HRESULT Plot::put_BottomSurfaceColorProperty(IGProperty* pProperty) {
+   propertyBottomSurfaceColor = pProperty;
+   return S_OK;
+   }
+
+   HRESULT Plot::get_BottomSurfaceColorProperty(IGProperty** ppProperty) {
+   if ( ! ppProperty )
+      return E_POINTER;
+   *ppProperty = propertyBottomSurfaceColor;
+   return S_OK;
+   }
+
 
 
    HRESULT Plot::put_ParentWindow(HWND hwndParent) {
@@ -328,7 +368,7 @@ Beep(2000,100);
    pIProperties -> ShowProperties(NULL,pUnknown);
    pUnknown -> Release();
    if ( pWhenChangedCallback )
-      pWhenChangedCallback(pWhenChangedCallbackArg);
+      pWhenChangedCallback(pWhenChangedCallbackArg,whenChangedCallbackCookie);
    return S_OK;
    }
 

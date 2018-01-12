@@ -565,7 +565,7 @@
 
    HRESULT Axis::Initialize(HWND ho,char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
                               IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropOpenGLText,
-                              IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *),void *pChangedArg) {
+                              IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *,ULONG_PTR),void *pChangedArg,ULONG_PTR changedCookie) {
 
    hwndOwner = ho;
    type = axisType;
@@ -577,6 +577,8 @@
    pWhenChangedCallback = pChangedCallback;
 
    pWhenChangedCallbackArg = pChangedArg;
+
+   whenChangedCallbackCookie = changedCookie;
 
    pParentPropertyPlotView = pPlotView;
 
@@ -603,7 +605,7 @@
    CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
  
    pIPlot -> Initialize(pIDataSetDomain,pIOpenGLImplementation,pIEvaluator,propertyLineColor,propertyLineWeight,pParentPropertyPlotView,propertyPlotType,
-                           NULL,NULL,pPropFloor,pPropCeiling,pWhenChangedCallback,pWhenChangedCallbackArg);
+                           NULL,NULL,pPropFloor,pPropCeiling,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
  
    pIPlot -> put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
 
@@ -611,13 +613,13 @@
 
    pIPlot -> put_OverrideOwnerPlotType(FALSE);
 
-   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
+   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    initWindows();
  
    InitNew();
 
-   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg);
+   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    switch ( axisType ) {
    case 'X':

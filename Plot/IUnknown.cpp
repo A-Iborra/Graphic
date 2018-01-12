@@ -92,15 +92,6 @@
    if ( riid == IID_IViewObjectEx ) 
       *ppv = static_cast<IViewObjectEx *>(this);
    else
- 
-   if ( riid == IID_IGSystemPlotType ) {
-
-      if ( ! pIGSystemPlotType_Provider )
-         pIGSystemPlotType_Provider = new _IGSystemPlotType(this);
-
-      return pIGSystemPlotType_Provider -> QueryInterface(riid,ppv);
-
-   } else
 
       return E_NOINTERFACE;
  

@@ -94,8 +94,9 @@
      IDataSet* pIDataSet;
      IDataSet* pIDataSetDomain;
 
-     void (__stdcall *pWhenChangedCallback)(void *);
+     void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
      void *pWhenChangedCallbackArg;
+     ULONG_PTR whenChangedCallbackCookie;
 
      PlotViews plotView;
      long plotType2D;

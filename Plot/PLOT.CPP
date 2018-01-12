@@ -24,13 +24,16 @@
 #include "List.cpp"
 
    long Plot::instanceCount = 0L;
+
    std::list<CLSID *> Plot::plotTypeProviderGUIDs;
+
    std::map<gc2DPlotTypes,IGSystemPlotType *> Plot::plotType2DProviderInstances;
    std::map<gc2DPlotTypes,char *> Plot::plotType2DProviderNames;
+   std::map<gc2DPlotTypes,long> Plot::plotType2DInstanceNumber;
+
    std::map<gc3DPlotTypes,IGSystemPlotType *> Plot::plotType3DProviderInstances;
    std::map<gc3DPlotTypes,char *> Plot::plotType3DProviderNames;
 
-   std::map<gc2DPlotTypes,long> Plot::plotType2DInstanceNumber;
    std::map<gc3DPlotTypes,long> Plot::plotType3DInstanceNumber;
 
    HANDLE Plot::globalPlotThread = NULL;
@@ -38,9 +41,7 @@
    HWND Plot::hwndSampleGraphic = NULL;
    HWND Plot::hwndSampleGraphicSurface = NULL;
 
-  int Plot::pCount = 0;
-
-  Plot::Plot(IUnknown *pUnkOuter)  :
+   Plot::Plot(IUnknown *pUnkOuter)  :
      refCount(0),
      currentPlotCount(0),
      pIUnknownOuter(pUnkOuter),
@@ -58,7 +59,6 @@
 
      propertyLineColor(NULL),
      propertyLineWeight(NULL),
-     lineWeight(DEFAULT_LINE_WEIGHT),
 
      adviseSink_dwAspect(0),
      adviseSink_advf(0),
@@ -129,7 +129,6 @@
 
    pIProperties -> Add(L"line weight",&propertyLineWeight);
    propertyLineWeight -> put_type(TYPE_LONG);
-   propertyLineWeight -> directAccess(TYPE_LONG,&lineWeight,sizeof(long));
 
    pIProperties -> Add(L"top surface color",&propertyTopSurfaceColor);
    propertyTopSurfaceColor -> put_type(TYPE_BINARY);
@@ -182,6 +181,10 @@
    hMenu = GetSubMenu(hMainMenu,0);
 
    if ( 1 == instanceCount ) {
+
+      pIProperties -> Add(L"plot types",&propertyPlotTypes);
+
+      InitNew();
 
       WNDCLASS aClass;
  
@@ -288,48 +291,6 @@
    CLSID clsid;
 
    long totalCount = 0;
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeNone] = NULL;
-   plotType2DProviderNames[gcPlotTypeNone] = "None";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeNatural] = NULL;
-   plotType2DProviderNames[gcPlotTypeNatural] = "Natural";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeStacks] = NULL;
-   plotType2DProviderNames[gcPlotTypeStacks] = "Histogram";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeBlocks] = NULL;
-   plotType2DProviderNames[gcPlotTypeBlocks] = "Blocks";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeBalls] = NULL;
-   plotType2DProviderNames[gcPlotTypeBalls] = "Balls";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypePie] = NULL;
-   plotType2DProviderNames[gcPlotTypePie] = "Pie";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeContour] = NULL;
-   plotType2DProviderNames[gcPlotTypeContour] = "Countour";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType2DProviderInstances[gcPlotTypeQuads] = NULL;
-   plotType2DProviderNames[gcPlotTypeQuads] = "Quads";
-
-#if 0
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType3DProviderInstances[gcPlotTypeSurface] = NULL;
-   plotType3DProviderNames[gcPlotTypeSurface] = "Surface";
-
-   plotTypeProviderGUIDs.push_back(new CLSID(GUID_NULL));
-   plotType3DProviderInstances[gcPlotTypeWireFrame] = NULL;
-   plotType3DProviderNames[gcPlotTypeWireFrame] = "WireFrame";
-#endif
 
    long external2DPlotType = (long)gcPlotType2DExternal1;
    long external3DPlotType = (long)gcPlotType3DExternal1;

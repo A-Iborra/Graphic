@@ -60,21 +60,121 @@
 
    p -> pIDataSetMaster -> ReSet();
 
-   IPlot *pPlot = (IPlot *)NULL;
+   p -> visiblePlotList.Empty();
+
+   if ( -1 == p -> currentPlotSourceID ) {
+
+      if ( p -> hwndDataSourcesTab ) {
+
+         long index = SendMessage(p -> hwndDataSourcesTab,TCM_GETCURSEL,0L,0L);
+
+         if ( -1 < index ) {
+
+            char szTemp[32];
+
+            TCITEM tcItem = {0};
+
+            tcItem.mask = TCIF_TEXT;
+            tcItem.pszText = szTemp;
+            tcItem.cchTextMax = 32;
+
+            SendMessage(p -> hwndDataSourcesTab,TCM_GETITEM,(WPARAM)index,(LPARAM)&tcItem);
+
+            if ( 0 == strcmp(szTemp,"Functions") ) {
+
+               index = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
+
+               tcItem.mask = TCIF_PARAM;
+
+               SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEM,(WPARAM)index,(LPARAM)&tcItem);
+
+               ContainedFunction *pContainedFunction = (ContainedFunction *)tcItem.lParam;
+
+               if ( pContainedFunction ) {
+
+                  IDataSet *pIDataSet = NULL;
+         
+                  pContainedFunction -> pFunction() -> get_IDataSet((void **)&pIDataSet);
+
+                  if ( pIDataSet ) {
+
+                     long countPoints = 0L;
+
+                     pIDataSet -> get_countPoints(&countPoints);
+
+                     if ( 0 == countPoints ) {
+
+                        pContainedFunction -> pFunction() -> Start();
+
+                        return 0;
+
+                     }
+
+                  }
+
+                  IPlot *pIPlot = NULL;
+
+                  pContainedFunction -> pFunction() -> get_IPlot((void **)&pIPlot);
+
+                  p -> currentPlotSourceID = p -> plotList.ID(pIPlot);
+
+               }
+
+            } else if ( 0 == strcmp(szTemp,"DataSets") ) {
+
+               index = SendMessage(p -> hwndDataSourcesDataSets,TCM_GETCURSEL,0L,0L);
+
+               tcItem.mask = TCIF_PARAM;
+
+               SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEM,(WPARAM)index,(LPARAM)&tcItem);
+
+               ContainedDataSet *pContainedDataSet = (ContainedDataSet *)tcItem.lParam;
+
+               if ( pContainedDataSet ) {
+
+                  long countPoints = 0L;
+
+                  pContainedDataSet -> pDataSet() -> get_countPoints(&countPoints);
+
+                  if ( 0 == countPoints ) {
+
+                     pContainedDataSet -> pDataSet() -> Start();
+
+                     return 0;
+                  }
+
+                  IPlot *pIPlot = NULL;
+
+                  pContainedDataSet -> pDataSet() -> get_IPlot((void **)&pIPlot);
+
+                  p -> currentPlotSourceID = p -> plotList.ID(pIPlot);
+
+               }
+
+            }
+
+         }
+
+      }
+
+   }
+
+   IPlot *pIPlot = (IPlot *)NULL;
 
    long allowedPlotCount = 0L;
 
-   while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+   while ( pIPlot = p -> plotList.GetNext(pIPlot) ) {
 
       long okayToPlot = false;
 
-      if ( p -> plotList.ID(pPlot) == p -> currentPlotSourceID )
+      if ( p -> plotList.ID(pIPlot) == p -> currentPlotSourceID )
          okayToPlot = TRUE;
       else
          okayToPlot = ( ! p -> autoClear || p -> currentPlotSourceID == 0 );
 
       IDataSet *pIDataSet = NULL;
-      pPlot -> get_IDataSet(&pIDataSet);
+
+      pIPlot -> get_IDataSet(&pIDataSet);
 
       if ( okayToPlot ) {
          DataPoint minPoint,maxPoint;
@@ -90,10 +190,13 @@
       if ( 0 == countPoints )
          okayToPlot = 0L;
 
-      pPlot -> put_OkToPlot(okayToPlot);
+      pIPlot -> put_OkToPlot(okayToPlot);
 
-      if ( okayToPlot )
+      if ( okayToPlot ) {
          allowedPlotCount++;
+         p -> visiblePlotList.Add(pIPlot);
+      }
+
    }
 
    if ( 0 == allowedPlotCount ) {
@@ -123,8 +226,7 @@
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
  
    p -> ActivateLighting();
-   //p -> pIOpenGLImplementation -> SetLighting(p -> ppPropertyLightOn,p -> ppPropertyAmbientLight,p -> ppPropertyDiffuseLight,p -> ppPropertySpecularLight,p -> ppPropertyLightPos,p -> propertyCountLights,p -> propertyShinyness);
- 
+
    p -> erase(); 
 
    ax = NULL;
@@ -152,16 +254,29 @@
    p -> pIOpenGLImplementation -> Finalize();
 
    if ( p -> showStatusBar ) {
-      char szText[MAX_PROPERTY_SIZE];
-      DataPoint dp[2];
-      p -> pIDataSetMaster -> GetDomain(&dp[0],&dp[1]);
 
-      if ( ! ( dp[0].x == -DBL_MAX ) && ! ( dp[0].y == -DBL_MAX ) && ! ( dp[0].z == -DBL_MAX ) &&
-            ! ( dp[1].x == DBL_MAX ) && ! ( dp[1].y == DBL_MAX ) && ! ( dp[1].z == DBL_MAX ) ) {
-         sprintf(szText,"Extents [ (%lf,%lf,%lf) <-> (%lf,%lf,%lf) ]",dp[0].x,dp[0].y,dp[0].z,dp[1].x,dp[1].y,dp[1].z);
-         p -> put_StatusText(0,szText);
-      } else
-         p -> put_StatusText(0,"Extents: infinite");
+      char szText[MAX_PROPERTY_SIZE];
+
+      char *pszExistingText = new char[MAX_PROPERTY_SIZE];
+
+      p -> get_StatusText(0,&pszExistingText);
+
+      if ( 0 == strcmp("Extents ",pszExistingText) || 2 > strlen(pszExistingText) ) {
+
+         DataPoint dp[2];
+         p -> pIDataSetMaster -> GetDomain(&dp[0],&dp[1]);
+
+         if ( ! ( dp[0].x == -DBL_MAX ) && ! ( dp[0].y == -DBL_MAX ) && ! ( dp[0].z == -DBL_MAX ) &&
+               ! ( dp[1].x == DBL_MAX ) && ! ( dp[1].y == DBL_MAX ) && ! ( dp[1].z == DBL_MAX ) ) {
+            sprintf(szText,"Extents [ (%lf,%lf,%lf) <-> (%lf,%lf,%lf) ]",dp[0].x,dp[0].y,dp[0].z,dp[1].x,dp[1].y,dp[1].z);
+            p -> put_StatusText(0,szText);
+         } else
+            p -> put_StatusText(0,"Extents: infinite");
+   
+      }
+
+      delete [] pszExistingText;
+
    }
 
    HANDLE *pt = p -> renderThreadList.GetLast();

@@ -277,10 +277,10 @@ import "ocidl.idl";
                            IGProperty *parentPropertyBackgroundColor,
                            IGProperty *parentPropertyFloor,
                            IGProperty *parentPropertyCeiling,
-                           [in] void (*pCallback)(void *),[in] void *pArg);
+                           [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
-      [propput,id(403)] HRESULT OnChangeCallback([in] void (*pCallback)(void *),[in] void *pArg);
+      [propput,id(403)] HRESULT OnChangeCallback([in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
 
       [helpstring("Returns whether any of the Controls for the function are visible, so that if not, the client does not have to display the function settings in it's UI")]
       [propget,id(404)] HRESULT AnyControlVisible([out,retval] VARIANT_BOOL *pAnyVisible);

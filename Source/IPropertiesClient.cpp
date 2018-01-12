@@ -101,6 +101,11 @@
 
    pParent -> propertyAxiis -> clearStorageObjects();
 
+   pParent -> propertyPlotServicesObject -> clearStorageObjects();
+   pParent -> propertyPlotServicesObject -> addStorageObject(pParent -> pIPlotServicesObject);
+   pParent -> propertyPlotServicesObject -> writeStorageObjects();
+   pParent -> propertyPlotServicesObject -> clearStorageObjects();
+
    return S_OK;
    }
 
@@ -117,7 +122,7 @@
    pParent -> autoClear = true;
 
    pParent -> plotView = gcPlotView3D;
-   pParent -> default2DPlotType = gcPlotTypeNatural;
+   pParent -> default2DPlotType = gcPlotTypeNone;
  
    pParent -> dataSetCount = 0;
    pParent -> textCount = 0;
@@ -383,6 +388,17 @@
 
    if ( pParent -> hwndFrame ) 
       pParent -> setDataSourcesVisibility(NULL,NULL);
+
+   pParent -> propertyPlotServicesObject -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+
+      pParent -> propertyPlotServicesObject -> clearStorageObjects();
+      pParent -> propertyPlotServicesObject -> addStorageObject(pParent -> pIPlotServicesObject);
+      pParent -> propertyPlotServicesObject -> readStorageObjects();
+      pParent -> propertyPlotServicesObject -> clearStorageObjects();
+
+   }
 
    return S_OK;
    }

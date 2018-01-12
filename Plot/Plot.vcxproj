@@ -136,17 +136,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\Common\source\utilities.cpp" />
     <ClCompile Include="..\..\Common\source\Utils.cpp" />
-    <ClCompile Include="IGSystemPlotType.cpp" />
-    <ClCompile Include="IGSystemPlotType_Surface.cpp" />
-    <ClCompile Include="IGSystemPlotType_WireFrame.cpp" />
     <ClCompile Include="IPlotServices.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="\Common\Utils\registryUtils.cpp" />
     <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
-    <ClCompile Include="balls.cpp" />
     <ClCompile Include="BasePlot.cpp" />
-    <ClCompile Include="blocks.cpp" />
     <ClCompile Include="colorHandler.cpp" />
     <ClCompile Include="COMImplementation.cpp" />
     <ClCompile Include="dimensionHandler.cpp" />
@@ -165,7 +160,6 @@
     <ClCompile Include="PlotHandler.cpp" />
     <ClCompile Include="Plotter.cpp" />
     <ClCompile Include="sampleGraphicHandler.cpp" />
-    <ClCompile Include="stacks.cpp" />
     <ClCompile Include="typeHandler.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -27,9 +27,8 @@
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
          p -> pIProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
          pIUnknown -> Release();
-         if ( p -> pWhenChangedCallback ) {
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
-         }
+         if ( p -> pWhenChangedCallback ) 
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          p -> hwndObjectWindow = NULL;
          DestroyWindow(hwnd);
          }
@@ -43,7 +42,7 @@
             p -> pIPlotNotify -> DeletePlot(pIPlot);
          }
          if ( p -> pWhenChangedCallback ) {
-            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg);
+            p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);
          }
          p -> hwndObjectWindow = NULL;
          DestroyWindow(hwnd);

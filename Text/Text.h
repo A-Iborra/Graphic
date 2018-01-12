@@ -151,7 +151,7 @@
      STDMETHOD(put_TextNotify)(ITextNotify *);
 
      STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty*,
-                              IGProperty*,IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *),void *pWhenChangedArg);
+                              IGProperty*,IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
@@ -288,8 +288,9 @@
      IOpenGLImplementation *pIOpenGLImplementation;
      IEvaluator *pIEvaluator;
 
-     void (__stdcall *pWhenChangedCallback)(void *);
+     void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
      void *pWhenChangedCallbackArg;
+     ULONG_PTR whenChangedCallbackCookie;
 
      IBasePlot *pIBasePlot;
      IBasePlot *pIBasePlotBoundingBox;

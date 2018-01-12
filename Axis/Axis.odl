@@ -199,7 +199,7 @@ library Axis {
                               [in] IGProperty* pIPropertyPlotView, 
                               [in] IGProperty* pPropertyFloor,[in] IGProperty *pPropertyCeiling,
                               [in] IGProperty* pPropertyOpenGLText,
-                              [in] IDataSet* pIDomainDataSet,[in] IOpenGLImplementation*,[in] IEvaluator*,[in] void (*pWhenChangedCallback)(void *),void *pWhenChangedArg);
+                              [in] IDataSet* pIDomainDataSet,[in] IOpenGLImplementation*,[in] IEvaluator*,[in] void (*pWhenChangedCallback)(void *pvArg,ULONG_PTR cookie),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
       [propget,id(axisMethodGetDataSet),helpstring("Retrieve a pointer to the axis dataset")]
       HRESULT DataSet([out,retval] IDataSet **);

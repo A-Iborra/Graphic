@@ -11,26 +11,35 @@
 #include "utils.h"
 #include "utilities.h"
 
-#define SET_TYPES_2D \
-   for ( std::pair<long,HWND> pPair : type2DToCheckBox ) \
-      SendMessage(pPair.second,BM_SETCHECK,(long)pPair.first & (long)pType2D ? BST_CHECKED : BST_UNCHECKED,0L);
+#define SET_TYPES_2D                                                                                              \
+for ( std::pair<long,HWND> pPair : type2DToCheckBox ) {                                                           \
+   long isSelected = (long)pPair.first & (long)pType2D;                                                           \
+   SendMessage(pPair.second,BM_SETCHECK,isSelected ? BST_CHECKED : BST_UNCHECKED,0L);                             \
+   HWND hwndProperties = type2DToProperties[pPair.first];                                                         \
+   if ( ! isSelected ) {                                                                                          \
+      ShowWindow(hwndProperties,SW_HIDE);                                                                         \
+      InvalidateRect(hwndPaneHosts[0],NULL,TRUE);                                                                 \
+      continue;                                                                                                   \
+   }                                                                                                              \
+   ShowWindow(hwndProperties,SW_SHOW);                                                                            \
+}
 
 #define SET_TYPES_3D \
-   for ( std::pair<long,HWND> pPair : type3DToCheckBox ) \
-      SendMessage(pPair.second,BM_SETCHECK,(long)pPair.first & (long)pType3D ? BST_CHECKED : BST_UNCHECKED,0L);
+for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                                                           \
+   long isSelected = (long)pPair.first & (long)pType3D;                                                           \
+   SendMessage(pPair.second,BM_SETCHECK,isSelected ? BST_CHECKED : BST_UNCHECKED,0L);                             \
+   HWND hwndProperties = type3DToProperties[pPair.first];                                                         \
+   if ( ! isSelected ) {                                                                                          \
+      ShowWindow(hwndProperties,SW_HIDE);                                                                         \
+      InvalidateRect(hwndPaneHosts[1],NULL,TRUE);                                                                 \
+      continue;                                                                                                   \
+   }                                                                                                              \
+   ShowWindow(hwndProperties,SW_SHOW);                                                                            \
+}
 
-   HWND hwndScrollPanes[] = {NULL,NULL,NULL};
    HWND hwndScrollBars[] = {NULL,NULL,NULL};
-
-   HWND hwnd2DTypesScrollPane = NULL;
-   HWND hwnd2DTypesPaneHost = NULL;
-   HWND hwnd2DTypesScrollBar = NULL;
-
-   HWND hwnd3DTypesScrollPane = NULL;
-   HWND hwnd3DTypesPaneHost = NULL;
-   HWND hwnd3DTypesScrollBar = NULL;
-
    HWND hwndPaneHosts[] = {NULL,NULL,NULL};
+   HWND hwndScrollPanes[] = {NULL,NULL,NULL};
 
    long max2DTypeControlId = 0;
 
@@ -39,8 +48,14 @@
    bool needsToScroll[] = {false,false,false};
 
    std::map<long,long> controlIdToType;
+   std::map<long,long> controlIdToTypeInstanceNumber;
    static std::map<long,HWND> type2DToCheckBox;
    static std::map<long,HWND> type3DToCheckBox;
+   static std::map<long,HWND> type2DToProperties;
+   static std::map<long,HWND> type3DToProperties;
+
+   std::list<IGSystemPlotType *> needingRelease2D;
+   std::list<IGSystemPlotType *> needingRelease3D;
 
    LRESULT CALLBACK scrollPaneHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
@@ -99,18 +114,22 @@
 
       SetWindowPos(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS),HWND_TOP,0,0,0,0,SWP_NOSIZE | SWP_NOMOVE);
 
-      hwndScrollPanes[0] = hwnd2DTypesScrollPane = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_PANE);
-      hwndScrollPanes[1] = hwnd3DTypesScrollPane = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_PANE);
+      hwndScrollPanes[0] = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_PANE);
+      hwndScrollPanes[1] = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_PANE);
 
-      hwndScrollBars[0] = hwnd2DTypesScrollBar = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_BAR);
-      hwndScrollBars[1] = hwnd3DTypesScrollBar = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_BAR);
+      hwndScrollBars[0] = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_2D_TYPES_SCROLL_BAR);
+      hwndScrollBars[1] = GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_3D_TYPES_SCROLL_BAR);
 
       SAFEARRAY *p2DTypeIDs,*p2DTypeNames,*p3DTypeIDs,*p3DTypeNames;
+      SAFEARRAY *p2DTypeInstances,*p3DTypeInstances;
+      SAFEARRAY *p2DTypeInstanceNumbers,*p3DTypeInstanceNumbers;
 
-      p -> pIPlotServicesObject -> GetPlotTypesInformation(&p2DTypeIDs,&p3DTypeIDs,&p2DTypeNames,&p3DTypeNames);
+      p -> pIPlotServicesObject -> GetPlotTypesInformation(&p2DTypeIDs,&p3DTypeIDs,&p2DTypeNames,&p3DTypeNames,&p2DTypeInstanceNumbers,&p3DTypeInstanceNumbers,&p2DTypeInstances,&p3DTypeInstances);
 
       long *pvIDs = NULL;
       BSTR *pvNames = NULL;
+      IUnknown **pvIUnknowns = NULL;
+      long *pvInstanceNumbers = NULL;
 
       long count2DTypes = 0;
 
@@ -118,34 +137,78 @@
 
       SafeArrayAccessData(p2DTypeIDs,reinterpret_cast<void **>(&pvIDs));
       SafeArrayAccessData(p2DTypeNames,reinterpret_cast<void **>(&pvNames));
+      SafeArrayAccessData(p2DTypeInstanceNumbers,reinterpret_cast<void **>(&pvInstanceNumbers));
+      SafeArrayAccessData(p2DTypeInstances,reinterpret_cast<void **>(&pvIUnknowns));
 
       std::list<long> type2DIds;
       std::list<char *> type2DNames;
+      std::list<IGSystemPlotType *> typePropertyInstance2D;
+
+      needingRelease2D.clear();
+
+      long controlId = IDDI_PLOT_TYPE_2D_MIN;
 
       for ( long k = 0; k < count2DTypes; k++ ) {
+
          type2DIds.push_back(pvIDs[k]);
+
          long n = wcslen(pvNames[k]);
+
          char *pszTemp = new char[n + 1];
+
          pszTemp[n] = '\0';
+
          WideCharToMultiByte(CP_ACP,0,pvNames[k],-1,pszTemp,n,0,0);
+
          type2DNames.push_back(pszTemp);
+
+         IGSystemPlotType *pIGSystemPlotType = NULL;
+
+         pvIUnknowns[k] -> QueryInterface(IID_IGSystemPlotType,reinterpret_cast<void **>(&pIGSystemPlotType));
+
+         VARIANT_BOOL hasProperties = VARIANT_FALSE;
+
+         pIGSystemPlotType -> get_HasProperties(pvInstanceNumbers[k],&hasProperties);
+
+         needingRelease2D.push_back(pIGSystemPlotType);
+
+         if ( VARIANT_FALSE == hasProperties )
+            pIGSystemPlotType = NULL;
+
+         controlIdToTypeInstanceNumber[controlId] = pvInstanceNumbers[k];
+
+         typePropertyInstance2D.push_back(pIGSystemPlotType);
+
+         controlId++;
+
       }
 
       SafeArrayUnaccessData(p2DTypeIDs);
       SafeArrayUnaccessData(p2DTypeNames);
+      SafeArrayUnaccessData(p2DTypeInstanceNumbers);
+      SafeArrayUnaccessData(p2DTypeInstances);
 
       SafeArrayDestroy(p2DTypeIDs);
       SafeArrayDestroy(p2DTypeNames);
+      SafeArrayDestroy(p2DTypeInstanceNumbers);
+      SafeArrayDestroy(p2DTypeInstances);
 
       long count3DTypes = 0;
 
       SafeArrayGetUBound(p3DTypeIDs,1,&count3DTypes);
 
       SafeArrayAccessData(p3DTypeIDs,reinterpret_cast<void **>(&pvIDs));
+      SafeArrayAccessData(p3DTypeInstanceNumbers,reinterpret_cast<void **>(&pvInstanceNumbers));
       SafeArrayAccessData(p3DTypeNames,reinterpret_cast<void **>(&pvNames));
+      SafeArrayAccessData(p3DTypeInstances,reinterpret_cast<void **>(&pvIUnknowns));
 
       std::list<long> type3DIds;
       std::list<char *> type3DNames;
+      std::list<IGSystemPlotType *> typePropertyInstance3D;
+
+      needingRelease3D.clear();
+
+      controlId = IDDI_PLOT_TYPE_3D_MIN;
 
       for ( long k = 0; k < count3DTypes; k++ ) {
          type3DIds.push_back(pvIDs[k]);
@@ -154,15 +217,39 @@
          pszTemp[n] = '\0';
          WideCharToMultiByte(CP_ACP,0,pvNames[k],-1,pszTemp,n,0,0);
          type3DNames.push_back(pszTemp);
+
+         IGSystemPlotType *pIGSystemPlotType = NULL;
+
+         pvIUnknowns[k] -> QueryInterface(IID_IGSystemPlotType,reinterpret_cast<void **>(&pIGSystemPlotType));
+
+         VARIANT_BOOL hasProperties = VARIANT_FALSE;
+
+         pIGSystemPlotType -> get_HasProperties(pvInstanceNumbers[k],&hasProperties);
+
+         needingRelease3D.push_back(pIGSystemPlotType);
+
+         if ( VARIANT_FALSE == hasProperties )
+            pIGSystemPlotType = NULL;
+
+         controlIdToTypeInstanceNumber[controlId] = pvInstanceNumbers[k];
+
+         typePropertyInstance3D.push_back(pIGSystemPlotType);
+
+         controlId++;
+
       }
 
       SafeArrayUnaccessData(p3DTypeIDs);
+      SafeArrayUnaccessData(p3DTypeInstanceNumbers);
       SafeArrayUnaccessData(p3DTypeNames);
+      SafeArrayUnaccessData(p3DTypeInstances);
 
       SafeArrayDestroy(p3DTypeIDs);
       SafeArrayDestroy(p3DTypeNames);
+      SafeArrayDestroy(p3DTypeInstanceNumbers);
+      SafeArrayDestroy(p3DTypeInstances);
 
-      long controlId = IDDI_PLOT_TYPE_2D_MIN;
+      controlId = IDDI_PLOT_TYPE_2D_MIN;
 
       RECT rcCheckbox,rcParent;
       GetWindowRect(hwnd,&rcParent);
@@ -171,7 +258,7 @@
       long cxCheckbox = rcCheckbox.right - rcCheckbox.left;
       long cyCheckbox = rcCheckbox.bottom - rcCheckbox.top;
       long xCheckbox = rcCheckbox.left - rcParent.left;
-      long yCheckbox = 0;
+      long yCheckbox = 4;
 
       HFONT hGUIFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
 
@@ -191,6 +278,20 @@
 
          delete [] pszTemp;
 
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[0],(HMENU)(controlId + 1000),hModule,NULL);
+
+         ShowWindow(hwndProperties,SW_HIDE);
+
+         IGSystemPlotType *pIGSystemPlotType = typePropertyInstance2D.front();
+
+         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)pIGSystemPlotType);
+
+         SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
+
+         type2DToProperties[controlIdToType[controlId]] = hwndProperties;
+
+         typePropertyInstance2D.pop_front();
+
          yCheckbox += cyCheckbox + 8;
 
          max2DTypeControlId = controlId;
@@ -199,9 +300,9 @@
 
       }
 
-      GetWindowRect(hwnd2DTypesScrollPane,&rcCheckbox);
+      GetWindowRect(hwndScrollPanes[0],&rcCheckbox);
 
-      SetWindowPos(hwnd2DTypesScrollPane,HWND_TOP,0,0,rcCheckbox.right - rcCheckbox.left,yCheckbox,SWP_NOMOVE);
+      SetWindowPos(hwndScrollPanes[0],HWND_TOP,0,0,rcCheckbox.right - rcCheckbox.left,yCheckbox,SWP_NOMOVE);
 
       controlId = IDDI_PLOT_TYPE_3D_MIN;
 
@@ -210,7 +311,7 @@
       cxCheckbox = rcCheckbox.right - rcCheckbox.left;
       cyCheckbox = rcCheckbox.bottom - rcCheckbox.top;
       xCheckbox = rcCheckbox.left - rcParent.left;
-      yCheckbox = 0;
+      yCheckbox = 4;
 
       while ( 0 < type3DNames.size() ) {
 
@@ -230,36 +331,55 @@
 
          max3DTypeControlId = controlId;
 
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[1],(HMENU)(controlId + 1000),hModule,NULL);
+
+         ShowWindow(hwndProperties,SW_HIDE);
+         IGSystemPlotType *pIGSystemPlotType = typePropertyInstance3D.front();
+
+         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)pIGSystemPlotType);
+
+         SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
+
+         type3DToProperties[controlIdToType[controlId]] = hwndProperties;
+
+         typePropertyInstance3D.pop_front();
+
          controlId++;
 
          yCheckbox += cyCheckbox + 8;
 
       }
 
-      GetWindowRect(hwnd3DTypesScrollPane,&rcCheckbox);
+      GetWindowRect(hwndScrollPanes[1],&rcCheckbox);
 
-      SetWindowPos(hwnd3DTypesScrollPane,HWND_TOP,0,0,rcCheckbox.right - rcCheckbox.left,yCheckbox,SWP_NOMOVE);
+      SetWindowPos(hwndScrollPanes[1],HWND_TOP,0,0,rcCheckbox.right - rcCheckbox.left,yCheckbox,SWP_NOMOVE);
 
-      hwndPaneHosts[0] = hwnd2DTypesPaneHost = CreateWindowEx(0,"STATIC","",WS_VISIBLE | WS_CHILD,0,0,0,0,hwnd,NULL,hModule,(void *)p);
-      hwndPaneHosts[1] = hwnd3DTypesPaneHost = CreateWindowEx(0,"STATIC","",WS_VISIBLE | WS_CHILD,0,0,0,0,hwnd,NULL,hModule,(void *)p);
+      hwndPaneHosts[0] = CreateWindowEx(0,"STATIC","",WS_VISIBLE | WS_CHILD,0,0,0,0,hwnd,NULL,hModule,(void *)p);
+      hwndPaneHosts[1] = CreateWindowEx(0,"STATIC","",WS_VISIBLE | WS_CHILD,0,0,0,0,hwnd,NULL,hModule,(void *)p);
 
-      SetParent(hwnd2DTypesScrollPane,hwnd2DTypesPaneHost);
-      SetWindowPos(hwnd2DTypesScrollPane,HWND_TOP,0,0,0,0,SWP_NOSIZE);
+      SetParent(hwndScrollPanes[0],hwndPaneHosts[0]);
+      SetWindowPos(hwndScrollPanes[0],HWND_TOP,0,0,0,0,SWP_NOSIZE);
 
-      SetWindowLongPtr(hwnd2DTypesScrollPane,GWLP_USERDATA,(ULONG_PTR)p);
-      SetWindowLongPtr(hwnd2DTypesScrollPane,GWLP_WNDPROC,(ULONG_PTR)scrollPaneHandler);
+      SetWindowLongPtr(hwndScrollPanes[0],GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(hwndScrollPanes[0],GWLP_WNDPROC,(ULONG_PTR)scrollPaneHandler);
 
-      SetParent(hwnd3DTypesScrollPane,hwnd3DTypesPaneHost);
-      SetWindowPos(hwnd3DTypesScrollPane,HWND_TOP,0,0,0,0,SWP_NOSIZE);
+      SetParent(hwndScrollPanes[1],hwndPaneHosts[1]);
+      SetWindowPos(hwndScrollPanes[1],HWND_TOP,0,0,0,0,SWP_NOSIZE);
 
-      SetWindowLongPtr(hwnd3DTypesScrollPane,GWLP_USERDATA,(ULONG_PTR)p);
-      SetWindowLongPtr(hwnd3DTypesScrollPane,GWLP_WNDPROC,(ULONG_PTR)scrollPaneHandler);
+      SetWindowLongPtr(hwndScrollPanes[1],GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(hwndScrollPanes[1],GWLP_WNDPROC,(ULONG_PTR)scrollPaneHandler);
 
       }
       return LRESULT(FALSE);
  
    case WM_DESTROY:
       p -> hwndSampleGraphic = NULL;
+      for ( IGSystemPlotType *ppt : needingRelease2D )
+         ppt -> Release();
+      needingRelease2D.clear();
+      for ( IGSystemPlotType *ppt : needingRelease3D )
+         ppt -> Release();
+      needingRelease3D.clear();
       break;
 
    case WM_SHOWWINDOW: {
@@ -269,6 +389,9 @@
 
       if ( lParam )
          break;
+
+      if ( ! ( GetParent(hwndSampleGraphic) == hwnd ) )
+         SetParent(hwndSampleGraphic,hwnd);
 
       SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_DELETEALLITEMS,0L,(LPARAM)0L);
 
@@ -294,8 +417,6 @@
          SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
       }
 
-      SetParent(hwndSampleGraphic,hwnd);
-
       RECT rcSample,rcDialog;
       GetWindowRect(hwnd,&rcDialog);
       GetWindowRect(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SAMPLE),&rcSample);
@@ -315,11 +436,18 @@
 
       rcTabs.bottom = rcDialog.bottom - 24;
 
-      SetWindowPos(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_DEFAULTS_BOX),HWND_TOP,0,0,rcTabs.right - rcTabs.left + 16,rcTabs.bottom - rcTabs.top + 32,SWP_NOMOVE);
+      //SetWindowPos(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_DEFAULTS_BOX),HWND_TOP,0,0,rcTabs.right - rcTabs.left + 16,rcTabs.bottom - rcTabs.top + 32,SWP_NOMOVE);
 
       SetWindowPos(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS),HWND_TOP,0,0,rcTabs.right - rcTabs.left,rcTabs.bottom - rcTabs.top,SWP_NOMOVE);
 
       long cxScroll = GetSystemMetrics(SM_CXVSCROLL);
+
+      long currentIndex = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_GETCURSEL,0L,0L);
+
+      if ( -1 == currentIndex ) {
+         SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_SETCURSEL,0L,0L);
+         currentIndex = 0;
+      }
 
       for ( long k = 0; 1; k++ ) {
 
@@ -327,6 +455,7 @@
             break;
 
          SetWindowPos(hwndPaneHosts[k],HWND_TOP,rcTabs.left - rcDialog.left + 8,rcTabs.top - rcDialog.top + 32,rcTabs.right - rcTabs.left - 16 - cxScroll,rcTabs.bottom - rcTabs.top - 32 - 8,0L);
+
          SetWindowPos(hwndScrollBars[k],HWND_TOP,rcTabs.right - rcDialog.left - cxScroll - 4,rcTabs.top - rcDialog.top + 32,GetSystemMetrics(SM_CXVSCROLL),rcTabs.bottom - rcTabs.top - 32 - 8,0L);
 
          RECT rcPane;
@@ -346,21 +475,16 @@
          SendMessage(hwndScrollBars[k],SBM_SETSCROLLINFO,(WPARAM)TRUE,(LPARAM)&si);
          SendMessage(hwndScrollBars[k],SBM_ENABLE_ARROWS,(WPARAM)ESB_DISABLE_UP,0L);
 
-         ShowWindow(hwndScrollPanes[k],SW_SHOW);
+         if ( ! ( k == currentIndex ) ) 
+            ShowWindow(hwndPaneHosts[k],SW_HIDE);
 
-         ShowWindow(hwndPaneHosts[k],SW_HIDE);
          ShowWindow(hwndScrollBars[k],SW_HIDE);
 
       }
 
-      long currentIndex = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_GETCURSEL,0L,0L);
-
-      if ( -1 == currentIndex ) {
-         SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_SETCURSEL,0L,0L);
-         currentIndex = 0;
-      }
-
       ShowWindow(hwndPaneHosts[currentIndex],SW_SHOW);
+      ShowWindow(hwndScrollPanes[currentIndex],SW_SHOW);
+
       if ( needsToScroll[currentIndex] )
          ShowWindow(hwndScrollBars[currentIndex],SW_SHOW);
 
@@ -414,14 +538,14 @@
 
       HWND hwndScrollBar = (HWND)lParam;
 
-      if ( ! ( hwndScrollBar == hwnd2DTypesScrollBar ) && ! ( hwndScrollBar == hwnd3DTypesScrollBar ) ) 
+      if ( ! ( hwndScrollBar == hwndScrollBars[0] ) && ! ( hwndScrollBar == hwndScrollBars[1] ) ) 
          return LRESULT(FALSE);
 
       if ( LOWORD(wParam) == SB_ENDSCROLL ) 
          return LRESULT(FALSE);
 
       long sbIndex = 0;
-      if ( hwndScrollBar == hwnd3DTypesScrollBar )
+      if ( hwndScrollBar == hwndScrollBars[1] )
          sbIndex = 1;
 
       SCROLLINFO si;
@@ -479,6 +603,8 @@
          else
             p -> default2DPlotType = (gc2DPlotTypes)((long)p -> default2DPlotType & ( ~ controlIdToType[controlID]));
 
+         G::plotHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
          break;
 
       }
@@ -490,8 +616,34 @@
          else
             p -> default3DPlotType = (gc3DPlotTypes)((long)p -> default3DPlotType & ( ~ controlIdToType[controlID]));
 
+         G::plotHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
          break;
 
+      }
+
+      if ( (IDDI_PLOT_TYPE_2D_MIN + 1000) <= controlID && controlID <= (max2DTypeControlId + 1000) ) {
+
+         ((IGSystemPlotType *)GetWindowLongPtr((HWND)lParam,GWLP_USERDATA)) -> 
+            ShowProperties(controlIdToTypeInstanceNumber[controlID - 1000],hwnd,GUID_NULL,NULL,NULL,0);
+
+         G::plotHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
+         InvalidateRect(hwndSampleGraphic,NULL,TRUE);
+
+         break;
+      }
+
+      if ( (IDDI_PLOT_TYPE_3D_MIN + 1000) <= controlID && controlID <= (max3DTypeControlId + 1000) ) {
+
+         ((IGSystemPlotType *)GetWindowLongPtr((HWND)lParam,GWLP_USERDATA)) -> 
+            ShowProperties(controlIdToTypeInstanceNumber[controlID - 1000],hwnd,GUID_NULL,NULL,NULL,0);
+
+         G::plotHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
+         InvalidateRect(hwndSampleGraphic,NULL,TRUE);
+
+         break;
       }
 
       switch ( LOWORD(wParam) ) {
@@ -513,11 +665,13 @@
             break;
          }
          for ( int k = 0; k < itemCount; k++ ) {
+
             memset(&lvItem,0,sizeof(LVITEM));
             lvItem.iItem = k;
             lvItem.mask = LVIF_STATE | LVIF_PARAM;
             lvItem.stateMask = LVIS_SELECTED;
             SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEM,0L,(LPARAM)&lvItem);
+
             if ( lvItem.state && LVIS_SELECTED ) {
 
                IPlot * pIPlot = (IPlot *)lvItem.lParam;
@@ -537,7 +691,11 @@
                   lvItem.pszText = szTemp;
                   SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_SETITEM,0L,(LPARAM)&lvItem);
                }
-               break;
+
+               G::plotHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
+               SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_SETITEM,0L,(LPARAM)&lvItem);
+
             }
          }
          }
