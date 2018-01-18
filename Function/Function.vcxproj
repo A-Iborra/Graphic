@@ -177,6 +177,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>N_EMBEDDED_PROPERTIES;N_EMBEDDED_EVALUATOR;N_EMBEDDED_VARIABLES;_WIN32_DCOM;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderOutputFile>.\Function.pch</PrecompiledHeaderOutputFile>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>
