@@ -55,11 +55,24 @@
 
 
    int BasePlot::ReplaceDataSet(IDataSet *newDataSet) {
-   if ( pIDataSet) pIDataSet -> Release();
+
+   if ( pIDataSet) 
+      pIDataSet -> Release();
+
    pIDataSet = newDataSet;
-   if ( pIDataSet) pIDataSet -> AddRef();
-   pIDataSet -> put_floor(pPropertyFloor);
-   pIDataSet -> put_ceiling(pPropertyCeiling);
+
+   if ( pIDataSet )
+      pIDataSet -> AddRef();
+
+   pIDataSet -> put_XFloor(pPropertyXFloor);
+   pIDataSet -> put_XCeiling(pPropertyXCeiling);
+
+   pIDataSet -> put_YFloor(pPropertyYFloor);
+   pIDataSet -> put_YCeiling(pPropertyYCeiling);
+
+   pIDataSet -> put_ZFloor(pPropertyZFloor);
+   pIDataSet -> put_ZCeiling(pPropertyZCeiling);
+
    return TRUE;
    }
  

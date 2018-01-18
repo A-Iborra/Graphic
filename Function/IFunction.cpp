@@ -590,8 +590,9 @@
                                           IGProperty *parentPropertyDefault2DPlotSubType,
                                           IGProperty *parentPropertyDefault3DPlotSubType,
                                           IGProperty *parentPropertyBackgroundColor,
-                                          IGProperty *parentPropertyFloor,
-                                          IGProperty *parentPropertyCeiling,
+                                          IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                                          IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                                          IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                                           void (__stdcall *pCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR callbackCookie) {
 
    pIPlot -> put_IDataSet(pIDataSet);
@@ -603,7 +604,11 @@
    whenChangedCallbackCookie = callbackCookie;
 
    HRESULT rc = pIPlot -> Initialize(pIDataSet_Domain,pIOpenGLImplementation,evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
-                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg,callbackCookie);
+                                       parentPropertyBackgroundColor,
+                                       parentPropertyXFloor,parentPropertyXCeiling,
+                                       parentPropertyYFloor,parentPropertyYCeiling,
+                                       parentPropertyZFloor,parentPropertyZCeiling,
+                                       pCallback,pArg,callbackCookie);
 
    pIDataSet -> put_IsFunctionSource(TRUE);
    BSTR bstrExpression;

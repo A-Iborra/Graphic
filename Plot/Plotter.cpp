@@ -46,7 +46,9 @@
             if ( ! ( plotTypes & pPair.first ) )
                continue;
 
-            pPair.second -> Execute(plotType2DInstanceNumber[pPair.first],segmentID,(void *)pThis -> pIPlots[plotIndex],(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
+            pPair.second -> Execute(plotType2DInstanceNumber[pPair.first],
+                                          p -> overrideOwnerType ? p -> plotType2DInstanceGUIDS[(long)pPair.first] : GUID_NULL,
+                                          segmentID,(void *)pThis -> pIPlots[plotIndex],(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
 
          }
 
@@ -82,7 +84,9 @@
          if ( ! ( plotTypes & pPair.first ) )
             continue;
 
-         pPair.second -> Execute(plotType3DInstanceNumber[pPair.first],segmentID,(void *)pThis -> pIPlots[plotIndex],(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
+         pPair.second -> Execute(plotType3DInstanceNumber[pPair.first],
+                                    p -> overrideOwnerType ? p -> plotType3DInstanceGUIDS[(long)pPair.first] : GUID_NULL,
+                                    segmentID,(void *)pThis -> pIPlots[plotIndex],(void *)p -> pIOpenGLImplementation,(void *)p -> pIDataSet);
 
       }
 

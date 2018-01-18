@@ -2,11 +2,12 @@
 #include "PlotTypes.h"
 #include "utils.h"
 
-   void PlotTypes::surface(long segmentID) {
+   void PlotTypes::surface(commonProperties *pProperties,long segmentID) {
    
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;
    DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
+   DataPoint centerPoint;
    int endOfData,kAccross;
 
    double xProd0[3],xProd1[3],xProd2[3],avgNormal[5][4];
@@ -19,7 +20,9 @@
    dl = (DataList *)NULL;
 
    pIDataSet -> get(dl,&firstPoint,&dl);
-   
+
+   pIOpenGLImplementation -> BeginOpenGLMode(GL_QUADS);
+      
    while ( dl ) {
          
       dlNext = dl;
@@ -71,10 +74,7 @@
       xProd1[2] = v[3].z - v[0].z;
 
       VxV(xProd0,xProd1,xProd2);
-      unitVector(xProd2,xProd0);
-      avgNormal[0][0] = xProd0[0];
-      avgNormal[0][1] = xProd0[1];
-      avgNormal[0][2] = xProd0[2];
+      unitVector(xProd2,avgNormal[0]);
     
       xProd0[0] = v[2].x - v[1].x; // x-product of the vector from 1->2 with 1->0
       xProd0[1] = v[2].y - v[1].y;
@@ -84,10 +84,7 @@
       xProd1[2] = v[0].z - v[1].z;
 
       VxV(xProd0,xProd1,xProd2);
-      unitVector(xProd2,xProd0);
-      avgNormal[1][0] = xProd0[0];
-      avgNormal[1][1] = xProd0[1];
-      avgNormal[1][2] = xProd0[2];
+      unitVector(xProd2,avgNormal[1]);
     
       xProd0[0] = v[3].x - v[2].x; // x-product of the vector from 2->3 with 2->1
       xProd0[1] = v[3].y - v[2].y;
@@ -97,10 +94,7 @@
       xProd1[2] = v[1].z - v[2].z;
 
       VxV(xProd0,xProd1,xProd2);
-      unitVector(xProd2,xProd0);
-      avgNormal[2][0] = xProd0[0];
-      avgNormal[2][1] = xProd0[1];
-      avgNormal[2][2] = xProd0[2];
+      unitVector(xProd2,avgNormal[2]);
     
       xProd0[0] = v[0].x - v[3].x; // x-product of the vector from 3->0 with 3->2
       xProd0[1] = v[0].y - v[3].y;
@@ -110,10 +104,7 @@
       xProd1[2] = v[2].z - v[3].z;
 
       VxV(xProd0,xProd1,xProd2);
-      unitVector(xProd2,xProd0);
-      avgNormal[3][0] = xProd0[0];
-      avgNormal[3][1] = xProd0[1];
-      avgNormal[3][2] = xProd0[2];
+      unitVector(xProd2,avgNormal[3]);
 
       avgNormal[4][0] = 0.0;
       avgNormal[4][1] = 0.0;
@@ -128,18 +119,17 @@
       }
 
       pIOpenGLImplementation -> Normal3dv(avgNormal[4]);
-      for ( int vk = 0; vk < 4; vk++ ) {
-         //pIOpenGLImplementation -> Normal3dv(avgNormal[vk]);
+
+      for ( int vk = 0; vk < 4; vk++ ) 
          pIOpenGLImplementation -> Vertex(&v[vk]);
-      }
 
       kAccross++;
    
       pIDataSet -> get(dl,&firstPoint,&dl);
     
    }
-    
-   pIOpenGLImplementation -> EndSurface(segmentID);
-   
+
+   pIOpenGLImplementation -> CloseSegment(segmentID,TRUE);   
+
    return;
    }

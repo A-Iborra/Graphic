@@ -1,7 +1,7 @@
 
 #include "PlotTypes.h"
 
-   void PlotTypes::wireFrame(long segmentID) {
+   void PlotTypes::wireFrame(commonProperties *pProperties,long segmentID) {
 
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;

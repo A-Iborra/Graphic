@@ -300,6 +300,8 @@
 
       STDMETHOD(Normal3dv)(double *normal);
  
+      STDMETHOD(SetColor3dv)(double *v);
+
 // Selection ? 
       STDMETHOD(GetPickBoxHits)(POINTL *,long,unsigned int *,long,long *,unsigned int *);
  

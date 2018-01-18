@@ -133,7 +133,10 @@ library Plot {
      HRESULT Destroy();
 
      HRESULT Initialize(IDataSet *pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
-                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,IGProperty *pIPropertyFloor,IGProperty *pIPropertyCeiling);
+                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+                           IGProperty *pIPropertyXFloor,IGProperty *pIPropertyXCeiling,
+                           IGProperty *pIPropertyYFloor,IGProperty *pIPropertyYCeiling,
+                           IGProperty *pIPropertyZFloor,IGProperty *pIPropertyZCeiling);
 
      HRESULT Erase();
 
@@ -272,8 +275,9 @@ library Plot {
                            IGProperty *parentPropertyDefault2DPlotSubType,
                            IGProperty *parentPropertyDefault3DPlotSubType,
                            IGProperty *parentPropertyBackgroundColor,
-                           IGProperty *parentPropertyFloor,
-                           IGProperty *parentPropertyCeiling,
+                           IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                           IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                           IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                            [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
 
      HRESULT PrepareForData();

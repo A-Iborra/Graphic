@@ -55,7 +55,10 @@
 
 
    HRESULT Text::Initialize(HWND ho,IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
-                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,
+                              IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
+                              IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
+                              IGProperty* pPropZFloor,IGProperty* pPropZCeiling,
+                              IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,
                                     void (__stdcall *pWhenChanged)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR changedCallbackCookie) {
  
    hwndOwner = ho;
@@ -80,16 +83,23 @@
    }
 
    if ( doOpenGLRendering ) {
+
       pIBasePlot -> Initialize(pIDataSetWorld,pIOpenGLImplementation,pIEvaluator,
-                                 propertyTextColor,propertyLineWeight,pPropFloor,pPropCeiling);
+                                 propertyTextColor,propertyLineWeight,
+                                 pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
+
       pIBasePlotBoundingBox -> Initialize(pIDataSetWorld,pIOpenGLImplementation,pIEvaluator,
-                                             propertyTextColor,propertyLineWeight,pPropFloor,pPropCeiling);
+                                             propertyTextColor,propertyLineWeight,
+                                             pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
+
    } else {
       pIBasePlot -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
-                                 propertyTextColor,propertyLineWeight,pPropFloor,pPropCeiling);
+                                 propertyTextColor,propertyLineWeight,
+                                 pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
 
       pIBasePlotBoundingBox -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
-                                             propertyTextColor,propertyLineWeight,pPropFloor,pPropCeiling);
+                                             propertyTextColor,propertyLineWeight,
+                                             pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
    }
 
    pIBasePlot -> get_IDataSet(&pIDataSet);

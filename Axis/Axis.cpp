@@ -30,10 +30,16 @@
      pIOpenGLImplementation(NULL),
      pIEvaluator(NULL),
      pIGSystemStatusBar(NULL),
+
      pParentPropertyPlotView(NULL),
-     pParentPropertyFloor(NULL),
-     pParentPropertyCeiling(NULL),
+     pParentPropertyXFloor(NULL),
+     pParentPropertyXCeiling(NULL),
+     pParentPropertyYFloor(NULL),
+     pParentPropertyYCeiling(NULL),
+     pParentPropertyZFloor(NULL),
+     pParentPropertyZCeiling(NULL),
      pParentPropertyOpenGLText(NULL),
+
      pIPlot(NULL),
      pLabel(NULL),
      refCount(0),

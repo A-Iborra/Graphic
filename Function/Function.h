@@ -131,8 +131,9 @@
                               IGProperty *parentPropertyDefault2DPlotSubType,
                               IGProperty *parentPropertyDefault3DPlotSubType,
                               IGProperty *parentPropertyBackgroundColor,
-                              IGProperty *parentPropertyFloor,
-                              IGProperty *parentPropertyCeiling,
+                              IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                              IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                              IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                               void (__stdcall *pCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
      STDMETHOD(put_OnChangeCallback)(void (__stdcall *pOnChange)(void *,ULONG_PTR),void *,ULONG_PTR);

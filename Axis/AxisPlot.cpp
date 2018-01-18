@@ -77,6 +77,21 @@
    if ( -DBL_MAX == minPoint.x || DBL_MAX == minPoint.x )
       return 0;
   
+   //if ( minPoint.x == maxPoint.x ) {
+   //   if ( minPoint.x < 0.0 )
+   //      maxPoint.x = -minPoint.x;
+   //   else {
+   //      maxPoint.x = minPoint.x;
+   //      minPoint.x = -minPoint.x;
+   //   }
+   //}
+
+   //if ( minPoint.y == maxPoint.y )
+   //   maxPoint.y = minPoint.y + 1.0;
+   //
+   //if ( minPoint.z == maxPoint.z )
+   //   maxPoint.z = minPoint.z + 1.0;
+
    char szVariable[1024];
 
    sprintf(szVariable,"Ox = %lf",minPoint.x);
@@ -414,7 +429,11 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                 pParentPropertyXFloor,pParentPropertyXCeiling,
+                                 pParentPropertyYFloor,pParentPropertyYCeiling,
+                                 pParentPropertyZFloor,pParentPropertyZCeiling,
+                                 pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
 
                t -> CopyFrom(pRepresentativeText);
 
@@ -541,7 +560,11 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                    pParentPropertyXFloor,pParentPropertyXCeiling,
+                                    pParentPropertyYFloor,pParentPropertyYCeiling,
+                                    pParentPropertyZFloor,pParentPropertyZCeiling,
+                                    pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
 
                t -> CopyFrom(pRepresentativeText);
 
@@ -670,8 +693,12 @@
                   textList.Add(t,NULL,tickNumber);
                }
  
-               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,
-                              pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+               t -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                 pParentPropertyXFloor,pParentPropertyXCeiling,
+                                 pParentPropertyYFloor,pParentPropertyYCeiling,
+                                 pParentPropertyZFloor,pParentPropertyZCeiling,
+                                 pParentPropertyOpenGLText,NULL,NULL,
+                                 pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
 
                t -> CopyFrom(pRepresentativeText);
 

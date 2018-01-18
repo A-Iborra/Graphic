@@ -18,6 +18,26 @@
 #include "PlotTypes_i.h"
 
 #include "utils.h"
+#include "utilities.h"
+
+#define ITEM_NATURAL       1
+#define ITEM_WRITEFRAME    2
+#define ITEM_SURFACE       3
+#define ITEM_HISTORGRAM    4
+#define ITEM_BLOCKS        5
+#define ITEM_BALLS         6
+
+   struct blocksProperties {
+      bool keepCubic;
+      double sizeInPercentDomain[3]{10.0,10.0,10.0};
+   };
+
+   struct commonProperties {
+      double defaultSolidSizeInPercentDomain{10.0};
+      void *pvAdditionalProperties{NULL};
+      long additionalpropertiesSize{0};
+   };
+
 
    class PlotTypes : public IGSystemPlotType {
 
@@ -38,7 +58,11 @@
       STDMETHOD(get_UsesMaterialShading)(long item,VARIANT_BOOL *);
       STDMETHOD(get_HasProperties)(long item,VARIANT_BOOL *);
 
-      STDMETHOD(Execute)(long item,long segmentId,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
+      STDMETHOD(InitNew)(long item,REFIID instanceGUID);
+      STDMETHOD(Save)(long item,REFIID instanceGUID,void *pvIStream);
+      STDMETHOD(Load)(long item,REFIID instanceGUID,void *pvIStream);
+
+      STDMETHOD(Execute)(long item,REFIID instanceGUID,long segmentId,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
       STDMETHOD(ShowProperties)(long item,HWND hwndParent,REFIID instanceGuid,void (__stdcall *)(void *,ULONG_PTR),void *,ULONG_PTR);
 
       // IPropertyPageClient
@@ -79,20 +103,18 @@
 
       };
 
-      void natural(long segmentID);
+      void natural(commonProperties *pProperties,long segmentID);
 
-      void surface(long segmentID);
-      void wireFrame(long segmentID);
+      void surface(commonProperties *pProperties,long segmentID);
+      void wireFrame(commonProperties *pProperties,long segmentID);
 
-      void stacks(long segmentID);
-      void stacks2D(long segmentID);
-      void stacks3D(long segmentID);
+      void stacks(commonProperties *pProperties,long segmentID);
+      void stacks2D(commonProperties *pProperties,long segmentID);
+      void stacks3D(commonProperties *pProperties,long segmentID);
 
-      void blocks(long segmentID);
-      void blocks2D(long segmentID);
-      void blocks3D(long segmentID);
+      void blocks(commonProperties *pProperties,long segmentID);
 
-      void balls(long segmentID);
+      void balls(commonProperties *pProperties,long segmentID);
 
    private:
 
@@ -109,29 +131,28 @@
 
       long refCount{0};
 
+      commonProperties *findProperties(long itemNumber,REFIID);
+
       std::function<void(void *,void *,void *)> *executePrep;
 
       std::map<long,BSTR> itemName;
       std::map<long,bool> itemIs3DOnly;
       std::map<long,bool> itemUseMaterialShading;
       std::map<long,bool> itemHasProperties;
-      std::map<long,std::function<void(long,HWND,REFIID)> *> itemShowProperties;
-      std::map<long,std::function<void(long,void *,void *,void *)> *> itemExecute;
+      std::map<long,std::function<void(long,commonProperties *,void *,void *,void *)> *> itemExecute;
 
       std::map<long,_IGPropertyPageClient *> itemPropertyPageClients;
 
+      std::map<long,commonProperties *> allocatedInstancePropertiesStorage;
 
       IGProperty *propertyAllBinary{NULL};
 
-      BYTE *propertiesStart{NULL};
+      commonProperties properties;
 
-      double defaultSolidSizeInPercentDomain{10.0};
-
-      BYTE *propertiesEnd{NULL};
-
+      commonProperties *pActiveProperties{NULL};
 
       static LRESULT APIENTRY propertiesHandler(HWND,UINT,WPARAM,LPARAM);
-
+      static LRESULT APIENTRY blocksPropertiesHandler(HWND,UINT,WPARAM,LPARAM);
 
    };
 

@@ -169,6 +169,8 @@ library OpenGLImplementor {
       HRESULT SetLineWeight(IGProperty*);
       HRESULT Normal3dv(double *normal);
 
+      HRESULT SetColor3dv(double *);
+
 // Selection 
 
       HRESULT GetPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);

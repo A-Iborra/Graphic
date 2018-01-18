@@ -165,9 +165,15 @@ library GSystems {
 
       [propget] HRESULT HasProperties([in] long item,[out,retval] VARIANT_BOOL *);
 
+      HRESULT InitNew([in] long item,[in] REFIID instanceGUID);
+
+      HRESULT Save([in] long item,[in] REFIID instanceGUID,[in] /*IStream **/ void *pvIStream);
+
+      HRESULT Load([in] long item,[in] REFIID instanceGUID,[in] /*IStream **/ void *pvIStream);
+
       HRESULT ShowProperties([in] long item,[in] HWND hwndParent,REFIID instanceGuid,void (__stdcall *whenDoneCallBack)(void *pArg,ULONG_PTR cookie),void *pArg,ULONG_PTR cookie);
 
-      HRESULT Execute([in] long item,long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
+      HRESULT Execute([in] long item,[in] REFIID instanceGUID,long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet);
 
    }
    

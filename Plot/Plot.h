@@ -33,7 +33,10 @@
 //      IPlot
 
      STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
-                           IGProperty*,IGProperty *pPropertyFloor,IGProperty *pPropertyCeiling,
+                           IGProperty*,
+                           IGProperty *pPropertyXFloor,IGProperty *pPropertyXCeiling,
+                           IGProperty *pPropertyYFloor,IGProperty *pPropertyYCeiling,
+                           IGProperty *pPropertyZFloor,IGProperty *pPropertyZCeiling,
                               void (__stdcall *pWhenDoneCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR);
 
      STDMETHOD(PrepareForData)();
@@ -208,7 +211,6 @@
 
      IPlot** pIPlots;
      long currentPlotCount;
-     double defaultSolidSizeInPercentDomain;
 
      MessageTable messageTable;
 
@@ -247,7 +249,6 @@
      IGProperty *propertyLineJoin;
      IGProperty *propertyCustomColors;
      IGProperty *propertyPropertiesPosition;
-     IGProperty *propertyDefaultSolidSizeInPercentDomain;
 
      IGProperty* propertyDataExtents;
 
@@ -255,12 +256,19 @@
 
      IGProperty* propertyDataSet{NULL};
 
-     IGProperty *propertyPlotTypes{NULL};
+     IGProperty *propertyPlotTypesGlobal{NULL};
+
+     IGProperty *propertyPlotTypesInstance{NULL};
+
+     IGProperty *propertyPlotTypes2DInstanceIdentifiers{NULL};
+     IGProperty *propertyPlotTypes3DInstanceIdentifiers{NULL};
+
+     IGProperty *propertyPlotTypesStorage{NULL};
 
      HANDLE PlotThread();
 
-     std::map<long,GUID> plotType2DInstanceIdentifiers;
-     std::map<long,GUID> plotType3DInstanceIdentifiers;
+     std::map<long,GUID> plotType2DInstanceGUIDS;
+     std::map<long,GUID> plotType3DInstanceGUIDS;
 
      static long instanceCount;
 

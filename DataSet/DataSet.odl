@@ -49,8 +49,9 @@ library DataSet {
                            IGProperty *parentPropertyDefault2DPlotSubType,
                            IGProperty *parentPropertyDefault3DPlotSubType,
                            IGProperty *parentPropertyBackgroundColor,
-                           IGProperty *parentPropertyFloor,
-                           IGProperty *parentPropertyCeiling,
+                           IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                           IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                           IGProperty *parentPropertyTFloor,IGProperty *parentPropertyZCeiling,
                            [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,ULONG_PTR cookie);
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
@@ -69,9 +70,14 @@ library DataSet {
       [propput] HRESULT minZ([in] double minVal);
       [propget] HRESULT minZ([out,retval] double *getVal);
 
-      [propput] HRESULT floor([in]IGProperty *);
+      [propput] HRESULT XFloor([in]IGProperty *);
+      [propput] HRESULT XCeiling([in]IGProperty *);
 
-      [propput] HRESULT ceiling([in]IGProperty *);
+      [propput] HRESULT YFloor([in]IGProperty *);
+      [propput] HRESULT YCeiling([in]IGProperty *);
+
+      [propput] HRESULT ZFloor([in]IGProperty *);
+      [propput] HRESULT ZCeiling([in]IGProperty *);
 
       [propget] HRESULT top([out,retval] struct DataList **getTop);
       [propget] HRESULT bottom([out,retval] struct DataList **getBottom);

@@ -167,11 +167,8 @@
       break;
 
    case WM_OPENGLIMPLEMENTATION_SETCOLOR: {
-      IGProperty *pColor = (IGProperty *)wParam;
-      float fv[4];
-      BYTE *pb = (BYTE *)fv;
-      pColor -> get_binaryValue(sizeof(fv),(BYTE**)&pb);
-      glColor3fv(fv);
+      GLfloat *pfv = (GLfloat *)wParam;
+      glColor3fv(pfv);
       }
       break;
 
@@ -425,21 +422,15 @@ OPENGL_ERROR_CHECK
       }
 
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,fvTopColor);
-      glMaterialfv(GL_FRONT,GL_SPECULAR,fvTopColor);
 
       glMaterialfv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,fvBottomColor);
-      glMaterialfv(GL_BACK,GL_SPECULAR,fvBottomColor);
 
-      glFrontFace(GL_CCW); 
+      glFrontFace(GL_CCW);
       glDisable(GL_CULL_FACE);
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-
-      glEnable(GL_DEPTH_TEST);
-
+ 
       p -> plotWindow -> enableLighting();
-
-      glBegin(GL_QUADS);
 
       delete ps;
 
@@ -481,10 +472,8 @@ OPENGL_ERROR_CHECK
          lineWeight = 1;
 
       glLineWidth((float)lineWeight);
-OPENGL_ERROR_CHECK
 
       glColor3fv(fvColor);
-OPENGL_ERROR_CHECK
 
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
       glFrontFace(GL_CCW);         
@@ -493,8 +482,6 @@ OPENGL_ERROR_CHECK
       glNewList(ps -> segmentID,GL_COMPILE);
 
       glBegin(GL_QUADS);
-
-OPENGL_ERROR_CHECK
 
       delete ps;
       }

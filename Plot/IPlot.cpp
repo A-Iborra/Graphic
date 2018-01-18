@@ -17,8 +17,9 @@
                                  IGProperty* parentDefault2DPlotType,
                                  IGProperty* parentDefault3DPlotType,
                                  IGProperty *parentBackground,
-                                 IGProperty *parentFloor,
-                                 IGProperty *parentCeiling,
+                                 IGProperty *parentXFloor,IGProperty *parentXCeiling,
+                                 IGProperty *parentYFloor,IGProperty *parentYCeiling,
+                                 IGProperty *parentZFloor,IGProperty *parentZCeiling,
                                  void (__stdcall *pCallback)(void *,ULONG_PTR),void *pCallbarkArg,ULONG_PTR callbackCookie) {
  
    if ( pPropColor ) {
@@ -41,7 +42,7 @@
    pWhenChangedCallbackArg = pCallbarkArg;
    whenChangedCallbackCookie = callbackCookie;
 
-   BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentFloor,parentCeiling);
+   BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentXFloor,parentXCeiling,parentYFloor,parentYCeiling,parentZFloor,parentZCeiling);
 
    InitNew();
 

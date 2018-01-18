@@ -39,13 +39,6 @@
    itemHasProperties[5] = true;
    itemHasProperties[6] = true;
 
-   itemShowProperties[1] = new std::function<void(long,HWND,REFIID)>( [](long itemNumber,HWND hwndParent,REFIID refInstanceGUID ) { return; });
-   itemShowProperties[2] = itemShowProperties[1];
-   itemShowProperties[3] = itemShowProperties[1];
-   itemShowProperties[4] = itemShowProperties[1];
-   itemShowProperties[5] = itemShowProperties[1];
-   itemShowProperties[6] = itemShowProperties[1];
-
    executePrep = new std::function<void(void *,void *,void*)>( [=](void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet)
       {
          pIPlot = (IPlot *)pvIPlot;
@@ -57,12 +50,23 @@
          pIPlot -> get_LineWeightProperty(&propertyLineWeight);
       });
 
-   itemExecute[1] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { natural(segmentID); });
-   itemExecute[2] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { wireFrame(segmentID); });
-   itemExecute[3] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { surface(segmentID); });
-   itemExecute[4] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { stacks(segmentID); });
-   itemExecute[5] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { blocks(segmentID); });
-   itemExecute[6] = new std::function<void(long,void *,void *,void *)>( [=](long segmentID,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { balls(segmentID); });
+   itemExecute[1] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { natural(pProperties,segmentID); });
+
+   itemExecute[2] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { wireFrame(pProperties,segmentID); });
+
+   itemExecute[3] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { surface(pProperties,segmentID); });
+
+   itemExecute[4] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { stacks(pProperties,segmentID); });
+
+   itemExecute[5] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { blocks(pProperties,segmentID); });
+
+   itemExecute[6] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { balls(pProperties,segmentID); });
 
    CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
  
@@ -70,15 +74,16 @@
    itemPropertyPageClients[2] = new _IGPropertyPageClient(this,IDDIALOG_WIREFRAME,propertiesHandler,"WireFrame");
    itemPropertyPageClients[3] = new _IGPropertyPageClient(this,IDDIALOG_SURFACE,propertiesHandler,"Surface");
    itemPropertyPageClients[4] = new _IGPropertyPageClient(this,IDDIALOG_HISTOGRAM,propertiesHandler,"Histogram");
-   itemPropertyPageClients[5] = new _IGPropertyPageClient(this,IDDIALOG_BLOCKS,propertiesHandler,"Block");
+   itemPropertyPageClients[5] = new _IGPropertyPageClient(this,IDDIALOG_BLOCKS,blocksPropertiesHandler,"Block");
    itemPropertyPageClients[6] = new _IGPropertyPageClient(this,IDDIALOG_BALLS,propertiesHandler,"Balls");
 
    pIGProperties -> Add(L"all binary",&propertyAllBinary);
 
-   propertyAllBinary -> directAccess(TYPE_BINARY,&propertiesStart,offsetof(PlotTypes,propertiesEnd) - offsetof(PlotTypes,propertiesStart));
+   propertyAllBinary -> directAccess(TYPE_BINARY,&properties,sizeof(commonProperties));
 
    return;
    }
+
 
    PlotTypes::~PlotTypes() {
 
@@ -88,7 +93,32 @@
    for ( std::pair<long,_IGPropertyPageClient *> p : itemPropertyPageClients )
       p.second -> Release();
 
+   for ( std::pair<long,void *> p : allocatedInstancePropertiesStorage )  {
+      if ( ((commonProperties *)p.second) -> pvAdditionalProperties )
+         delete [] ((commonProperties *)p.second) -> pvAdditionalProperties;
+      delete [] p.second;
+   }
    return;
    }
 
 
+   commonProperties *PlotTypes::findProperties(long itemNumber,REFIID instanceGUID) {
+
+   BSTR bstrCLSID;
+
+   StringFromCLSID(instanceGUID,&bstrCLSID);
+
+   long key = HashCode(bstrCLSID);
+
+   CoTaskMemFree(bstrCLSID);
+
+   if ( ! ( allocatedInstancePropertiesStorage.find(key) == allocatedInstancePropertiesStorage.end() )  )
+      return allocatedInstancePropertiesStorage[key];
+
+   if ( ! ( GUID_NULL == instanceGUID ) ) {
+      InitNew(itemNumber,instanceGUID);
+      return allocatedInstancePropertiesStorage[key];
+   }
+
+   return &properties;
+   }

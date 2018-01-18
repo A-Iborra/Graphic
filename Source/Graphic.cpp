@@ -103,7 +103,7 @@
       plotView(gcPlotView2D),
 
       defaultPlotView(gcPlotView2D),
-      default2DPlotType(gcPlotTypeNone),
+      default2DPlotType(gcPlotType2DExternal1),
       default3DPlotType(gcPlotType3DNone),
 
       dataSetCount(0),
@@ -121,6 +121,10 @@
       yPixelsPerUnit(0),
 
       zLevel(1.0),
+      floorX(0.0),
+      ceilingX(0.0),
+      floorY(0.0),
+      ceilingY(0.0),
       floorZ(0.0),
       ceilingZ(1.0)
   {
@@ -224,8 +228,21 @@
    pIGProperties -> Add(L"text count",NULL);
    pIGProperties -> Add(L"function count",NULL);
                                                                                                                                                                                     
-   pIGProperties -> Add(L"floor z",&propertyFloor);
-   pIGProperties -> Add(L"ceiling z",&propertyCeiling);
+   pIGProperties -> Add(L"floor x",&propertyXFloor);
+   pIGProperties -> Add(L"ceiling x",&propertyXCeiling);
+   pIGProperties -> Add(L"floor y",&propertyYFloor);
+   pIGProperties -> Add(L"ceiling y",&propertyYCeiling);
+   pIGProperties -> Add(L"floor z",&propertyZFloor);
+   pIGProperties -> Add(L"ceiling z",&propertyZCeiling);
+
+   propertyXFloor -> put_type(TYPE_DOUBLE);
+   propertyXCeiling -> put_type(TYPE_DOUBLE);
+
+   propertyYFloor -> put_type(TYPE_DOUBLE);
+   propertyYCeiling -> put_type(TYPE_DOUBLE);
+
+   propertyZFloor -> put_type(TYPE_DOUBLE);
+   propertyZCeiling-> put_type(TYPE_DOUBLE);
 
    IGProperty* pTemp;
    pIGProperties -> Add(L"pick box size",&pTemp);
@@ -336,8 +353,16 @@
    pIGProperties -> DirectAccess(L"text count",TYPE_LONG,&textCount,sizeof(textCount));
    pIGProperties -> DirectAccess(L"function count",TYPE_LONG,&functionCount,sizeof(functionCount));
    pIGProperties -> DirectAccess(L"pick box size",TYPE_BINARY,&pickBoxSize,sizeof(pickBoxSize));
+
+   pIGProperties -> DirectAccess(L"floor x",TYPE_DOUBLE,&floorX,sizeof(floorX));
+   pIGProperties -> DirectAccess(L"ceiling x",TYPE_DOUBLE,&ceilingX,sizeof(ceilingX));
+
+   pIGProperties -> DirectAccess(L"floor y",TYPE_DOUBLE,&floorY,sizeof(floorY));
+   pIGProperties -> DirectAccess(L"ceiling y",TYPE_DOUBLE,&ceilingY,sizeof(ceilingY));
+
    pIGProperties -> DirectAccess(L"floor z",TYPE_DOUBLE,&floorZ,sizeof(floorZ));
    pIGProperties -> DirectAccess(L"ceiling z",TYPE_DOUBLE,&ceilingZ,sizeof(ceilingZ));
+
    pIGProperties -> DirectAccess(L"show functions",TYPE_BOOL,&showFunctions,sizeof(showFunctions));
 
    propertyDenyUserPropertySettings -> directAccess(TYPE_BOOL,&denyUserPropertySettings,sizeof(denyUserPropertySettings));
@@ -568,8 +593,12 @@ Beep(2000,100);
                               propertyDefault2DPlotType,
                               propertyDefault3DPlotType,
                               propertyBackgroundColor,
-                              propertyFloor,
-                              propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIDataSet);
+
+                              propertyXFloor,propertyXCeiling,
+                              propertyYFloor,propertyYCeiling,
+                              propertyZFloor,propertyZCeiling,
+
+                              someObjectChanged,(void *)this,(ULONG_PTR)pIDataSet);
 
    IPlot *pIPlot = NULL;
 
@@ -670,8 +699,10 @@ Beep(2000,100);
                               propertyDefault2DPlotType,
                               propertyDefault3DPlotType,
                               propertyBackgroundColor,
-                              propertyFloor,
-                              propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIFunction);
+                              propertyXFloor,propertyXCeiling,
+                              propertyYFloor,propertyYCeiling,
+                              propertyZFloor,propertyZCeiling,
+                              someObjectChanged,(void *)this,(ULONG_PTR)pIFunction);
  
    IPlot *pIPlot = NULL;
 
@@ -777,7 +808,13 @@ Beep(2000,100);
 
    pIText -> put_PartOfWorldDomain(FALSE);
 
-   pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,propertyFloor,propertyCeiling,propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
+   pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,
+
+                           propertyXFloor,propertyXCeiling,
+                           propertyYFloor,propertyYCeiling,
+                           propertyZFloor,propertyZCeiling,
+
+                           propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
 
    pIText -> AdviseGSystemStatusBar(pIGSystemStatusBar);
 
@@ -798,8 +835,12 @@ Beep(2000,100);
                            propertyDefault2DPlotType,
                            propertyDefault3DPlotType,
                            propertyBackgroundColor,
-                           propertyFloor,
-                           propertyCeiling,someObjectChanged,(void *)this,(ULONG_PTR)pIPlot);
+
+                           propertyXFloor,propertyXCeiling,
+                           propertyYFloor,propertyYCeiling,
+                           propertyZFloor,propertyZCeiling,
+
+                           someObjectChanged,(void *)this,(ULONG_PTR)pIPlot);
  
    IPlotNotify *pIPlotNotify;
    QueryInterface(IID_IPlotNotify,reinterpret_cast<void **>(&pIPlotNotify));

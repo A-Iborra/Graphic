@@ -33,7 +33,6 @@
 
    std::map<gc3DPlotTypes,IGSystemPlotType *> Plot::plotType3DProviderInstances;
    std::map<gc3DPlotTypes,char *> Plot::plotType3DProviderNames;
-
    std::map<gc3DPlotTypes,long> Plot::plotType3DInstanceNumber;
 
    HANDLE Plot::globalPlotThread = NULL;
@@ -67,7 +66,6 @@
      haveAnyData(false),
      okToPlot(true),
      selected(false),
-     defaultSolidSizeInPercentDomain(10.0),
 
      overrideOwnerView(false),
      overrideOwnerType(false),
@@ -169,10 +167,16 @@
    propertyDataExtents -> put_type(TYPE_BINARY);
    propertyDataExtents -> put_size(128);
 
-   pIProperties -> Add(L"Default solid size in percent domain",&propertyDefaultSolidSizeInPercentDomain);
-   pIProperties -> DirectAccess(L"Default solid size in percent domain",TYPE_DOUBLE,&defaultSolidSizeInPercentDomain,sizeof(defaultSolidSizeInPercentDomain));
-
    pIProperties -> Add(L"dataset",&propertyDataSet);
+
+   pIProperties -> Add(L"2D plot type instance identifiers",&propertyPlotTypes2DInstanceIdentifiers);
+
+   pIProperties -> Add(L"3D plot type instance identifiers",&propertyPlotTypes3DInstanceIdentifiers);
+
+   pIProperties -> Add(L"storage for plot types instances",&propertyPlotTypesStorage);
+
+   propertyPlotTypesStorage -> put_type(TYPE_BINARY);
+
 
    refCount = 0;
 
@@ -182,7 +186,7 @@
 
    if ( 1 == instanceCount ) {
 
-      pIProperties -> Add(L"plot types",&propertyPlotTypes);
+      pIProperties -> Add(L"plot type global defaults",&propertyPlotTypesGlobal);
 
       InitNew();
 

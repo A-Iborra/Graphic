@@ -89,8 +89,31 @@
          ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE),SW_HIDE);
       }
 
-      p -> pPropertyFloor -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_FLOOR);
-      p -> pPropertyCeiling -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_CEILING);
+      double floor,ceiling;
+
+      p -> pPropertyZFloor -> get_doubleValue(&floor);
+      p -> pPropertyZCeiling -> get_doubleValue(&ceiling);
+
+      if ( ! ( floor == ceiling ) ) {
+         p -> pPropertyZFloor -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_FLOOR);
+         p -> pPropertyZCeiling -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_CEILING);
+      }
+
+      p -> pPropertyXFloor -> get_doubleValue(&floor);
+      p -> pPropertyXCeiling -> get_doubleValue(&ceiling);
+
+      if ( ! ( floor == ceiling ) ) {
+         p -> pPropertyXFloor -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_X_RANGE_FLOOR);
+         p -> pPropertyXCeiling -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_X_RANGE_CEILING);
+      }
+
+      p -> pPropertyYFloor -> get_doubleValue(&floor);
+      p -> pPropertyYCeiling -> get_doubleValue(&ceiling);
+
+      if ( ! ( floor == ceiling ) ) {
+         p -> pPropertyYFloor -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_Y_RANGE_FLOOR);
+         p -> pPropertyYCeiling -> setWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_Y_RANGE_CEILING);
+      }
 
       }
       break;
@@ -113,12 +136,7 @@
       SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION1_RANGE,"");
       SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION2_RANGE,"");
       SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION3_RANGE,"");
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL),SW_HIDE);
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL2),SW_HIDE);
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL3),SW_HIDE);
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL4),SW_HIDE);
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_FLOOR),SW_HIDE);
-      ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_CEILING),SW_HIDE);
+
       if ( 0 == countPoints ) {
          sprintf_s(szTemp,512,"The dimensionality of the data is not known.");
          SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_ARITY,szTemp);
@@ -130,26 +148,27 @@
          case DATA_ARITY_3D:
          case DATA_ARITY_2D:
          case DATA_ARITY_1D:
+
             sprintf_s(szTemp,512,szRangeFormat,1,p -> xMin,p -> xMax);
             SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION1_RANGE,szTemp);
+
             if ( DATA_ARITY_1D == dataArity )
                break;
+
             sprintf_s(szTemp,512,szRangeFormat,2,p -> yMin,p -> yMax);
             SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION2_RANGE,szTemp);
+
             if ( DATA_ARITY_2D == dataArity )
                break;
+
             sprintf_s(szTemp,512,szRangeFormat,3,p -> zMin,p -> zMax);
             SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_DIMENSION3_RANGE,szTemp);
-            if ( p -> zMin == p -> zMax ) {
-               sprintf_s(szTemp,512,szFloorCeilingFormat,3,"3rd");
-               SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL,szTemp);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL),SW_SHOW);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL2),SW_SHOW);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL3),SW_SHOW);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL4),SW_SHOW);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_FLOOR),SW_SHOW);
-               ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATA_BOX_CEILING),SW_SHOW);
-            }
+
+            //if ( p -> zMin == p -> zMax ) {
+            //   sprintf_s(szTemp,512,szFloorCeilingFormat,3,"3rd");
+            //   SetDlgItemText(hwnd,IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL,szTemp);
+            //}
+
          }
 
       }
@@ -179,14 +198,34 @@
             SetDlgItemText(p -> hwndSpecDialog,IDDI_DATASET_SPEC_DATASOURCE,p -> szDataSource);
          break;
 
+      case IDDI_DATASET_DATA_BOX_X_RANGE_FLOOR:
+         if ( EN_CHANGE == notifyCode )
+            p -> pPropertyXFloor -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_X_RANGE_FLOOR);
+         return (LRESULT)0L;
+
+      case IDDI_DATASET_DATA_BOX_X_RANGE_CEILING:
+         if ( EN_CHANGE == notifyCode ) 
+            p -> pPropertyXCeiling -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_X_RANGE_CEILING);
+         return (LRESULT)0L;
+
+      case IDDI_DATASET_DATA_BOX_Y_RANGE_FLOOR:
+         if ( EN_CHANGE == notifyCode )
+            p -> pPropertyYFloor -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_Y_RANGE_FLOOR);
+         return (LRESULT)0L;
+
+      case IDDI_DATASET_DATA_BOX_Y_RANGE_CEILING:
+         if ( EN_CHANGE == notifyCode ) 
+            p -> pPropertyYCeiling -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_Y_RANGE_CEILING);
+         return (LRESULT)0L;
+
       case IDDI_DATASET_DATA_BOX_FLOOR:
          if ( EN_CHANGE == notifyCode )
-            p -> pPropertyFloor -> getWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_FLOOR);
+            p -> pPropertyZFloor -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_FLOOR);
          return (LRESULT)0L;
 
       case IDDI_DATASET_DATA_BOX_CEILING:
          if ( EN_CHANGE == notifyCode ) 
-            p -> pPropertyCeiling -> getWindowItemText(hwnd,IDDI_DATASET_DATA_BOX_CEILING);
+            p -> pPropertyZCeiling -> getWindowItemValue(hwnd,IDDI_DATASET_DATA_BOX_CEILING);
          return (LRESULT)0L;
 
       case IDDI_DATASET_DATASOURCE_EXPORT_DEST:

@@ -63,14 +63,20 @@
     <ClCompile Include="Implementations\balls.cpp">
       <Filter>Source Files\Implementations</Filter>
     </ClCompile>
-    <ClCompile Include="COM Interfaces\natural.cpp">
-      <Filter>Source Files\Implementations</Filter>
-    </ClCompile>
     <ClCompile Include="COM Interfaces\IPropertyPageClient.cpp">
       <Filter>Source Files\COM Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="COM Interfaces\propertiesHandler.cpp">
+    <ClCompile Include="..\..\Common\source\utilities.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blocksPropertiesHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="propertiesHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Implementations\natural.cpp">
+      <Filter>Source Files\Implementations</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

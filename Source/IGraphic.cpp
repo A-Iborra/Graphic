@@ -76,8 +76,11 @@
    IAxis *pIAxis;
    pAxis -> QueryInterface(IID_IAxis,reinterpret_cast<void**>(&pIAxis));
    axisList.Add(pIAxis);
-   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,
-                           propertyCeiling,propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)pIAxis);
+   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,
+                           propertyXFloor,propertyXCeiling,
+                           propertyYFloor,propertyYCeiling,
+                           propertyZFloor,propertyZCeiling,
+                           propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)pIAxis);
    return S_OK;
    }
 

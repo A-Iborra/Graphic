@@ -479,6 +479,8 @@
 
       int eraseMode,rendering;
       double xPixelsPerUnit,yPixelsPerUnit;
+      double floorX,ceilingX;
+      double floorY,ceilingY;
       double floorZ,ceilingZ;
 
       unsigned int hitTableHits,*hitTable;
@@ -599,8 +601,12 @@
 
       IGProperty* propertyStatusText;
 
-      IGProperty* propertyFloor;
-      IGProperty* propertyCeiling;
+      IGProperty* propertyXFloor{NULL};
+      IGProperty* propertyXCeiling{NULL};
+      IGProperty* propertyYFloor{NULL};
+      IGProperty* propertyYCeiling{NULL};
+      IGProperty* propertyZFloor{NULL};
+      IGProperty* propertyZCeiling{NULL};
 
       IGProperty* propertyRenderOpenGLAxisText;
 

@@ -275,8 +275,9 @@ import "ocidl.idl";
                            IGProperty *parentPropertyDefault2DPlotSubType,
                            IGProperty *parentPropertyDefault3DPlotSubType,
                            IGProperty *parentPropertyBackgroundColor,
-                           IGProperty *parentPropertyFloor,
-                           IGProperty *parentPropertyCeiling,
+                           IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                           IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                           IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                            [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]

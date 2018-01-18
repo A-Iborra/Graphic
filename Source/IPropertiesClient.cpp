@@ -122,7 +122,8 @@
    pParent -> autoClear = true;
 
    pParent -> plotView = gcPlotView3D;
-   pParent -> default2DPlotType = gcPlotTypeNone;
+   pParent -> default2DPlotType = gcPlotType2DExternal1;
+   pParent -> default3DPlotType = gcPlotType3DNone;
  
    pParent -> dataSetCount = 0;
    pParent -> textCount = 0;
@@ -139,6 +140,12 @@
    pParent -> propertyViewSpin -> put_doubleValue(0.0);
 
    pParent -> denyUserPropertySettings = FALSE;
+
+   pParent -> floorX = 0.0;
+   pParent -> ceilingX = 0.0;
+
+   pParent -> floorY = 0.0;
+   pParent -> ceilingY = 0.0;
 
    pParent -> floorZ = 0.0;
    pParent -> ceilingZ = 1.0;
@@ -219,7 +226,7 @@
    fv[0] = 1.0f; fv[1] = 1.0f; fv[2] = 1.0f;
    pParent -> propertySpecularReference -> put_binaryValue(4 * sizeof(float),(BYTE*)fv);
    pParent -> propertyAmbientReference -> put_binaryValue(4 * sizeof(float),(BYTE*)fv);
-   pParent -> propertyShinyness -> put_longValue(128L);
+   pParent -> propertyShinyness -> put_longValue(50);
  
    PRINTDLG printDialog;
    memset(&printDialog,0,sizeof(PRINTDLG));

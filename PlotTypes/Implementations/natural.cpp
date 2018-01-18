@@ -1,7 +1,7 @@
 
 #include "PlotTypes.h"
 
-   void PlotTypes::natural(long segmentID) {
+   void PlotTypes::natural(commonProperties *pProperties,long segmentID) {
 
    pIOpenGLImplementation -> OpenSegment(segmentID,propertyLineColor,propertyLineWeight);
 

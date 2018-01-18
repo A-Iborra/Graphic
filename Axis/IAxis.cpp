@@ -564,7 +564,10 @@
 
 
    HRESULT Axis::Initialize(HWND ho,char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
-                              IGProperty* pPropFloor,IGProperty* pPropCeiling,IGProperty* pPropOpenGLText,
+                              IGProperty* pPropertyXFloor,IGProperty* pPropertyXCeiling,
+                              IGProperty* pPropertyYFloor,IGProperty* pPropertyYCeiling,
+                              IGProperty* pPropertyZFloor,IGProperty* pPropertyZCeiling,
+                              IGProperty* pPropOpenGLText,
                               IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *,ULONG_PTR),void *pChangedArg,ULONG_PTR changedCookie) {
 
    hwndOwner = ho;
@@ -582,9 +585,14 @@
 
    pParentPropertyPlotView = pPlotView;
 
-   pParentPropertyFloor = pPropFloor;
+   pParentPropertyXFloor = pPropertyXFloor;
+   pParentPropertyXCeiling = pPropertyXCeiling;
 
-   pParentPropertyCeiling = pPropCeiling;
+   pParentPropertyYFloor = pPropertyYFloor;
+   pParentPropertyYCeiling = pPropertyYCeiling;
+
+   pParentPropertyZFloor = pPropertyZFloor;
+   pParentPropertyZCeiling = pPropertyZCeiling;
 
    pParentPropertyOpenGLText = pPropOpenGLText;
 
@@ -595,8 +603,12 @@
    pIDataSetDomain = pds;
 
    if ( pIDataSetDomain ) {
-      pIDataSetDomain -> put_floor(pPropFloor);
-      pIDataSetDomain -> put_ceiling(pPropCeiling);
+      pIDataSetDomain -> put_XFloor(pPropertyXFloor);
+      pIDataSetDomain -> put_XCeiling(pPropertyXCeiling);
+      pIDataSetDomain -> put_YFloor(pPropertyYFloor);
+      pIDataSetDomain -> put_YCeiling(pPropertyYCeiling);
+      pIDataSetDomain -> put_ZFloor(pPropertyZFloor);
+      pIDataSetDomain -> put_ZCeiling(pPropertyZCeiling);
    }
 
    if ( pIPlot ) 
@@ -605,7 +617,11 @@
    CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
  
    pIPlot -> Initialize(pIDataSetDomain,pIOpenGLImplementation,pIEvaluator,propertyLineColor,propertyLineWeight,pParentPropertyPlotView,propertyPlotType,
-                           NULL,NULL,pPropFloor,pPropCeiling,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
+                           NULL,NULL,
+                           pPropertyXFloor,pPropertyXCeiling,
+                           pPropertyYFloor,pPropertyYCeiling,
+                           pPropertyZFloor,pPropertyZCeiling,
+                           pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
  
    pIPlot -> put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
 
@@ -613,13 +629,21 @@
 
    pIPlot -> put_OverrideOwnerPlotType(FALSE);
 
-   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
+   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                           pParentPropertyXFloor,pParentPropertyXCeiling,
+                           pParentPropertyYFloor,pParentPropertyYCeiling,
+                           pParentPropertyZFloor,pParentPropertyZCeiling,
+                           pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    initWindows();
  
    InitNew();
 
-   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
+   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                       pParentPropertyXFloor,pParentPropertyXCeiling,
+                                       pParentPropertyYFloor,pParentPropertyYCeiling,
+                                       pParentPropertyZFloor,pParentPropertyZCeiling,
+                                       pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    switch ( axisType ) {
    case 'X':

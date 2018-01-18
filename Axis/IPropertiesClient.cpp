@@ -129,7 +129,7 @@
 
    propertyTextCount -> put_longValue(0);
  
-   propertyPlotType -> put_longValue(gcPlotTypeNone);
+   propertyPlotType -> put_longValue(gcPlotType2DExternal1);
    
    return Loaded();
    }

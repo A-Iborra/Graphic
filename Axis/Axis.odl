@@ -197,7 +197,9 @@ library Axis {
 
       HRESULT Initialize([in]HWND hwndOwner,[in]char type,[in]IAxis *pXAxis,[in]IAxis *pYAxis,[in]IAxis *pZAxis,
                               [in] IGProperty* pIPropertyPlotView, 
-                              [in] IGProperty* pPropertyFloor,[in] IGProperty *pPropertyCeiling,
+                              [in] IGProperty* pPropertyXFloor,[in] IGProperty *pPropertyXCeiling,
+                              [in] IGProperty* pProeprtyYFloor,[in] IGProperty *pProeprtyYCeiling,
+                              [in] IGProperty* pPropertyZFloor,[in] IGProperty *pPropertyZCeiling,
                               [in] IGProperty* pPropertyOpenGLText,
                               [in] IDataSet* pIDomainDataSet,[in] IOpenGLImplementation*,[in] IEvaluator*,[in] void (*pWhenChangedCallback)(void *pvArg,ULONG_PTR cookie),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 

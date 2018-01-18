@@ -26,7 +26,10 @@
 
    HRESULT BasePlot::Initialize(IDataSet* pDS,IOpenGLImplementation *pimp,IEvaluator *piev,
                                  IGProperty* propLineColor,
-                                 IGProperty* propLineWeight,IGProperty* propFloor,IGProperty* propCeiling) {
+                                 IGProperty* propLineWeight,
+                                 IGProperty* propXFloor,IGProperty* propXCeiling,
+                                 IGProperty* propYFloor,IGProperty* propYCeiling,
+                                 IGProperty* propZFloor,IGProperty* propZCeiling) {
  
    if ( pIDataSetDomain )
       pIDataSetDomain -> Release();
@@ -39,17 +42,28 @@
 
    pIEvaluator = piev;
 
-   pPropertyFloor = propFloor;
-   pPropertyCeiling = propCeiling;
+   pPropertyXFloor = propXFloor;
+   pPropertyXCeiling = propXCeiling;
+
+   pPropertyYFloor = propYFloor;
+   pPropertyYCeiling = propYCeiling;
+
+   pPropertyZFloor = propZFloor;
+   pPropertyZCeiling = propZCeiling;
 
    if ( ! pIDataSet ) {
       CoCreateInstance(CLSID_DataSet,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
       externalDataSet = FALSE;
    }
 
-   pIDataSet -> put_floor(pPropertyFloor);
+   pIDataSet -> put_XFloor(pPropertyXFloor);
+   pIDataSet -> put_XCeiling(pPropertyXCeiling);
 
-   pIDataSet -> put_ceiling(pPropertyCeiling);
+   pIDataSet -> put_YFloor(pPropertyYFloor);
+   pIDataSet -> put_YCeiling(pPropertyYCeiling);
+
+   pIDataSet -> put_ZFloor(pPropertyZFloor);
+   pIDataSet -> put_ZCeiling(pPropertyZCeiling);
  
 #if 0
    if ( pIDataSetDomain )

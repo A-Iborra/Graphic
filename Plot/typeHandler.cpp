@@ -19,11 +19,11 @@ for ( std::pair<long,HWND> pPair : type2DToCheckBox ) {                         
    if ( 0 == GetWindowLongPtr(hwndProperties,GWLP_USERDATA) )                                                     \
       continue;                                                                                                   \
    ShowWindow(hwndProperties,SW_SHOW);                                                                            \
-   if ( ! ( p -> plotType2DInstanceIdentifiers.find(pPair.first) == p -> plotType2DInstanceIdentifiers.end() ) )  \
+   if ( ! ( p -> plotType2DInstanceGUIDS.find(pPair.first) == p -> plotType2DInstanceGUIDS.end() ) )              \
       continue;                                                                                                   \
    GUID theGUID;                                                                                                  \
    CoCreateGuid(&theGUID);                                                                                        \
-   p -> plotType2DInstanceIdentifiers[pPair.first] = theGUID;                                                     \
+   p -> plotType2DInstanceGUIDS[pPair.first] = theGUID;                                                           \
 }
 
 #define SET_TYPES_3D \
@@ -39,11 +39,11 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
    if ( 0 == GetWindowLongPtr(hwndProperties,GWLP_USERDATA) )                                                     \
       continue;                                                                                                   \
    ShowWindow(hwndProperties,SW_SHOW);                                                                            \
-   if ( ! ( p -> plotType3DInstanceIdentifiers.find(pPair.first) == p -> plotType3DInstanceIdentifiers.end() ) )  \
+   if ( ! ( p -> plotType3DInstanceGUIDS.find(pPair.first) == p -> plotType3DInstanceGUIDS.end() ) )              \
       continue;                                                                                                   \
    GUID theGUID;                                                                                                  \
    CoCreateGuid(&theGUID);                                                                                        \
-   p -> plotType3DInstanceIdentifiers[pPair.first] = theGUID;                                                     \
+   p -> plotType3DInstanceGUIDS[pPair.first] = theGUID;                                                           \
 }
 
    HWND hwndScrollPanes[] = {NULL,NULL,NULL};
@@ -519,7 +519,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
          ((IGSystemPlotType *)GetWindowLongPtr((HWND)lParam,GWLP_USERDATA)) -> 
             ShowProperties(Plot::plotType2DInstanceNumber[(gc2DPlotTypes)controlIdToType[controlID - 1000]],
-                                 hwnd,p -> plotType2DInstanceIdentifiers[controlIdToType[controlID - 1000]],NULL,NULL,0);
+                                 hwnd,p -> plotType2DInstanceGUIDS[controlIdToType[controlID - 1000]],NULL,NULL,0);
 
          Plot::typeHandler(hwnd,WM_SHOWWINDOW,1L,0L);
 
@@ -532,7 +532,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
          ((IGSystemPlotType *)GetWindowLongPtr((HWND)lParam,GWLP_USERDATA)) -> 
             ShowProperties(Plot::plotType3DInstanceNumber[(gc3DPlotTypes)controlIdToType[controlID - 1000]],
-                              hwnd,p -> plotType3DInstanceIdentifiers[controlIdToType[controlID - 1000]],NULL,NULL,0);
+                              hwnd,p -> plotType3DInstanceGUIDS[controlIdToType[controlID - 1000]],NULL,NULL,0);
 
          Plot::typeHandler(hwnd,WM_SHOWWINDOW,1L,0L);
 

@@ -16,7 +16,7 @@
       PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
       p = (PlotTypes *)pPage -> lParam;
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
-      sprintf_s(szTemp,128,"%3.1f",p -> defaultSolidSizeInPercentDomain);
+      sprintf_s(szTemp,128,"%3.1f",p -> pActiveProperties -> defaultSolidSizeInPercentDomain);
       SetDlgItemText(hwnd,IDDI_BALLS_SIZE_PERCENT_DOMAIN,szTemp);
       SendDlgItemMessage(hwnd,IDDI_BALLS_SIZE_PERCENT_DOMAIN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
       }
@@ -34,7 +34,7 @@
       switch ( controlId ) {
 
       case IDDI_BALLS_SIZE_PERCENT_DOMAIN: {
-         p -> defaultSolidSizeInPercentDomain = atof(szTemp);
+         p -> pActiveProperties -> defaultSolidSizeInPercentDomain = atof(szTemp);
          }
          break;
 

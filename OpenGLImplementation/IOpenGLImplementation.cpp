@@ -384,7 +384,10 @@ Sleep(10);
  
  
    HRESULT OpenGLImplementor::SetColor(IGProperty* pColor) {
-   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETCOLOR,pColor)
+   GLfloat fv[4];
+   BYTE *pb = (BYTE *)fv;
+   pColor -> get_binaryValue(sizeof(fv),(BYTE**)&pb);
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETCOLOR,fv)
    return S_OK;
    }
  
@@ -610,7 +613,18 @@ Sleep(10);
    }
  
 
+   HRESULT OpenGLImplementor::SetColor3dv(double *pDoubleColors) {
+   GLfloat *pColors = new GLfloat[4];
+   pColors[0] = (GLfloat)pDoubleColors[0];
+   pColors[1] = (GLfloat)pDoubleColors[1];
+   pColors[2] = (GLfloat)pDoubleColors[2];
+   pColors[3] = 0.0;
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETCOLOR,pColors)
+   delete [] pColors;
+   return S_OK;
+   }
  
+
    HRESULT OpenGLImplementor::WindowToData(DataPoint *dpSource,DataPoint *dpTarget) {
 
    if ( ! dpSource || ! dpTarget ) return E_POINTER;

@@ -126,16 +126,26 @@
       propertyPlotMarginUnits,
       propertyPlotMarginsStretchAll);
 
-   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
+   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,
+                              propertyXFloor,propertyXCeiling,
+                              propertyYFloor,propertyYCeiling,
+                              propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)xaxis);
-   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
+   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,
+                              propertyXFloor,propertyXCeiling,
+                              propertyYFloor,propertyYCeiling,
+                              propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)yaxis);
-   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,propertyFloor,propertyCeiling,
+   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,
+                              propertyXFloor,propertyXCeiling,
+                              propertyYFloor,propertyYCeiling,
+                              propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)zaxis);
 
    pIViewSet -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,
                               propertyPlotView,
-                              propertyViewTheta,propertyViewPhi,propertyViewSpin,propertyFloor,propertyCeiling,pIDataSetMaster,xaxis,yaxis,zaxis);
+                              propertyViewTheta,propertyViewPhi,propertyViewSpin,
+                              propertyZFloor,propertyZCeiling,pIDataSetMaster,xaxis,yaxis,zaxis);
 
    return TRUE;
    }

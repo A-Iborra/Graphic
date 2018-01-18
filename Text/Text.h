@@ -150,8 +150,11 @@
 
      STDMETHOD(put_TextNotify)(ITextNotify *);
 
-     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty*,
-                              IGProperty*,IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
+     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,
+                              IGProperty *pPropXFloor,IGProperty* pPropXCeiling,
+                              IGProperty *pPropYFloor,IGProperty* pPropYCeiling,
+                              IGProperty *pPropZFloor,IGProperty* pPropZCeiling,
+                              IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();

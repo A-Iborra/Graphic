@@ -128,7 +128,8 @@
    // Methods
 
      STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
-                              IGProperty*,IGProperty*,IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
+                              IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,
+                              IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
      STDMETHOD(get_DataSet)(IDataSet **);
 
@@ -185,8 +186,16 @@
      IPlot *pIPlot;
 
      IGProperty* pParentPropertyPlotView;
-     IGProperty* pParentPropertyFloor;
-     IGProperty* pParentPropertyCeiling;
+
+     IGProperty* pParentPropertyXFloor{NULL};
+     IGProperty* pParentPropertyXCeiling{NULL};
+
+     IGProperty* pParentPropertyYFloor{NULL};
+     IGProperty* pParentPropertyYCeiling{NULL};
+
+     IGProperty* pParentPropertyZFloor{NULL};
+     IGProperty* pParentPropertyZCeiling{NULL};
+
      IGProperty* pParentPropertyOpenGLText;
 
      IDataSet *pIDataSetDomain;

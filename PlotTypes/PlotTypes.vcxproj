@@ -160,22 +160,24 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Common\source\utilities.cpp" />
     <ClCompile Include="..\..\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="..\..\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="..\..\Common\Utils\registryUtils.cpp" />
     <ClCompile Include="..\..\Common\Utils\Utils.cpp" />
+    <ClCompile Include="blocksPropertiesHandler.cpp" />
     <ClCompile Include="COM Interfaces\IGSystemPlotType.cpp" />
     <ClCompile Include="COM Interfaces\IPropertyPageClient.cpp" />
     <ClCompile Include="COM Interfaces\IUnknown.cpp" />
-    <ClCompile Include="COM Interfaces\natural.cpp" />
-    <ClCompile Include="COM Interfaces\propertiesHandler.cpp" />
     <ClCompile Include="dllMain.cpp" />
     <ClCompile Include="Implementations\balls.cpp" />
     <ClCompile Include="Implementations\blocks.cpp" />
+    <ClCompile Include="Implementations\natural.cpp" />
     <ClCompile Include="Implementations\stacks.cpp" />
     <ClCompile Include="Implementations\surface.cpp" />
     <ClCompile Include="Implementations\wireFrame.cpp" />
     <ClCompile Include="PlotTypes.cpp" />
+    <ClCompile Include="propertiesHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlotTypes.h" />

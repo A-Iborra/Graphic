@@ -138,8 +138,9 @@
                                           IGProperty *parentPropertyDefault2DPlotSubType,
                                           IGProperty *parentPropertyDefault3DPlotSubType,
                                           IGProperty *parentPropertyBackgroundColor,
-                                          IGProperty *parentPropertyFloor,
-                                          IGProperty *parentPropertyCeiling,
+                                          IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                                          IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                                          IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                                           void (__stdcall *pCallback)(void *,ULONG_PTR),void *pArg,ULONG_PTR callbackCookie) {
 
    IDataSet *pds = NULL;
@@ -154,7 +155,11 @@
 
    HRESULT rc = pIPlot -> Initialize((IDataSet *)pvIDataSet_Domain,(IOpenGLImplementation *)pvIOpenGLImplementation,
                                        NULL/*evaluator*/,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
-                                       parentPropertyBackgroundColor,parentPropertyFloor,parentPropertyCeiling,pCallback,pArg,callbackCookie);
+                                       parentPropertyBackgroundColor,
+                                       parentPropertyXFloor,parentPropertyXCeiling,
+                                       parentPropertyYFloor,parentPropertyYCeiling,
+                                       parentPropertyZFloor,parentPropertyZCeiling,
+                                       pCallback,pArg,callbackCookie);
 
    return rc;
    }
@@ -168,13 +173,31 @@
 
 
    HRESULT DataSet::get_maxX(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMax,returnedMax = xMax;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_maxX(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
+
+   if ( pPropertyXCeiling ) {
+      if ( -DBL_MAX == returnedMax )
+         pPropertyXCeiling -> get_doubleValue(&returnedMax);
+      IGProperty* pKeep = pPropertyXFloor;
+      pPropertyXFloor = NULL;
+      double tempMin;
+      get_minX(&tempMin);
+      if ( tempMin == returnedMax )
+         pPropertyXCeiling -> get_doubleValue(&returnedMax);
+      pPropertyXFloor = pKeep;
+   }
+
    *getVal = returnedMax;
+
    return S_OK;
    }
 
@@ -187,13 +210,31 @@
  
 
    HRESULT DataSet::get_maxY(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMax,returnedMax = yMax;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_maxY(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
+
+   if ( pPropertyYCeiling ) {
+      if ( -DBL_MAX == returnedMax )
+         pPropertyYCeiling -> get_doubleValue(&returnedMax);
+      IGProperty* pKeep = pPropertyYFloor;
+      pPropertyYFloor = NULL;
+      double tempMin;
+      get_minY(&tempMin);
+      if ( tempMin == returnedMax )
+         pPropertyYCeiling -> get_doubleValue(&returnedMax);
+      pPropertyYFloor = pKeep;
+   }
+
    *getVal = returnedMax;
+
    return S_OK;
    }
 
@@ -206,24 +247,31 @@
  
  
    HRESULT DataSet::get_maxZ(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMax,returnedMax = zMax;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_maxZ(&otherMax);
       returnedMax = max(returnedMax,otherMax);
    }
-   if ( pPropertyCeiling ) {
+
+   if ( pPropertyZCeiling ) {
       if ( -DBL_MAX == returnedMax )
-         pPropertyCeiling -> get_doubleValue(&returnedMax);
-      IGProperty* pKeep = pPropertyFloor;
-      pPropertyFloor = NULL;
+         pPropertyZCeiling -> get_doubleValue(&returnedMax);
+      IGProperty* pKeep = pPropertyZFloor;
+      pPropertyZFloor = NULL;
       double tempMin;
       get_minZ(&tempMin);
       if ( tempMin == returnedMax )
-         pPropertyCeiling -> get_doubleValue(&returnedMax);
-      pPropertyFloor = pKeep;
+         pPropertyZCeiling -> get_doubleValue(&returnedMax);
+      pPropertyZFloor = pKeep;
    }
+
    *getVal = returnedMax;
+
    return S_OK;
    }
 
@@ -236,17 +284,31 @@
  
  
    HRESULT DataSet::get_minX(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMin,returnedMin = xMin;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_minX(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }
-   *getVal = returnedMin;
-   if ( DBL_MAX == returnedMin ) {
-      if ( pPropertyFloor ) 
-         pPropertyFloor -> get_doubleValue(getVal);
+
+   if ( pPropertyXFloor ) {
+      if ( DBL_MAX == returnedMin )
+         pPropertyXFloor -> get_doubleValue(&returnedMin);
+      IGProperty *pKeep = pPropertyXCeiling;
+      pPropertyXCeiling = NULL;
+      double tempMax;
+      get_maxX(&tempMax);
+      if ( tempMax == returnedMin )
+         pPropertyXFloor -> get_doubleValue(&returnedMin);
+      pPropertyXCeiling = pKeep;
    }
+
+   *getVal = returnedMin;
+
    return S_OK;
    }
 
@@ -259,13 +321,31 @@
 
  
    HRESULT DataSet::get_minY(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMin,returnedMin = yMin;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_minY(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }
+
+   if ( pPropertyYFloor ) {
+      if ( DBL_MAX == returnedMin )
+         pPropertyYFloor -> get_doubleValue(&returnedMin);
+      IGProperty *pKeep = pPropertyYCeiling;
+      pPropertyYCeiling = NULL;
+      double tempMax;
+      get_maxY(&tempMax);
+      if ( tempMax == returnedMin )
+         pPropertyYFloor -> get_doubleValue(&returnedMin);
+      pPropertyYCeiling = pKeep;
+   }
+
    *getVal = returnedMin;
+
    return S_OK;
    }
 
@@ -278,24 +358,30 @@
  
  
    HRESULT DataSet::get_minZ(double *getVal) {
-   if ( ! getVal ) return E_POINTER;
+   if ( ! getVal ) 
+      return E_POINTER;
+
    double otherMin,returnedMin = zMin;
+
    for ( IDataSet *p : otherDomains ) {
       p -> get_minZ(&otherMin);
       returnedMin = min(returnedMin,otherMin);
    }
-   if ( pPropertyFloor ) {
+
+   if ( pPropertyZFloor ) {
       if ( DBL_MAX == returnedMin )
-         pPropertyFloor -> get_doubleValue(&returnedMin);
-      IGProperty *pKeep = pPropertyCeiling;
-      pPropertyCeiling = NULL;
+         pPropertyZFloor -> get_doubleValue(&returnedMin);
+      IGProperty *pKeep = pPropertyZCeiling;
+      pPropertyZCeiling = NULL;
       double tempMax;
       get_maxZ(&tempMax);
       if ( tempMax == returnedMin )
-         pPropertyFloor -> get_doubleValue(&returnedMin);
-      pPropertyCeiling = pKeep;
+         pPropertyZFloor -> get_doubleValue(&returnedMin);
+      pPropertyZCeiling = pKeep;
    }
+
    *getVal = returnedMin;
+
    return S_OK;
    }
 
@@ -306,15 +392,35 @@
    return S_OK;
    }
  
-
-   HRESULT DataSet::put_floor(IGProperty *pf) {
-   pPropertyFloor = pf;
+   HRESULT DataSet::put_XFloor(IGProperty *pf) {
+   pPropertyXFloor = pf;
    return S_OK;
    }
 
    
-   HRESULT DataSet::put_ceiling(IGProperty *pc) {
-   pPropertyCeiling = pc;
+   HRESULT DataSet::put_XCeiling(IGProperty *pc) {
+   pPropertyXCeiling = pc;
+   return S_OK;
+   }
+
+   HRESULT DataSet::put_YFloor(IGProperty *pf) {
+   pPropertyYFloor = pf;
+   return S_OK;
+   }
+   
+   HRESULT DataSet::put_YCeiling(IGProperty *pc) {
+   pPropertyYCeiling = pc;
+   return S_OK;
+   }
+
+   HRESULT DataSet::put_ZFloor(IGProperty *pf) {
+   pPropertyZFloor = pf;
+   return S_OK;
+   }
+
+   
+   HRESULT DataSet::put_ZCeiling(IGProperty *pc) {
+   pPropertyZCeiling = pc;
    return S_OK;
    }
 
@@ -765,11 +871,25 @@
    pMaxPoint -> z = zMax;
 #endif
 
+   if ( pMinPoint -> x == pMaxPoint -> x ) {
+      if ( pPropertyXFloor ) 
+         pPropertyXFloor -> get_doubleValue(&pMinPoint -> x);
+      if ( pPropertyXCeiling ) 
+         pPropertyXCeiling -> get_doubleValue(&pMaxPoint -> x);
+   }
+
+   if ( pMinPoint -> y == pMaxPoint -> y ) {
+      if ( pPropertyYFloor ) 
+         pPropertyYFloor -> get_doubleValue(&pMinPoint -> y);
+      if ( pPropertyYCeiling ) 
+         pPropertyYCeiling -> get_doubleValue(&pMaxPoint -> y);
+   }
+
    if ( pMinPoint -> z == pMaxPoint -> z ) {
-      if ( pPropertyFloor ) 
-         pPropertyFloor -> get_doubleValue(&pMinPoint -> z);
-      if ( pPropertyCeiling ) 
-         pPropertyCeiling -> get_doubleValue(&pMaxPoint -> z);
+      if ( pPropertyZFloor ) 
+         pPropertyZFloor -> get_doubleValue(&pMinPoint -> z);
+      if ( pPropertyZCeiling ) 
+         pPropertyZCeiling -> get_doubleValue(&pMaxPoint -> z);
    }
 
    return S_OK;
@@ -1343,44 +1463,29 @@
 
    STDMETHODIMP DataSet::Start() {
 
-   DataList *pDataList = NULL;
-   DataPoint dp;
+   long countPoints = 0;
 
-   get(pDataList,&dp,&pDataList);
+   get_countPoints(&countPoints);
 
-   if ( ! pDataList ) {
+   if ( 0 == countPoints ) {
+
       if ( szDataSource[0] && szSpreadsheetName[0] && szCellRange[0]) 
          loadExcelCellRange(NULL,NULL,szDataSource,szSpreadsheetName,szCellRange);
       else if ( szDataSource[0] && szNamedRange[0] )
          loadExcelNamedRange(NULL,NULL,szDataSource,szNamedRange);
       else
          return E_UNEXPECTED;
-      get(pDataList,&dp,&pDataList);
-      if ( ! pDataList )
+
+      get_countPoints(&countPoints);
+
+      if ( 0 == countPoints )
          return E_UNEXPECTED;
+
    }
 
    fire_Clear();
 
-   long countPoints = 0;
-
-   get_countPoints(&countPoints);
-#if 0
-   while ( 1 ) {
-
-      if ( ! pDataList )
-         break;
-
-      countPoints++;
-
-      get(pDataList,&dp,&pDataList);
-
-   } 
-#endif
-
    fire_Started(countPoints);
-
-   pDataList = NULL;
 
    fire_Finished();
 

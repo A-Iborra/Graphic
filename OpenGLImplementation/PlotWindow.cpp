@@ -827,21 +827,21 @@ OPENGL_ERROR_CHECK
       if ( pPropAmbientLight && pPropAmbientLight[k] ) {
          BYTE *pb = (BYTE *)&openGLLighting.fvAmbientLight[k][0];
          pPropAmbientLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-openGLLighting.fvAmbientLight[k][3] = 0.0;
+openGLLighting.fvAmbientLight[k][3] = 1.0;
          openGLLighting.hasAmbient[k] = true;
       }
 
       if ( pPropDiffuseLight && pPropDiffuseLight[k] ) {
          BYTE *pb = (BYTE *)&openGLLighting.fvDiffuseLight[k][0];
          pPropDiffuseLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-openGLLighting.fvDiffuseLight[k][3] = 0.0;
+openGLLighting.fvDiffuseLight[k][3] = 1.0;
          openGLLighting.hasDiffuse[k] = true;
       }
 
       if ( pPropSpecularLight && pPropSpecularLight[k] ) {
          BYTE *pb = (BYTE *)&openGLLighting.fvSpecularLight[k][0];
          pPropSpecularLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-openGLLighting.fvSpecularLight[k][3] = 0.0;
+openGLLighting.fvSpecularLight[k][3] = 1.0;
          openGLLighting.hasSpecular[k] = true;
       }
 
@@ -868,12 +868,9 @@ openGLLighting.lightPosition[k][3] = 1.0;
       pPropShinyness -> get_longValue(&openGLLighting.shinyness);
    }
 
-   //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-   //glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-
    return S_OK;
    }
- 
+
 
    void PlotWindow::enableLighting() {
 
@@ -881,10 +878,7 @@ openGLLighting.lightPosition[k][3] = 1.0;
    glEnable(GL_LIGHTING);
    glEnable(GL_DEPTH_TEST);
 
-   glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-   glColorMaterial(GL_FRONT_AND_BACK,GL_SPECULAR);
- 
-   glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1.0f);
+   glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER,1.0f);
 
    for ( int k = 0; k < openGLLighting.lightCount && k < openGLLighting.lightCount; k ++ ) {
 
@@ -901,11 +895,13 @@ openGLLighting.lightPosition[k][3] = 1.0;
       if ( openGLLighting.hasDiffuse[k] ) 
          glLightfv(GL_LIGHT0 + k,GL_DIFFUSE,openGLLighting.fvDiffuseLight[k]);
 
-      if ( openGLLighting.hasSpecular[k] ) 
+      if ( openGLLighting.hasSpecular[k] ) {
          glLightfv(GL_LIGHT0 + k,GL_SPECULAR,openGLLighting.fvSpecularLight[k]);
+         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,openGLLighting.fvSpecularLight[k]);
+      }
 
       glLightfv(GL_LIGHT0 + k,GL_POSITION,openGLLighting.lightPosition[k]);
-      glLightf(GL_LIGHT0 + k,GL_SPOT_CUTOFF,90.0f);
+      //glLightf(GL_LIGHT0 + k,GL_SPOT_CUTOFF,90.0f);
 
    }
 
@@ -917,14 +913,14 @@ openGLLighting.lightPosition[k][3] = 1.0;
    return;
    }
  
+
    HRESULT PlotWindow::erase(IGProperty *pPropBackgroundColor) {
 
    float fv[4];
    if ( pPropBackgroundColor ) {
       BYTE *pb = (BYTE *)fv;
       pPropBackgroundColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
-   }
-   else {
+   } else {
       if ( pSaved_BackgroundColor ) {
          BYTE *pb = (BYTE *)fv;
          pSaved_BackgroundColor -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
@@ -1118,9 +1114,9 @@ openGLLighting.lightPosition[k][3] = 1.0;
 
    HGDIOBJ oldBitmap = SelectObject(hdcMerged,hbmMerged);
 
-   BitBlt(hdcMerged,0,0,cxWindow,cyWindow,hdc,0,0,SRCCOPY);
+   //BitBlt(hdcMerged,0,0,cxWindow,cyWindow,hdc,0,0,SRCCOPY);
 
-   BitBlt(hdcMerged,0*(cxWindow - cxBuffer)/2,0*(cyWindow - cyBuffer)/2,cxBuffer,cyBuffer,hdcOpenGL,0,0,SRCAND);
+   BitBlt(hdcMerged,0,0,cxBuffer,cyBuffer,hdcOpenGL,0,0,SRCCOPY);
 
    SelectObject(hdcMerged,oldBitmap);
 

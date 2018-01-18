@@ -121,14 +121,14 @@ library Graphic {
       [propget,id(gcPropPlotType),helpstring("Gets the plot type of the Graphic Control, From the enum PlotTypes")]
       HRESULT PlotType([out,retval] enum gc2DPlotTypes* plotType);
 
-      [propput,id(gcPropFloor),helpstring("Sets the value to use as minimum Z when data does not supply a Z value")]
+      [propput,id(gcPropFloor),helpstring("Sets the value to use as minimum Z when data does not supply any or only 1 Z value")]
       HRESULT Floor([in] double floorZValue);
-      [propget,id(gcPropFloor),helpstring("Gets the value in use as the minimum Z value when data does not supply a Z value")]
+      [propget,id(gcPropFloor),helpstring("Gets the value in use as the minimum Z value when data does not supply any or only 1 Z value")]
       HRESULT Floor([out,retval] double *pFloorZValue);
 
-      [propput,id(gcPropCeiling),helpstring("Sets the value to use as maximum Z when data does not supply a Z value")]
+      [propput,id(gcPropCeiling),helpstring("Sets the value to use as maximum Z when data does not supply any or only 1 Z value")]
       HRESULT Ceiling([in] double ceilingZValue);
-      [propget,id(gcPropCeiling),helpstring("Gets the value in use as the maximum Z value when data does not supply a Z value")]
+      [propget,id(gcPropCeiling),helpstring("Gets the value in use as the maximum Z value when data does not supply any or only 1 Z value")]
       HRESULT Ceiling([out,retval] double *pCeilingZValue);
 
       [propput,id(gcPropViewPhi),helpstring("One of two angles which determines the view of the graphic is Theta - an angle of elevation above the X-Y plane. This property is the value, in degrees, of this angle.")]

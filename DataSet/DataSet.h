@@ -103,8 +103,9 @@ using namespace VBIDE;
                               IGProperty *parentPropertyDefault2DPlotSubType,
                               IGProperty *parentPropertyDefault3DPlotSubType,
                               IGProperty *parentPropertyBackgroundColor,
-                              IGProperty *parentPropertyFloor,
-                              IGProperty *parentPropertyCeiling,
+                              IGProperty *parentPropertyXFloor,IGProperty *parentPropertyXCeiling,
+                              IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
+                              IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                               void (__stdcall *pCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
       STDMETHOD(put_OnChangeCallback)(void (__stdcall *)(void *,ULONG_PTR),void *,ULONG_PTR);
@@ -122,8 +123,14 @@ using namespace VBIDE;
       STDMETHOD(put_minZ)(double);
       STDMETHOD(get_minZ)(double *getVal);                     
                                                                  
-      STDMETHOD(put_floor)(IGProperty *);
-      STDMETHOD(put_ceiling)(IGProperty *);
+      STDMETHOD(put_XFloor)(IGProperty *);
+      STDMETHOD(put_XCeiling)(IGProperty *);
+
+      STDMETHOD(put_YFloor)(IGProperty *);
+      STDMETHOD(put_YCeiling)(IGProperty *);
+
+      STDMETHOD(put_ZFloor)(IGProperty *);
+      STDMETHOD(put_ZCeiling)(IGProperty *);
 
       STDMETHOD(get_top)(DataList **getTop);                    
       STDMETHOD(get_bottom)(DataList **getBottom);              
@@ -594,8 +601,15 @@ using namespace VBIDE;
 
       IGProperty *pPropertyState{NULL};
 
-      IGProperty *pPropertyFloor{NULL};
-      IGProperty *pPropertyCeiling{NULL};
+      IGProperty *pPropertyXFloor{NULL};
+      IGProperty *pPropertyXCeiling{NULL};
+
+      IGProperty *pPropertyYFloor{NULL};
+      IGProperty *pPropertyYCeiling{NULL};
+
+      IGProperty *pPropertyZFloor{NULL};
+      IGProperty *pPropertyZCeiling{NULL};
+
       IGProperty* pPropertyPlots{NULL};
 
       IGProperty* pPropertyEmbeddedData{NULL};

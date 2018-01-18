@@ -34,7 +34,7 @@
 
   protected:
 
-     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty*,IGProperty*,IGProperty*);
+     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*);
 
      STDMETHOD(Erase)();
      STDMETHOD(AddText)(void *text,char *name,int id);
@@ -109,8 +109,13 @@
      IOpenGLImplementation *pIOpenGLImplementation;
      IEvaluator *pIEvaluator;
      IGProperty* pPropertyLastDrawLineWeight;
-     IGProperty* pPropertyFloor;
-     IGProperty* pPropertyCeiling;
+
+     IGProperty* pPropertyXFloor{NULL};
+     IGProperty* pPropertyXCeiling{NULL};
+     IGProperty* pPropertyYFloor{NULL};
+     IGProperty* pPropertyYCeiling{NULL};
+     IGProperty* pPropertyZFloor{NULL};
+     IGProperty* pPropertyZCeiling{NULL};
 
      unsigned int refCount;
 

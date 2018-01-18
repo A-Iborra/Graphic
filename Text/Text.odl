@@ -205,8 +205,11 @@ library Text {
      [propput,id(textPropertyTextNotify),helpstring("")]
      HRESULT TextNotify(ITextNotify* pITextNotify);
 
-     [id(102)] HRESULT Initialize(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,IGProperty* pPropFloor,
-                                    IGProperty* pPropCeiling,IGProperty* pPropOpenGLRendering,char *text,struct DataPoint *position,
+     [id(102)] HRESULT Initialize(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,
+                                    IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
+                                    IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
+                                    IGProperty* pPropZFloor,IGProperty* pPropZCeiling,
+                                    IGProperty* pPropOpenGLRendering,char *text,struct DataPoint *position,
                                     [in] void (*pWhenChangedCallback)(void *,ULONG_PTR),[in] void *pWhenChangedArg,[in] ULONG_PTR whenChangedCookie);
 
      [id(103)] HRESULT PrepData();

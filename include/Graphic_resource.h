@@ -123,26 +123,30 @@
    #define IDDI_DATASET_DATA_BOX_DIMENSION1_RANGE                          2219
    #define IDDI_DATASET_DATA_BOX_DIMENSION2_RANGE                          2220
    #define IDDI_DATASET_DATA_BOX_DIMENSION3_RANGE                          2221
-   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL                        2222
-   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL2                       2223
-   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL3                       2224
-   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL4                       2225
-   #define IDDI_DATASET_DATA_BOX_FLOOR                                     2226
-   #define IDDI_DATASET_DATA_BOX_CEILING                                   2227
+   #define IDDI_DATASET_DATA_BOX_X_RANGE_FLOOR                             2222
+   #define IDDI_DATASET_DATA_BOX_X_RANGE_CEILING                           2223
+   #define IDDI_DATASET_DATA_BOX_Y_RANGE_FLOOR                             2224
+   #define IDDI_DATASET_DATA_BOX_Y_RANGE_CEILING                           2225
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL                        2226
+   #define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL2                       2227
+   //#define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL3                       2228
+   //#define IDDI_DATASET_DATA_BOX_SINGLE_VALUE_LABEL4                       2229
+   #define IDDI_DATASET_DATA_BOX_FLOOR                                     2230
+   #define IDDI_DATASET_DATA_BOX_CEILING                                   2231
 
-   #define IDDI_DATASET_EXPORT_BOX                                         2229
-   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST                             2230
-   #define IDDI_DATASET_GETEXPORT_DEST                                     2231
-   #define IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST                       2232
-   #define IDDI_DATASET_DATASOURCE_EXPORT_CELL                             2233
-   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST_OPEN                        2234
-   #define IDDI_DATASET_DATASOURCE_EXPORT                                  2235
-   #define IDDI_DATASET_DATASOURCE_EXPORT_CANCEL                           2236
-   #define IDDI_DATASET_DATASOURCE_EXPORT_STATUS                           2237
-   #define IDDI_DATASET_DATASOURCE_EMBED_INSTRUCTIONS                      2238
-   #define IDDI_DATASET_DATASOURCE_IS_EMBEDDED                             2249
-   #define IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE                         2240
-   #define IDDI_DATASET_DATASOURCE_ERROR                                   2241
+   #define IDDI_DATASET_EXPORT_BOX                                         2240
+   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST                             2241
+   #define IDDI_DATASET_GETEXPORT_DEST                                     2242
+   #define IDDI_DATASET_DATASOURCE_EXPORT_SHEET_LIST                       2243
+   #define IDDI_DATASET_DATASOURCE_EXPORT_CELL                             2244
+   #define IDDI_DATASET_DATASOURCE_EXPORT_DEST_OPEN                        2245
+   #define IDDI_DATASET_DATASOURCE_EXPORT                                  2246
+   #define IDDI_DATASET_DATASOURCE_EXPORT_CANCEL                           2247
+   #define IDDI_DATASET_DATASOURCE_EXPORT_STATUS                           2248
+   #define IDDI_DATASET_DATASOURCE_EMBED_INSTRUCTIONS                      2249
+   #define IDDI_DATASET_DATASOURCE_IS_EMBEDDED                             2250
+   #define IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE                         2251
+   #define IDDI_DATASET_DATASOURCE_ERROR                                   2252
 
 #define IDDIALOG_DATASET_EXCEL                                             2230
    #define IDDI_DATASET_EXCEL_SPREADSHEET_LIST                             2231

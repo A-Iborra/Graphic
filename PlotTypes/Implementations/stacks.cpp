@@ -5,16 +5,16 @@
 
 //#include "plot.h"
 
-   void PlotTypes::stacks(long segmentID) {
+   void PlotTypes::stacks(commonProperties *pProperties,long segmentID) {
    if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 
-      stacks2D(segmentID);
+      stacks2D(pProperties,segmentID);
    else
-      stacks3D(segmentID);
+      stacks3D(pProperties,segmentID);
    return;
    }
 
 
-   void PlotTypes::stacks2D(long segmentID) {
+   void PlotTypes::stacks2D(commonProperties *pProperties,long segmentID) {
    
    DECLARE_PLANE
 
@@ -149,7 +149,7 @@
    }
 
 
-   void PlotTypes::stacks3D(long segmentID) {
+   void PlotTypes::stacks3D(commonProperties *pProperties,long segmentID) {
 
    DECLARE_PLANE
 

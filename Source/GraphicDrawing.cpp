@@ -241,6 +241,8 @@
       p -> plotList.GetFirst() -> Plotter(n,&pIPlots);
    }
 
+   p -> pIOpenGLImplementation -> Finalize();
+
    ax = NULL;
    while ( ax = p -> axisList.GetNext(ax) )
       ax -> DrawLabels();
@@ -250,8 +252,6 @@
       t -> PrepData();
       t -> Draw();
    } 
-
-   p -> pIOpenGLImplementation -> Finalize();
 
    if ( p -> showStatusBar ) {
 
