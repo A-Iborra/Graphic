@@ -61,16 +61,19 @@ When you ran the installer, the Properties.ocx component was installed and regis
 Well - there's no getting around it - there <strong>ARE</strong> circular dependencies here.
 
 The fact is, this is a system of rich objects - sometimes defined in terms of each other - and that is how I want them to be. For example, a dataset has a related plot, a plot has a related dataset, a function is a dataset, and so on. 
-I cannot allow a technical issue such as the occassional build difficult dictate the nature of my objects - if somebody knows a better way, and it doesn't drive my thinking or architecture in some artificial way - I'm all ears, but
+I cannot allow a technical issue such as the occassional build difficulty dictate the nature of my objects - if somebody knows a better way, and it doesn't drive my thinking or architecture in some artificial way - I'm all ears, but
 for now I live with it.
 
-Note that the systems interrelate through the generated <fileName>_i.h and <fileName>_i.c files from the MIDL compiler. I DO check these into the repositories for the very reason that they need to be there for the first build.
+Note that the systems interrelate through the generated <fileName>_i.h and <fileName>_i.c files from the MIDL compiler. I DO check these into the repositories for the very reason that they need to be there for the first build. Note, 
+however, that because they are generated, a build "clean" or "rebuild all" will delete them. As I say, if anyone knows a better way - that does NOT drive the object model, I'd love to hear it.
 
 <strong>By the way</strong> ALL artifacts build into subdirectories of "\Common\Artifacts" - this includes generated files needed across projects.
 
 Anyway - there ARE issues with MIDL puking on just about everything with absolutely no useful information. I have not always been able to get interfaces formally into '.odl files - for example, sometimes I have to resort
-to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are a perfect example of the absolute bullshit type of laziness on the part of 
-software developers that we become victims of.
+to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are total bullshit and it's way past time that we should be given the respect, by MS 
+and others, for that matter, to be provided better tools, or at least tools that can be the best they can be.
+
+
 
 
 
