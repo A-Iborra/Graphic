@@ -7,7 +7,7 @@ This one is my lifelong passion - or, put another way - something I've been stuc
 I don't know why - but for some reason, Sibelius and Scientific Computer Graphics grabbed my ass sometime in 1980 or so. And, to this date, almost 40 years later, they both still have full control over me.
 
 I should have known when, having dropped a stack of FORTRAN punch cards - yes - punch cards (and YES, FORTRAN), I studiously put them ALL back in order absolutely adament about saving that work - that I was forever in the 
-unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, would I get the fuck out of it right then and there !? 
+unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, should I hitail my ass out of there right then and there ?
 
 I'll never know the answer to that - but I do know that for whatever angst, trials, and tribulations I've endured during these 40 years - if there will be some good that comes out of it - it may as well be a
 contribution back to that realm that somehow roped me into this bullshit, irratitating, and frustrating career that I love so much...
@@ -72,6 +72,37 @@ however, that because they are generated, a build "clean" or "rebuild all" will 
 Anyway - there ARE issues with MIDL puking on just about everything with absolutely no useful information. I have not always been able to get interfaces formally into '.odl files - for example, sometimes I have to resort
 to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are total bullshit and it's way past time that we should be given the respect, by MS 
 and others, for that matter, to be provided better tools, or at least tools that can be the best they can be.
+
+### Building the system
+----
+Because of the afore mentioned cicular dependencies - please don't do any "build clean", or "rebuild all" quite yet. Someday I'll figure out a better way - but for now, I generally just right click and build each project as necessary.
+
+Also note that all of my projects use a common VS properties sheet that is in the \Common repository (Compiler Options.props) I try very carefully never to apply specific bild properties on a file-by-file basis, but sometimes
+they slip through.
+
+A quick synopsis of the components in the system, in alphabetical order is (ALL of these are COM objects):
+
+1. Graphic - the core "central" component - hosts sthe graphic drawing window and UI components for interacting with Functions, DataSets, Plots and properties for the whole system. This is the main ActiveX/COM component control of the system.
+2. Axis - The x, y, and z axiis for the plots.
+3. DataSet - The data. That which will be plotted. This object also has very extensive import/export MS Excel capabilities.
+4. Documentation - just a place holder for now, some stuff I had started in the early 2000s time frame, but documentation IS lacking here
+5. Evaluator - Evaluates mathematical expressions. Given a string representation of any algebraic equation - will provide the results of it. It will detect independent variables that the user would need to provide range(s) for.
+6. Function - tightly integrated with the Evaluator to provide the ability to define arbitrarily complex algebraic functions whose data is then tightly integrated with Graphic to achieve plotting (as well as the UI host for the function definitions)
+7. GSystem - a few interfaces and other definitions that are useful system wide
+8. GraphicHost - The sample C++ embedding application. This very simple application is the "application" installed by the installer. By containing (hosting) the Graphic Control - it is in itself a very powerful graphics system. You would almost think
+that this executable WAS the system - but it's not - any windows application can use the Graphic control and appear just as full featured.
+9. OpenGLImplementation - All calls to the OpenGL library are made here - essentially nothing in the entire system <i>except</i> this component knows or cares even a little bit about OpenGL. Instead, other components use the interfaces 
+to this object to produce graphics. Essentially - one could use any underlying graphics API by re-implementing this component over that API. This particular project shows one way how to access OpenGL in a multi-threaded system correctly.
+10. Plot - The graphic itself - the drawing, or "representation" of the data. Note there are only a few plot "types" defined at this point, natural (line), wireframe, surface (again you can see these almost instantly by running the 
+sample application and creating functions). However - What is important is that the plot types themselves <strong>are also</strong> COM objects ! In other words - Anybody can create any new plottype they can dream up (in any language For
+that matter) and it will seamlessly integrate into the entire system - as if it were natively built in - this is but one very good example of the power of raw COM.
+11. PlotTypes - Here are the currently implemented plot types. All of the logic for representing the data would be in COM objects - like this one. This particular project cam about when I realized the power of taking this logic out of the main System
+and creating a COM-centric strategy that would allow anyone to publish a plot type. If you want to create a new plot type - use this project as a pattern - and create your own (new) project for your type(s). Check out the code in dllMain.cpp
+to see how plot types are "registered" so that the main system control (Graphic) can pick them up and implement them (they are actually put into service by the Plot project - but that is just a details.
+12. Text - I have isolated Text Objects here - there is not much that is currently being done with Text - other than drawing axis labels, etc., It will be my next big project - to really flesh out the text capabilities
+13. V - This stands for Variable. It is an object that the Function and Evaluator objects will detect and create while parsing some expression. It also contains the UI for range specification when using Functions in the Graphic.
+14. ViewSet - This project pops up a dialog that allows you to set the 3-D "viewing parameters" of the scene. You can rotate about 3 different axis using slider controls. Select "Dimension -> Set 3-D View" from the right-click context menu to 
+activate the dialog.
 
 
 
