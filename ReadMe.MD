@@ -14,18 +14,30 @@ contribution back to that realm that somehow roped me into this bullshit, irrati
 
 And, so, here it is - number graphics - on Windows - in COM - and when I say COM - I mean COM.
 
+## What is this software ?
+----
+
+At it's core - this is really a <strong>development</strong> tool. It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
+"container" support. In fact, the "application" that installs with this system is a very simple container of perhaps 100 or so lines of code. It is incredibly easy to pop this tool into just about any system imaginable. 
+In fact, one can instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.
+
 ## Building the System
 ----
-As I mentioned, this is COM. To further clarify, this is RAW COM. There is nothing here, in terms of what you may <strong>THINK</strong> is COM, that you will recognize.
+As I mentioned, this is COM. To further clarify, this is RAW COM.
 
-All I can say is welcome to this incredibly powerful world ! Let me help you explore this world that MS didn't have the balls or courtesy to describe to you, perhaps because they themselves never truly understood it ! 
-Which would NOT surprise me! Or, perhaps because they didn't have as much faith in you that I have in you ! All THEY wanted to do is provide the NEXT generation - having left THIS one in such poorly documented state that you'd HAVE to 
-buy the next !
+All I can say is welcome to this incredibly powerful world ! Let me help you explore this world that MS doesn't have the courtesy to sufficiently document. Seems like all they wanted to do is provide the NEXT generation - 
+having left THIS one in such poorly documented state that you'd HAVE to  buy the next !
 
-But you will find - as I did - that it is ultimately SOoooo... simple, that it is an absolute afront to our intelligence that they would leave this stuff out !?! And, that to have our faculties insulted in this way should 
-drive us incessently towards putting it right back in their face.
+But you will find - as I did - that it is ultimately SOoooo... simple.
 
 So, my friends, join me in this - embrace the fact that software development of integrated systems is complex, yet, given a willingness to understand it, it becomes simple, elegant, robust, and extensible.
 
 If what you want is cookie cutter, your hand held, it done for you, or some high level lowest common denominator one size fits all thing - well, then, please <strong>Move along - these are not the Droid's you're looking for</strong>
+
+### Run the installer
+----
+You will find the NSIS built installer in the "Installer Support" directory. This installer will put a "Graphic" icon on your desktop. 
+You can get to know how the system works quickly by right clicking on the empty graphic and choosing "Functions", then click "Add" to define a new function (default 3-D functions are provided).
+
+
 
