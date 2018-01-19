@@ -7,7 +7,7 @@ This one is my lifelong passion - or, put another way - something I've been stuc
 I don't know why - but for some reason, Sibelius and Scientific Computer Graphics grabbed my ass sometime in 1980 or so. And, to this date, almost 40 years later, they both still have full control over me.
 
 I should have known when, having dropped a stack of FORTRAN punch cards - yes - punch cards (and YES, FORTRAN), I studiously put them ALL back in order absolutely adament about saving that work - that I was forever in the 
-unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, would I get the fuck out of right then and there !? 
+unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, would I get the fuck out of it right then and there !? 
 
 I'll never know the answer to that - but I do know that for whatever angst, trials, and tribulations I've endured during these 40 years - if there will be some good that comes out of it - it may as well be a
 contribution back to that realm that somehow roped me into this bullshit, irratitating, and frustrating career that I love so much...
