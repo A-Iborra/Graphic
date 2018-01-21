@@ -26,11 +26,10 @@ As I mentioned, this is COM. To further clarify, this is RAW COM.
 All I can say is welcome to this incredibly powerful world ! Let me help you explore this world that MS doesn't have the courtesy to sufficiently document. Seems like all they wanted to do is provide the NEXT generation - 
 having left THIS one in such poorly documented state that you'd HAVE to  buy the next !
 
-But you will find - as I did - that it is ultimately SOoooo... simple.
+But you will find - as I did - that it is ultimately SO simple.
 
 So, my friends, join me in this - embrace the fact that software development of integrated systems is complex, yet, given a willingness to understand it, it becomes simple, elegant, robust, and extensible.
 
-If what you want is cookie cutter, your hand held, it done for you, or some high level lowest common denominator one size fits all thing - well, then, please <strong>Move along - these are not the Droid's you're looking for</strong>
 
 ### Run the installer
 ----

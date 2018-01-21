@@ -90,6 +90,8 @@ ShowUnInstDetails show
 
 SetPluginUnload  alwaysoff
 
+Var PostInstallDLL
+
 Function .onInit
 
 !ifdef INNER
@@ -101,21 +103,21 @@ Function .onInit
 
 !echo '${ARCH}'
 
-;${If} 'x64' == '${ARCH}';\
-;
-;   StrCpy $INSTDIR "$PROGRAMFILES64\InnoVisioNate\Graphic"
-;
-;   StrCpy $PostInstallDLL "PostInstall32"
-;
-;   SetRegView 64
-;
-;${Else}
-;
-;   strCpy $PostInstallDLL "PostInstall"
-;
-;   SetRegView 32
-;
-;${EndIf}
+${If} 'x64' == '${ARCH}'
+
+   StrCpy $INSTDIR "$PROGRAMFILES64\InnoVisioNate\Graphic"
+
+   StrCpy $PostInstallDLL "PostInstall32"
+
+   SetRegView 64
+
+${Else}
+
+   StrCpy $PostInstallDLL "PostInstall"
+
+   SetRegView 32
+
+${EndIf}
 
    SetOutPath "$INSTDIR"
   
