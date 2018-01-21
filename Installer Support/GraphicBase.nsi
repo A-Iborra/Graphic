@@ -136,27 +136,33 @@ Section "Graphic" SEC01
 !ifdef INNER
 !ifndef DONT_SIGN
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\GraphicHost.exe"'
-!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Function.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Axis.dll"'
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\DataSet.dll"'
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Evaluator.dll"'
-!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\ViewSet.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Function.dll"'
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Graphic.dll"'
-!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Text.dll"'
-!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Axis.dll"'
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\OpenGLImplementation.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Plot.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\PlotTypes.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Text.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\V.dll"'
+!system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\ViewSet.dll"'
 !system 'signtool sign /tr "http://timestamp.digicert.com" /f "D:\InnoVisioNate\Code Signing Certificate\Nathan Clark.pfx" /p pubfly "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Properties.ocx"'
 !endif
 !endif
 
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\GraphicHost.exe"
-  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Function.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Axis.dll"
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\DataSet.dll"
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Evaluator.dll"
-  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\ViewSet.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Function.dll"
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Graphic.dll"
-  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Text.dll"
-  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Axis.dll"
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\OpenGLImplementation.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Plot.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\PlotTypes.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Text.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\V.dll"
+  File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\ViewSet.dll"
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\Properties.ocx"
 
   File "\Common\Artifacts\${CONFIGURATION}\${ARCH}\PostInstall*.dll"
