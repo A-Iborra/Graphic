@@ -7,7 +7,7 @@ This one is my lifelong passion - or, put another way - something I've been stuc
 I don't know why - but for some reason, Sibelius and Scientific Computer Graphics grabbed my ass sometime in 1980 or so. And, to this date, almost 40 years later, they both still have full control over me.
 
 I should have known when, having dropped a stack of FORTRAN punch cards - yes - punch cards (and YES, FORTRAN), I studiously put them ALL back in order absolutely adament about saving that work - that I was forever in the 
-unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, should I hitail my ass out of there right then and there ?
+unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, should I have hitailed my ass out of there right then and there ?
 
 I'll never know the answer to that - but I do know that for whatever angst, trials, and tribulations I've endured during these 40 years - if there will be some good that comes out of it - it may as well be a
 contribution back to that realm that somehow roped me into this bullshit, irratitating, and frustrating career that I love so much...
@@ -18,7 +18,7 @@ And, so, here it is - number graphics - on Windows - in COM - and when I say COM
 ----
 
 At it's core - this is really a <strong>development</strong> tool. It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
-"container" support. In fact, the "application" that installs with this system is a very simple container of perhaps 100 or so lines of code. It is incredibly easy to pop this tool into just about any system imaginable. 
+"container" support. In fact, the "application" that installs with this system is a very simple container of perhaps 200 or so lines of code. It is incredibly easy to pop this tool into just about any system imaginable. 
 In fact, one can instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.
 
 As I mentioned, this is COM. To further clarify, this is RAW COM.
