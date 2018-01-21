@@ -1,10 +1,6 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Graphic.h"
 #include "Graphic_resource.h"
@@ -104,11 +100,7 @@
    HRESULT G::_IGPropertyPageClient::get_PropertyPageCount(long *pCount) {
    if ( ! pCount )
       return E_POINTER;
-#if 1
-   *pCount = 8;
-#else
    *pCount = 9;
-#endif
    return S_OK;
    }
 
@@ -144,65 +136,59 @@
    pPropSheetPages[2].lParam = (LPARAM)pParent;
    pPropSheetPages[2].pfnCallback = NULL;
 
-#if 1
-   int nextIndex = 3;
-#else
-   int nextIndex = 4;
-
    pPropSheetPages[3].dwFlags = PSP_USETITLE;
    pPropSheetPages[3].dwSize = sizeof(PROPSHEETPAGE);
    pPropSheetPages[3].hInstance = hModule;
-   pPropSheetPages[3].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_TEXT_SETTINGS);
-   pPropSheetPages[3].pfnDlgProc = (DLGPROC)G::textHandler;
-   pPropSheetPages[3].pszTitle = "Text";
+   pPropSheetPages[3].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_LIGHTING);
+   pPropSheetPages[3].pfnDlgProc = (DLGPROC)G::lightingHandler;
+   pPropSheetPages[3].pszTitle = "Lighting";
    pPropSheetPages[3].lParam = (LPARAM)pParent;
    pPropSheetPages[3].pfnCallback = NULL;
-#endif
 
-   pPropSheetPages[nextIndex].dwFlags = PSP_USETITLE;
-   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[nextIndex].hInstance = hModule;
-   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_LIGHTING);
-   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::lightingHandler;
-   pPropSheetPages[nextIndex].pszTitle = "Lighting";
-   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
-   pPropSheetPages[nextIndex].pfnCallback = NULL;
+   pPropSheetPages[4].dwFlags = PSP_USETITLE;
+   pPropSheetPages[4].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[4].hInstance = hModule;
+   pPropSheetPages[4].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_AXIIS);
+   pPropSheetPages[4].pfnDlgProc = (DLGPROC)G::axisHandler;
+   pPropSheetPages[4].pszTitle = "Axiis";
+   pPropSheetPages[4].lParam = (LPARAM)pParent;
+   pPropSheetPages[4].pfnCallback = NULL;
 
-   pPropSheetPages[++nextIndex].dwFlags = PSP_USETITLE;
-   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[nextIndex].hInstance = hModule;
-   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_AXIIS);
-   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::axisHandler;
-   pPropSheetPages[nextIndex].pszTitle = "Axiis";
-   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
-   pPropSheetPages[nextIndex].pfnCallback = NULL;
+   pPropSheetPages[5].dwFlags = PSP_USETITLE;
+   pPropSheetPages[5].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[5].hInstance = hModule;
+   pPropSheetPages[5].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_TEXT_SETTINGS);
+   pPropSheetPages[5].pfnDlgProc = (DLGPROC)G::textHandler;
+   pPropSheetPages[5].pszTitle = "Text";
+   pPropSheetPages[5].lParam = (LPARAM)pParent;
+   pPropSheetPages[5].pfnCallback = NULL;
 
-   pPropSheetPages[++nextIndex].dwFlags = PSP_USETITLE;
-   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[nextIndex].hInstance = hModule;
-   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_PLOTS);
-   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::plotHandler;
-   pPropSheetPages[nextIndex].pszTitle = "Plots";
-   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
-   pPropSheetPages[nextIndex].pfnCallback = NULL;
+   pPropSheetPages[6].dwFlags = PSP_USETITLE;
+   pPropSheetPages[6].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[6].hInstance = hModule;
+   pPropSheetPages[6].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_PLOTS);
+   pPropSheetPages[6].pfnDlgProc = (DLGPROC)G::plotHandler;
+   pPropSheetPages[6].pszTitle = "Plots";
+   pPropSheetPages[6].lParam = (LPARAM)pParent;
+   pPropSheetPages[6].pfnCallback = NULL;
 
-   pPropSheetPages[++nextIndex].dwFlags = PSP_USETITLE;
-   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[nextIndex].hInstance = hModule;
-   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_DATASETS);
-   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::dataSetHandler;
-   pPropSheetPages[nextIndex].pszTitle = "DataSets";
-   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
-   pPropSheetPages[nextIndex].pfnCallback = NULL;
+   pPropSheetPages[7].dwFlags = PSP_USETITLE;
+   pPropSheetPages[7].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[7].hInstance = hModule;
+   pPropSheetPages[7].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_DATASETS);
+   pPropSheetPages[7].pfnDlgProc = (DLGPROC)G::dataSetHandler;
+   pPropSheetPages[7].pszTitle = "DataSets";
+   pPropSheetPages[7].lParam = (LPARAM)pParent;
+   pPropSheetPages[7].pfnCallback = NULL;
 
-   pPropSheetPages[++nextIndex].dwFlags = PSP_USETITLE;
-   pPropSheetPages[nextIndex].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[nextIndex].hInstance = hModule;
-   pPropSheetPages[nextIndex].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_FUNCTIONS);
-   pPropSheetPages[nextIndex].pfnDlgProc = (DLGPROC)G::functionHandler;
-   pPropSheetPages[nextIndex].pszTitle = "Functions";
-   pPropSheetPages[nextIndex].lParam = (LPARAM)pParent;
-   pPropSheetPages[nextIndex].pfnCallback = NULL;
+   pPropSheetPages[8].dwFlags = PSP_USETITLE;
+   pPropSheetPages[8].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[8].hInstance = hModule;
+   pPropSheetPages[8].pszTemplate = MAKEINTRESOURCE(IDDIALOG_GRAPHIC_FUNCTIONS);
+   pPropSheetPages[8].pfnDlgProc = (DLGPROC)G::functionHandler;
+   pPropSheetPages[8].pszTitle = "Functions";
+   pPropSheetPages[8].lParam = (LPARAM)pParent;
+   pPropSheetPages[8].pfnCallback = NULL;
 
    hwndSampleGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_CHILD,0,0,0,0,pParent -> hwndGraphic,NULL,hModule,(void *)pParent);
 

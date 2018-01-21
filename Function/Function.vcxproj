@@ -247,8 +247,6 @@
     <ClCompile Include="propertiesHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\h\UTILS.H" />
-    <ClInclude Include="..\h\VList.h" />
     <ClInclude Include="..\include\Graphic_resource.h" />
     <ClInclude Include="ConnectedEvaluator.h" />
     <ClInclude Include="Function.h" />

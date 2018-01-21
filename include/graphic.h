@@ -1,6 +1,8 @@
+// Copyright 2017 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #pragma once
-
 
 #include <windows.h>
 #include <commctrl.h>
@@ -420,6 +422,7 @@
       void deleteDataSet(IDataSet *);
 
       IText* newText();
+      void deleteText(IText *);
 
       int render(long sourceID);
       static unsigned __stdcall threadRender(void *);

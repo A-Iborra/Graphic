@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #pragma once
 
@@ -359,6 +362,12 @@
 #define IDDI_GRAPHIC_STYLE_SETVIEW                                         7267
                                                                            
 #define IDDIALOG_GRAPHIC_TEXT_SETTINGS                                     7300
+   #define IDDI_GRAPHIC_TEXTS_COUNT                                        7301
+   #define IDDI_GRAPHIC_TEXTS_ADD                                          7302
+   #define IDDI_GRAPHIC_TEXTS_EDIT                                         7303
+   #define IDDI_GRAPHIC_TEXTS_DELETE                                       7304
+   #define IDDI_GRAPHIC_TEXTS_LIST                                         7310
+
 
 #define IDDIALOG_GRAPHIC_LIGHTING                                          7500
 #define IDDI_LIGHT_ENABLED                                                 7510

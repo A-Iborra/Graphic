@@ -1,7 +1,9 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-#include <windows.h>
+#include "OpenGLImplementor.h"
 
-#include <gl\gl.h>
 #include <gl\glu.h>
 
 #include "Graphic_resource.h"
@@ -311,6 +313,8 @@ OPENGL_ERROR_CHECK
       double lw = 1.0;
       if ( ps -> pPropLineWeight )
          ps -> pPropLineWeight -> get_doubleValue(&lw);
+
+      p -> plotWindow -> disableLighting();
 
       glDeleteLists(ps -> segmentID,1);
 
@@ -651,24 +655,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
       glGetIntegerv(GL_VIEWPORT,vport);
    
       double y = (double)p -> plotWindow -> openGLState.windowCY - ps -> dpSource.y;
-   
-      if ( (int)ps -> dpSource.x < vport[0] ) {
-         ps -> result = S_FALSE;
-         break;
-      }
-      if ( (int)ps -> dpSource.x > vport[2] + vport[0] ) {
-         ps -> result = S_FALSE;
-         break;
-      }
-      if ( (int)y < vport[1] ) {
-         ps -> result = S_FALSE;
-         break;
-      }
-      if ( (int)y > vport[3] + vport[1] ) {
-         ps -> result = S_FALSE;
-         break;
-      }
-   
+
       gluUnProject(ps -> dpSource.x,y,ps -> dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
    
       memcpy(&ps -> dpTarget,&dpWorking,sizeof(DataPoint));
@@ -743,6 +730,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
       long k = -1;
       DataList* pSource = ps -> dlSource;
       DataList* pTarget = ps -> dlTarget;
+
       while ( pSource ) {
    
          k++;
@@ -756,7 +744,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
          }
    
          gluProject(pSource -> data.x,pSource -> data.y,pSource -> data.z,mMatrix,pMatrix,vport,&pTarget -> data.x,&pTarget -> data.y,&pTarget -> data.z);
-   
+
          pTarget -> data.y =  (double)p -> plotWindow -> openGLState.windowCY - pTarget -> data.y;
    
          pSource = pSource -> next;

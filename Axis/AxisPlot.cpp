@@ -1,15 +1,10 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <math.h>
-
-#include "utils.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "axis.h"
+
+#include "utils.h"
 
 #include "list.cpp"
 
@@ -70,10 +65,12 @@
    pIPlot -> get_IDataSet(&pIDataSetPlot);
 
    pIDataSetDomain -> get_IsIncludedDomain(pIDataSetPlot,&bIsIncluded);
+
    if ( bIsIncluded )
       pIDataSetDomain -> RemoveIncludedDomain(pIDataSetPlot);
 
    pIDataSetDomain -> GetDomain(&minPoint,&maxPoint);
+
    if ( -DBL_MAX == minPoint.x || DBL_MAX == minPoint.x )
       return 0;
   
@@ -114,6 +111,7 @@
 
    char szAll[] = {"OX=Ox ox=Ox oX=Ox OY=Oy oy=Oy oY=Oy OZ=Oz oz=Oz oZ=Oz MX=Mx mx=Mx mX=Mx MY=My my=My mY=My MZ=Mz mz=Mz mZ=Mz "
                      "MinX=Ox MinY=Oy MinZ=Oz MaxX=Mx MaxY=My MaxZ=Mz"};
+
    char *pszTemp = szAll;
    while ( *pszTemp ) evalConsume(pIEvaluator,pszTemp);
 
@@ -421,8 +419,8 @@
  
             if ( drawTickLabels ) {
  
-               dp.x = xAtAxis + (tickBelow/* + usedTickLength/10.0*/) * cosPhi * sinTheta; // <-- It is not clear why this "10%" was being used              
-               dp.y = yAtAxis - (tickBelow/* + usedTickLength/10.0*/) * cosPhi * cosTheta; //     but it was causing problems when domain width < 1, or small
+               dp.x = xAtAxis + tickBelow * cosPhi * sinTheta;
+               dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
  
                if ( ! ( t = textList.Get(tickNumber) ) ) {
                   CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&t));
@@ -548,8 +546,8 @@
     
             if ( drawTickLabels ) {
  
-               dp.x = xAtAxis - (tickAbove/* + usedTickLength/10.0*/) * cosPhi * sinTheta; // <-- It is not clear why this "10%" was being used
-               dp.y = yAtAxis - (tickAbove/* + usedTickLength/10.0*/) * cosPhi * cosTheta; //     but it was causing problems when domain width < 1, or small
+               dp.x = xAtAxis - tickAbove * cosPhi * sinTheta;
+               dp.y = yAtAxis - tickAbove * cosPhi * cosTheta;
  
                if ( ! ( t = textList.Get(tickNumber) ) ) {
                   CoCreateInstance(CLSID_Text,
@@ -857,5 +855,6 @@
    }
 
    *ppszLabels = pszLabels;
+
    return pszNextLabel;
    }

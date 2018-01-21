@@ -1,12 +1,7 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1999,2000 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-
-#include "utils.h"
 #include "OpenGLImplementor.h"
  
    long __stdcall OpenGLImplementor::QueryInterface(REFIID riid,void **ppv) {

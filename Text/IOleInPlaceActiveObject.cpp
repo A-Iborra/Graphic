@@ -1,13 +1,8 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,2000 Nathan T. Clark
-
-*/
-
-#include <windows.h>
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Text.h"
-#include "Text_i.h"
 
 
   STDMETHODIMP Text::TranslateAccelerator(LPMSG) { 

@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #pragma once
 
@@ -316,6 +319,10 @@
 
      HMENU hMainMenu,hMenu;
 
+     HBITMAP hbmBoundingBoxBackground{NULL};
+     RECT rcOnScreen{0,0,0,0};
+     RECT rcSavedBoundingBox{0,0,0,0};
+
      TextFormat format;
      CoordinatePlane coordinatePlane;
      DataPoint directionForward,directionUp;
@@ -323,7 +330,7 @@
      DataPoint dpEnd,dpSelectOffsetRestore;
      char szFace[MAX_PATH];
      double planeHeight;
-     double mHeight,mWidth;
+     double fontHeight,fontWidth,fontAscent,fontDescent;
      double fontSize,fontWeight;
      BOOL flipHorizontal,flipVertical;
      BOOL partOfWorldDomain;
@@ -331,8 +338,6 @@
      BOOL enablePositionSettings;
      BOOL partOfMainGraphic;
      BOOL doOpenGLRendering;
-
-     char *pszText;
 
      unsigned int refCount;
 
@@ -373,9 +378,8 @@
      long renderText(HDC hdc = (HDC)NULL,char *theText = (char*)NULL);
      long renderGlyph(HDC hdc,char c,DataPoint& startPosition);
      int drawSample();
-     int eraseGDI();
-     int eraseBoundingBox();
      int eraseBoundingBoxGDI();
+     void saveBoundingBoxBackground();
      int statusPosition();
      int createFont(LOGFONT *);
 

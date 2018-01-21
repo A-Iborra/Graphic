@@ -1,40 +1,32 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
-#include <stdio.h>
-                                
-#include <gl\gl.h>
-#include <gl\glu.h>
+#include "Text.h"
 
 #include "Graphic_resource.h"
 #include "utils.h"
-
-#include "Text.h"
 
 #include "list.cpp"
 
 
    HRESULT Text::put_Text(BSTR setText) {
-   if ( pszText )
-      delete [] pszText;
-   pszText = new char[wcslen(setText) + 1];
-   memset(pszText,0,wcslen(setText) + 1);
-   WideCharToMultiByte(CP_ACP,0,setText,-1,pszText,wcslen(setText) + 1,0,0);
+   propertyContent -> put_stringValue(setText);
    return S_OK;
    }
  
-   HRESULT Text::get_Text(BSTR *getText) {
-   if ( ! pszText ) {
-      swprintf(*getText,L"");
+   HRESULT Text::get_Text(BSTR *pGetText) {
+   if ( ! propertyContent -> pointer() ) {
+      *pGetText = SysAllocString(L"");
       return S_FALSE;
    }
-   long n = strlen(pszText);
-   MultiByteToWideChar(CP_ACP,0,pszText,-1,*getText,n - 1);
+   long n = strlen((char *)propertyContent -> pointer());
+   if ( 0 == n ) {
+      *pGetText = SysAllocString(L"");
+      return S_FALSE;
+   }
+   *pGetText = SysAllocStringLen(NULL,n);
+   MultiByteToWideChar(CP_ACP,0,(char *)propertyContent -> pointer(),-1,*pGetText,n);
    return S_OK;
    }
  
@@ -82,25 +74,13 @@
       doOpenGLRendering = v ? TRUE : FALSE;
    }
 
-   if ( doOpenGLRendering ) {
+   pIBasePlot -> Initialize(doOpenGLRendering ? pIDataSetWorld : NULL,pIOpenGLImplementation,pIEvaluator,
+                              propertyTextColor,propertyLineWeight,
+                              pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
 
-      pIBasePlot -> Initialize(pIDataSetWorld,pIOpenGLImplementation,pIEvaluator,
-                                 propertyTextColor,propertyLineWeight,
-                                 pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
-
-      pIBasePlotBoundingBox -> Initialize(pIDataSetWorld,pIOpenGLImplementation,pIEvaluator,
-                                             propertyTextColor,propertyLineWeight,
-                                             pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
-
-   } else {
-      pIBasePlot -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
-                                 propertyTextColor,propertyLineWeight,
-                                 pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
-
-      pIBasePlotBoundingBox -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
-                                             propertyTextColor,propertyLineWeight,
-                                             pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
-   }
+   pIBasePlotBoundingBox -> Initialize(doOpenGLRendering ? pIDataSetWorld : NULL,pIOpenGLImplementation,pIEvaluator,
+                                          propertyTextColor,propertyLineWeight,
+                                          pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
 
    pIBasePlot -> get_IDataSet(&pIDataSet);
 
@@ -233,7 +213,9 @@
    void *pData;
 
    long cntItems = countSafeArrayItems(pPosition);
-   if ( cntItems < 2 ) return E_INVALIDARG;
+
+   if ( cntItems < 2 ) 
+      return E_INVALIDARG;
 
    SafeArrayGetVartype(pPosition,&vType);
    SafeArrayAccessData(pPosition,&pData);
@@ -361,7 +343,9 @@
    void *pData;
 
    long cntItems = countSafeArrayItems(*ppPosition);
-   if ( cntItems < 2 ) return E_INVALIDARG;
+
+   if ( cntItems < 2 ) 
+      return E_INVALIDARG;
 
    SafeArrayGetVartype(*ppPosition,&vType);
    SafeArrayAccessData(*ppPosition,&pData);

@@ -1,19 +1,12 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
+#include "Evaluator.h"
 
-*/
-#include <windows.h>
-#include <stdio.h>
-
-#include <math.h>
-
-#include "resource.h"
 #include "gmessage.h"
 #include "utils.h"
 #include "VList.h"
-
-#include "Evaluator.h"
 #include "list.cpp"
 
 

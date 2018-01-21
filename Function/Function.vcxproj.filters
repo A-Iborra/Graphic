@@ -131,12 +131,6 @@
     <ClInclude Include="Function.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\h\UTILS.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\h\VList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\Graphic_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,20 +1,11 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include "dataset.h"
 
 #include "general.h"
 #include "utils.h"
-
-#include "dataset.h"
 
 #include "list.cpp"
 
@@ -1249,24 +1240,14 @@
    get_minZ(&otherZMin);
    get_maxZ(&otherZMax);
 
-#if 1
-   double deltaX = (otherXMax - otherXMin);
-   double deltaY = (otherYMax - otherYMin);
-   double deltaZ = (otherZMax - otherZMin);
-#else
-   double deltaX = 0.0;
-   double deltaY = 0.0;
-   double deltaZ = 0.0;
-#endif
-
    DataPoint dp = {otherXMin,otherYMin,otherZMin};
 
    pIDataSetBoundingBox -> pushDataPoint(&dp);
 
-   dp.x = otherXMin + deltaX;
+   dp.x = otherXMax;
    pIDataSetBoundingBox -> pushDataPoint(&dp);
 
-   dp.y = otherYMin + deltaY;
+   dp.y = otherYMax;
    pIDataSetBoundingBox -> pushDataPoint(&dp);
 
    dp.x = otherXMin;
@@ -1275,39 +1256,6 @@
    dp.y = otherYMin;
    pIDataSetBoundingBox -> pushDataPoint(&dp);
 
-/*
-   This is not working yet, (Clipping ???)
-
-   dp.x = otherXMax + deltaX;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.y = otherYMax + deltaY;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.x = otherXMin - deltaX;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.y = otherYMin - deltaY;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-
-   pIDataSetBoundingBox -> pushDataPoint(&movePoint);
-   dp.x = otherXMax + deltaX;
-   dp.z = otherZMin - deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.z = otherZMax + deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-
-   pIDataSetBoundingBox -> pushDataPoint(&movePoint);
-   dp.y = otherYMax + deltaY;
-   dp.z = otherZMin - deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.z = otherZMax + deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-
-   pIDataSetBoundingBox -> pushDataPoint(&movePoint);
-   dp.x = otherXMin - deltaY;
-   dp.z = otherZMin - deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-   dp.z = otherZMax + deltaZ;
-   pIDataSetBoundingBox -> pushDataPoint(&dp);
-*/
    return S_OK;
    }
 
@@ -1318,7 +1266,8 @@
 
    if ( xMin == DBL_MAX && xMax == -DBL_MAX &&
         yMin == DBL_MAX && yMax == -DBL_MAX &&
-        zMin == DBL_MAX && zMax == -DBL_MAX ) return E_UNEXPECTED;
+        zMin == DBL_MAX && zMax == -DBL_MAX ) 
+      return E_UNEXPECTED;
 
    long cp;
 

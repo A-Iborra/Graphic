@@ -206,7 +206,6 @@
     <ClInclude Include="include\ContainedDataSet.h" />
     <ClInclude Include="include\ContainedFunction.h" />
     <ClInclude Include="include\ContainedObject.h" />
-    <ClInclude Include="include\General.h" />
     <ClInclude Include="include\GMessage.H" />
     <ClInclude Include="include\graphic.h" />
     <ClInclude Include="include\Graphic_resource.h" />

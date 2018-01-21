@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Graphic.h"
 #include <CommCtrl.h>
@@ -27,7 +30,7 @@
       SendMessage(hwndStatusBar,SB_SETPARTS,(WPARAM)2,(LPARAM)sbWidths);
    }
 
-   PostMessage(hwndStatusBar,SB_SETTEXT,(WPARAM)paneIndex,(LPARAM)pszText);
+   SendMessage(hwndStatusBar,SB_SETTEXT,(WPARAM)paneIndex,(LPARAM)pszText);
 
    return S_OK; 
    } 

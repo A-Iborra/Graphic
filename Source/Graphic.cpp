@@ -1,17 +1,13 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008,2009 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
+#include "Graphic.h"
 
 #include "Graphic_resource.h"
 
 #include "utils.h"
 #include "ContainedFunction.h"
-#include "Graphic.h"
 
 #include "List.cpp"
 
@@ -795,6 +791,7 @@ Beep(2000,100);
 
 
    IText* G::newText() {
+
    IText* pIText;
 
    CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pIText));
@@ -809,11 +806,9 @@ Beep(2000,100);
    pIText -> put_PartOfWorldDomain(FALSE);
 
    pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,
-
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
-
                            propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
 
    pIText -> AdviseGSystemStatusBar(pIGSystemStatusBar);
@@ -821,6 +816,16 @@ Beep(2000,100);
    textList.Add(pIText);
 
    return pIText;
+   }
+
+
+   void G::deleteText(IText *pIText) {
+
+   pIText -> Release();
+
+   textList.Remove(pIText);
+
+   return;
    }
 
  
@@ -835,11 +840,9 @@ Beep(2000,100);
                            propertyDefault2DPlotType,
                            propertyDefault3DPlotType,
                            propertyBackgroundColor,
-
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
-
                            someObjectChanged,(void *)this,(ULONG_PTR)pIPlot);
  
    IPlotNotify *pIPlotNotify;
@@ -976,9 +979,6 @@ Beep(2000,100);
    while ( pIPlot = visiblePlotList.GetNext(pIPlot) ) {
       pIPlot -> get_SegmentCount(&k);
       pIPlot -> GetSegments(pLong);
-char szZ[32];
-sprintf(szZ,"PlotID: %ld count:%ld\n",*pLong,k);
-OutputDebugString(szZ);
       pLong += k;
    }
 

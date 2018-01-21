@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Graphic.h"
 
@@ -23,7 +26,7 @@
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
-      char szTemp[32];
+      char szTemp[128];
       sprintf(szTemp,"There are %ld data sets defined",p -> dataSetList.Count());
       SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_COUNT),szTemp);
 

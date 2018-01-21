@@ -1,28 +1,11 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
-                                
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <process.h>
-
-//#include <gl\gl.h>
-//#include <gl\glu.h>
-
-#include "general.h"
-#include "Graphic_resource.h"
-#include "utils.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Text.h"
+#include <stdio.h>
 
-#include "list.cpp"
+#include "Graphic_resource.h"
 
    static bool didRegister = false;
    extern HMODULE hModule;
@@ -61,6 +44,8 @@
        hMainMenu(0),
        hMenu(0),
 
+       hbmBoundingBoxBackground(NULL),
+
        pWhenChangedCallback(NULL),
        pWhenChangedCallbackArg(NULL),
        whenChangedCallbackCookie(0L),
@@ -87,14 +72,14 @@
 
        fontSize(12.0),
        fontWeight(FW_NORMAL),
-       mWidth(0.0),
-       mHeight(0.0),
-
-       pszText(NULL)
+       fontWidth(0.0),
+       fontHeight(0.0),
+       fontAscent(0.0),
+       fontDescent(0.0)
    {
   
    refCount = 100;
- 
+
    memset(&dpStart,0,sizeof(DataPoint));
    memset(&dpEnd,0,sizeof(DataPoint));
    memset(&dpSelectOffsetRestore,0,sizeof(DataPoint));
@@ -305,7 +290,7 @@
 
    int Text::statusPosition() {
    char szText[MAX_PROPERTY_SIZE];
-   sprintf(szText,"Text(%lf,%lf,%lf)",dpStart.x,dpStart.y,dpStart.z);
+   sprintf(szText,"Text(%g,%g,%g)",dpStart.x,dpStart.y,dpStart.z);
    if ( pIGSystemStatusBar )
       pIGSystemStatusBar -> put_StatusText(0,szText);
    return 0;
@@ -316,8 +301,7 @@
       return 0;
    if ( hFont )
       DeleteObject(hFont);
-   HDC hdc;
-   pIOpenGLImplementation -> get_HDC(&hdc);
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
    if ( ! szFace[0] ) 
       strcpy(szFace,DEFAULT_FONT);
    pLogFont -> lfHeight = -MulDiv((long)fontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);

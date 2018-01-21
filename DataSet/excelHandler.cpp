@@ -1,12 +1,11 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-#include <windows.h>
-#include <olectl.h>
-#include <CommCtrl.h>
+#include "DataSet.h"
 
 #include "General.h"
 #include "Graphic_resource.h"
-
-#include "DataSet.h"
 
 #define ENABLE_LOAD_BUTTON \
 EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> szCellRange) && \

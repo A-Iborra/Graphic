@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "graphic.h"
 
@@ -20,36 +23,6 @@
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
       p -> hwndStyleSettings = hwnd;
-
-      //EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_STYLE_SETVIEW),p -> plotView == gcPlotView3D ? TRUE : FALSE);
-
-
-#if 0
-      SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_SURFACE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
-      SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
-      SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_NATURAL,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
-      SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_STACKS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
-
-      EnableWindow(GetDlgItem(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_SURFACE),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_NATURAL),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_STACKS),p -> plotView == gcPlotView3D);
-
-      switch ( p -> plotType ) {
-      case gcPlotTypeSurface:
-         SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_SURFACE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
-         break;
-      case gcPlotTypeWireFrame:
-         SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
-         break;
-      case gcPlotTypeNatural:
-         SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_NATURAL,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
-         break;
-      case gcPlotTypeStacks:
-         SendDlgItemMessage(p -> hwndStyleSettings,IDDI_GRAPHIC_SUB_STYLE_STACKS,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
-         break;
-      }
-#endif
 
       }
       return LRESULT(FALSE);
@@ -86,17 +59,6 @@
 
    case WM_ERASEBKGND:
 
-#if 0
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_SURFACE),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_NATURAL),p -> plotView == gcPlotView3D);
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_STACKS),p -> plotView == gcPlotView3D);
-
-      if ( p -> plotType == gcPlotTypeSurface ) SendDlgItemMessage(hwnd,IDDI_GRAPHIC_SUB_STYLE_SURFACE,BM_SETCHECK,1L,0);
-      if ( p -> plotType == gcPlotTypeWireFrame ) SendDlgItemMessage(hwnd,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME,BM_SETCHECK,1L,0);
-      if ( p -> plotType == gcPlotTypeNatural ) SendDlgItemMessage(hwnd,IDDI_GRAPHIC_SUB_STYLE_NATURAL,BM_SETCHECK,1L,0);
-      if ( p -> plotType == gcPlotTypeStacks ) SendDlgItemMessage(hwnd,IDDI_GRAPHIC_SUB_STYLE_STACKS,BM_SETCHECK,1L,0);
-#endif
       if ( p -> plotView == gcPlotView3D )
          SendDlgItemMessage(hwnd,IDMI_GRAPHIC_VIEW_3D,BM_SETCHECK,1L,0);
       else
@@ -113,12 +75,6 @@
             p -> plotView = gcPlotView2D;
          else
             p -> plotView = gcPlotView3D;
-#if 0
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_SURFACE),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_NATURAL),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_STACKS),p -> plotView == gcPlotView3D);
-#endif
          }
          break;
       case IDMI_GRAPHIC_VIEW_3D: {
@@ -126,29 +82,8 @@
             p -> plotView = gcPlotView3D;
          else
             p -> plotView = gcPlotView2D;
-#if 0
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_SURFACE),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_WIREFRAME),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_NATURAL),p -> plotView == gcPlotView3D);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_SUB_STYLE_STACKS),p -> plotView == gcPlotView3D);
-#endif
          }
          break;
-#if 0
-      case IDDI_GRAPHIC_SUB_STYLE_SURFACE:
-         if ( rv == BST_CHECKED ) p -> put_PlotType(gcPlotTypeSurface);
-         break;
-      case IDDI_GRAPHIC_SUB_STYLE_WIREFRAME:
-         if ( rv == BST_CHECKED ) p -> put_PlotType(gcPlotTypeWireFrame);
-         break;
-      case IDDI_GRAPHIC_SUB_STYLE_NATURAL:
-         if ( rv == BST_CHECKED ) p -> put_PlotType(gcPlotTypeNatural);
-         break;
-      case IDDI_GRAPHIC_SUB_STYLE_STACKS:
-         if ( rv == BST_CHECKED ) p -> put_PlotType(gcPlotTypeStacks);
-         break;
-#endif
-
       case IDDI_GRAPHIC_STYLE_SETVIEW: {
          p -> pIViewSet -> Properties(styleHandlerSomeObjectChanged,(void *)p);
          EnableWindow(hwnd,FALSE);

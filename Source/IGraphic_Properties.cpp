@@ -1,16 +1,11 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <stdio.h>
+#include "Graphic.h"
 
 #include "utils.h"
 #include "Graphic_resource.h"
-
-#include "Graphic.h"
 
 #include "GraphicControl_i.h"
 
@@ -326,9 +321,9 @@
    }
 
 
-   STDMETHODIMP G::get_Text(BSTR text,IDispatch **pText) {
-   if ( ! pText ) return E_POINTER;
-   *pText = NULL;
+   STDMETHODIMP G::get_Text(BSTR text,IDispatch **ppText) {
+   if ( ! ppText ) return E_POINTER;
+   *ppText = NULL;
    char* szText = new char[wcslen(text) + 1];
    memset(szText,0,wcslen(text) + 1);
    WideCharToMultiByte(CP_ACP,0,text,-1,szText,wcslen(text) + 1,0,0);
@@ -341,7 +336,7 @@
       WideCharToMultiByte(CP_ACP,0,bstrText,-1,szCheckText,wcslen(bstrText),0,0);
       SysFreeString(bstrText);
       if ( 0 == strcmp(szText,szCheckText) ) {
-         p -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(pText));
+         p -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppText));
          delete [] szText;
          delete [] szCheckText;
          return S_OK;

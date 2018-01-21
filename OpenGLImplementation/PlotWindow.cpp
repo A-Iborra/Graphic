@@ -1,20 +1,14 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
+#include "OpenGLImplementor.h"
 
-*/
-
-#include <windows.h>
-#include <math.h>
-#include <gl\gl.h>
 #include <gl\glu.h>
 
 #include "general.h"
 #include "Graphic_resource.h"
 #include "utils.h"
-
-#include "GraphicControl_i.h"
-#include "OpenGLImplementor.h"
 
    int PlotWindow::pixelFormat = 0;
    HGLRC PlotWindow::renderingContext = NULL;
@@ -1021,7 +1015,8 @@ openGLLighting.lightPosition[k][3] = 1.0;
 
    while ( *pList ) {
       glLoadName(*pList);
-      glCallList(*pList++);
+      glCallList(*pList);
+      pList++;
    }
 
    *pHitTableHits = glRenderMode(GL_RENDER);

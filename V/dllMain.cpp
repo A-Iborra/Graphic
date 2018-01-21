@@ -1,22 +1,14 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <stdio.h>
-
-#include "resource.h"
-#include "utils.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "V.h"
 
+#include "utils.h"
+
 #include "Variable_i.c"
 #include "Evaluator_i.c"
-#ifdef EMBEDDED_PROPERTIES
-#include "Properties_i.h"
-#endif
+
 
    BOOL WINAPI DllMain(HANDLE module,ULONG flag,void *) {
    switch ( flag ) {

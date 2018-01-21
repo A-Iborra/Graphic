@@ -1,4 +1,6 @@
-
+// Copyright 2017 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "windows.h"
 #include "commctrl.h"
@@ -28,9 +30,9 @@ BEGIN
             VALUE "FileDescription", "Graphic\0"
             VALUE "FileVersion", "1, 0, 0, 1\0"
             VALUE "InternalName", "Graphic\0"
-            VALUE "LegalCopyright", "Copyright © 1998,1999,2000,2001,2002\0"
+            VALUE "LegalCopyright", "Copyright © 1998,1999,2000,2001,2002,2008,2017,2018\0"
             VALUE "OriginalFilename", "Graphic.ocx\0"
-            VALUE "ProductName", "Nathan T. Clark, Inc. Graphic\0"
+            VALUE "ProductName", "InnoVisioNate, Inc. Graphic\0"
             VALUE "ProductVersion", "1, 0, 0, 1\0"
             VALUE "OLESelfRegister", "\0"
         END
@@ -127,6 +129,11 @@ IDDIALOG_GRAPHIC_TEXT_SETTINGS DIALOG DISCARDABLE  0, 0, 205, 126
 STYLE WS_CHILD
 FONT 8, "MS Sans Serif"
 BEGIN
+    LTEXT  "There are %1 text components defined",IDDI_GRAPHIC_TEXTS_COUNT,3,8,130,8
+    PUSHBUTTON  "&Add",IDDI_GRAPHIC_TEXTS_ADD,134,5,30,14
+    PUSHBUTTON  "&Edit",IDDI_GRAPHIC_TEXTS_EDIT,166,5,30,14
+    PUSHBUTTON  "&Delete",IDDI_GRAPHIC_TEXTS_DELETE,198,5,30,14
+    CONTROL  "",IDDI_GRAPHIC_TEXTS_LIST,WC_LISTVIEW,LVS_REPORT | LVS_SHOWSELALWAYS,2,23,230,107,WS_EX_CLIENTEDGE
 END
 
 

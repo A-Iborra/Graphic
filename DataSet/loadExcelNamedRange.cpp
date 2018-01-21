@@ -1,6 +1,8 @@
-#include "DataSet.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-#include <time.h>
+#include "DataSet.h"
 
    long DataSet::loadExcelNamedRange(HWND hwndDestinationList,HWND hwndErrorReport,char *pszWorkbookName,char *pszRangeName) {
 

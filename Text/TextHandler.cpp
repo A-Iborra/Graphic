@@ -1,22 +1,10 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <commctrl.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-
-#include "Graphic_resource.h"
-#include "utils.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "text.h"
 
+#include "Graphic_resource.h"
 
    LRESULT EXPENTRY Text::handler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2) {
 
@@ -32,9 +20,13 @@
    case WM_COMMAND: {
       switch ( LOWORD(mp1) ) {
       case IDMI_TEXT_PROPERTIES: {
+         HWND hwndOwner = NULL;
+         POINT ptCursor = {0};
+         GetCursorPos(&ptCursor);
+         hwndOwner = WindowFromPoint(ptCursor);
          IUnknown* pIUnknown;
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-         p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
+         p -> pIProperties -> ShowProperties(hwndOwner,pIUnknown);
          pIUnknown -> Release();       
          if ( p -> pWhenChangedCallback ) 
             p -> pWhenChangedCallback(p -> pWhenChangedCallbackArg,p -> whenChangedCallbackCookie);

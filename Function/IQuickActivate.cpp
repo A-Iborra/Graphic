@@ -1,13 +1,8 @@
-/*
-
-                       Copyright (c) 1999,2000,2001,2002 Nathan T. Clark
-
-*/
-#include <windows.h>
-#include <CommCtrl.h>
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Function.h"
-
 
    HRESULT Function::QuickActivate(QACONTAINER* qaContainer,QACONTROL* qaControl) {
    DWORD dwDummy;

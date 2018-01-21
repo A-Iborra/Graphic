@@ -219,9 +219,6 @@
     <ClInclude Include="include\graphic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\General.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ContainedObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,16 +1,12 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
+#include "Text.h"
 #include <math.h>
 #include <stdio.h>
 
 #include "utils.h"
-
-#include "Text.h"
 
 #define EPSILON 1.0E-6
 
@@ -36,23 +32,19 @@
  
    HRESULT Text::PrepData() {
 
-   if ( ! pszText )
+   if ( ! propertyContent -> pointer() )
       return E_FAIL;
 
    if ( 0.0 == piover2 )
       piover2 = 2.0 * atan(1.0);
 
-   HDC hdc = NULL;
-   //if ( doOpenGLRendering )
-      pIOpenGLImplementation -> get_HDC(&hdc);
-   //else
-   //   hdc = GetDC(hwndOwner);
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
 
    DataPoint dpMin,dpMax;
    double worldXMin,worldXMax,worldYMin,worldYMax,worldZMin,worldZMax;
    
-//   pIOpenGLImplementation -> GetExtents(&worldXMin,&worldYMin,&worldZMin,&worldXMax,&worldYMax,&worldZMax);
    pIDataSetWorld -> GetDomain(&dpMin,&dpMax);
+
    worldXMin = dpMin.x;
    worldXMax = dpMax.x;
    worldYMin = dpMin.y;
@@ -73,6 +65,9 @@
 
    short partOfWorldDomain;
    get_PartOfWorldDomain(&partOfWorldDomain);
+
+if ( strstr((char *)propertyContent -> pointer(),"This is") )
+printf("hello world");
 
    double theRange[] = {RANGE,RANGE,RANGE};
 
@@ -115,25 +110,19 @@
       hOriginalFont = (HFONT)SelectObject(hdc,hFont);
 
       TEXTMETRIC tm;
+
       GetTextMetrics(hdc,&tm);
 
-      mHeight = tm.tmHeight;
-      mWidth = tm.tmAveCharWidth;
+      fontHeight = tm.tmHeight;
+      fontWidth = tm.tmAveCharWidth;
+      fontAscent = tm.tmAscent;
+      fontDescent = tm.tmDescent;
 
       pIDataSet -> ReSet();
- #if 0
-      DataPoint dp;
 
-      propertyPositionX -> get_doubleValue(&dp.x);
-      propertyPositionY -> get_doubleValue(&dp.y);
-      propertyPositionZ -> get_doubleValue(&dp.z);
+      memset(&rcOnScreen,0,sizeof(RECT));
 
-      pIDataSet -> pushDataPoint(&dp);
-#endif
-      RECT rectText;
-      memset(&rectText,0,sizeof(RECT));
-      if ( pszText )
-         DrawText(hdc,pszText,-1L,&rectText,DT_CALCRECT);
+      DrawText(hdc,(char *)propertyContent -> pointer(),-1L,&rcOnScreen,DT_CALCRECT);
 
       pIDataSet -> ReSet();
 
@@ -141,14 +130,14 @@
  
       DataPoint dp;
 
-      dp.x = (double)rectText.left;
-      dp.y = (double)rectText.top;
+      dp.x = (double)rcOnScreen.left;
+      dp.y = (double)rcOnScreen.top;
       dp.z = 0.0;
 
       pIDataSet -> pushDataPoint(&dp);
 
-      dp.x = rectText.right;
-      dp.y = rectText.bottom;
+      dp.x = rcOnScreen.right;
+      dp.y = rcOnScreen.bottom + fontDescent;
       dp.z = 0.0;
 
       pIDataSet -> pushDataPoint(&dp);
@@ -173,8 +162,8 @@
       pIDataSet -> get_minZ(&textMinZ);
       pIDataSet -> get_maxZ(&textMaxZ);
 
-      mWidth = textMaxX - textMinX;
-      mHeight = textMaxY - textMinY;
+      fontWidth = textMaxX - textMinX;
+      fontHeight = textMaxY - textMinY;
 
       if ( ! renderText() ) {
          SelectObject(hdc,hOriginalFont);
@@ -193,40 +182,23 @@
       double pixelsY = (double)GetDeviceCaps(hdc,LOGPIXELSY);
       double pixelsX = (double)GetDeviceCaps(hdc,LOGPIXELSX);
 
-//      if ( doOpenGLRendering ) {
+      double desiredHeightInInches;
 
-         double desiredHeightInInches;
+      if ( TEXT_SIZE_PIXELS == fontSizeUnits )
+         desiredHeightInInches = fontSize / pixelsY;
+      else
+         desiredHeightInInches = fontSize / 72.0;
 
-         if ( TEXT_SIZE_PIXELS == fontSizeUnits )
-            desiredHeightInInches = fontSize / pixelsY;
-         else
-            desiredHeightInInches = fontSize / 72.0;
+      double desiredHeightInPixels = pixelsY * desiredHeightInInches;
 
-         double desiredWidthInInches = desiredHeightInInches * mWidth / mHeight;
+      //if ( doOpenGLRendering ) {
+      //   dyScale = desiredHeightInPixels * ( textDomainMaxY - textDomainMinY ) / fontHeight / (double)(viewPort[3]);
+      //   dxScale = dyScale * ( textDomainMaxX - textDomainMinX ) / (textDomainMaxY - textDomainMinY);
+      //} else {
+         dyScale = desiredHeightInPixels * ( worldYMax - worldYMin ) / fontHeight / (double)(viewPort[3]);
+         dxScale = dyScale * (worldXMax - worldXMin) / (worldYMax - worldYMin);
+      //}
 
-         double desiredWidthInPixels = pixelsX * desiredWidthInInches;
-         double desiredHeightInPixels = pixelsY * desiredHeightInInches;
-
-if ( doOpenGLRendering ) {
-         dxScale = desiredWidthInPixels * ( textDomainMaxX - textDomainMinX ) / mWidth / (double)(viewPort[2] - viewPort[0]);
-         dyScale = desiredHeightInPixels * ( textDomainMaxY - textDomainMinY ) / mHeight / (double)(viewPort[3] - viewPort[1]);
-} else {
-         dxScale = desiredWidthInPixels * ( worldXMax - worldXMin ) / mWidth / (double)(viewPort[2] - viewPort[0]);
-         dyScale = desiredHeightInPixels * ( worldYMax - worldYMin ) / mHeight / (double)(viewPort[3] - viewPort[1]);
-//dxScale = 1.0;
-//dyScale = 1.0;
-}
-
-#if 0
-      } else {
-
-//         dyScale = ( textDomainMaxY - textDomainMinY ) / (double)(viewPort[3] - viewPort[1]);
-//         dxScale = ( textDomainMaxX - textDomainMinX ) / (double)(viewPort[2] - viewPort[0]);
-dyScale = 1.0;
-dxScale = 1.0;
-
-      }
-#endif
       }
       break;
 
@@ -234,39 +206,42 @@ dxScale = 1.0;
 
       switch ( coordinatePlane ) {
       case CoordinatePlane_XY:
-         dyScale = theRange[0] * fontSize / mHeight / 100.0;
+         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_YX:
-         dyScale = theRange[1] * fontSize / mHeight / 100.0;
+         dyScale = theRange[1] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_XZ:
-         dyScale = theRange[0] * fontSize / mHeight / 100.0;
+         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_YZ:
-         dyScale = theRange[1] * fontSize / mHeight / 100.0;
+         dyScale = theRange[1] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_ZY:
-         dyScale = theRange[2] * fontSize / mHeight / 100.0;
+         dyScale = theRange[2] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_ZX:
-         dyScale = theRange[2] * fontSize / mHeight / 100.0;
+         dyScale = theRange[2] * fontSize / fontHeight / 100.0;
          break;
       case CoordinatePlane_screen:
-         dyScale = theRange[0] * fontSize / mHeight / 100.0;
+         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
          break;
       }
 
-      dxScale = dyScale * mWidth / mHeight;
+      dxScale = dyScale * fontWidth / fontHeight;
 
       break;
 
    }
 
    BSTR bstrEval = SysAllocStringLen(NULL,256);
-   swprintf(bstrEval,L"mHeight = %lf",mHeight * dyScale);
+
+   swprintf(bstrEval,L"mHeight = %lf",fontHeight * dyScale);
    evalBSTR(pIEvaluator,bstrEval);
-   swprintf(bstrEval,L"mWidth = %lf",mWidth * dxScale);
+
+   swprintf(bstrEval,L"mWidth = %lf",fontWidth * dxScale);
    evalBSTR(pIEvaluator,bstrEval);
+
    SysFreeString(bstrEval);
 
    char szPosition[256];
@@ -320,12 +295,6 @@ dxScale = 1.0;
    }
 
    DataPoint dpScale = {dxScale,dyScale,1.0};
-
-#if 0
-   dpStart.x = worldXMin + (dpStart.x - worldXMin) * toTextDomainScaleX;
-   dpStart.y = worldYMin + (dpStart.y - worldYMin) * toTextDomainScaleY;
-   dpStart.z = worldZMin + (dpStart.z - worldZMin) * toTextDomainScaleZ;
-#endif
 
    DataPoint minPoint,maxPoint,dpTranslateFormat = {0.0,0.0,0.0};
    
@@ -411,38 +380,38 @@ dxScale = 1.0;
 
    SelectObject(hdc,hOriginalFont);
 
-   //if ( ! doOpenGLRendering )
-   //   ReleaseDC(hwndOwner,hdc);
-
    return S_OK;
    }
 
 
    HRESULT Text::Draw() {
 
+#if 1
    if ( doOpenGLRendering ) {
       if ( partOfMainGraphic ) {
-         pIOpenGLImplementation -> Push();
-         pIOpenGLImplementation -> SetUp(pIDataSet);
+         //pIOpenGLImplementation -> Push();
+         //pIOpenGLImplementation -> SetUp(pIDataSet);
          pIBasePlot -> Draw();
-         pIOpenGLImplementation -> Pop();
+         //pIOpenGLImplementation -> Pop();
       }
       if ( partOfWorldDomain ) {
          pIBasePlot -> Draw();
       }
       return S_OK;
    }
+#endif
 
-   if ( ! pszText )
+   if ( ! propertyContent -> pointer() )
       return S_OK;
 
-   HDC hdc = pIOpenGLImplementation -> TargetDC();//GetDC(hwndOwner);
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
 
    createFont(&logicalFont);
 
    hOriginalFont = (HFONT)SelectObject(hdc,hFont);
 
    DataPoint minPoint,maxPoint;
+
    RECT rectText;
 
    pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
@@ -462,13 +431,26 @@ dxScale = 1.0;
 
    int oldBackground = SetBkMode(hdc,TRANSPARENT);
 
-   DrawText(hdc,pszText,-1L,&rectText,DT_NOCLIP | DT_LEFT | DT_BOTTOM);
+   float fv[4];
+   BYTE *pb = (BYTE *)fv;
+
+   propertyTextColor -> get_binaryValue(4 * sizeof(long),(BYTE **)&pb);
+
+   BYTE vb[3];
+   COLORREF cr;
+   vb[0] = (BYTE)(255.0f*fv[0]);
+   vb[1] = (BYTE)(255.0f*fv[1]);
+   vb[2] = (BYTE)(255.0f*fv[2]);
+
+   cr = RGB(vb[0],vb[1],vb[2]);
+   
+   SetTextColor(hdc,cr);
+
+   DrawText(hdc,(char *)propertyContent -> pointer(),-1L,&rectText,DT_NOCLIP | DT_LEFT | DT_BOTTOM);
 
    SetBkMode(hdc,oldBackground);
 
    SelectObject(hdc,hOriginalFont);
-
-   //ReleaseDC(hwndOwner,hdc);
 
    return S_OK;
    }
@@ -482,6 +464,18 @@ dxScale = 1.0;
       pIBasePlot -> Erase();
       pIOpenGLImplementation -> Pop();
    }
+
+   if ( ! doOpenGLRendering ) {
+      HDC hdc = pIOpenGLImplementation -> TargetDC();
+      RECT rcBox;
+      get_GDIBoundingBox(&rcBox);
+      rcBox.bottom += 2;
+      COLORREF thePixel = GetPixel(hdc,2,2);
+      HBRUSH hb = CreateSolidBrush(thePixel);
+      FillRect(hdc,&rcBox,hb);
+      DeleteObject(hb);
+   }
+
    return S_OK;
    }
 
@@ -507,7 +501,7 @@ dxScale = 1.0;
    HDC hdc = hdcp;
 
    if ( ! hdc ) 
-      pIOpenGLImplementation -> get_HDC(&hdc);
+      hdc = pIOpenGLImplementation -> TargetDC();
 
    if ( ! hFont ) {
       if ( ! szFace[0] )
@@ -534,12 +528,12 @@ dxScale = 1.0;
    pIDataSet -> ReSet();
 
    if ( ! theText ) {
-      if ( ! pszText )
+      if ( ! propertyContent -> pointer() )
          return 0;
-      long n = strlen(pszText) + 1;
+      long n = strlen((char *)propertyContent -> pointer()) + 1;
       text = new char[n];
       memset(text,0,n * sizeof(char));
-      strcpy(text,pszText);
+      strcpy(text,(char *)propertyContent -> pointer());
    } else {
       long n = strlen(theText);
       text = new char[n + 1];
@@ -601,9 +595,12 @@ dxScale = 1.0;
    xText = dpStart.x;
    yText = dpStart.y;
    zText = dpStart.z;
+
+long xx = GDI_ERROR;
  
    cbCharacter = GetGlyphOutline(hdc,c,GGO_NATIVE,&glyphMetrics,0,NULL,&matrix);
-   if ( cbCharacter < 0 ) return 0;
+   if ( cbCharacter < 0 ) 
+      return 0;
 
    b = new BYTE[cbCharacter];
    cbCharacter = GetGlyphOutline(hdc,c,GGO_NATIVE,&glyphMetrics,cbCharacter,b,&matrix);
@@ -769,8 +766,6 @@ dxScale = 1.0;
 
    pIDataSet -> Release();
 
-   //pIOpenGLImplementation -> ResetTargetWindow();
-
    pIDataSetWorld = pIDataSetWorld_Old;
 
    pIDataSet = pIDataSetOld;
@@ -799,31 +794,80 @@ dxScale = 1.0;
    }
 
 
-   int Text::eraseGDI() {
-   HDC hdc;
-Beep(2000,100);
-#if 0
-   pIOpenGLImplementation -> get_HDC(&hdc);
-   SetROP2(hdc,R2_NOTXORPEN);
-#endif
-   pIBasePlot -> DrawGDI();
-   return 0;
-   }
-
-
-   int Text::eraseBoundingBox() {
-   pIBasePlotBoundingBox -> Erase();
-   return 0;
-   }
-
-
    int Text::eraseBoundingBoxGDI() {
-   HDC hdc;
-Beep(2000,100);
-#if 0
-   pIOpenGLImplementation -> get_HDC(&hdc);
-   SetROP2(hdc,R2_NOTXORPEN);
-#endif
-   pIBasePlotBoundingBox -> DrawGDI();
+
+   if ( NULL == hbmBoundingBoxBackground ) 
+      return 0;
+
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
+
+   HDC hdcSource = CreateCompatibleDC(hdc);
+
+   HGDIOBJ oldBitmap = SelectObject(hdcSource,hbmBoundingBoxBackground);
+   
+   long cx = rcSavedBoundingBox.right - rcSavedBoundingBox.left + 4;
+   long cy = rcSavedBoundingBox.bottom - rcSavedBoundingBox.top + 4;
+
+   BitBlt(hdc,rcSavedBoundingBox.left - 2,rcSavedBoundingBox.top - 2,cx,cy,hdcSource,0,0,SRCCOPY);
+
+   SelectObject(hdcSource,oldBitmap);
+
+   DeleteObject(hbmBoundingBoxBackground);
+
+   DeleteDC(hdcSource);
+
+   hbmBoundingBoxBackground = NULL;
+
    return 0;
+   }
+
+
+   void Text::saveBoundingBoxBackground() {
+
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
+
+   HDC hdcTarget = CreateCompatibleDC(hdc);
+
+   get_GDIBoundingBox(&rcSavedBoundingBox);
+
+   long x = rcSavedBoundingBox.left - 2;
+   long y = rcSavedBoundingBox.top - 2;
+   long cx = rcSavedBoundingBox.right - rcSavedBoundingBox.left + 4;
+   long cy = rcSavedBoundingBox.bottom - rcSavedBoundingBox.top + 4;
+
+   hbmBoundingBoxBackground = CreateCompatibleBitmap(hdc,cx,cy);
+
+   HGDIOBJ oldBitmap = SelectObject(hdcTarget,hbmBoundingBoxBackground);
+
+   BitBlt(hdcTarget,0,0,cx,cy,hdc,x,y,SRCCOPY);
+
+   long countPixels = cx * cy;
+
+   float *pPixels = new float[4 * countPixels];
+
+   memset(pPixels,0,4 * countPixels * sizeof(float));
+
+   pIOpenGLImplementation -> GetPixels(x,y,x + cx,y + cy,(BYTE *)pPixels);
+
+   float *pf = pPixels;
+   BYTE b[3];
+
+   for ( int k = 0; k < cy; k++ ) {
+      for ( int j = 0; j < cx; j++ ) {
+         b[0] = (BYTE)(255.0 * pf[0]);
+         b[1] = (BYTE)(255.0 * pf[1]);
+         b[2] = (BYTE)(255.0 * pf[2]);
+         COLORREF cr = RGB(b[0],b[1],b[2]) & GetPixel(hdcTarget,j,k);
+         SetPixel(hdcTarget,j,k,cr);
+         pf += 4;
+      }
+   }
+
+   delete [] pPixels;
+
+   SelectObject(hdcTarget,oldBitmap);
+
+   DeleteDC(hdcTarget);
+
+   return;
    }

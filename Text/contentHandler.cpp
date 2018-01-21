@@ -1,15 +1,10 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-
-#include "Graphic_resource.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "text.h"
 
+#include "Graphic_resource.h"
 
    LRESULT CALLBACK Text::contentHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 
@@ -28,9 +23,6 @@
       p -> hwndContent = hwnd;
 
       long n;
-
-      if ( p -> pszText )
-         p -> propertyContent -> put_szValue(p -> pszText);
 
       p -> propertyContent -> setWindowText(GetDlgItem(hwnd,IDDI_TEXT_TEXT));
 
@@ -101,6 +93,7 @@
       RECT rectParent;
       GetWindowRect(GetParent(GetParent(hwnd)),&rectParent);
       p -> propertyPropertiesPosition -> put_binaryValue(sizeof(RECT),(BYTE*)&rectParent);
+      p -> propertyContent -> getWindowItemValue(hwnd,IDDI_TEXT_TEXT);
       }
       break;
  

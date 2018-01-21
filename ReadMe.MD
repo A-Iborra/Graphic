@@ -80,9 +80,9 @@ Because of the afore mentioned cicular dependencies - please don't do any "build
 Also note that all of my projects use a common VS properties sheet that is in the \Common repository (Compiler Options.props) I try very carefully never to apply specific bild properties on a file-by-file basis, but sometimes
 they slip through.
 
-A quick synopsis of the components in the system, in alphabetical order is (ALL of these are COM objects):
+A quick synopsis of the components in the system is (ALL of these are COM objects):
 
-1. Graphic - the core "central" component - hosts sthe graphic drawing window and UI components for interacting with Functions, DataSets, Plots and properties for the whole system. This is the main ActiveX/COM component control of the system.
+1. Graphic - the core "central" component - hosts the graphic drawing window and UI components for interacting with Functions, DataSets, Plots and properties for the whole system. This is the main ActiveX/COM component control of the system.
 2. Axis - The x, y, and z axiis for the plots.
 3. DataSet - The data. That which will be plotted. This object also has very extensive import/export MS Excel capabilities.
 4. Documentation - just a place holder for now, some stuff I had started in the early 2000s time frame, but documentation IS lacking here
@@ -96,10 +96,12 @@ to this object to produce graphics. Essentially - one could use any underlying g
 10. Plot - The graphic itself - the drawing, or "representation" of the data. Note there are only a few plot "types" defined at this point, natural (line), wireframe, surface (again you can see these almost instantly by running the 
 sample application and creating functions). However - What is important is that the plot types themselves <strong>are also</strong> COM objects ! In other words - Anybody can create any new plottype they can dream up (in any language For
 that matter) and it will seamlessly integrate into the entire system - as if it were natively built in - this is but one very good example of the power of raw COM.
-11. PlotTypes - Here are the currently implemented plot types. All of the logic for representing the data would be in COM objects - like this one. This particular project cam about when I realized the power of taking this logic out of the main System
+11. PlotTypes - Here are the currently implemented plot types. All of the logic for representing the data would be in COM objects - like this one. This particular project came about when I realized the power of taking this logic out of the main System
 and creating a COM-centric strategy that would allow anyone to publish a plot type. If you want to create a new plot type - use this project as a pattern - and create your own (new) project for your type(s). Check out the code in dllMain.cpp
-to see how plot types are "registered" so that the main system control (Graphic) can pick them up and implement them (they are actually put into service by the Plot project - but that is just a details.
-12. Text - I have isolated Text Objects here - there is not much that is currently being done with Text - other than drawing axis labels, etc., It will be my next big project - to really flesh out the text capabilities
+to see how plot types are "registered" so that the main system control (Graphic) can pick them up and implement them. They are actually put into service by the Plot project - but that is just a detail.
+12. Text - I have isolated Text Objects here - Text is working pretty well - however, I would like to see better text layout that follows 3-D views - in other words, full control over the 3-D location of the text as well as perspective 
+to the view. For example, if the text is on some X-Y plane, then I want it to appear as such in a 3-D View. I believe this is possible with GDI text but I haven't tried it yet. Instead I have attempted to "plot" text by unraveling the
+actual glyphs in true-type fonts - but at this point the polygon-fill implementation isn't correct so it looks "hollow".
 13. V - This stands for Variable. It is an object that the Function and Evaluator objects will detect and create while parsing some expression. It also contains the UI for range specification when using Functions in the Graphic.
 14. ViewSet - This project pops up a dialog that allows you to set the 3-D "viewing parameters" of the scene. You can rotate about 3 different axis using slider controls. Select "Dimension -> Set 3-D View" from the right-click context menu to 
 activate the dialog.

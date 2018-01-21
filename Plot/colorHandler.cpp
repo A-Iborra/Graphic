@@ -1,11 +1,9 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Plot.h"
-#include <commctrl.h>
+
 #include <functional>
 
 #include "Graphic_resource.h"

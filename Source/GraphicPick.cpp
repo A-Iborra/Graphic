@@ -1,31 +1,20 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <process.h>
-#include <math.h>
-
-#include "Graphic_resource.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Graphic.h"
+
+#include "Graphic_resource.h"
 #include "utils.h"
-
 #include "list.cpp"
-
 
    int G::doPickBox(POINTL *ptl) {
  
    if ( hitTable ) 
       return FALSE;
  
-   if ( ! pIOpenGLImplementation ) return FALSE;
+   if ( ! pIOpenGLImplementation ) 
+      return FALSE;
  
    long *pCallLists = NULL;
 
@@ -40,6 +29,26 @@
       pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits);
 
       delete [] pCallLists;
+
+      IText *pText = NULL;
+
+      while ( pText = textList.GetNext(pText) ) {
+
+         boolean isOpenGLRendered = false;
+
+         pText -> get_TextRender(&isOpenGLRendered);
+         if ( isOpenGLRendered )
+            continue;
+
+         RECT rcText;
+         pText -> get_GDIBoundingBox(&rcText);
+
+         if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
+            continue;
+
+         hitTableHits++;
+
+      }      
 
    }
 
@@ -75,13 +84,35 @@
       return FALSE;
    }
 
+   IText *pText = NULL;
+   long hitTableIndex = hitTableHits * 4;
+   while ( pText = textList.GetNext(pText) ) {
+      boolean isOpenGLRendered = false;
+      pText -> get_TextRender(&isOpenGLRendered);
+      if ( isOpenGLRendered )
+         continue;
+      RECT rcText;
+      pText -> get_GDIBoundingBox(&rcText);
+      if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
+         continue;
+      long segmentID;
+      pText -> get_SegmentID(&segmentID);
+      hitTable[hitTableIndex] = 1;
+      hitTable[hitTableIndex + 3] = (unsigned int)segmentID;
+      hitTableHits++;
+      hitTableIndex += 4;
+   } 
+
    delete [] pCallLists;
 
    if ( actionFunction ) {
       if ( forceToThread ) {
-///        unsigned int threadAddr;
-///        _beginthreadex(NULL,4096,actionFunction,(void *)this,0,&threadAddr);
-actionFunction((void*)this);
+#if 0
+         unsigned int threadAddr;
+        _beginthreadex(NULL,4096,actionFunction,(void *)this,0,&threadAddr);
+#else
+         actionFunction((void*)this);
+#endif
          return TRUE;
       }
       else 
@@ -131,7 +162,7 @@ actionFunction((void*)this);
          if ( hitList.Get((int)hitID) ) 
             continue;
  
-         IPlot* pPlot = NULL;
+         IPlot *pPlot = NULL;
          while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
             pPlot -> get_SegmentID(&segID);
             if ( (unsigned int)(segID) == hitID ) {

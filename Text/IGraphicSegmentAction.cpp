@@ -1,18 +1,11 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <stdio.h>
-
-#include "Graphic_resource.h"
-
-#include "utils.h"
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "Text.h"
+#include <math.h>
 
+#include "Graphic_resource.h"
 
    HRESULT Text::LeftMouse() {
    return S_OK;  
@@ -39,11 +32,13 @@
  
  
    HRESULT Text::Unselector() {
-   eraseBoundingBox();
+   eraseBoundingBoxGDI();
    return S_OK;
    }
  
  
+   static double totalXMovement = 0.0;
+
    HRESULT Text::Selector() {
 
    statusPosition();
@@ -70,8 +65,11 @@
 
    Erase();
 
-   pIBasePlot -> DrawGDI();
+   saveBoundingBoxBackground();
+
    pIBasePlotBoundingBox -> DrawGDI();
+
+   totalXMovement = 0.0;
 
    return S_OK;
    }
@@ -79,22 +77,26 @@
 
    HRESULT Text::MouseMove(POINT* ptMouse) {
 
-   eraseGDI();
    eraseBoundingBoxGDI();
 
    DataPoint dpNew,dpMouse = {(double)ptMouse -> x,(double)ptMouse -> y,0.0};
 
    pIOpenGLImplementation -> WindowToData(&dpMouse,&dpNew);
 
+   totalXMovement += fabs(dpNew.x - dpStart.x);
+
    DataPoint dpTranslate = {dpNew.x - dpStart.x,dpNew.y - dpStart.y,dpNew.z - dpStart.z};
 
    pIDataSet -> Translate(&dpTranslate);
+
    pIDataSetBoundingBox -> Translate(&dpTranslate);
 
    pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+
    pIDataSetBoundingBox -> GenerateGDICoordinates(pIOpenGLImplementation);
 
    pIDataSet -> TranslateGDI(&ptSelectOffset);
+
    pIDataSetBoundingBox -> TranslateGDI(&ptSelectOffset);
 
    dpStart.x = dpNew.x;
@@ -105,11 +107,21 @@
    put_PositionY(dpStart.y);
    put_PositionZ(dpStart.z);
 
-   pIBasePlot -> DrawGDI();
+   saveBoundingBoxBackground();
 
    pIBasePlotBoundingBox -> DrawGDI();
 
+   //Draw();
+
    statusPosition();
+
+//HWND hwndOwner = NULL;
+//POINT ptCursor = {0};
+//GetCursorPos(&ptCursor);
+//hwndOwner = WindowFromPoint(ptCursor);
+//UpdateWindow(pIOpenGLImplementation->TargetHWND());
+//Beep(2000,100);
+Sleep(20);
 
    return S_OK;
    }
@@ -121,22 +133,26 @@
       SetCursor(moveCursor);
 
    moveCursor = NULL;
-   eraseGDI();
+
    eraseBoundingBoxGDI();
 
-   dpStart.x += dpSelectOffsetRestore.x;
-   dpStart.y += dpSelectOffsetRestore.y;
-   dpStart.z += dpSelectOffsetRestore.z;
+   if ( 0.0 < totalXMovement ) {
 
-   pIDataSet -> Translate(&dpSelectOffsetRestore);
+      dpStart.x += dpSelectOffsetRestore.x;
+      dpStart.y += dpSelectOffsetRestore.y;
+      dpStart.z += dpSelectOffsetRestore.z;
 
-   put_PositionX(dpStart.x);
-   put_PositionY(dpStart.y);
-   put_PositionZ(dpStart.z);
+      pIDataSet -> Translate(&dpSelectOffsetRestore);
 
-   pIDataSetBoundingBox -> Translate(&dpSelectOffsetRestore);
+      put_PositionX(dpStart.x);
+      put_PositionY(dpStart.y);
+      put_PositionZ(dpStart.z);
 
-   pIBasePlot -> Draw();
+      pIDataSetBoundingBox -> Translate(&dpSelectOffsetRestore);
+
+   }
+
+   Draw();
 
    return S_OK;
    }

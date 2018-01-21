@@ -1,9 +1,10 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "PlotTypes.h"
 
 #include "utils.h"
-
-//#include "plot.h"
 
    void PlotTypes::stacks(commonProperties *pProperties,long segmentID) {
    if ( DATA_ARITY_2D == pIDataSet -> DataArity() ) 

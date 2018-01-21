@@ -1,3 +1,7 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #define WMG_DEBUG_WINDOW                  (WM_USER + 1)
 #define WMG_SET_POINTER                   (WM_USER + 2)
 #define WMG_FUNCTION_SET_EXPRESSION       (WM_USER + 3)

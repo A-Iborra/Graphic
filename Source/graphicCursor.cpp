@@ -1,3 +1,6 @@
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
 #include "graphic.h"
 
@@ -57,9 +60,6 @@
       ReleaseDC(hwndGraphic,hdc);
       ptlPickBox.x = pPtlPickBox -> x;
       ptlPickBox.y = pPtlPickBox -> y; 
-
-
-
       return 0;
    }
 
@@ -206,6 +206,7 @@
    long bitmapIndex = 0;
 
    long itemCount = 6;
+
    if ( gcPlotView3D == plotView ) 
       itemCount = 12;
 
@@ -236,9 +237,12 @@
       pCursor -> sizelCrossBitmaps[bitmapIndex].cy = cy;
 
       pCursor -> crossBitmaps[bitmapIndex] = CreateCompatibleBitmap(hdc,cx,cy);
+
       HGDIOBJ oldBitmap = SelectObject(hdcTarget,pCursor -> crossBitmaps[bitmapIndex]);
+
       BitBlt(hdcTarget,0,0,cx,cy,hdc,x,y,SRCCOPY);
 
+#if 0
       long countPixels = cx * cy;
 
       float *pPixels = new float[4 * countPixels];
@@ -262,6 +266,7 @@
       }
 
       delete [] pPixels;
+#endif
 
       bitmapIndex++;
 
@@ -332,6 +337,7 @@
 
    BitBlt(hdcTarget,0,0,cx,cy,hdc,x,y,SRCCOPY);
 
+#if 0
    long countPixels = cx * cy;
 
    float *pPixels = new float[4 * countPixels];
@@ -355,6 +361,7 @@
    }
 
    delete [] pPixels;
+#endif
 
    SelectObject(hdcTarget,oldBitmap);
 
@@ -388,6 +395,7 @@
    while ( p = graphicCursorList.GetFirst() ) {
 
       long itemCount = 3;
+
       if ( gcPlotView3D == plotView ) 
          itemCount = 6;
 

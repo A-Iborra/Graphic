@@ -1,17 +1,13 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002,2008 Nathan T. Clark
-
-*/
-
-#include <windows.h>
-#include <process.h>
-#include <commctrl.h>
+#include "Graphic.h"
+#include <map>
 
 #include "Graphic_resource.h"
 
 #include "utils.h"
-#include "Graphic.h"
 
 #include "List.cpp"
 
@@ -209,18 +205,36 @@
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
 
    IAxis *ax = NULL;
+
+   std::map<DataPoint *,DataPoint *> axiisDomains;
+
    while ( ax = p -> axisList.GetNext(ax) ) {
+
       char type;
       ax -> get_Type(&type);
       if ( p -> plotView != gcPlotView3D && 'Z' == type )
          continue;
+
       ax -> PrepData();
-      DataPoint minPoint,maxPoint;
+
       IDataSet *pIDataSet;
+
       ax -> get_DataSet(&pIDataSet);
-      pIDataSet -> GetDomain(&minPoint,&maxPoint);
-      p -> pIDataSetMaster -> ResetLimits(&minPoint);
-      p -> pIDataSetMaster -> ResetLimits(&maxPoint);
+
+      DataPoint *pMin = new DataPoint();
+      DataPoint *pMax = new DataPoint();
+
+      pIDataSet -> GetDomain(pMin,pMax);
+
+      axiisDomains[pMin] = pMax;
+
+   }
+
+   for ( std::pair<DataPoint *,DataPoint *> pair : axiisDomains ) {
+      p -> pIDataSetMaster -> ResetLimits(pair.first);
+      p -> pIDataSetMaster -> ResetLimits(pair.second);
+      delete pair.second;
+      delete pair.first;
    }
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
@@ -241,14 +255,28 @@
       p -> plotList.GetFirst() -> Plotter(n,&pIPlots);
    }
 
+   IText *t = NULL;
+   while ( t = p -> textList.GetNext(t) ) {
+      boolean doOpenGLRendering = FALSE;
+      t -> get_TextRender(&doOpenGLRendering);
+      if ( ! doOpenGLRendering ) 
+         continue;
+      t -> PrepData();
+      t -> Draw();
+   } 
+
    p -> pIOpenGLImplementation -> Finalize();
 
    ax = NULL;
    while ( ax = p -> axisList.GetNext(ax) )
       ax -> DrawLabels();
 
-   IText *t = NULL;
+   t = NULL;
    while ( t = p -> textList.GetNext(t) ) {
+      boolean doOpenGLRendering = FALSE;
+      t -> get_TextRender(&doOpenGLRendering);
+      if ( doOpenGLRendering ) 
+         continue;
       t -> PrepData();
       t -> Draw();
    } 

@@ -1,16 +1,13 @@
-/*
+// Copyright 2018 InnoVisioNate Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
 
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
+#include "Function.h"
 
-*/
-
-#include <windows.h>
 #include <olectl.h>
 #include <CommCtrl.h>
 
 #include "Graphic_resource.h"
-
-#include "Function.h"
 #include "list.cpp"
 
    LRESULT EXPENTRY Function::functionDialogHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
