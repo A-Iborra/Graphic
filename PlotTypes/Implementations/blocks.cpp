@@ -6,7 +6,9 @@
 
    void PlotTypes::blocks(commonProperties *pProperties,long segmentID) {
    
-   DECLARE_PLANE
+   DataPoint homePoint,firstPoint,secondPoint,thirdPoint,fourthPoint,v[4]; 
+   double avgNormal[3];
+   int vk;
 
    double minx,maxx,miny,maxy,minz,maxz;
    BOOL endOfData;

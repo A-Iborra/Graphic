@@ -10,7 +10,6 @@
    DataPoint v[5];
    DataList *dlTemp,*dlNext,*dl;
    DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
-   DataPoint centerPoint;
    int endOfData,kAccross;
 
    double xProd0[3],xProd1[3],xProd2[3],avgNormal[5][4];
