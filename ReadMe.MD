@@ -17,13 +17,13 @@ And, so, here it is - number graphics - on Windows - in COM - and when I say COM
 ## What is this software ?
 ----
 
-This software is <strong>both</strong> a full featured scientific numeric plotting application <strong>AND</strong> a development tool - with which you can add every bit of these features <strong>YOUR</strong> application.
+This software is <strong>both</strong> a full featured scientific numeric plotting application/system <strong>AND</strong> a development tool - with which you can add every bit of these features to <strong>YOUR</strong> application.
 It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
-"container" support. In fact, the "application" that installs with this system is itself a very simple container of perhaps 200 or so lines of code. In fact, that application was primarily written as an 
+"container" support. In fact, the "application" that installs with this system is itself a very simple container of perhaps 200 or so lines of code. That application was primarily written as an 
 example to show you HOW to embedd the control, but it is powerful enough at the same time to <strong>BE</strong> the hosting application.
 
 It is incredibly easy to pop this tool into just about any system imaginable. 
-In fact, one can instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.
+You can even instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.
 
 As I mentioned, this is COM. To further clarify, this is RAW COM.
 
