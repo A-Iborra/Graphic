@@ -5,7 +5,6 @@
 #include "Evaluator.h"
 #include <olectl.h>
 
-
    Evaluator::_IConnectionPoint::_IConnectionPoint(Evaluator *pp) : 
       pParent(pp), 
       adviseSink(0),

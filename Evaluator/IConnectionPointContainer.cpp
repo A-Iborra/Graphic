@@ -7,7 +7,6 @@
 
 #include "List.cpp"
 
-
    STDMETHODIMP Evaluator::EnumConnectionPoints(IEnumConnectionPoints **ppEnum) {
    _IConnectionPoint* connectionPoints[1];
    *ppEnum = NULL;

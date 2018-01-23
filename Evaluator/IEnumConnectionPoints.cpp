@@ -4,7 +4,6 @@
 
 #include "Evaluator.h"
 
-
    Evaluator::_IEnumConnectionPoints::_IEnumConnectionPoints(Evaluator *pp,_IConnectionPoint **cp,int connectionPointCount) : 
     	  cpCount(connectionPointCount),
          pParent(pp) {

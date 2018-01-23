@@ -7,11 +7,7 @@
 #include "Evaluator_i.c"
 #include "Variable_i.c"
 
-#ifdef EMBEDDED_PROPERTIES
-#include "Properties_i.h"
-#else
 #include "Properties_i.c"
-#endif
 
    extern HMODULE gsEvaluator_hModule;
    extern char gsEvaluator_szModuleName[];

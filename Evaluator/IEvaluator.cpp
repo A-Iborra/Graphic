@@ -5,10 +5,7 @@
 #include "Evaluator.h"
 #include <process.h>
 
-#include "gmessage.h"
-#include "Resource.h"
 #include "Utils.h"
-
 #include "list.cpp"
 
 

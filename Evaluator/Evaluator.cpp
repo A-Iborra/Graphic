@@ -5,7 +5,7 @@
 #include "Evaluator.h"
 
 #include "Graphic_resource.h"
-#include "gmessage.h"
+
 #include "utils.h"
 
 #include "Vlist.h"

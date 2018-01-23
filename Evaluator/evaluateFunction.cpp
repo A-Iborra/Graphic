@@ -4,7 +4,6 @@
 
 #include "Evaluator.h"
 
-#include "gmessage.h"
 #include "utils.h"
 #include "VList.h"
 #include "list.cpp"
@@ -61,20 +60,9 @@
 
       delete [] pszName;
 
-#if 1
       long cntThisVar = 0L;
       v -> get_StepCount(&cntThisVar);
       cntIterations *= cntThisVar;
-#else
-      v -> get_DomainExpression(&bstrValue);
-      get_Eval(bstrValue,&deltaValue);
-      SysFreeString(bstrValue);
-
-      deltaValue -= currentValue;
-
-      if ( deltaValue != 0.0 && maxValue != minValue )
-         cntIterations *= (long)(fabs(maxValue - minValue) / deltaValue);
-#endif
 
    }
 
