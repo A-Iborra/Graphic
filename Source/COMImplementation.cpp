@@ -110,35 +110,35 @@
    return TRUE;
    }
  
-char OBJECT_DESCRIPTION[][128] = {"GSystemGraphic Position And Size Properties",
-                                    "GSystemGraphic Style Properties",
-                                    "GSystemGraphic Background Properties",
-                                    "GSystemGraphic Text Properties",
-                                    "GSystemGraphic Lighting Properties",
-                                    "GSystemGraphic Axis Properties",
-                                    "GSystemGraphic Plot Properties",
-                                    "GSystemGraphic DataSet Properties",
-                                    "GSystemGraphic Function Properties"};
+char OBJECT_DESCRIPTION[][128] = {"InnoVisioNate Graphic Position And Size Properties",
+                                    "InnoVisioNate Graphic Style Properties",
+                                    "InnoVisioNate Graphic Background Properties",
+                                    "InnoVisioNate Graphic Text Properties",
+                                    "InnoVisioNate Graphic Lighting Properties",
+                                    "InnoVisioNate Graphic Axis Properties",
+                                    "InnoVisioNate Graphic Plot Properties",
+                                    "InnoVisioNate Graphic DataSet Properties",
+                                    "InnoVisioNate Graphic Function Properties"};
  
-char OBJECT_NAME[][128] = {"GSystemGraphic.PropertiesPosSize",
-                                 "GSystemGraphic.PropertiesStyle",
-                                 "GSystemGraphic.PropertiesBackground",
-                                 "GSystemGraphic.PropertiesText",
-                                 "GSystemGraphic.PropertiesLighting",
-                                 "GSystemGraphic.PropertiesAxis",
-                                 "GSystemGraphic.PropertiesPlot",
-                                 "GSystemGraphic.PropertiesDataSets",
-                                 "GSystemGraphic.PropertiesFunctions"};
+char OBJECT_NAME[][128] = {"InnoVisioNate.GraphicPropertiesPosSize",
+                                 "InnoVisioNate.GraphicPropertiesStyle",
+                                 "InnoVisioNate.GraphicPropertiesBackground",
+                                 "InnoVisioNate.GraphicPropertiesText",
+                                 "InnoVisioNate.GraphicPropertiesLighting",
+                                 "InnoVisioNate.GraphicPropertiesAxis",
+                                 "InnoVisioNate.GraphicPropertiesPlot",
+                                 "InnoVisioNate.GraphicPropertiesDataSets",
+                                 "InnoVisioNate.GraphicPropertiesFunctions"};
 
-char OBJECT_NAME_V[][128] = {"GSystemGraphic.PropertiesPosSize.1",
-                                 "GSystemGraphic.PropertiesStyle.1",
-                                 "GSystemGraphic.PropertiesBackground.1",
-                                 "GSystemGraphic.PropertiesText.1",
-                                 "GSystemGraphic.PropertiesLighting.1",
-                                 "GSystemGraphic.PropertiesAxis.1",
-                                 "GSystemGraphic.PropertiesPlot.1",
-                                 "GSystemGraphic.PropertiesDataSets.1",
-                                 "GSystemGraphic.PropertiesFunctions.1"};
+char OBJECT_NAME_V[][128] = {"InnoVisioNate.GraphicPropertiesPosSize.1",
+                                 "InnoVisioNate.GraphicPropertiesStyle.1",
+                                 "InnoVisioNate.GraphicPropertiesBackground.1",
+                                 "InnoVisioNate.GraphicPropertiesText.1",
+                                 "InnoVisioNate.GraphicPropertiesLighting.1",
+                                 "InnoVisioNate.GraphicPropertiesAxis.1",
+                                 "InnoVisioNate.GraphicPropertiesPlot.1",
+                                 "InnoVisioNate.GraphicPropertiesDataSets.1",
+                                 "InnoVisioNate.GraphicPropertiesFunctions.1"};
 
 CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
                                  CLSID_GSystemGraphicPropertiesStyle,
@@ -210,12 +210,8 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
    memset(bstrLibrary,0,strlen(szLibrary) + 1);
    MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,strlen(szLibrary) + 1);
    utilsDllRegisterTypeLib(bstrLibrary);
-   utilsDllRegisterObject(CLSID_GSystems,LIBID_GSystems,hModule,
-                                  szModuleName,
-                                  "GSystems Common Definitions Type Library",
-                                  "GSystem.CommonDefinitions",
-                                  "GSystem.CommonDefinitions.1",
-                                  (CATID *)NULL,0,oleMisc,false,false,true);
+   utilsDllRegisterObject(CLSID_GSystems,LIBID_GSystems,hModule,szModuleName,"InnoVisioNate Graphic Common Definitions Type Library","InnoVisioNate.GraphicCommonDefinitions","InnoVisioNate.GraphicCommonDefinitions.1",
+                                    (CATID *)NULL,0,oleMisc,false,false,true);
    }
 
    for ( long objIndex = 0; 1; objIndex++ ) {
@@ -223,20 +219,12 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
       if ( GUID_NULL == OBJECT_CLSID[objIndex] )
          break;
 
-      utilsDllRegisterObject(OBJECT_CLSID[objIndex],LIBID_Graphic,hModule,
-                                  szModuleName,
-                                  OBJECT_DESCRIPTION[objIndex],
-                                  OBJECT_NAME[objIndex],
-                                  OBJECT_NAME_V[objIndex],
-                                  (CATID *)NULL,0,0,false,false,false);
+      utilsDllRegisterObject(OBJECT_CLSID[objIndex],LIBID_Graphic,hModule,szModuleName,OBJECT_DESCRIPTION[objIndex],OBJECT_NAME[objIndex],OBJECT_NAME_V[objIndex],
+                                    (CATID *)NULL,0,0,false,false,false);
    }
 
-   return utilsDllRegisterObject(CLSID_GSystemGraphic,LIBID_Graphic,hModule,
-                                  szModuleName,
-                                  "GSystems Graphic Object",
-                                  "GSystem.Graphic",
-                                  "GSystem.Graphic.1",
-                                  (CATID *)NULL,IDOCXBITMAP_GRAPHIC,oleMisc,true,true,true);
+   return utilsDllRegisterObject(CLSID_GSystemGraphic,LIBID_Graphic,hModule,szModuleName,"InnoVisioNate Graphic Object","InnoVisioNate.Graphic","InnoVisioNate.Graphic.1",
+                                                   (CATID *)NULL,0,0,false,false,true);//IDOCXBITMAP_GRAPHIC,oleMisc,true,true,true);
    }
  
  
@@ -250,7 +238,7 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
       utilsDllUnregisterObject(OBJECT_CLSID[objIndex],OBJECT_NAME[objIndex],OBJECT_NAME_V[objIndex]);
    }
 
-   utilsDllUnregisterObject(CLSID_GSystemGraphic,"GSystem.Graphic","GSystem.Graphic.1");
+   utilsDllUnregisterObject(CLSID_GSystemGraphic,"InnoVisioNate.Graphic","InnoVisioNate.Graphic.1");
 
    return utilsDllUnregisterTypeLib(bstrModuleName,LIBID_Graphic,wsVersionMajor,wsVersionMinor);
    }

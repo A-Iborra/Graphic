@@ -7,6 +7,7 @@
 #include "GraphicControl_i.h"
 
    long __stdcall G::QueryInterface(REFIID riid,void **ppv) {
+
    *ppv = NULL; 
  
    if ( riid == IID_IUnknown )
@@ -17,6 +18,10 @@
          *ppv = static_cast<IGSGraphic *>(this);
       else
  
+      //if ( riid == IID_IDataObject ) 
+      //   *ppv = static_cast<IDataObject *>(this);
+      //else
+
       if ( riid == IID_IDispatch ) 
          *ppv = static_cast<IDispatch *>(this);
       else
@@ -77,7 +82,11 @@
          *ppv = static_cast<IProvideClassInfo2 *>(this);
       else
 
-      if ( riid == IID_IViewObject ) 
+      if ( riid == IID_IRunnableObject ) 
+         *ppv = static_cast<IRunnableObject *>(this);
+      else
+ 
+     if ( riid == IID_IViewObject ) 
          *ppv = static_cast<IViewObjectEx *>(this);
       else
  

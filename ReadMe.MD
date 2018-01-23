@@ -17,8 +17,12 @@ And, so, here it is - number graphics - on Windows - in COM - and when I say COM
 ## What is this software ?
 ----
 
-At it's core - this is really a <strong>development</strong> tool. It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
-"container" support. In fact, the "application" that installs with this system is a very simple container of perhaps 200 or so lines of code. It is incredibly easy to pop this tool into just about any system imaginable. 
+This software is <strong>both</strong> a full featured scientific numeric plotting application <strong>AND</strong> a development tool - with which you can add every bit of these features <strong>YOUR</strong> application.
+It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
+"container" support. In fact, the "application" that installs with this system is itself a very simple container of perhaps 200 or so lines of code. In fact, that application was primarily written as an 
+example to show you HOW to embedd the control, but it is powerful enough at the same time to <strong>BE</strong> the hosting application.
+
+It is incredibly easy to pop this tool into just about any system imaginable. 
 In fact, one can instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.
 
 As I mentioned, this is COM. To further clarify, this is RAW COM.
@@ -74,9 +78,9 @@ and others, for that matter, to be provided better tools, or at least tools that
 
 ### Building the system
 ----
-Because of the afore mentioned cicular dependencies - please don't do any "build clean", or "rebuild all" quite yet. Someday I'll figure out a better way - but for now, I generally just right click and build each project as necessary.
+Because of the aforementioned cicular dependencies - please don't do any "build clean", or "rebuild all" quite yet. Someday I'll figure out a better way - but for now, I generally just right click and build each project as necessary.
 
-Also note that all of my projects use a common VS properties sheet that is in the \Common repository (Compiler Options.props) I try very carefully never to apply specific bild properties on a file-by-file basis, but sometimes
+Also note that all of my projects use a common VS properties sheet that is in the \Common repository (Compiler Options.props) I try very carefully never to apply specific build properties on a file-by-file basis, but sometimes
 they slip through.
 
 A quick synopsis of the components in the system is (ALL of these are COM objects):

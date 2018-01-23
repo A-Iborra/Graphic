@@ -9,7 +9,7 @@ import "ocidl.idl";
 [ 
    uuid(8CAEFD70-55E6-11d3-8365-006008BD5BC3),
    helpfile("Graphic.hlp"),
-   helpstring("GSystems Graphic Control"), 
+   helpstring("InnoVisioNate Graphic Control"), 
    lcid(0x00000000), 
    version(1.0),
    control
@@ -86,6 +86,7 @@ library Graphic {
       helpstring("GSystems Graphic Control (G), Events Interface"),
    ]
    dispinterface IGSGraphicEvents {
+
       properties:
 
       methods:
@@ -320,7 +321,7 @@ library Graphic {
 
    [
       uuid(8CAEFD74-55E6-11d3-8365-006008BD5BC3),
-      helpstring("GSystems Graphic Class G"),
+      helpstring("InnoVisioNate Graphic Class G"),
       control
    ]
    coclass GSystemGraphic {

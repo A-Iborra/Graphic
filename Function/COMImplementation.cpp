@@ -131,35 +131,6 @@
    HKEY hKey;                             
    DWORD dwDisposition;
 
-#ifdef FUNCTION_SAMPLE
-                        
-   RegCreateKeyEx(HKEY_CLASSES_ROOT,"CLSID\\{685223E6-5CF9-4d06-B744-DA4A9A777E68}",0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,&dwDisposition);
-
-   if ( REG_CREATED_NEW_KEY == dwDisposition ) {
-
-      RegCreateKeyEx(hKey,"InProcServer",0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,&dwDisposition);
-
-      char szTime[128];
-      SYSTEMTIME sysTime;
-      memset(&sysTime,0,sizeof(SYSTEMTIME));
-      GetSystemTime(&sysTime);
-      memset(szTime,0,sizeof(szTime));
-      sprintf(szTime,"/%02d/%02d/%02d",sysTime.wMonth,sysTime.wDay,sysTime.wYear);
-      RegSetValueEx(hKey,NULL,0,REG_SZ,(BYTE*)szTime,strlen(szTime));
-   }
-
-   RegCloseKey(hKey);
-
-#else
-
-   RegCreateKeyEx(HKEY_CLASSES_ROOT,"CLSID\\{685223E6-5CF9-4d06-B744-DA4A9A777E68}",0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,&dwDisposition);
-
-   RegDeleteKey(hKey,"InProcServer");
-
-   RegDeleteKey(HKEY_CLASSES_ROOT,"CLSID\\{685223E6-5CF9-4d06-B744-DA4A9A777E68}");
-
-#endif
-
    utilsDllRegisterTypeLib(wstrModuleName);
 
    GUID categoryIDs[6];
@@ -170,36 +141,20 @@
    categoryIDs[4] = CATID_PersistsToPropertyBag;
    categoryIDs[5] = CATID_NULL;
 
-#ifdef FUNCTION_SAMPLE
-   return utilsDllRegisterObject(CLSID_GSystemFunctioNaterSample,LIBID_FunctioNaterSample,hModule,
-                                  szModuleName,
-                                  "GSystems FunctioNater Sample Object",
-                                  "GSystem.FunctioNaterSampleControl",
-                                  "GSystem.FunctioNaterSampleControl.1",
-                                  categoryIDs,
-                                  IDOCXBITMAP_FUNCTION,oleMiscStatus,
-                                  false,true,true);
-#else
    return utilsDllRegisterObject(CLSID_GSystemFunctioNater,LIBID_FunctioNater,hModule,
                                   szModuleName,
-                                  "GSystems FunctioNater Object",
-                                  "GSystem.FunctioNaterControl",
-                                  "GSystem.FunctioNaterControl.1",
+                                  "InnoVisioNate FunctioNater Object",
+                                  "InnoVisioNate.FunctioNaterControl",
+                                  "InnoVisioNate.FunctioNaterControl.1",
                                   categoryIDs,
                                   IDOCXBITMAP_FUNCTION,oleMiscStatus,
                                   true,true,true);
-#endif
    }
  
  
    STDAPI DllUnregisterServer() {
-#ifdef FUNCTION_SAMPLE
-   utilsDllUnregisterObject(CLSID_GSystemFunctioNaterSample,"GSystem.FunctionNaterSampleControl","GSystem.FunctioNaterSampleControl.1");
-   return utilsDllUnregisterTypeLib(wstrModuleName,LIBID_FunctioNaterSample,wsVersionMajor,wsVersionMinor);
-#else
-   utilsDllUnregisterObject(CLSID_GSystemFunctioNater,"GSystem.FunctioNaterControl","GSystem.FunctioNaterControl.1");
+   utilsDllUnregisterObject(CLSID_GSystemFunctioNater,"InnoVisioNate.FunctioNaterControl","InnoVisioNate.FunctioNaterControl.1");
    return utilsDllUnregisterTypeLib(wstrModuleName,LIBID_FunctioNater,wsVersionMajor,wsVersionMinor);
-#endif
    }
  
  
@@ -216,16 +171,6 @@
  
  
    HRESULT STDMETHODCALLTYPE FunctionFactory::CreateInstance(struct IUnknown *pUnkOuter,const struct _GUID &riid,void **ppv) {
-
-#ifdef FUNCTION_SAMPLE
-#ifdef FUNCTION_EVALUATION
-   if ( trialExpired ) {
-      MessageBox(NULL,"The GSystems FunctioNater Control Sample trial period of 30 days has expired.\n\n"
-                        "Thank you sincerely for evaluating this product.","Note",MB_OK | MB_ICONEXCLAMATION);
-      return CLASS_E_CLASSNOTAVAILABLE;
-   }
-#endif
-#endif
 
    HRESULT hr = S_OK;
    *ppv = NULL;

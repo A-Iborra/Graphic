@@ -15,7 +15,7 @@
   }
 
   STDMETHODIMP G::QueryGetData(FORMATETC *) {
-  return E_NOTIMPL;
+  return S_FALSE;
   }
 
   STDMETHODIMP G::GetCanonicalFormatEtc(FORMATETC *,FORMATETC *) {

@@ -85,15 +85,15 @@
    utilsDllRegisterTypeLib(wstrModuleName);
    return utilsDllRegisterObject(CLSID_OpenGLImplementor,LIBID_OpenGLImplementor,
                                   hModule,szModuleName,
-                                  "GSystems OpenGLImplementor Object",
-                                  "GSystem.OpenGLImplementor",
-                                  "GSystem.OpenGLImplementor.1",
+                                  "InnoVisioNate OpenGLImplementor Object",
+                                  "InnoVisioNate.OpenGLImplementor",
+                                  "InnoVisioNate.OpenGLImplementor.1",
                                   (CATID*)NULL,0,0,false,true,false);
    }
  
  
    STDAPI DllUnregisterServer() {
-   utilsDllUnregisterObject(CLSID_OpenGLImplementor,"GSystem.OpenGLImplementor","GSystem.OpenGLImplementor.1");
+   utilsDllUnregisterObject(CLSID_OpenGLImplementor,"InnoVisioNate.OpenGLImplementor","InnoVisioNate.OpenGLImplementor.1");
    return utilsDllUnregisterTypeLib(wstrModuleName,LIBID_OpenGLImplementor,wsVersionMajor,wsVersionMinor);
    }
  

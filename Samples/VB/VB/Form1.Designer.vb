@@ -30,10 +30,10 @@ Partial Class Form1
       'AxGSystemGraphic1
       '
       Me.AxGSystemGraphic1.Enabled = True
-      Me.AxGSystemGraphic1.Location = New System.Drawing.Point(41, 45)
+      Me.AxGSystemGraphic1.Location = New System.Drawing.Point(84, 44)
       Me.AxGSystemGraphic1.Name = "AxGSystemGraphic1"
       Me.AxGSystemGraphic1.OcxState = CType(resources.GetObject("AxGSystemGraphic1.OcxState"), System.Windows.Forms.AxHost.State)
-      Me.AxGSystemGraphic1.Size = New System.Drawing.Size(1156, 678)
+      Me.AxGSystemGraphic1.Size = New System.Drawing.Size(1129, 658)
       Me.AxGSystemGraphic1.TabIndex = 0
       '
       'Form1

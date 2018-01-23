@@ -53,13 +53,13 @@
    STDAPI gsVariables_DllRegisterServer() {
    utilsDllRegisterTypeLib(gsVariables_wstrModuleName);
    return utilsDllRegisterObject(CLSID_Variable,LIBID_Variable,gsVariables_hModule,
-                                  gsVariables_szModuleName,"GSystem Variable Object","GSystem.Variable","GSystem.Variable.1",
+                                  gsVariables_szModuleName,"InnoVisioNate Variable Object","InnoVisioNate.Variable","InnoVisioNate.Variable.1",
                                   (CATID*)NULL,0,gsVariables_oleMisc,false,false,false);
    }
  
  
    STDAPI gsVariables_DllUnregisterServer() {
-   utilsDllUnregisterObject(CLSID_Variable,"GSystem Variable Object","GSystem.Variable");
+   utilsDllUnregisterObject(CLSID_Variable,"InnoVisioNate Variable Object","InnoVisioNate.Variable");
    return utilsDllUnregisterTypeLib(gsVariables_wstrModuleName,LIBID_Variable,gsVariables_wsVersionMajor,gsVariables_wsVersionMinor);
    }
  

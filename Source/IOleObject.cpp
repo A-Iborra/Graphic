@@ -201,7 +201,7 @@
  
    STDMETHODIMP G::GetMiscStatus(DWORD dwAspect,DWORD *dwStatus) {
    if ( dwAspect == DVASPECT_CONTENT )
-      *dwStatus = oleMisc;
+      *dwStatus = 0;//oleMisc;
    else
       *dwStatus = 0;
 //   return OleRegGetMiscStatus(CLSID_GSystemGraphic,dwAspect,dwStatus);

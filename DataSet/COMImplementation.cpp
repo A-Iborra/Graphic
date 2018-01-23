@@ -98,9 +98,9 @@
   STDAPI DllRegisterServer() {	
   return utilsDllRegisterObject(CLSID_DataSet,LIBID_DataSet,hModule,
                                  szModuleName,
-                                 "GSystem DataSet Object",
-                                 "GSystem.DataSet",
-                                 "GSystem.DataSet.1",
+                                 "InnoVisioNate DataSet Object",
+                                 "InnoVisioNate.DataSet",
+                                 "InnoVisioNate.DataSet.1",
                                  (CATID*)NULL,0,0,false,false,false);
   }
 

@@ -86,15 +86,15 @@
   utilsDllRegisterTypeLib(wstrModuleName);
   return utilsDllRegisterObject(CLSID_GSystemAxis,LIBID_Axis,hModule,
                                  szModuleName,
-                                 "GSystems Axis Object",
-                                 "GSystem.Axis",
-                                 "GSystem.Axis.1",
+                                 "InnoVisioNate Axis Object",
+                                 "InnoVisioNate.Axis",
+                                 "InnoVisioNate.Axis.1",
                                  (CATID*)NULL,0,0,false,true,false);
   }
 
 
   STDAPI DllUnregisterServer() {
-  utilsDllUnregisterObject(CLSID_GSystemAxis,"GSystem.Axis","GSystem.Axis.1");
+  utilsDllUnregisterObject(CLSID_GSystemAxis,"InnoVisioNate.Axis","InnoVisioNate.Axis.1");
   return utilsDllUnregisterTypeLib(wstrModuleName,LIBID_Axis,wsVersionMajor,wsVersionMinor);
   }
 

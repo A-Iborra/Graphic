@@ -29,7 +29,7 @@
 
    STDAPI DllRegisterServer() {	
 
-   utilsDllRegisterObject(CLSID_PlotTypes,LIBID_PlotTypes,hModule,szModuleName,"GSystem Plot Types Implementation Object","GSystem.PlotTypes","GSystem.PlotTypes.1",(CATID*)NULL,0,0,false,false,true);
+   utilsDllRegisterObject(CLSID_PlotTypes,LIBID_PlotTypes,hModule,szModuleName,"InnoVisioNate Plot Types Implementation Object","InnoVisioNate.PlotTypes","InnoVisioNate.PlotTypes.1",(CATID*)NULL,0,0,false,false,true);
 
    ICatRegister *pICatRegister;
 
@@ -46,7 +46,7 @@
 
 
    STDAPI DllUnregisterServer() {
-   utilsDllUnregisterObject(CLSID_PlotTypes,"GSystem.PlotTypes","GSystem.PlotTypes.1");
+   utilsDllUnregisterObject(CLSID_PlotTypes,"InnoVisioNate.PlotTypes","InnoVisioNate.PlotTypes.1");
    return TRUE;
    }
 

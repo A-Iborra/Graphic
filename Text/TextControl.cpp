@@ -59,9 +59,9 @@
   STDAPI DllRegisterServer() {	
   return utilsDllRegisterObject(CLSID_Text,LIBID_Text,hModule,
                                  szModuleName,
-                                 "GSystems Text Object",
-                                 "GSystem.Text",
-                                 "GSystem.Text.1",
+                                 "InnoVisioNate Text Object",
+                                 "InnoVisioNate.Text",
+                                 "InnoVisioNate.Text.1",
                                  (CATID*)NULL,0,0,false,true,false);
   }
 

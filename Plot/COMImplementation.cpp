@@ -59,14 +59,15 @@
 
 
    STDAPI DllRegisterServer() {	
-   utilsDllRegisterObject(CLSID_Plot,LIBID_Plot,hModule,szModuleName,"GSystem Plot Object","GSystem.Plot","GSystem.Plot.1",(CATID*)NULL,0,0,false,false,true);
-   utilsDllRegisterObject(CLSID_BasePlot,LIBID_Plot,hModule,szModuleName,"GSystem Base Plot Object","GSystem.BasePlot","GSystem.BasePlot.1",(CATID*)NULL,0,0,false,false,true);
+   utilsDllRegisterObject(CLSID_Plot,LIBID_Plot,hModule,szModuleName,"InnoVisioNate Plot Object","InnoVisioNate.Plot","InnoVisioNate.Plot.1",(CATID *)NULL,0,0,false,false,true);
+   utilsDllRegisterObject(CLSID_BasePlot,LIBID_Plot,hModule,szModuleName,"InnoVisioNate Base Plot Object","InnoVisioNate.BasePlot","InnoVisioNate.BasePlot.1",(CATID *)NULL,0,0,false,false,true);
    return DllRegisterServer_Segment();
    }
 
 
   STDAPI DllUnregisterServer() {
-  utilsDllUnregisterObject(CLSID_Plot,"GSystem.Plot","GSystem.Plot.1");
+  utilsDllUnregisterObject(CLSID_Plot,"InnoVisioNate.Plot","InnoVisioNate.Plot.1");
+  utilsDllUnregisterObject(CLSID_Plot,"InnoVisioNate.BasePlot","InnoVisioNate.BasePlot.1");
   return TRUE;
   }
 

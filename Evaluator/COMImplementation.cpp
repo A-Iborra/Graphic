@@ -93,9 +93,9 @@
    utilsDllRegisterTypeLib(gsEvaluator_wstrModuleName);
    return utilsDllRegisterObject(CLSID_Evaluator,LIBID_Evaluator,gsEvaluator_hModule,
                                  gsEvaluator_szModuleName,
-                                 "GSystems Evaluator Object",
-                                 "GSystem.EvaluatorControl",
-                                 "GSystem.EvaluatorControl.1",
+                                 "InnoVisioNate Evaluator Object",
+                                 "InnoVisioNate.EvaluatorControl",
+                                 "InnoVisioNate.EvaluatorControl.1",
                                  (CATID *)NULL,
                                  0,0,false,true,true);
    return S_OK;
@@ -103,7 +103,7 @@
  
  
    STDAPI gsEvaluator_DllUnregisterServer() {
-   utilsDllUnregisterObject(CLSID_Evaluator,"GSystem.EvaluatorControl","GSystem.EvaluatorControl.1");
+   utilsDllUnregisterObject(CLSID_Evaluator,"InnoVisioNate.EvaluatorControl","InnoVisioNate.EvaluatorControl.1");
    return utilsDllUnregisterTypeLib(gsEvaluator_wstrModuleName,LIBID_Evaluator,gsEvaluator_wsVersionMajor,gsEvaluator_wsVersionMinor);
    }
  
