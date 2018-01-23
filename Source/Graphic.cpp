@@ -496,6 +496,8 @@
    delete pIPropertiesClient;
    delete pIPropertyPageClient;
 
+   pIPropertiesClient = NULL;
+
    if ( pIOleInPlaceSite ) 
       pIOleInPlaceSite -> Release();
 

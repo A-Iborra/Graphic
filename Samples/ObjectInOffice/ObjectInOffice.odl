@@ -1,0 +1,29 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[ 
+   uuid(117F6326-C767-42BD-AAD2-47C3B23BE5EF),
+   lcid(0x00000000), 
+   version(1.0),
+   control
+] 
+library ObjectInOffice { 
+
+   [  uuid(117F6326-C767-42BD-AAD2-47C3B23BE5F0) //,
+//      dual,oleautomation,
+//      pointer_default(unique)
+   ] 
+   interface IObjectInOffice : IUnknown { //: IDispatch {
+
+
+   };
+
+   [
+      uuid(117F6326-C767-42BD-AAD2-47C3B23BE5F1),
+      control
+   ]
+   coclass ObjectInOffice {
+      [default] interface IObjectInOffice;
+   };
+
+};

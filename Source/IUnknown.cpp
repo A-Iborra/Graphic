@@ -18,9 +18,9 @@
          *ppv = static_cast<IGSGraphic *>(this);
       else
  
-      //if ( riid == IID_IDataObject ) 
-      //   *ppv = static_cast<IDataObject *>(this);
-      //else
+      if ( riid == IID_IDataObject ) 
+         *ppv = static_cast<IDataObject *>(this);
+      else
 
       if ( riid == IID_IDispatch ) 
          *ppv = static_cast<IDispatch *>(this);
@@ -87,11 +87,11 @@
       else
  
      if ( riid == IID_IViewObject ) 
-         *ppv = static_cast<IViewObjectEx *>(this);
+         *ppv = static_cast<IViewObject *>(this);
       else
  
       if ( riid == IID_IViewObject2 ) 
-         *ppv = static_cast<IViewObjectEx *>(this);
+         *ppv = static_cast<IViewObject2 *>(this);
       else
  
       if ( riid == IID_IViewObjectEx ) 
@@ -143,7 +143,7 @@
    unsigned long __stdcall G::Release() {
    refCount--;
    if ( refCount == 0 ) {
-      stop();//reinterpret_cast<void *>(this));
+      stop();
       delete this;
       pStaticObject = NULL;
       return 0;

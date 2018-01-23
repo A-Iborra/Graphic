@@ -113,8 +113,6 @@
       void wireFrame(commonProperties *pProperties,long segmentID);
 
       void stacks(commonProperties *pProperties,long segmentID);
-      //void stacks2D(commonProperties *pProperties,long segmentID);
-      //void stacks3D(commonProperties *pProperties,long segmentID);
 
       void blocks(commonProperties *pProperties,long segmentID);
 

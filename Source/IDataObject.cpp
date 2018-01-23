@@ -6,46 +6,45 @@
 
 #include "GraphicControl_i.h"
 
-  STDMETHODIMP G::GetData(FORMATETC *,STGMEDIUM *) {
-  return S_OK;
-  }
+   STDMETHODIMP G::GetData(FORMATETC *,STGMEDIUM *) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::GetDataHere(FORMATETC *,STGMEDIUM *) {
-  return E_NOTIMPL;
-  }
+   STDMETHODIMP G::GetDataHere(FORMATETC *,STGMEDIUM *) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::QueryGetData(FORMATETC *) {
-  return S_FALSE;
-  }
+   STDMETHODIMP G::QueryGetData(FORMATETC *) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::GetCanonicalFormatEtc(FORMATETC *,FORMATETC *) {
-  return E_NOTIMPL;
-  }
+   STDMETHODIMP G::GetCanonicalFormatEtc(FORMATETC *,FORMATETC *) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::SetData(FORMATETC *theData,STGMEDIUM *,BOOL) {
-  return E_NOTIMPL;
-  }
+   STDMETHODIMP G::SetData(FORMATETC *theData,STGMEDIUM *,BOOL) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::EnumFormatEtc(DWORD,IEnumFORMATETC **) {
-  return E_NOTIMPL;
-  }
+   STDMETHODIMP G::EnumFormatEtc(DWORD,IEnumFORMATETC **) {
+   return S_OK;
+   }
 
-  STDMETHODIMP G::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pIAS,DWORD *pdwConnection) {
-  G *p = static_cast<G *>(this);
-  if ( !p -> pDataAdviseHolder ) 
-     CreateDataAdviseHolder(&p -> pDataAdviseHolder);
-  if ( p -> pDataAdviseHolder )
-     p -> pDataAdviseHolder -> Advise(static_cast<IDataObject *>(p),pFormatEtc,advf,pIAS,pdwConnection);
-  return S_OK;
-  }
+   STDMETHODIMP G::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pIAS,DWORD *pdwConnection) {
+   return E_NOTIMPL;
+  //if ( ! pDataAdviseHolder ) 
+  //   CreateDataAdviseHolder(&pDataAdviseHolder);
+  //if ( pDataAdviseHolder )
+  //   pDataAdviseHolder -> Advise(static_cast<IDataObject *>(this),pFormatEtc,advf,pIAS,pdwConnection);
+  //return S_OK;
+   }
 
-  STDMETHODIMP G::DUnadvise(DWORD dwConnection) {
-  G *p = static_cast<G *>(this);
-  if ( p -> pDataAdviseHolder )
-     p -> pDataAdviseHolder -> Unadvise(dwConnection);
-  return S_OK;
-  }
+   STDMETHODIMP G::DUnadvise(DWORD dwConnection) {
+   if ( pDataAdviseHolder )
+      pDataAdviseHolder -> Unadvise(dwConnection);
+   return S_OK;
+   }
 
-  STDMETHODIMP G::EnumDAdvise(IEnumSTATDATA **) {
-  return S_OK;
-  }
+   STDMETHODIMP G::EnumDAdvise(IEnumSTATDATA **) {
+   return S_OK;
+   }

@@ -6,10 +6,9 @@
 #include <OleCtl.h>
 #include "utils.h"
 
-
    STDMETHODIMP G::SetClientSite(IOleClientSite *pcs) {
  
-   if ( pIOleInPlaceSite ) 
+  if ( pIOleInPlaceSite ) 
       pIOleInPlaceSite -> Release();
    pIOleInPlaceSite = NULL;
 
@@ -88,7 +87,6 @@
    hiMetricToPixel(pSizel,&tempSizel);
    rect.right = tempSizel.cx;
    rect.bottom = tempSizel.cy;
-   //SetWindowPos(hwndFrame,HWND_TOP,0L + 4,0L + 4,rect.right - rect.left - 8,rect.bottom - rect.top - 8,SWP_NOMOVE);
    SetWindowPos(hwndFrame,HWND_TOP,0L,0L,rect.right - rect.left,rect.bottom - rect.top,SWP_NOMOVE);
    memcpy(&containerSize,&tempSizel,sizeof(SIZEL));
    return S_OK;
@@ -96,7 +94,10 @@
  
  
    STDMETHODIMP G::GetExtent(DWORD dwDrawAspect,SIZEL *pSizel) {
-   memcpy(pSizel,&containerSize,sizeof(SIZEL));
+   RECT rc;
+   GetWindowRect(hwndFrame,&rc);
+   pSizel -> cx = rc.right - rc.left;
+   pSizel -> cy = rc.bottom - rc.top;
    pixelsToHiMetric(pSizel,pSizel);
    return S_OK;
    }
@@ -122,11 +123,10 @@
       if ( ! hwndFrame ) {
          hwndOwner = hwndParent;
          initWindows();
-         SetWindowPos(hwndFrame,HWND_TOP,
-                        lprcPosRect -> left + 4,lprcPosRect -> top + 4,
-                            lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,0L);
       }
-      ShowWindow(hwndFrame,SW_SHOW);
+      SetWindowPos(hwndFrame,HWND_TOP,
+                     lprcPosRect -> left + 4,lprcPosRect -> top + 4,
+                           lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,SWP_SHOWWINDOW);
       break;
  
    default:
@@ -137,11 +137,11 @@
  
  
    STDMETHODIMP G::SetHostNames(LPCOLESTR szContainerApp,LPCOLESTR olestrContainerObject) {
-   char szTemp[64];
-   memset(szTemp,0,sizeof(szTemp));
-   WideCharToMultiByte(CP_ACP,0,olestrContainerObject,wcslen(olestrContainerObject),szTemp,64,0,0);
-   strncpy(szName,szTemp,sizeof(szName));
-//   name(szTemp);
+//   char szTemp[64];
+//   memset(szTemp,0,sizeof(szTemp));
+//   WideCharToMultiByte(CP_ACP,0,olestrContainerObject,wcslen(olestrContainerObject),szTemp,64,0,0);
+//   strncpy(szName,szTemp,sizeof(szName));
+////   name(szTemp);
    return S_OK;
    }
  
@@ -201,7 +201,7 @@
  
    STDMETHODIMP G::GetMiscStatus(DWORD dwAspect,DWORD *dwStatus) {
    if ( dwAspect == DVASPECT_CONTENT )
-      *dwStatus = 0;//oleMisc;
+      *dwStatus = oleMisc;
    else
       *dwStatus = 0;
 //   return OleRegGetMiscStatus(CLSID_GSystemGraphic,dwAspect,dwStatus);

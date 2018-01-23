@@ -224,7 +224,7 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
    }
 
    return utilsDllRegisterObject(CLSID_GSystemGraphic,LIBID_Graphic,hModule,szModuleName,"InnoVisioNate Graphic Object","InnoVisioNate.Graphic","InnoVisioNate.Graphic.1",
-                                                   (CATID *)NULL,0,0,false,false,true);//IDOCXBITMAP_GRAPHIC,oleMisc,true,true,true);
+                                                   (CATID *)NULL,IDOCXBITMAP_GRAPHIC,oleMisc,false,false,true);//IDOCXBITMAP_GRAPHIC,oleMisc,true,true,true);
    }
  
  

@@ -6,20 +6,20 @@
 
 #include "GraphicControl_i.h"
 
-   static int isRunning = 0;
+   static int isObjectRunning = 0;
 
    STDMETHODIMP G::GetRunningClass(CLSID *pcid) {
    *pcid = CLSID_GSystemGraphic;
-   return E_UNEXPECTED;
+   return S_OK;
    }
 
    STDMETHODIMP G::Run(LPBC) { 
-   isRunning = 1;
+   isObjectRunning = 1;
    return S_OK; 
    }
 
    int __stdcall G::IsRunning() { 
-   return isRunning; 
+   return isObjectRunning; 
    }
 
    STDMETHODIMP G::LockRunning(BOOL,BOOL) { 
