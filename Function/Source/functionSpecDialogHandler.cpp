@@ -25,11 +25,11 @@
       if ( ! p ) break;
       p -> stopAllProcessing = true;
       if ( p -> oldResultLabelHandler ) 
-         SetWindowLong(GetDlgItem(hwnd,IDDI_FUNCTION_RESULT_LABEL),GWL_WNDPROC,(long)(p -> oldResultLabelHandler));
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_FUNCTION_RESULT_LABEL),GWLP_WNDPROC,(ULONG_PTR)(p -> oldResultLabelHandler));
       if ( p -> oldExpressionLabelHandler )
-         SetWindowLong(GetDlgItem(hwnd,IDDI_FUNCTION_EXPRESSION_LABEL),GWL_WNDPROC,(long)(p -> oldExpressionLabelHandler));
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_FUNCTION_EXPRESSION_LABEL),GWLP_WNDPROC,(ULONG_PTR)(p -> oldExpressionLabelHandler));
       if ( p -> oldExpressionHandler )
-         SetWindowLong(GetDlgItem(hwnd,IDDI_FUNCTION_EQUATION_ENTRY),GWL_WNDPROC,(long)(p -> oldExpressionHandler));
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_FUNCTION_EQUATION_ENTRY),GWLP_WNDPROC,(ULONG_PTR)(p -> oldExpressionHandler));
       break;
 
    case WM_MOVE:
@@ -120,7 +120,7 @@
          SetTextColor(ps.hdc,p -> foregroundColor);
          DrawText(ps.hdc, "No UI components are visible, set properties to change. The control won't be visible at runtime in this state.", -1, &ps.rcPaint, DT_VCENTER | DT_WORDBREAK); 
       } else {
-         long nID = GetWindowLongPtr(hwnd,GWLP_ID);
+         long nID = (long)GetWindowLongPtr(hwnd,GWLP_ID);
          if ( IDDI_FUNCTION_RESULT_LABEL == nID || IDDI_FUNCTION_EXPRESSION_LABEL == nID ) {
             RECT rect;
             char *pszText;
@@ -269,12 +269,12 @@
       NMHDR *pn = (NMHDR *)lParam;
       TCITEM tcItem;
       char szText[64];
-      long k = SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
+      long k = (long)SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
       memset(&tcItem,0,sizeof(TCITEM));
       tcItem.mask = TCIF_TEXT;
       tcItem.pszText = szText;
       tcItem.cchTextMax = 64;
-      SendMessage(pn -> hwndFrom,TCM_GETITEM,(int)k,(long)&tcItem);
+      SendMessage(pn -> hwndFrom,TCM_GETITEM,(int)k,(LPARAM)&tcItem);
       switch ( pn -> code ) {
       case TCN_SELCHANGING:
          p -> currentShowingVariable = p -> pVariableList -> Get(szText);
@@ -343,7 +343,7 @@
 
 
    LRESULT EXPENTRY Function::expressionHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   Function *p = reinterpret_cast<Function *>(GetWindowLong(hwnd,GWL_USERDATA));
+   Function *p = reinterpret_cast<Function *>(GetWindowLongPtr(hwnd,GWLP_USERDATA));
    switch ( msg ) {
    case WM_CHAR: {
       short keyCode = (short)wParam;

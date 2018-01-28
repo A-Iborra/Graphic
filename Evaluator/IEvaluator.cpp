@@ -87,7 +87,7 @@
 
 
    HRESULT Evaluator::get_Eval(BSTR bstrExpression,double* pTheResult) {
-   long n = wcslen(bstrExpression) + 1;
+   long n = (DWORD)wcslen(bstrExpression) + 1;
    char* pszInput = new char[n];
    memset(pszInput,0,n);
    WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,pszInput,n,0,0);
@@ -112,7 +112,7 @@
    
    HRESULT Evaluator::Consume_szExpression(char* szExpression,double* pTheResult) {
    if ( ! pTheResult ) return E_POINTER;
-   int n = strlen(szExpression);
+   int n = (DWORD)strlen(szExpression);
    if ( 0 == n ) {
       *pTheResult = 0.0;
       return S_OK;
@@ -166,7 +166,7 @@
 
    HRESULT Evaluator::IsVariable(BSTR bstrName,BOOL* isVariable) {
    if ( ! isVariable ) return E_POINTER;
-   long n = wcslen(bstrName) + 1;
+   long n = (DWORD)wcslen(bstrName) + 1;
    char *pszName = new char[n];
    memset(pszName,0,n);
    WideCharToMultiByte(CP_ACP,0,bstrName,-1,pszName,n,0,0);
@@ -207,7 +207,7 @@
 
    HRESULT Evaluator::Evaluate_bstrExpression(BSTR bstrExpression,double* pTheResult) {
    if ( ! pTheResult ) return E_POINTER;
-   long n = wcslen(bstrExpression) + 1;
+   long n = (DWORD)wcslen(bstrExpression) + 1;
    char *pszExpression = new char[n];
    memset(pszExpression,0,n);
    WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,pszExpression,n,0,0);

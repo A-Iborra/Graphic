@@ -124,7 +124,7 @@
       while ( v = pManuallyAddedVariables -> GetNext(v) ) {
          BSTR bstrName = SysAllocStringLen(NULL,64);
          v -> get_Name(&bstrName);
-         long n = wcslen(bstrName) + 1;
+         long n = (DWORD)wcslen(bstrName) + 1;
          char *pszName = new char[n];
          memset(pszName,0,n);
          WideCharToMultiByte(CP_ACP,0,bstrName,-1,pszName,n,0,0);

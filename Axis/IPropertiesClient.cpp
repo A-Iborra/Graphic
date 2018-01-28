@@ -65,46 +65,53 @@
    switch ( type ) {
    case 'x':
    case 'X': {
-      float v[] = {CLR_RED};
-      propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //float v[] = {CLR_RED};
+      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyEndpointXValue -> put_szValue("Mx");
       propertyEndpointYValue -> put_szValue("Oy");
       propertyEndpointZValue -> put_szValue("Oz");
       propertyLabelPositionXValue -> put_szValue("Ox + (Mx-Ox)/2");    
       propertyLabelPositionYValue -> put_szValue("Oy");    
-      propertyLabelPositionZValue -> put_szValue("0z");    
+      propertyLabelPositionZValue -> put_szValue("0z");
+      propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BELOW);
+      propertyTicksAllPlanes -> put_boolValue(FALSE);
       }
       break;
  
    case 'y':
    case 'Y': {
-      float v[] = {CLR_GREEN};
-      propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //float v[] = {CLR_GREEN};
+      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyLabelPositionXValue -> put_szValue("Ox");    
       propertyLabelPositionYValue -> put_szValue("Oy + (My-Oy)/2");    
       propertyLabelPositionZValue -> put_szValue("0z");    
       propertyEndpointXValue -> put_szValue("Ox");
       propertyEndpointYValue -> put_szValue("My");
       propertyEndpointZValue -> put_szValue("Oz");
+      propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BELOW);
+      propertyTicksAllPlanes -> put_boolValue(FALSE);
       }
       break;
  
    case 'z':
    case 'Z': {
-      float v[] = {CLR_BLUE};
-      propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //float v[] = {CLR_BLUE};
+      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
+      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyLabelPositionXValue -> put_szValue("Ox");    
       propertyLabelPositionYValue -> put_szValue("Oy");    
       propertyLabelPositionZValue -> put_szValue("0z + (Mz-Oz)/2");    
       propertyEndpointXValue -> put_szValue("Ox");
       propertyEndpointYValue -> put_szValue("Oy");
       propertyEndpointZValue -> put_szValue("Mz");
+      propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BOTH);
+      propertyTicksAllPlanes -> put_boolValue(TRUE);
+      propertyTickLength -> put_doubleValue(DEFAULT_ZAXIS_TICK_PERCENT);
       }
       break;
  
@@ -119,7 +126,6 @@
    propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
    propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
 #endif 
-//   memset(propertyCustomColors -> ValueDoubleMatrix(),0,9 * sizeof(double));
 
    propertyTextCount -> put_longValue(0);
  

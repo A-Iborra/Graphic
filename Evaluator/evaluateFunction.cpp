@@ -29,7 +29,7 @@
    }
 
    long n,cntIterations = 1;
-   double minValue,maxValue,currentValue,deltaValue;
+   double minValue,maxValue,currentValue;
    BSTR bstrValue;
    char *pszName;
 
@@ -48,12 +48,12 @@
       SysFreeString(bstrValue);
 
       v -> get_Name(&bstrValue);
-      pszName = new char[n = (wcslen(bstrValue) + 64)];
+      pszName = new char[n = ((DWORD)wcslen(bstrValue) + 64)];
       memset(pszName,0,n);
       WideCharToMultiByte(CP_ACP,0,bstrValue,-1,pszName,n,0,0);
       SysFreeString(bstrValue);
 
-      cntNameChars += strlen(pszName) + 1;
+      cntNameChars += (DWORD)strlen(pszName) + 1;
 
       sprintf(pszName + strlen(pszName)," = %lf",minValue);
       currentValue = eval(pszName);
@@ -66,20 +66,20 @@
 
    }
 
-   cntNameChars += strlen(pszResultName) + 2;
+   cntNameChars += (DWORD)strlen(pszResultName) + 2;
    char *p,*pszNames = new char[cntNameChars];
    memset(pszNames,0,cntNameChars);
 
    p = pszNames;
    while ( v = GetNext(v) ) {
       v -> get_Name(&bstrValue);
-      n = wcslen(bstrValue) + 1;
+      n = (DWORD)wcslen(bstrValue) + 1;
       pszName = new char[n];
       memset(pszName,0,n);
       WideCharToMultiByte(CP_ACP,0,bstrValue,-1,pszName,n,0,0);
       SysFreeString(bstrValue);
       strcpy(p,pszName);
-      p += strlen(pszName) + 1;
+      p += (DWORD)strlen(pszName) + 1;
    }
 
    strcpy(p,pszResultName);

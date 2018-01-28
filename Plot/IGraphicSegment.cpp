@@ -31,12 +31,12 @@
    }
  
  
-   HRESULT GraphicSegment::Initialize(IOpenGLImplementation *pimp,IGProperty* propLineColor,IGProperty* propLineWeight) {
+   HRESULT GraphicSegment::Initialize(void *pvIOpenGLImplementation,IGProperty* propLineColor,IGProperty* propLineWeight) {
  
    if ( pIOpenGLImplementation )
       pIOpenGLImplementation -> Release();
  
-   pIOpenGLImplementation = pimp;
+   pIOpenGLImplementation = (IOpenGLImplementation *)pvIOpenGLImplementation;
    if ( pIOpenGLImplementation )
       pIOpenGLImplementation -> AddRef();
  
@@ -103,7 +103,10 @@
 
  
    HRESULT GraphicSegment::Create(long *pSegmentID) {
-   Destroy();
+   if ( segmentID ) {
+      *pSegmentID = segmentID;
+      return S_OK;
+   }
    pIOpenGLImplementation -> NewSegments(1,&segmentID);
    if ( pSegmentID )
       *pSegmentID = segmentID;

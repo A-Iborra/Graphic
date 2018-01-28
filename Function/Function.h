@@ -124,7 +124,7 @@
      STDMETHOD(put_IDataSet)(void *);
      STDMETHOD(get_IDataSet)(void **);
 
-     STDMETHOD(Initialize)(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
+     STDMETHOD(Initialize)(IDataSet* pIDataSet_Domain,void *pvIOpenGLImplementation,
                               IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                               IGProperty *parentPropertyPlotView,
                               IGProperty *parentPropertyDefault2DPlotSubType,
@@ -203,7 +203,7 @@
 
 //      IViewObject
 
-     STDMETHOD (Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+     STDMETHOD (Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(ULONG_PTR),ULONG_PTR);
      STDMETHOD (GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
      STDMETHOD (Freeze)(DWORD,long,void *,DWORD *);
      STDMETHOD (Unfreeze)(DWORD);

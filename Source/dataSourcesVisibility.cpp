@@ -12,7 +12,7 @@
 
    long tabIndex(HWND hwndTab,char *pszCompare) {
 
-   long countTabs = SendMessage(hwndTab,TCM_GETITEMCOUNT,0L,0L);
+   long countTabs = (long)SendMessage(hwndTab,TCM_GETITEMCOUNT,0L,0L);
    
    char szTest[32];
 
@@ -29,6 +29,7 @@
 
    return -1;
    }
+
 
    void G::setDataSourcesVisibility(IDataSet *pIDataSet_Relevant,IGSFunctioNater *pIFunction_Relevant) {
 
@@ -49,7 +50,7 @@
    bool anyFunctionVisible = false;
    bool anyDataSetVisible = false;
 
-   long entryTabIndex = SendMessage(hwndDataSourcesTab,TCM_GETCURSEL,(WPARAM)0L,(LPARAM)0L);
+   long entryTabIndex = (long)SendMessage(hwndDataSourcesTab,TCM_GETCURSEL,(WPARAM)0L,(LPARAM)0L);
 
    if ( -1 == entryTabIndex )
       entryTabIndex = -2;
@@ -157,7 +158,7 @@
          tie.mask = TCIF_TEXT;
          tie.pszText = "DataSets";
          tie.cchTextMax = 18;
-         long rc = SendMessage(hwndDataSourcesTab,TCM_INSERTITEM,(WPARAM)SendMessage(hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L),(LPARAM)&tie);
+         long rc = (long)SendMessage(hwndDataSourcesTab,TCM_INSERTITEM,(WPARAM)SendMessage(hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L),(LPARAM)&tie);
 
          for ( long k = 0; k < containedDataSetList.Count(); k++ ) {
             ContainedDataSet * pIDataSet = containedDataSetList.GetByIndex(k);
@@ -339,21 +340,20 @@
       rectStatusText.top = 2;
       rectStatusText.bottom = rectStatusBar.bottom - rectStatusBar.top - 4;
 
-      SetWindowPos(hwndGraphic,HWND_TOP,xGraphic,yGraphic,cxGraphic,cyGraphic - (rectStatusBar.bottom - rectStatusBar.top),0L);
+      SetWindowPos(Canvas(),HWND_TOP,xGraphic,yGraphic,cxGraphic,cyGraphic - (rectStatusBar.bottom - rectStatusBar.top),0L);
 
    } else {
 
       ShowWindow(hwndStatusBar,SW_HIDE);
 
-      SetWindowPos(hwndGraphic,HWND_TOP,xGraphic,yGraphic,cxGraphic,cyGraphic,0L);
+      SetWindowPos(Canvas(),HWND_TOP,xGraphic,yGraphic,cxGraphic,cyGraphic,0L);
 
    }
 
-   HWND hwndCurrent = pIOpenGLImplementation -> TargetHWND();
+   //HWND hwndCurrent = pIOpenGLImplementation -> TargetHWND();
 
-   if ( hwndCurrent == hwndGraphic )
-      pIOpenGLImplementation -> SetTargetWindow(hwndGraphic);
-
+   //if ( hwndCurrent == Canvas() )
+   //   pIOpenGLImplementation -> SetTargetWindow(Canvas());
 
    return;
    }

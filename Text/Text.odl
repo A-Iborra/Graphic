@@ -208,7 +208,7 @@ library Text {
      [propput,id(textPropertyTextNotify),helpstring("")]
      HRESULT TextNotify(ITextNotify* pITextNotify);
 
-     [id(102)] HRESULT Initialize(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,
+     [id(102)] HRESULT Initialize(IOpenGLImplementation *,IEvaluator *,IDataSet *,
                                     IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
                                     IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
                                     IGProperty* pPropZFloor,IGProperty* pPropZCeiling,

@@ -10,7 +10,7 @@
 #include "ContainedDataSet.h"
 
 
-   ContainedDataSet::ContainedDataSet(G* pp,long pID,HWND hwndT,IDataSet *pIDS,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
+   ContainedDataSet::ContainedDataSet(G* pp,ULONG_PTR pID,HWND hwndT,IDataSet *pIDS,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
       plotID(pID),
       pIDataSet(pIDS),
       ContainedObject(pp,hwndT,pIUnknownObject,riidEventsInterface) {};

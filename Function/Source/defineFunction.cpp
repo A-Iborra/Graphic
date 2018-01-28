@@ -38,12 +38,12 @@
    long n;
 
    if ( pszTheExpression ) {
-      n = strlen(pszTheExpression) + 1;
+      n = (DWORD)strlen(pszTheExpression) + 1;
       pszTemp = new char[n];
       memset(pszTemp,0,n);
       strcpy(pszTemp,pszTheExpression);
    } else {
-      n = SendDlgItemMessage(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,WM_GETTEXTLENGTH,0L,0L);
+      n = (long)SendDlgItemMessage(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,WM_GETTEXTLENGTH,0L,0L);
       pszTemp = new char[n + 1];
       memset(pszTemp,0,n + 1);
       GetDlgItemText(hwndSpecDialog,IDDI_FUNCTION_EQUATION_ENTRY,pszTemp,n + 1);
@@ -55,7 +55,7 @@
 
    double dummyVal;
    expectEvalUndefines = TRUE;
-   BSTR bstrExpression = SysAllocStringLen(NULL,n = (strlen(expression) + 1));
+   BSTR bstrExpression = SysAllocStringLen(NULL,n = ((DWORD)strlen(expression) + 1));
    MultiByteToWideChar(CP_ACP,0,expression,-1,bstrExpression,n);
 
    evaluator -> get_Eval(bstrExpression,&dummyVal);
@@ -72,11 +72,11 @@
             char* pszVariableName;
             BSTR bstrValue;
             v -> get_Name(&bstrValue);
-            pszVariableName = new char[wcslen(bstrValue) + 1];
-            memset(pszVariableName,0,wcslen(bstrValue) + 1);
-            WideCharToMultiByte(CP_ACP,0,bstrValue,-1,pszVariableName,wcslen(bstrValue) + 1,0,0);
+            pszVariableName = new char[(DWORD)wcslen(bstrValue) + 1];
+            memset(pszVariableName,0,(DWORD)wcslen(bstrValue) + 1);
+            WideCharToMultiByte(CP_ACP,0,bstrValue,-1,pszVariableName,(DWORD)wcslen(bstrValue) + 1,0,0);
             SysFreeString(bstrValue);
-            k = SendDlgItemMessage(hwndProperties,IDDI_FUNCTION_PROPERTIES_VARIABLES,CB_FINDSTRINGEXACT,-1L,(LPARAM)pszVariableName);
+            k = (long)SendDlgItemMessage(hwndProperties,IDDI_FUNCTION_PROPERTIES_VARIABLES,CB_FINDSTRINGEXACT,-1L,(LPARAM)pszVariableName);
             delete [] pszVariableName;
             if ( CB_ERR != k ) 
                SendDlgItemMessage(hwndProperties,IDDI_FUNCTION_PROPERTIES_VARIABLES,CB_DELETESTRING,(WPARAM)k,0L);
@@ -96,7 +96,7 @@
       pn.idFrom = IDDI_FUNCTION_VARIABLES_TABS;
 
       pn.code = TCN_SELCHANGING;
-      long k = SendMessage(hwndVariablesTab,TCM_GETCURSEL,0L,0L);
+      long k = (long)SendMessage(hwndVariablesTab,TCM_GETCURSEL,0L,0L);
       SendMessage(hwndVariablesTab,WM_NOTIFY,0L,(LPARAM)&pn);
 
       pn.code = TCN_SELCHANGE;

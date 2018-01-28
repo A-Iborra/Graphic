@@ -22,7 +22,7 @@
 
    HRESULT Plot::TakeDataString(BSTR input) {
 
-   int n = wcslen(input) + 1;
+   int n = (DWORD)wcslen(input) + 1;
 
    if ( 1 == n ) 
       return S_FALSE;

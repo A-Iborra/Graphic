@@ -37,13 +37,13 @@
 
       GetModuleFileName(hModule,szModuleName,1024);
       memset(wstrModuleName,0,sizeof(wstrModuleName));
-      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  
+      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, (DWORD)strlen(szModuleName));  
 
       char szLibrary[1026];
       sprintf(szLibrary,"%s\\%ld",szModuleName,(long)FUNCTION_TYPELIB_ID);
       BSTR bstrLibrary = SysAllocStringLen(NULL,256);
       memset(bstrLibrary,0,strlen(szLibrary) + 1);
-      MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,strlen(szLibrary) + 1);
+      MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,(DWORD)strlen(szLibrary) + 1);
 
       ITypeLib *ptLib;
 

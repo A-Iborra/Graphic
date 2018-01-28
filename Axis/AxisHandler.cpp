@@ -13,7 +13,7 @@
    switch (msg) {
    case WM_CREATE: {
       CREATESTRUCT *pc = (CREATESTRUCT *)lParam;
-      SetWindowLong(hwnd,GWL_USERDATA,(LONG)pc -> lpCreateParams);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)pc -> lpCreateParams);
       }
       return LRESULT(FALSE);
  

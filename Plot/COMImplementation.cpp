@@ -15,6 +15,7 @@
 #include "Properties_i.c"
 #include "DataSet_i.c"
 #include "OpenGLImplementation_i.c"
+#include "Text_i.c"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
@@ -38,9 +39,9 @@
 
      hModule = reinterpret_cast<HMODULE>(module);
      GetModuleFileName(hModule,szModuleName,1024);
-     wstrModuleName = SysAllocStringLen(NULL,strlen(szModuleName) + 1);
+     wstrModuleName = SysAllocStringLen(NULL,(DWORD)strlen(szModuleName) + 1);
      memset(wstrModuleName,0,(strlen(szModuleName) + 1) * sizeof(OLECHAR));
-     MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  
+     MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, (DWORD)strlen(szModuleName));  
      ITypeLib *ptLib;
      LoadTypeLib(wstrModuleName,&ptLib);
      ptLib -> GetTypeInfoOfGuid(IID_IPlot,&pITypeInfo);

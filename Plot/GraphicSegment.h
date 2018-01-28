@@ -30,7 +30,7 @@
      STDMETHOD_ (ULONG, AddRef)();
      STDMETHOD_ (ULONG, Release)();
 
-     STDMETHOD(Initialize)(IOpenGLImplementation *,IGProperty*,IGProperty*);
+     STDMETHOD(Initialize)(void *pvIOpenGLImplementation,IGProperty*,IGProperty*);
 
      STDMETHOD(get_SegmentID)(long *getID);
 

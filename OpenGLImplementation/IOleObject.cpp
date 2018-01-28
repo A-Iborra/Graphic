@@ -130,7 +130,6 @@
    if ( ! pIOleClientSite ) 
       return E_NOTIMPL;
    return pIOleClientSite -> GetMoniker(OLEGETMONIKER_FORCEASSIGN,OLEWHICHMK_OBJFULL,ppm);
-   return E_NOTIMPL;
    }
  
  

@@ -30,10 +30,11 @@ using namespace VBIDE;
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+#include "DataSet_i.h"
+
 #include "OpenGLImplementation_i.h"
 #include "Function_i.h"
 
@@ -100,7 +101,7 @@ using namespace VBIDE;
       STDMETHOD(put_IPlot)(void *);
       STDMETHOD(get_IPlot)(void **);
 
-      STDMETHOD(Initialize)(void * pvIDataSet_Domain,void *pvIOpenGLImplementation,
+      STDMETHOD(Initialize)(void * pvIDataSet_Domain,void *pvIOpenGLImplementation,IEvaluator *pIEvaluator,
                               IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                               IGProperty *parentPropertyPlotView,
                               IGProperty *parentPropertyDefault2DPlotSubType,
@@ -198,7 +199,7 @@ using namespace VBIDE;
  
       STDMETHOD(GenerateBoundingBox)(IDataSet*);
  
-      STDMETHOD(GenerateGDICoordinates)(IUnknown*);
+      STDMETHOD(GenerateGDICoordinates)(void *pIOpenGLImplementation);
 
       STDMETHOD(PushExtents)();
 
@@ -276,7 +277,7 @@ using namespace VBIDE;
 
 //      IViewObject
 
-      STDMETHOD (Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+      STDMETHOD (Draw)(DWORD,LONG,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(ULONG_PTR),ULONG_PTR);
       STDMETHOD (GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
       STDMETHOD (Freeze)(DWORD,long,void *,DWORD *);
       STDMETHOD (Unfreeze)(DWORD);

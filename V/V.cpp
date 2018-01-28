@@ -103,7 +103,7 @@
    refCount = 101;
 
    if ( hwndTabControl )
-      long k = SendMessage(hwndTabControl,TCM_DELETEITEM,(WPARAM)tabIndex,0);
+      long k = (long)SendMessage(hwndTabControl,TCM_DELETEITEM,(WPARAM)tabIndex,0);
 
    if ( hwndDialog)
       DestroyWindow(hwndDialog);
@@ -140,9 +140,9 @@
       memset(&tie,0,sizeof(TC_ITEM));
       tie.mask = TCIF_TEXT; 
       tie.pszText = name;
-      tie.cchTextMax = strlen(name);
+      tie.cchTextMax = (DWORD)strlen(name);
 
-      tabIndex = SendMessage(hwndTabControl,TCM_GETITEMCOUNT,0,0);
+      tabIndex = (long)SendMessage(hwndTabControl,TCM_GETITEMCOUNT,0,0);
 
       SendMessage(hwndTabControl,TCM_INSERTITEM,(WPARAM)tabIndex,(LPARAM)&tie);
 

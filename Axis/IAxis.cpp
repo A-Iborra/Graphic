@@ -558,14 +558,13 @@
    }
 
 
-   HRESULT Axis::Initialize(HWND ho,char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
+   HRESULT Axis::Initialize(char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
                               IGProperty* pPropertyXFloor,IGProperty* pPropertyXCeiling,
                               IGProperty* pPropertyYFloor,IGProperty* pPropertyYCeiling,
                               IGProperty* pPropertyZFloor,IGProperty* pPropertyZCeiling,
                               IGProperty* pPropOpenGLText,
-                              IDataSet* pds,IOpenGLImplementation* newPimp,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *,ULONG_PTR),void *pChangedArg,ULONG_PTR changedCookie) {
+                              IDataSet* pds,void * pvNewOpenGLImplementation,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *,ULONG_PTR),void *pChangedArg,ULONG_PTR changedCookie) {
 
-   hwndOwner = ho;
    type = axisType;
 
    pXAxis = pX;
@@ -591,7 +590,7 @@
 
    pParentPropertyOpenGLText = pPropOpenGLText;
 
-   pIOpenGLImplementation = newPimp;
+   pIOpenGLImplementation = (IOpenGLImplementation *)pvNewOpenGLImplementation;
 
    pIEvaluator = iev;
 
@@ -624,7 +623,7 @@
 
    pIPlot -> put_OverrideOwnerPlotType(FALSE);
 
-   pLabel -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+   pLabel -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                            pParentPropertyXFloor,pParentPropertyXCeiling,
                            pParentPropertyYFloor,pParentPropertyYCeiling,
                            pParentPropertyZFloor,pParentPropertyZCeiling,
@@ -634,7 +633,7 @@
  
    InitNew();
 
-   pRepresentativeText -> Initialize(hwndOwner,pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+   pRepresentativeText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                        pParentPropertyXFloor,pParentPropertyXCeiling,
                                        pParentPropertyYFloor,pParentPropertyYCeiling,
                                        pParentPropertyZFloor,pParentPropertyZCeiling,
@@ -703,15 +702,41 @@
    }
 
 
-   HRESULT Axis::DrawLabels() {
+   HRESULT Axis::DrawOpenGLLabels() {
    IText *pIText = NULL;
-   while ( pIText = textList.GetNext(pIText) )
+   boolean isOpenGL;
+   while ( pIText = textList.GetNext(pIText) ) {
+      pIText -> get_TextRender(&isOpenGL);
+      if ( ! isOpenGL )
+         continue;
       pIText -> Draw();
-   if ( pLabel )
-      pLabel -> Draw();
+   }
+   if ( ! pLabel ) 
+      return S_OK;
+   pLabel -> get_TextRender(&isOpenGL);
+   if ( ! isOpenGL )
+      return S_OK;
+   pLabel -> Draw();
    return S_OK;
    }
 
+   HRESULT Axis::DrawGDILabels() {
+   IText *pIText = NULL;
+   boolean isOpenGL;
+   while ( pIText = textList.GetNext(pIText) ) {
+      pIText -> get_TextRender(&isOpenGL);
+      if ( isOpenGL )
+         continue;
+      pIText -> Draw();
+   }
+   if ( ! pLabel ) 
+      return S_OK;
+   pLabel -> get_TextRender(&isOpenGL);
+   if ( isOpenGL )
+      return S_OK;
+   pLabel -> Draw();
+   return S_OK;
+   }
 
    HRESULT Axis::Redraw() {
    if ( ! pIPlot ) return E_UNEXPECTED;

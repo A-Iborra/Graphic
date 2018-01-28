@@ -116,7 +116,7 @@
    HRESULT V::get_Value(double* pv) {
    if ( ! pv ) return E_POINTER;
    if ( hwndDialog && ! isIndependentVariable ) {
-      long n = SendMessage(GetDlgItem(hwndDialog,IDDI_VARIABLE_VALUE),WM_GETTEXTLENGTH,0L,0L);
+      long n = (long)SendMessage(GetDlgItem(hwndDialog,IDDI_VARIABLE_VALUE),WM_GETTEXTLENGTH,0L,0L);
       char* pszTemp = new char[n + 1];
       SendMessage(GetDlgItem(hwndDialog,IDDI_VARIABLE_VALUE),WM_GETTEXT,n + 1,(LPARAM)pszTemp);
       EVALUATE_SZ(iEvaluator,pszTemp,value.doubleValue)
@@ -138,8 +138,8 @@
    }
    HRESULT V::get_ValueExpression(BSTR* pstrExpression) {
    if ( ! pstrExpression ) return E_POINTER;
-   *pstrExpression = SysAllocStringLen(NULL,strlen(valueExpression) + 1);
-   MultiByteToWideChar(CP_ACP,0,valueExpression,-1,*pstrExpression,strlen(valueExpression) + 1);
+   *pstrExpression = SysAllocStringLen(NULL,(DWORD)strlen(valueExpression) + 1);
+   MultiByteToWideChar(CP_ACP,0,valueExpression,-1,*pstrExpression,(DWORD)strlen(valueExpression) + 1);
    return S_OK;
    }
 
@@ -147,7 +147,7 @@
    HRESULT V::put_Name(BSTR bstrName) {
    memset(name,0,sizeof(name));
    WideCharToMultiByte(CP_ACP,0,bstrName,-1,name,sizeof(name),0,0);
-   char * pszTemp = new char[strlen(name) + 10];
+   char * pszTemp = new char[(DWORD)strlen(name) + 10];
    sprintf(pszTemp,"<= %s <= ",name);
 
    SetWindowText(GetDlgItem(hwndProperties,IDDI_VARIABLE_DOMAIN_NAME),pszTemp);
@@ -167,7 +167,7 @@
       memset(&tie,0,sizeof(TC_ITEM));
       tie.mask = TCIF_TEXT; 
       tie.pszText = name;
-      tie.cchTextMax = strlen(name);
+      tie.cchTextMax = (DWORD)strlen(name);
       SendMessage(hwndTabControl,TCM_SETITEM,(WPARAM)tabIndex,(LPARAM)&tie);
    }
    getDomain(hwndDialog);
@@ -176,8 +176,8 @@
 
 
    HRESULT V::get_Name(BSTR* pbstrName) {
-   *pbstrName = SysAllocStringLen(NULL,strlen(name) + 1);
-   MultiByteToWideChar(CP_ACP,0,name,-1,*pbstrName,strlen(name) + 1);
+   *pbstrName = SysAllocStringLen(NULL,(DWORD)strlen(name) + 1);
+   MultiByteToWideChar(CP_ACP,0,name,-1,*pbstrName,(DWORD)strlen(name) + 1);
    return S_OK;
    }
 
@@ -207,8 +207,8 @@
    }
    HRESULT V::get_DomainExpression(BSTR* pbstrDomainExpression) {
    if ( ! pbstrDomainExpression ) return E_POINTER;
-   *pbstrDomainExpression = SysAllocStringLen(NULL,strlen(stepCount) + 1);
-   MultiByteToWideChar(CP_ACP,0,stepCount,-1,*pbstrDomainExpression,strlen(stepCount) + 1);
+   *pbstrDomainExpression = SysAllocStringLen(NULL,(DWORD)strlen(stepCount) + 1);
+   MultiByteToWideChar(CP_ACP,0,stepCount,-1,*pbstrDomainExpression,(DWORD)strlen(stepCount) + 1);
    return S_OK;
    }
 
@@ -222,8 +222,8 @@
    return S_OK;
    }
    HRESULT V::get_MinValueExpression(BSTR* pbstrDomainExpression) {
-   *pbstrDomainExpression = SysAllocStringLen(NULL,strlen(minValue) + 1);
-   MultiByteToWideChar(CP_ACP,0,minValue,-1,*pbstrDomainExpression,strlen(minValue) + 1);
+   *pbstrDomainExpression = SysAllocStringLen(NULL,(DWORD)strlen(minValue) + 1);
+   MultiByteToWideChar(CP_ACP,0,minValue,-1,*pbstrDomainExpression,(DWORD)strlen(minValue) + 1);
    getDomain(hwndDialog);
    return S_OK;
    }
@@ -238,8 +238,8 @@
    return S_OK;
    }
    HRESULT V::get_MaxValueExpression(BSTR* pbstrMax) {
-   *pbstrMax = SysAllocStringLen(NULL,strlen(maxValue) + 1);
-   MultiByteToWideChar(CP_ACP,0,maxValue,-1,*pbstrMax,strlen(maxValue) + 1);
+   *pbstrMax = SysAllocStringLen(NULL,(DWORD)strlen(maxValue) + 1);
+   MultiByteToWideChar(CP_ACP,0,maxValue,-1,*pbstrMax,(DWORD)strlen(maxValue) + 1);
    return S_OK;
    }
 

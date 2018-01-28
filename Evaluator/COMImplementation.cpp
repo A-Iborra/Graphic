@@ -47,7 +47,7 @@
    GetModuleFileName(gsEvaluator_hModule,gsEvaluator_szModuleName,1024);
 
    long n;
-   char* pszLibraryName = new char[n = strlen(gsEvaluator_szModuleName) + 16];
+   char* pszLibraryName = new char[n = (DWORD)strlen(gsEvaluator_szModuleName) + 16];
    memset(pszLibraryName,0,n);
    sprintf(pszLibraryName,"%s\\%d",gsEvaluator_szModuleName,EVALUATOR_TYPELIB_ID);
 
@@ -64,7 +64,7 @@
    ptLib -> GetTypeInfoOfGuid(IID_IEvaluator,&pITypeInfo_IEvaluator);
 
    memset(gsEvaluator_wstrModuleName,0,n);
-   MultiByteToWideChar(CP_ACP, 0, gsEvaluator_szModuleName, -1, gsEvaluator_wstrModuleName, strlen(gsEvaluator_szModuleName));  
+   MultiByteToWideChar(CP_ACP, 0, gsEvaluator_szModuleName, -1, gsEvaluator_wstrModuleName, (DWORD)strlen(gsEvaluator_szModuleName));  
    return TRUE;
    }
 

@@ -718,14 +718,12 @@ MessageBox(NULL,ex.what(),"",MB_OK);
 
       strCall_DataListToWindow *ps = reinterpret_cast<strCall_DataListToWindow*>(wParam);
 
-      double mMatrix[16],pMatrix[16];
-      double depthRange[2];
+      double modelMatrix[16],projectionMatrix[16];
       int vport[4];
    
-      glGetDoublev(GL_MODELVIEW_MATRIX,mMatrix);
-      glGetDoublev(GL_PROJECTION_MATRIX,pMatrix);
+      glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+      glGetDoublev(GL_PROJECTION_MATRIX,projectionMatrix);
       glGetIntegerv(GL_VIEWPORT,vport);
-      glGetDoublev(GL_DEPTH_RANGE,depthRange);
    
       long k = -1;
       DataList* pSource = ps -> dlSource;
@@ -743,7 +741,7 @@ MessageBox(NULL,ex.what(),"",MB_OK);
             continue;
          }
    
-         gluProject(pSource -> data.x,pSource -> data.y,pSource -> data.z,mMatrix,pMatrix,vport,&pTarget -> data.x,&pTarget -> data.y,&pTarget -> data.z);
+         gluProject(pSource -> data.x,pSource -> data.y,pSource -> data.z,modelMatrix,projectionMatrix,vport,&pTarget -> data.x,&pTarget -> data.y,&pTarget -> data.z);
 
          pTarget -> data.y =  (double)p -> plotWindow -> openGLState.windowCY - pTarget -> data.y;
    

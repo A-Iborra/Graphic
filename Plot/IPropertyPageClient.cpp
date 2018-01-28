@@ -76,7 +76,7 @@
    HRESULT Plot::get_PropertyPageCount(long *pCount) {
    if ( ! pCount )
       return E_POINTER;
-   *pCount = 3;
+   *pCount = 4;
    return S_OK;
    }
 
@@ -111,6 +111,15 @@
    pPropSheetPages[2].pszTitle = "Color";
    pPropSheetPages[2].lParam = (LPARAM)this;
    pPropSheetPages[2].pfnCallback = NULL;
+
+   pPropSheetPages[3].dwFlags = PSP_USETITLE;
+   pPropSheetPages[3].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[3].hInstance = hModule;
+   pPropSheetPages[3].pszTemplate = MAKEINTRESOURCE(IDDIALOG_PLOT_TEXT);
+   pPropSheetPages[3].pfnDlgProc = (DLGPROC)textHandler;
+   pPropSheetPages[3].pszTitle = "Text";
+   pPropSheetPages[3].lParam = (LPARAM)this;
+   pPropSheetPages[3].pfnCallback = NULL;
 
    return S_OK;
    }

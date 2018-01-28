@@ -24,9 +24,9 @@
    }
  
    static FIXED doubleToFixed(double d) {
-   long l;
-   l = static_cast<long>(d * 65536L);
-   return *(FIXED *)&l;
+   long x;
+   x = static_cast<long>(d * 65536L);
+   return *(FIXED *)&x;
    }
  
  
@@ -41,60 +41,20 @@
    HDC hdc = pIOpenGLImplementation -> TargetDC();
 
    DataPoint dpMin,dpMax;
-   double worldXMin,worldXMax,worldYMin,worldYMax,worldZMin,worldZMax;
-   
+
    pIDataSetWorld -> GetDomain(&dpMin,&dpMax);
 
-   worldXMin = dpMin.x;
-   worldXMax = dpMax.x;
-   worldYMin = dpMin.y;
-   worldYMax = dpMax.y;
-   worldZMin = dpMin.z;
-   worldZMax = dpMax.z;
-
-   if ( ( -DBL_MAX == worldXMin && DBL_MAX == worldXMax ) || ( DBL_MAX == worldXMin && -DBL_MAX == worldXMax ) )
+   if ( ( -DBL_MAX == dpMin.x && DBL_MAX == dpMax.x ) || ( DBL_MAX == dpMin.x && -DBL_MAX == dpMax.x ) )
       return 0;
 
-   double toTextDomainScaleX,toTextDomainScaleY,toTextDomainScaleZ;
-   double textDomainMinX,textDomainMinY,textDomainMinZ;
-   double textDomainMaxX,textDomainMaxY,textDomainMaxZ;
    double textMinX,textMaxX,textMinY,textMaxY,textMinZ,textMaxZ;
    int viewPort[4];
 
    pIOpenGLImplementation -> get_ViewPort(viewPort);
 
    short partOfWorldDomain;
+
    get_PartOfWorldDomain(&partOfWorldDomain);
-
-if ( strstr((char *)propertyContent -> pointer(),"This is") )
-printf("hello world");
-
-   double theRange[] = {RANGE,RANGE,RANGE};
-
-   if ( partOfWorldDomain ) {
-      theRange[0] = worldXMax - worldXMin;
-      theRange[1] = worldYMax - worldYMin;
-      theRange[2] = worldZMax - worldZMin;
-      toTextDomainScaleX = 1.0;
-      toTextDomainScaleY = 1.0;
-      toTextDomainScaleZ = 1.0;
-      textDomainMinX = worldXMin;
-      textDomainMinY = worldYMin;
-      textDomainMinZ = worldZMin;
-      textDomainMaxX = worldXMax;
-      textDomainMaxY = worldYMax;
-      textDomainMaxZ = worldZMax;
-   } else {
-      toTextDomainScaleX = 2.0 * theRange[0] / (worldXMax - worldXMin);
-      toTextDomainScaleY = 2.0 * theRange[1] / (worldYMax - worldYMin);
-      toTextDomainScaleZ = 2.0 * theRange[2] / (worldZMax - worldZMin);
-      textDomainMinX = -RANGE;
-      textDomainMinY = -RANGE;
-      textDomainMinZ = -RANGE;
-      textDomainMaxX = RANGE;
-      textDomainMaxY = RANGE;
-      textDomainMaxZ = RANGE;
-   }
 
    long fontSizeUnits;
    double dyScale,dxScale;
@@ -117,8 +77,6 @@ printf("hello world");
       fontWidth = tm.tmAveCharWidth;
       fontAscent = tm.tmAscent;
       fontDescent = tm.tmDescent;
-
-      pIDataSet -> ReSet();
 
       memset(&rcOnScreen,0,sizeof(RECT));
 
@@ -165,134 +123,19 @@ printf("hello world");
       fontWidth = textMaxX - textMinX;
       fontHeight = textMaxY - textMinY;
 
-      if ( ! renderText() ) {
-         SelectObject(hdc,hOriginalFont);
+      if ( ! renderText() ) 
          return S_OK;
-      }
 
    }
 
    pIDataSet -> GenerateBoundingBox(pIDataSetBoundingBox);
 
-   switch ( fontSizeUnits ) {
+   dyScale = (dpMax.y - dpMin.y) / (double)viewPort[3];
+   dxScale = (dpMax.x - dpMin.x) / (double)viewPort[2];
 
-   case TEXT_SIZE_PIXELS:
-   case TEXT_SIZE_POINTS: {
-
-      double pixelsY = (double)GetDeviceCaps(hdc,LOGPIXELSY);
-      double pixelsX = (double)GetDeviceCaps(hdc,LOGPIXELSX);
-
-      double desiredHeightInInches;
-
-      if ( TEXT_SIZE_PIXELS == fontSizeUnits )
-         desiredHeightInInches = fontSize / pixelsY;
-      else
-         desiredHeightInInches = fontSize / 72.0;
-
-      double desiredHeightInPixels = pixelsY * desiredHeightInInches;
-
-      //if ( doOpenGLRendering ) {
-      //   dyScale = desiredHeightInPixels * ( textDomainMaxY - textDomainMinY ) / fontHeight / (double)(viewPort[3]);
-      //   dxScale = dyScale * ( textDomainMaxX - textDomainMinX ) / (textDomainMaxY - textDomainMinY);
-      //} else {
-         dyScale = desiredHeightInPixels * ( worldYMax - worldYMin ) / fontHeight / (double)(viewPort[3]);
-         dxScale = dyScale * (worldXMax - worldXMin) / (worldYMax - worldYMin);
-      //}
-
-      }
-      break;
-
-   case TEXT_SIZE_PERCENT:
-
-      switch ( coordinatePlane ) {
-      case CoordinatePlane_XY:
-         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_YX:
-         dyScale = theRange[1] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_XZ:
-         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_YZ:
-         dyScale = theRange[1] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_ZY:
-         dyScale = theRange[2] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_ZX:
-         dyScale = theRange[2] * fontSize / fontHeight / 100.0;
-         break;
-      case CoordinatePlane_screen:
-         dyScale = theRange[0] * fontSize / fontHeight / 100.0;
-         break;
-      }
-
-      dxScale = dyScale * fontWidth / fontHeight;
-
-      break;
-
-   }
-
-   BSTR bstrEval = SysAllocStringLen(NULL,256);
-
-   swprintf(bstrEval,L"mHeight = %lf",fontHeight * dyScale);
-   evalBSTR(pIEvaluator,bstrEval);
-
-   swprintf(bstrEval,L"mWidth = %lf",fontWidth * dxScale);
-   evalBSTR(pIEvaluator,bstrEval);
-
-   SysFreeString(bstrEval);
-
-   char szPosition[256];
-   propertyPositionString -> get_szValue(szPosition);
-
-   if ( strlen(szPosition) ) {
-
-      BSTR bstrPosition = SysAllocStringLen(NULL,256);
-
-      char *p = strtok(szPosition,",");
-      if ( p ) {
-         MultiByteToWideChar(CP_ACP,0,p,-1,bstrPosition,strlen(p) + 1);
-         pIDataSetWorld -> Evaluate(bstrPosition,&dpStart.x);
-         p = strtok(NULL,",");
-         if ( p ) {
-            MultiByteToWideChar(CP_ACP,0,p,-1,bstrPosition,strlen(p) + 1);
-            pIDataSetWorld -> Evaluate(bstrPosition,&dpStart.y);
-            p = strtok(NULL,",");
-            if ( p ) {
-               MultiByteToWideChar(CP_ACP,0,p,-1,bstrPosition,strlen(p) + 1);
-               pIDataSetWorld -> Evaluate(bstrPosition,&dpStart.z);
-            } else {
-               dpStart.z = 0.0;
-            }
-         } else {
-            dpStart.y = 0.0;
-            dpStart.z = 0.0;
-         }
-      } else {
-         dpStart.x = 0.0;
-         dpStart.y = 0.0;
-         dpStart.z = 0.0;
-      }
-
-      SysFreeString(bstrPosition);
-
-   } else {
-
-      SAFEARRAY *pStart = NULL;
-      BSTR *pData;
-      get_Position(&pStart);
-      SafeArrayAccessData(pStart,(void **)&pData);
-      dpStart.x = evalBSTR(pIEvaluator,*pData);
-      pData++;
-      dpStart.y = evalBSTR(pIEvaluator,*pData);
-      pData++;
-      dpStart.z = evalBSTR(pIEvaluator,*pData);
-      SafeArrayUnaccessData(pStart);
-      SafeArrayDestroy(pStart);
-
-   }
+   propertyPositionX -> get_doubleValue(&dpStart.x);
+   propertyPositionY -> get_doubleValue(&dpStart.y);
+   propertyPositionZ -> get_doubleValue(&dpStart.z);
 
    DataPoint dpScale = {dxScale,dyScale,1.0};
 
@@ -378,6 +221,8 @@ printf("hello world");
 
    pIDataSet -> GenerateBoundingBox(pIDataSetBoundingBox);
 
+   pIDataSetBoundingBox -> GenerateGDICoordinates(pIOpenGLImplementation);
+
    SelectObject(hdc,hOriginalFont);
 
    return S_OK;
@@ -412,21 +257,32 @@ printf("hello world");
 
    DataPoint minPoint,maxPoint;
 
-   RECT rectText;
+   RECT rectText{0,0,0,0};
 
-   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+   if ( E_UNEXPECTED == pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation) ) {
 
-   pIDataSet -> GetDomainGDI(&minPoint,&maxPoint);
+      get_GDIBoundingBox(&rectText);
 
-   rectText.left = (long)minPoint.x;
-   rectText.top = (long)minPoint.y;
-   rectText.right = (long)maxPoint.x;
-   rectText.bottom = (long)maxPoint.y;
+      if ( 0 == rectText.right - rectText.left ) {
+         DrawText(hdc,(char *)propertyContent -> pointer(),-1,&rectText,DT_CALCRECT);
+         put_GDIBoundingBox(&rectText);
+      }
 
-   if ( CoordinatePlane_YX == coordinatePlane ) {
-      long cy = rectText.bottom - rectText.top;
-      rectText.bottom += cy;
-      rectText.top += cy;
+   } else {
+
+      pIDataSet -> GetDomainGDI(&minPoint,&maxPoint);
+
+      rectText.left = (long)minPoint.x;
+      rectText.top = (long)minPoint.y;
+      rectText.right = (long)maxPoint.x;
+      rectText.bottom = (long)maxPoint.y;
+
+      if ( CoordinatePlane_YX == coordinatePlane ) {
+         long cy = rectText.bottom - rectText.top;
+         rectText.bottom += cy;
+         rectText.top += cy;
+      }
+
    }
 
    int oldBackground = SetBkMode(hdc,TRANSPARENT);
@@ -530,12 +386,12 @@ printf("hello world");
    if ( ! theText ) {
       if ( ! propertyContent -> pointer() )
          return 0;
-      long n = strlen((char *)propertyContent -> pointer()) + 1;
+      long n = (DWORD)strlen((char *)propertyContent -> pointer()) + 1;
       text = new char[n];
       memset(text,0,n * sizeof(char));
       strcpy(text,(char *)propertyContent -> pointer());
    } else {
-      long n = strlen(theText);
+      long n = (DWORD)strlen(theText);
       text = new char[n + 1];
       strcpy(text,theText);
    }

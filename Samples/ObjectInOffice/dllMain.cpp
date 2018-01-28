@@ -19,9 +19,9 @@
       hModule = reinterpret_cast<HMODULE>(module);
 
       GetModuleFileName(hModule,szModuleName,1024);
-      bstrModuleName = SysAllocStringLen(NULL,strlen(szModuleName) + 1);
+      bstrModuleName = SysAllocStringLen(NULL,(DWORD)strlen(szModuleName) + 1);
       memset(bstrModuleName,0,(strlen(szModuleName) + 1) * sizeof(OLECHAR));
-      MultiByteToWideChar(CP_ACP,0,szModuleName,-1,bstrModuleName,strlen(szModuleName));
+      MultiByteToWideChar(CP_ACP,0,szModuleName,-1,bstrModuleName,(DWORD)strlen(szModuleName));
  
       //ITypeLib *ptLib;
       //LoadTypeLib(bstrModuleName,&ptLib);

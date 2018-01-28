@@ -98,8 +98,8 @@
    BOOL isVariable;
    pParent -> evaluator -> IsVariable(variableName,&isVariable);
    if ( ! isVariable ) {
-      char* errorString = new char[wcslen(variableName) + 1];
-      WideCharToMultiByte(CP_ACP,0,variableName,-1,errorString,wcslen(variableName) + 1,0,0);
+      char* errorString = new char[(DWORD)wcslen(variableName) + 1];
+      WideCharToMultiByte(CP_ACP,0,variableName,-1,errorString,(DWORD)wcslen(variableName) + 1,0,0);
       bool bDummy;
       pParent -> UnknownVariable(errorString,&bDummy);
       delete [] errorString;
@@ -151,7 +151,7 @@
 
    HRESULT _IEvaluatorEvents::InvalidArgument(BSTR bstrFunctionName,double badArgument) {
    pParent -> fire_InvalidArgument(bstrFunctionName,badArgument);
-   long n = wcslen(bstrFunctionName) + 1;
+   long n = (DWORD)wcslen(bstrFunctionName) + 1;
    char *pszName = new char[n];
    memset(pszName,0,n);
    WideCharToMultiByte(CP_ACP,0,bstrFunctionName,-1,pszName,n,0,0);

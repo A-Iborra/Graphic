@@ -67,6 +67,7 @@
       #define IDMI_GRAPHIC_MENU_TITLE                                      6006
       #define IDMI_GRAPHIC_SAVE_AS                                         6007
       #define IDMI_GRAPHIC_OPEN                                            6008
+      #define IDMI_GRAPHIC_PRINT                                           6009
       #define IDMI_GRAPHIC_VIEW_2D                                         6010
       #define IDMI_GRAPHIC_VIEW_3D                                         6015
       #define IDMI_GRAPHIC_VIEW_SET                                        6018
@@ -84,7 +85,6 @@
    #define IDMI_GRAPHIC_REDRAW                                             6150
    #define IDMI_GRAPHIC_CANCEL                                             6155
    #define IDMI_GRAPHIC_TEXT                                               6160
-   #define IDMI_GRAPHIC_PRINT                                              6170
 
 
 #define IDMENU_AXIS                                                        7000
@@ -112,7 +112,7 @@
    #define IDSTRING_DATASET_INSTRUCTIONS2                                  2202
    #define IDSTRING_DATASET_INSTRUCTIONS3                                  2203
    #define IDSTRING_DATASET_INSTRUCTIONS4                                  2204
-   #define IDSTRING_DATASET_DATASOURCE_EMBED_INSTRUCTIONS                  2223
+   #define IDSTRING_DATASET_DATASOURCE_EMBED_INST                          2223
 
 #define IDDIALOG_DATASET_PROPERTIES                                        2210
    #define IDDI_DATASET_NAME                                               2211
@@ -296,7 +296,6 @@
 #define IDDI_VARIABLE_PROPERTIES_TOFILE                                    6210
 #define IDDI_VARIABLE_PROPERTIES_TOGRAPH                                   6220
 #define IDDIALOG_VARIABLE_PROPERTIES                                       6201
-
 
 #define IDDIALOG_TOOLBOX                                                   3000
 
@@ -484,6 +483,7 @@
 #define IDDI_AXIS_STYLE_DETERMINESDOMAIN                                   7220
 #define IDDI_AXIS_STYLE_MSG_TICKCOUNT                                      8221
 #define IDDI_AXIS_STYLE_TICKCOUNT                                          8222
+#define IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES                               8223
                                                                              
 #define IDDIALOG_AXIS_POSITION                                             8300
 #define IDDI_AXIS_POSITION_ORIGIN_MINPOINT                                 8302
@@ -550,7 +550,6 @@
 #define IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_BACKGROUND                        8426
 #define IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_CHOOSE                            8427
 
-
 #define IDDIALOG_PLOT_DIMENSION                                            9250
    #define IDDI_PLOT_DIMENSION_OVERRIDE_OWNER                              9251
    #define IDDI_PLOT_DIMENSION_3D                                          9252
@@ -603,6 +602,22 @@
    #define IDDI_PLOT_COLOR_BOTTOM_BLUE_SPIN                                9237
    #define IDDI_PLOT_COLOR_BOTTOM_CHOOSE                                   9238
 
+#define IDDIALOG_PLOT_TEXT                                                 9300
+   #define IDDI_PLOT_TEXT_PLOT_NAME                                        9301
+   #define IDDI_PLOT_TEXTS_COUNT                                           9302
+   #define IDDI_PLOT_TEXTS_ADD                                             9303
+   #define IDDI_PLOT_TEXTS_EDIT                                            9304
+   #define IDDI_PLOT_TEXTS_DELETE                                          9305
+   #define IDDI_PLOT_TEXTS_LIST                                            9306
+   #define IDDI_PLOT_TEXTS_DRAG_INSTRUCTIONS                               9307
+
+#if 0
+   #define IDDI_PLOT_TEXT_LEGEND_BOX                                       9302
+   #define IDDI_PLOT_TEXT_LEGEND_CREATE                                    9303
+   #define IDDI_PLOT_TEXT_LEGEND_USE_NAME                                  9304
+   #define IDDI_PLOT_TEXT_LEGEND_ENTER_NAME                                9305
+   #define IDDI_PLOT_TEXT_LEGEND_ENTERED_NAME                              9306
+#endif
 
 //
 // The following is for the properties page presented by the GraphicControl

@@ -18,9 +18,9 @@
 
       GetModuleFileName(gsVariables_hModule,gsVariables_szModuleName,1024);
 
-      gsVariables_wstrModuleName = SysAllocStringLen(NULL,strlen(gsVariables_szModuleName) + 1);
+      gsVariables_wstrModuleName = SysAllocStringLen(NULL,(DWORD)strlen(gsVariables_szModuleName) + 1);
 
-      MultiByteToWideChar(CP_ACP, 0, gsVariables_szModuleName, -1, gsVariables_wstrModuleName, strlen(gsVariables_szModuleName) + 1);  
+      MultiByteToWideChar(CP_ACP, 0, gsVariables_szModuleName, -1, gsVariables_wstrModuleName, (DWORD)strlen(gsVariables_szModuleName) + 1);  
 
       }
       break;

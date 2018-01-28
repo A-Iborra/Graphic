@@ -124,11 +124,11 @@
       p -> zaxis -> put_DrawText(VARIANT_FALSE);
 
       if ( plotSelectedPlots ) {
-         long plotID = -1L;
-         std::list<long> plotIDs;
-         long itemCount = SendDlgItemMessage(GetParent(GetParent(hwnd)),IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         ULONG_PTR plotID = -1L;
+         std::list<ULONG_PTR> plotIDs;
+         long itemCount = (long)SendDlgItemMessage(GetParent(GetParent(hwnd)),IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
          if ( 0 < itemCount ) {
-            long selectedCount = SendDlgItemMessage(GetParent(GetParent(hwnd)),IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+            long selectedCount = (long)SendDlgItemMessage(GetParent(GetParent(hwnd)),IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
             if ( 0 < selectedCount ) {
                LVITEM lvItem = {0};
                for ( int k = 0; k < itemCount; k++ ) {
@@ -143,7 +143,7 @@
                      plotIDs.push_front(plotID);
                   }
                }
-               for ( long id : plotIDs )
+               for ( ULONG_PTR id : plotIDs )
                   p -> render(id);
             }
          }

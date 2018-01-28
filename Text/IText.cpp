@@ -20,7 +20,7 @@
       *pGetText = SysAllocString(L"");
       return S_FALSE;
    }
-   long n = strlen((char *)propertyContent -> pointer());
+   long n = (DWORD)strlen((char *)propertyContent -> pointer());
    if ( 0 == n ) {
       *pGetText = SysAllocString(L"");
       return S_FALSE;
@@ -46,15 +46,12 @@
    }
 
 
-   HRESULT Text::Initialize(HWND ho,IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
+   HRESULT Text::Initialize(IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
                               IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
                               IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
                               IGProperty* pPropZFloor,IGProperty* pPropZCeiling,
                               IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,
                                     void (__stdcall *pWhenChanged)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR changedCallbackCookie) {
- 
-   hwndOwner = ho;
-
    pIOpenGLImplementation = pimp;
  
    pIEvaluator = piev;
@@ -99,8 +96,8 @@
    pIBasePlotBoundingBox -> put_ActionTable(static_cast<IGraphicSegmentAction *>(this));
  
    if ( intext ) {
-      BSTR bstrText = SysAllocStringLen(NULL,strlen(intext));
-      MultiByteToWideChar(CP_ACP,0,intext,-1,bstrText,strlen(intext));
+      BSTR bstrText = SysAllocStringLen(NULL,(DWORD)strlen(intext));
+      MultiByteToWideChar(CP_ACP,0,intext,-1,bstrText,(DWORD)strlen(intext));
       put_Text(bstrText);
       SysFreeString(bstrText);
    }
@@ -314,7 +311,8 @@
  
    HRESULT Text::get_Position(SAFEARRAY **ppPosition) {
 
-   if ( ! ppPosition ) return E_POINTER;
+   if ( ! ppPosition ) 
+      return E_POINTER;
 
    SAFEARRAYBOUND rgsaBound;
 
@@ -733,7 +731,8 @@
 
  
    HRESULT Text::get_PartOfWorldDomain(VARIANT_BOOL *pb) {
-   if ( ! pb ) return E_POINTER;
+   if ( ! pb ) 
+      return E_POINTER;
    if ( ! doOpenGLRendering )
       *pb = false;
    else
@@ -839,10 +838,49 @@
    }
 
    STDMETHODIMP Text::put_GDIBoundingBox(RECT *pRect) {
-   return E_NOTIMPL;
+
+   memcpy(&rcFallBackBoundingBox,pRect,sizeof(RECT));
+
+   long x = pRect -> left;
+   long y = pRect -> top;
+
+   DataPoint dpSource = {(double)x,(double)y,1.0};
+   DataPoint dpTarget;
+
+   pIOpenGLImplementation -> WindowToData(&dpSource,&dpTarget);
+
+   pIDataSet -> ReSet();
+
+   pIDataSet -> pushDataPoint(&dpTarget);
+
+   dpSource.x = pRect -> right;
+   dpSource.y = pRect -> top;
+
+   pIOpenGLImplementation -> WindowToData(&dpSource,&dpTarget);
+
+   pIDataSet -> pushDataPoint(&dpTarget);
+
+   dpSource.x = pRect -> right;
+   dpSource.y = pRect -> bottom;
+
+   pIOpenGLImplementation -> WindowToData(&dpSource,&dpTarget);
+
+   pIDataSet -> pushDataPoint(&dpTarget);
+
+   dpSource.x = pRect -> left;
+   dpSource.y = pRect -> bottom;
+
+   pIOpenGLImplementation -> WindowToData(&dpSource,&dpTarget);
+
+   pIDataSet -> pushDataPoint(&dpTarget);
+
+   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+
+   return S_OK;
    }
 
    STDMETHODIMP Text::get_GDIBoundingBox(RECT *pRect) {
+
    if ( ! pRect )
       return E_POINTER;
 
@@ -850,8 +888,10 @@
 
    if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) {
       pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
-      if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) 
+      if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) {
+         memcpy(pRect,&rcFallBackBoundingBox,sizeof(RECT));
          return E_UNEXPECTED;
+      }
    }
 
    pRect -> left = (long)minPoint.x;

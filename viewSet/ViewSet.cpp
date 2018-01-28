@@ -34,8 +34,6 @@
       pPostDialogClientCallback(NULL),
       pPostDialogClientCallbackArg(NULL),
 
-      hwndOwner(NULL),
-      hwndParent(NULL),
       hwndGraphicContainer(NULL),
       hwndViewSet(NULL) {
  
@@ -102,13 +100,13 @@
    }
  
  
-   int ViewSet::initWindows() {
+   int ViewSet::initWindows(HWND hwndParent) {
 
    double d;
  
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_VIEWSET),RT_DIALOG));
 
-   hwndViewSet = CreateDialogIndirectParam(hModule,dt,hwndOwner,(DLGPROC)viewsetHandler,(LPARAM)this);
+   hwndViewSet = CreateDialogIndirectParam(hModule,dt,hwndParent,(DLGPROC)viewsetHandler,(LPARAM)this);
  
    WNDCLASS gClass;
    gClass.style = CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW;
@@ -202,7 +200,7 @@
 
    pIOpenGLImplementation -> SetUp(pIDataSet);
 
-   short drawText[3];
+   //short drawText[3];
 
    //pIAxis_X -> get_DrawText(&drawText[0]);
    //pIAxis_Y -> get_DrawText(&drawText[1]);

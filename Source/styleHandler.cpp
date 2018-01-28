@@ -68,7 +68,7 @@
 
    case WM_COMMAND: {
       int idControl = LOWORD(wParam);
-      long rv = SendMessage((HWND)lParam,BM_GETCHECK,0L,0L);
+      long rv = (long)SendMessage((HWND)lParam,BM_GETCHECK,0L,0L);
       switch ( idControl ) {
       case IDMI_GRAPHIC_VIEW_2D: {
          if ( rv == BST_CHECKED ) 
@@ -85,7 +85,7 @@
          }
          break;
       case IDDI_GRAPHIC_STYLE_SETVIEW: {
-         p -> pIViewSet -> Properties(styleHandlerSomeObjectChanged,(void *)p);
+         p -> pIViewSet -> Properties(p -> Canvas(),styleHandlerSomeObjectChanged,(void *)p);
          EnableWindow(hwnd,FALSE);
          }
          return (LRESULT)0L;

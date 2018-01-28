@@ -44,7 +44,7 @@
       if ( ! p ) break;
       RECT rectDialog,rectItem,rectBar,rectEntryField;
       HWND hwndBar = (HWND)lParam;
-      long pos = SendMessage(hwndBar,TBM_GETPOS,0,0);
+      long pos = (long)SendMessage(hwndBar,TBM_GETPOS,0,0);
  	   char szTemp[32];
       GetWindowRect(hwndBar,&rectBar);
       GetWindowRect(p -> hwndViewSet,&rectDialog);
@@ -166,7 +166,7 @@
          break;
 
       case IDDI_VIEWSET_VIEW2D: {
-         long isChecked = SendMessage(GetDlgItem(hwnd,IDDI_VIEWSET_VIEW2D),BM_GETCHECK,0L,0L);
+         long isChecked = (long)SendMessage(GetDlgItem(hwnd,IDDI_VIEWSET_VIEW2D),BM_GETCHECK,0L,0L);
          if ( isChecked == BST_CHECKED ) {
             EnableWindow(GetDlgItem(hwnd,IDDI_VIEWSET_THETASET),FALSE);
             EnableWindow(GetDlgItem(hwnd,IDDI_VIEWSET_PHISET),FALSE);
@@ -286,7 +286,7 @@
    sizelFrame.cx = rectFrame.right - rectFrame.left;
    sizelFrame.cy = rectFrame.bottom - rectFrame.top;
 
-   AdjustWindowRectEx(&rectFrame,GetWindowLongPtr(hwndViewSet,GWL_STYLE),GetWindowLongPtr(hwndViewSet,GWL_EXSTYLE),FALSE);
+   AdjustWindowRectEx(&rectFrame,(DWORD)GetWindowLongPtr(hwndViewSet,GWL_STYLE),FALSE,(DWORD)GetWindowLongPtr(hwndViewSet,GWL_EXSTYLE));
 
    buttonSpace = 8;
 

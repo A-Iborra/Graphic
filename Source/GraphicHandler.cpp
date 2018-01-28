@@ -6,6 +6,7 @@
 
 #include "Graphic_resource.h"
 #include "utils.h"
+#include "imageUtilities.h"
 
 #include "List.cpp"
 
@@ -76,7 +77,7 @@
          if ( abs(p -> ptlZoomAnchor.x - ptl.x) < 2 * p -> pickBoxSize.cx || abs(p -> ptlZoomAnchor.y - ptl.y) < 2 * p -> pickBoxSize.cy )
             break;
  
-         HDC hdc = GetDC(p -> hwndGraphic);
+         HDC hdc = GetDC(p -> Canvas());
 
          if ( ! ( -1L == p -> ptlZoomFloat.x ) ) 
             p -> restoreBox(&p -> ptlZoomAnchor,&p -> ptlZoomFloat,hdc,p -> boxBitmaps);
@@ -96,7 +97,7 @@
          if ( p -> ptlZoomAnchor.x != 0 && p -> ptlZoomAnchor.y != 0 ) 
             p -> trackedMouse = TRUE;
 
-         ReleaseDC(p -> hwndGraphic,hdc);
+         ReleaseDC(p -> Canvas(),hdc);
 
          return (LRESULT)TRUE;
 
@@ -135,7 +136,22 @@
       }
       return LRESULT(TRUE);
  
- 
+   case WM_LBUTTONDBLCLK: {
+
+      if ( ! isOpenGLActive ) 
+         break;
+
+      POINTL ptl = {LOWORD(lParam),HIWORD(lParam)};
+
+      p -> hitTableHits = 0;
+
+      p -> eraseGraphicCursor();
+
+      p -> pick(&ptl,processDefaultAction,FALSE);
+
+      }
+      break;
+
    case WM_LBUTTONDOWN: {
 
       if ( ! isOpenGLActive )
@@ -183,8 +199,7 @@
       p -> ptlZoomAnchor.y = -1L;
 
       return LRESULT(TRUE);
- 
- 
+
    case WM_PAINT: {
       if ( ! p ) break;
       PAINTSTRUCT ps;
@@ -244,7 +259,7 @@
 
                   f -> get_Expression(&bstrExpression);
 
-                  char* pszExpression = new char[n = wcslen(bstrExpression) + 1];
+                  char* pszExpression = new char[n = (DWORD)wcslen(bstrExpression) + 1];
 
                   memset(pszExpression,0,n);
                   WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,pszExpression,n,0,0);
@@ -307,9 +322,180 @@
       switch ( idCommand ) {
 
       case IDMI_GRAPHIC_SAVE_AS: {
-         BSTR savedFile = SysAllocStringLen(NULL,1024);
-         p -> pIGProperties -> SaveAs(&savedFile);
-         SysFreeString(savedFile);
+
+         char szFilter[MAX_PATH],szFile[MAX_PATH];
+
+         char szExtensions[][16] = {"graphic","bmp","png","jpg-jpeg","gif","tiff",NULL};
+
+         memset(szFilter,0,sizeof(szFilter));
+         memset(szFile,0,sizeof(szFile));
+
+         OPENFILENAME openFileName = {0};
+         memset(&openFileName,0,sizeof(OPENFILENAME));
+
+         long k = sprintf(szFilter,"Graphic (*.graphic)");
+         k = k + (DWORD)sprintf(szFilter + k + 1,"*.graphic") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"Bitmap (*.bmp)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.bmp") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"PNG (*.png)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.png") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"JPG (*.jpg,*.jpeg)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.jpg,*.jpeg") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"GIF (*.gif)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.gif") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"TIFF (*.tiff)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.tiff") + 1;
+
+         k = k + (DWORD)sprintf(szFilter + k + 1,"All Files (*.*)") + 1;
+         k = k + sprintf(szFilter + k + 1,"*.*") + 1;
+
+         openFileName.lStructSize = sizeof(OPENFILENAME);
+         openFileName.hwndOwner = p -> Canvas();
+         openFileName.Flags = OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT;
+         openFileName.lpstrFilter = szFilter;
+         openFileName.lpstrFile = szFile;
+         openFileName.lpstrDefExt = "graphic";
+         openFileName.nFilterIndex = 1;
+         openFileName.nMaxFile = MAX_PATH;
+         openFileName.lpstrTitle = "Specify a destination file";
+
+         if ( ! GetSaveFileName(&openFileName) ) 
+            break;
+
+         if ( 7 == openFileName.nFilterIndex ) {
+
+            char *pDot = strrchr(openFileName.lpstrFile,'.');
+   
+            if ( ! pDot ) 
+               openFileName.nFilterIndex = 1;
+            else {
+               char szLower[32];
+               strcpy(szLower,pDot + 1);
+               _strlwr(szLower);
+               for ( long k = 0; 1; k++ ) {
+                  if ( ! szExtensions[k] )
+                     break;
+                  if ( strstr(szExtensions[k],szLower) ) {
+                     openFileName.nFilterIndex = k + 1;
+                     break;
+                  }
+               }
+            }
+      
+            if ( 7 == openFileName.nFilterIndex )
+               openFileName.nFilterIndex = 1;
+         }
+
+         switch ( openFileName.nFilterIndex ) {
+         default:
+         case 1: {
+            BSTR savedFile = SysAllocStringLen(NULL,1024);
+            MultiByteToWideChar(CP_ACP,0,openFileName.lpstrFile,-1,savedFile,1024);
+            p -> pIGProperties -> SaveTo(savedFile);
+            SysFreeString(savedFile);
+            }
+            break;
+
+         case 2:
+         case 3:
+         case 4:
+         case 5:
+         case 6: {
+
+            HDC hdcSource = GetDC(p -> Canvas());
+
+            RECT rcClient;
+            GetClientRect(p -> Canvas(),&rcClient);
+            long cx = rcClient.right - rcClient.left;
+            long cy = rcClient.bottom - rcClient.top;
+
+            HDC hdcTarget = CreateCompatibleDC(hdcSource);
+
+            HBITMAP hBitmap = CreateCompatibleBitmap(hdcSource,cx,cy);
+
+            HGDIOBJ oldBitmap = SelectObject(hdcTarget,hBitmap);
+
+            BitBlt(hdcTarget,0,0,cx,cy,hdcSource,0,0,SRCCOPY);
+
+            SelectObject(hdcTarget,oldBitmap);
+
+            DeleteDC(hdcTarget);
+
+            char *pDot = strrchr(openFileName.lpstrFile,'.');
+
+            if ( pDot )
+               *pDot = '\0';
+
+            if ( 2 == openFileName.nFilterIndex ) {
+
+               strcat(openFileName.lpstrFile,".bmp");
+
+               SaveBitmapFile(hdcSource,hBitmap,openFileName.lpstrFile);
+
+               ReleaseDC(p -> Canvas(),hdcSource);
+
+               break;
+
+            } 
+
+            char szExtension[][8] = {"","","",".png",".jpg",".gif",".tiff"};
+
+            WCHAR szwEncoder[][32] = {L"",L"",L"",L"image/jpeg",L"image/png",L"image/gif",L"image/tiff"};
+
+            strcat(openFileName.lpstrFile,szExtension[openFileName.nFilterIndex]);
+
+            BITMAP bitMap;
+            GetObject(hBitmap,sizeof(BITMAP),&bitMap);
+
+            long colorTableSize = bitMap.bmHeight * ((bitMap.bmWidth * bitMap.bmPlanes * bitMap.bmBitsPixel + 31) & ~31) / 8 ;
+
+            long entireSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + colorTableSize;
+
+            BYTE *pBuffer = new BYTE[entireSize];
+
+            memset(pBuffer,0,entireSize * sizeof(BYTE));
+
+            BITMAPFILEHEADER *pBitmapFileHeader = (BITMAPFILEHEADER *)pBuffer;
+
+            BITMAPINFO *pBitmapInfo = (BITMAPINFO *)(pBuffer + sizeof(BITMAPFILEHEADER));
+
+            BITMAPINFOHEADER *pBitmapInfoHeader = &(pBitmapInfo -> bmiHeader);
+   
+            pBitmapInfoHeader -> biSize = sizeof(BITMAPINFOHEADER); 
+            pBitmapInfoHeader -> biWidth = bitMap.bmWidth;
+            pBitmapInfoHeader -> biHeight = bitMap.bmHeight;
+            pBitmapInfoHeader -> biPlanes = bitMap.bmPlanes; 
+            pBitmapInfoHeader -> biBitCount = bitMap.bmBitsPixel;
+            pBitmapInfoHeader -> biCompression = BI_RGB;
+            if ( 1 == bitMap.bmBitsPixel ) {
+               pBitmapInfoHeader -> biClrUsed = 2;
+               pBitmapInfoHeader -> biClrImportant = 2;
+            } else {
+               pBitmapInfoHeader -> biClrUsed = 0;
+               pBitmapInfoHeader -> biClrImportant = 0;
+            }
+
+            pBitmapInfoHeader -> biSizeImage = bitMap.bmHeight * ((bitMap.bmWidth * bitMap.bmPlanes * bitMap.bmBitsPixel + 31) & ~31) / 8 ;
+
+            BYTE *pBits = pBuffer + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+
+            long rc = GetDIBits(hdcSource,hBitmap,0,bitMap.bmHeight,pBits,(BITMAPINFO *)pBitmapInfo,DIB_RGB_COLORS);
+
+            SaveWithEncoder((BYTE *)pBitmapInfoHeader,openFileName.lpstrFile,szwEncoder[openFileName.nFilterIndex]);
+
+            delete [] pBuffer;
+
+            ReleaseDC(p -> Canvas(),hdcSource);
+            
+            }
+            break;
+
+         }
          }
          return LRESULT(TRUE);
 
@@ -320,12 +506,41 @@
          }
          return LRESULT(TRUE);
 
-      case IDMI_GRAPHIC_PRINT: 
-         if ( S_OK == p -> pIOpenGLImplementation -> PrintSetup() ) {
-           p -> render(0);
-           p -> pIOpenGLImplementation -> PrintFinish();
+      case IDMI_GRAPHIC_PRINT: {
+
+         PRINTDLG printDlg = {0};
+
+         printDlg.lStructSize = sizeof(PRINTDLG);
+         printDlg.hwndOwner = p -> Canvas();
+         printDlg.Flags = PD_ALLPAGES | PD_RETURNDC;
+
+         if ( ! PrintDlg(&printDlg) )
+            break;
+
+         DOCINFO docInfo;
+         memset(&docInfo,0,sizeof(docInfo));
+         docInfo.cbSize = sizeof(docInfo);
+         docInfo.lpszDocName = "InnoVisioNate Graphic";
+         
+         StartDoc(printDlg.hDC, &docInfo);
+
+         StartPage(printDlg.hDC);
+
+         HDC hdcSource = GetDC(p -> Canvas());
+
+         RECT rcClient;
+         GetClientRect(p -> Canvas(),&rcClient);
+
+         BOOL rc = BitBlt(printDlg.hDC,0,0,rcClient.right - rcClient.left,rcClient.bottom - rcClient.top,hdcSource,0,0,SRCCOPY);
+
+         EndPage(printDlg.hDC);
+
+         EndDoc(printDlg.hDC); 
+
+         ReleaseDC(p -> Canvas(),hdcSource);
          }
-          return LRESULT(TRUE);
+
+         return LRESULT(TRUE);
  
       case IDMI_GRAPHIC_ERASE:
          p -> erase();
@@ -350,9 +565,10 @@
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_VIEW_SET:
-         p -> pIViewSet -> Properties(G::menuHandlerSomeObjectChanged,(void *)p);
+         p -> pIViewSet -> Properties(p -> Canvas(),G::menuHandlerSomeObjectChanged,(void *)p);
          return LRESULT(TRUE);
 
+#if 0
       case IDMI_GRAPHIC_ZOOM_FULL: {
  
 /*
@@ -366,14 +582,15 @@
          p -> redraw();
          }
          return LRESULT(TRUE);
-    
+#endif
+
       case IDMI_GRAPHIC_PROPERTIES: {
          IUnknown *pIUnknownThis;
          p -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
-         p -> pIGProperties -> ShowProperties(p -> hwndGraphic,pIUnknownThis);
+         p -> pIGProperties -> ShowProperties(p -> Canvas(),pIUnknownThis);
          pIUnknownThis -> Release();
          p -> setDataSourcesVisibility(NULL,NULL);
-         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+         p -> pIOpenGLImplementation -> SetTargetWindow(p -> Canvas());
          p -> render(0);
          }
          return LRESULT(TRUE);
@@ -383,7 +600,7 @@
          p -> pIViewSet -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownObject));
          p -> pIGProperties -> ShowProperties(hwnd,pIUnknownObject);
          pIUnknownObject -> Release();
-         p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+         p -> pIOpenGLImplementation -> SetTargetWindow(p -> Canvas());
          }
          return LRESULT(TRUE);
  
@@ -429,7 +646,22 @@
    case WM_SIZE: {
       if ( ! p )
          break;
-      p -> setDataSourcesVisibility(NULL,NULL);
+      p -> setDataSourcesVisibility(NULL,NULL); 
+      HWND hwndCurrent = p -> Canvas();
+      if ( ! hwndCurrent )
+         break;
+      RECT rcCurrent,rcParent;
+      GetWindowRect(hwndCurrent,&rcCurrent);
+      GetWindowRect(hwnd,&rcParent);
+      long cx = rcCurrent.right - rcCurrent.left;
+      long cy = rcCurrent.bottom - rcCurrent.top;
+      rcCurrent.left -= rcParent.left;
+      rcCurrent.top -= rcParent.top;
+      rcCurrent.right = rcCurrent.left + cx;
+      rcCurrent.bottom = rcCurrent.top + cy;
+      HWND hwndNew = p -> newCanvas(&rcCurrent);
+      if ( hwndNew )
+         p -> pIOpenGLImplementation -> SetTargetWindow(hwndNew);
       }
       return (LRESULT)0;
 

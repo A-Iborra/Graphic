@@ -10,7 +10,7 @@
 #include "GraphicControl_i.h"
 
    STDMETHODIMP G::SetProperties() {
-   SendMessage(hwndGraphic,WM_COMMAND,MAKEWPARAM(IDMI_GRAPHIC_PROPERTIES,0),0L);
+   SendMessage(Canvas(),WM_COMMAND,MAKEWPARAM(IDMI_GRAPHIC_PROPERTIES,0),0L);
    return S_OK;
    }
  
@@ -27,7 +27,7 @@
  
  
    STDMETHODIMP G::put_Position(long x,long y) {
-   SetWindowPos(hwndGraphic,HWND_TOP,x,y,0,0,SWP_NOSIZE);
+   SetWindowPos(Canvas(),HWND_TOP,x,y,0,0,SWP_NOSIZE);
    return S_OK;
    }
  
@@ -264,9 +264,9 @@
    STDMETHODIMP G::get_Axis(BSTR type,IDispatch **pAxis) {
    if ( ! pAxis ) return E_POINTER;
    *pAxis = NULL;
-   char* szType = new char[wcslen(type) + 1];
-   memset(szType,0,wcslen(type) + 1);
-   WideCharToMultiByte(CP_ACP,0,type,-1,szType,wcslen(type) + 1,0,0);
+   char* szType = new char[(DWORD)wcslen(type) + 1];
+   memset(szType,0,(DWORD)wcslen(type) + 1);
+   WideCharToMultiByte(CP_ACP,0,type,-1,szType,(DWORD)wcslen(type) + 1,0,0);
    char checkType;
    IAxis *p = (IAxis *)NULL;
    while ( p = axisList.GetNext(p) ) {
@@ -297,16 +297,16 @@
    STDMETHODIMP G::get_Function(BSTR expression,IDispatch **pFunction) {
    if ( ! pFunction ) return E_POINTER;
    *pFunction = NULL;
-   char* szExpression = new char[wcslen(expression) + 1];
-   memset(szExpression,0,wcslen(expression) + 1);
-   WideCharToMultiByte(CP_ACP,0,expression,-1,szExpression,wcslen(expression) + 1,0,0);
+   char* szExpression = new char[(DWORD)wcslen(expression) + 1];
+   memset(szExpression,0,(DWORD)wcslen(expression) + 1);
+   WideCharToMultiByte(CP_ACP,0,expression,-1,szExpression,(DWORD)wcslen(expression) + 1,0,0);
    IGSFunctioNater *p = (IGSFunctioNater *)NULL;
    while ( p = functionList.GetNext(p) ) {
       BSTR bstrExpression;
       p -> get_Expression(&bstrExpression);
-      char *szCheckExpression = new char[wcslen(bstrExpression) + 1];
-      memset(szCheckExpression,0,wcslen(bstrExpression) + 1);
-      WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,szCheckExpression,wcslen(bstrExpression),0,0);
+      char *szCheckExpression = new char[(DWORD)wcslen(bstrExpression) + 1];
+      memset(szCheckExpression,0,(DWORD)wcslen(bstrExpression) + 1);
+      WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,szCheckExpression,(DWORD)wcslen(bstrExpression),0,0);
       SysFreeString(bstrExpression);
       if ( 0 == strcmp(szExpression,szCheckExpression) ) {
          p -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(pFunction));
@@ -326,14 +326,14 @@
    *ppText = NULL;
    char* szText = new char[wcslen(text) + 1];
    memset(szText,0,wcslen(text) + 1);
-   WideCharToMultiByte(CP_ACP,0,text,-1,szText,wcslen(text) + 1,0,0);
+   WideCharToMultiByte(CP_ACP,0,text,-1,szText,(DWORD)wcslen(text) + 1,0,0);
    IText *p = (IText *)NULL;
    while ( p = textList.GetNext(p) ) {
       BSTR bstrText;
       p -> get_Text(&bstrText);
-      char *szCheckText = new char[wcslen(bstrText) + 1];
-      memset(szCheckText,0,wcslen(bstrText) + 1);
-      WideCharToMultiByte(CP_ACP,0,bstrText,-1,szCheckText,wcslen(bstrText),0,0);
+      char *szCheckText = new char[(DWORD)wcslen(bstrText) + 1];
+      memset(szCheckText,0,(DWORD)wcslen(bstrText) + 1);
+      WideCharToMultiByte(CP_ACP,0,bstrText,-1,szCheckText,(DWORD)wcslen(bstrText),0,0);
       SysFreeString(bstrText);
       if ( 0 == strcmp(szText,szCheckText) ) {
          p -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppText));

@@ -52,9 +52,11 @@ BEGIN
         MENUITEM "Graphic Menu",       IDMI_GRAPHIC_MENU_TITLE, INACTIVE
         MENUITEM SEPARATOR
         MENUITEM "Save as ...",        IDMI_GRAPHIC_SAVE_AS
-        MENUITEM "Open ..",            IDMI_GRAPHIC_OPEN
+        MENUITEM "Open ...",           IDMI_GRAPHIC_OPEN
         MENUITEM SEPARATOR
-        POPUP "Dimension"
+        MENUITEM "Print ...",          IDMI_GRAPHIC_PRINT
+        MENUITEM SEPARATOR
+        POPUP "View"
         BEGIN
             MENUITEM "2 D",               IDMI_GRAPHIC_VIEW_2D
             MENUITEM "3 D",               IDMI_GRAPHIC_VIEW_3D

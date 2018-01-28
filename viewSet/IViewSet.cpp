@@ -4,7 +4,7 @@
 
 #include "ViewSet.h"
 
-   HRESULT ViewSet::Initialize(HWND ho,IOpenGLImplementation *pIOpenGLImp,
+   HRESULT ViewSet::Initialize(IOpenGLImplementation *pIOpenGLImp,
                                IEvaluator *piev,
                                IGProperty* parentPlotView,
                                IGProperty *parentTheta,
@@ -17,7 +17,7 @@
                                IAxis* pIAxis_y,
                                IAxis* pIAxis_z) {
  
-   hwndOwner = ho;
+   //hwndOwner = ho;
 
    pIOpenGLImplementation = pIOpenGLImp;
    pIEvaluator = piev;
@@ -48,10 +48,10 @@
    }
 
 
-   HRESULT ViewSet::Properties(void (__stdcall *pWhenDoneCallback)(void *),void *pArg) {
+   HRESULT ViewSet::Properties(HWND hwndParent,void (__stdcall *pWhenDoneCallback)(void *),void *pArg) {
    pPostDialogClientCallback = pWhenDoneCallback;
    pPostDialogClientCallbackArg = pArg;
-   initWindows();
+   initWindows(hwndParent);
    ShowWindow(hwndViewSet,SW_SHOW);
    return S_OK;
    }

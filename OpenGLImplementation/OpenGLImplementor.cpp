@@ -126,14 +126,14 @@
 
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDDIALOG_OPENGL_PROPERTIES),RT_DIALOG));
 
-   hwndProperties = CreateDialogIndirectParam(hModule,dt,hwndParent,(DLGPROC)propertiesHandler,(long)this);
+   hwndProperties = CreateDialogIndirectParam(hModule,dt,hwndParent,(DLGPROC)propertiesHandler,(ULONG_PTR)this);
 
    return TRUE;
    }
 
 
    LRESULT OpenGLImplementor::handler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   OpenGLImplementor* p = reinterpret_cast<OpenGLImplementor*>(GetWindowLong(hwnd,GWL_USERDATA));
+   OpenGLImplementor* p = reinterpret_cast<OpenGLImplementor*>(GetWindowLongPtr(hwnd,GWLP_USERDATA));
    switch ( msg ) {
    case WM_RBUTTONDOWN: {
       POINTS ptsMouse = MAKEPOINTS(wParam);
@@ -163,7 +163,7 @@ errorSound();
       int idControl = LOWORD(wParam);
       switch ( idControl ) {
       case IDDI_OPENGL_ALLOWHARDWAREACCELERATION: {
-         long isChecked = SendMessage(reinterpret_cast<HWND>(lParam),BM_GETCHECK,0L,0L);
+         long isChecked = (long)SendMessage(reinterpret_cast<HWND>(lParam),BM_GETCHECK,0L,0L);
          p -> pIPropertyAllowHardwareAcceleration -> put_longValue(isChecked);
       }
       default:

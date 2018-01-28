@@ -14,10 +14,11 @@
 #include "GSystem_i.h"
 #include "GraphicControl_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+
+#include "DataSet_i.h"
 
 #include "OpenGLImplementation_i.h"
 
@@ -130,9 +131,9 @@
 
    // Methods
 
-     STDMETHOD(Initialize)(HWND hwndOwner,char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
+     STDMETHOD(Initialize)(char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
                               IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,
-                              IDataSet*,IOpenGLImplementation*,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
+                              IDataSet*,void *pvIOpenGLImplementation,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
      STDMETHOD(get_DataSet)(IDataSet **);
 
@@ -143,7 +144,8 @@
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
-     STDMETHOD(DrawLabels)();
+     STDMETHOD(DrawOpenGLLabels)();
+     STDMETHOD(DrawGDILabels)();
      STDMETHOD(Redraw)();
      STDMETHOD(Erase)();
 
@@ -160,10 +162,10 @@
      STDMETHOD(RightMouse)();
      STDMETHOD(MouseMove)(POINT* ptMouse);
      STDMETHOD(MouseRelease)();
+     STDMETHOD(DefaultAction)();
 
      char type;
 
-     HWND hwndOwner;
      HWND hwndObjectWindow;
      HWND hwndStyleSettings,hwndPositionSettings,hwndTextSettings,hwndColorSettings;
      HMENU hMainMenu,hMenu;
@@ -177,7 +179,10 @@
      DataPoint origin,endPoint,minPoint,maxPoint,uvDirection;
      double tickAbove,tickBelow,tickLength;
      double tickPctAbove;
+     double tickLabelSize;
+     long tickLabelSizeUnits;
      long tickCount,gridLinesPerTick;
+     BOOL ticksOnAllNormalPlanes;
      double phi,theta;
 
      USHORT selected,expectingCommands;
@@ -225,6 +230,7 @@
      IGProperty *propertyTickStraddleStyle;
      IGProperty *propertyTickStraddleAbove;
      IGProperty *propertyTickCount;
+     IGProperty *propertyTicksAllPlanes;
      IGProperty *propertyGridLinesPerTick;
      IGProperty *propertyAxisPrecision;
      IGProperty *propertyCustomColors;
@@ -313,7 +319,8 @@
 #define TICK_UNITS_DATA_TEXT    "% data range"
 
 #define DEFAULT_TICK_COUNT      4
-#define DEFAULT_TICK_PERCENT    5.0
+#define DEFAULT_TICK_PERCENT    3.0
+#define DEFAULT_ZAXIS_TICK_PERCENT  5.0
 #define DEFAULT_TICK_UNITS      UNIT_PERCENT
 
 #define DEFAULT_TICK_STRADDLE_STYLE  TICK_STRADDLE_BOTH

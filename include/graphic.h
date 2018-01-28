@@ -6,14 +6,15 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <functional>
 
 #include "Graphic_resource.h"
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+#include "DataSet_i.h"
 #include "OpenGLImplementation_i.h"
 #include "Plot_i.h"
 #include "Axis_i.h"
@@ -115,12 +116,12 @@
 
      STDMETHOD(ClearAllData)();
 
-     STDMETHOD(PrepareForData)(long sourceID);
+     STDMETHOD(PrepareForData)(ULONG_PTR sourceID);
 
-     STDMETHOD(TakeDataString)(BSTR rawData,long plotID);
-     STDMETHOD(TakeDataArray)(SAFEARRAY **,long plotID);
-     STDMETHOD(TakeFile)(BSTR fileName,long plotID);
-     STDMETHOD(TakeDataSet)(long ds,long sourceID);
+     STDMETHOD(TakeDataString)(BSTR rawData,ULONG_PTR plotID);
+     STDMETHOD(TakeDataArray)(SAFEARRAY **,ULONG_PTR plotID);
+     STDMETHOD(TakeFile)(BSTR fileName,ULONG_PTR plotID);
+     STDMETHOD(TakeDataSet)(long ds,ULONG_PTR sourceID);
 
 /* Properties: Other categories */
 
@@ -139,11 +140,11 @@
      STDMETHOD(put_UseGraphicsCursor)(VARIANT_BOOL);
      STDMETHOD(get_UseGraphicsCursor)(VARIANT_BOOL*);
 
-     STDMETHOD(FinishedWithData)(long plotID);
+     STDMETHOD(FinishedWithData)(ULONG_PTR plotID);
      
      STDMETHOD(PrepareForDataSets)();
 
-     STDMETHOD(Draw)(long sourceID);
+     STDMETHOD(Draw)(ULONG_PTR sourceID);
 
      STDMETHOD(SetProperties)();
 
@@ -244,7 +245,7 @@
 
 //      IViewObject
 
-     STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+     STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(ULONG_PTR),ULONG_PTR);
      STDMETHOD(GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
      STDMETHOD(Freeze)(DWORD,long,void *,DWORD *);
      STDMETHOD(Unfreeze)(DWORD);
@@ -397,6 +398,8 @@
 
       IPropertyPage *PropertyPage(long index) { return static_cast<IPropertyPage *>(pIPropertyPage[index]); };
 
+      HWND Canvas() { return hwndCanvas; };
+
    private:
 
       int erase();
@@ -411,7 +414,7 @@
       int initWindows();
       void setDataSourcesVisibility(IDataSet *pIDataSet_Relevant,IGSFunctioNater *pIFunction_Relevant);
 
-      IPlot* newPlot(long plotID);
+      IPlot* newPlot(ULONG_PTR plotID);
 
       IGSFunctioNater* newFunction(bool connectNow);
       void connectFunction(IGSFunctioNater *);
@@ -424,7 +427,7 @@
       IText* newText();
       void deleteText(IText *);
 
-      int render(long sourceID);
+      int render(ULONG_PTR sourceID);
       static unsigned __stdcall threadRender(void *);
 
       int pick(POINTL *ptl,unsigned int (__stdcall *actionFunction)(void *),int forceToThread);
@@ -446,6 +449,8 @@
       void changeType();
       void clearData();
 
+      HWND newCanvas(RECT *pRect);
+
       IUnknown* pIUnknownThis;
       IOleClientSite *pIOleClientSite;
       IOleInPlaceSite *pIOleInPlaceSite;
@@ -459,7 +464,7 @@
 
       HWND hwndOwner;
       HWND hwndFrame;
-      HWND hwndGraphic;
+      HWND hwndCanvas;
       HWND hwndStatusBar;
       HMENU hMenuPlot;
       HWND hwndAppearanceSettings,hwndStyleSettings,hwndTextSettings;
@@ -487,7 +492,7 @@
       double floorZ,ceilingZ;
 
       unsigned int hitTableHits,*hitTable;
-      long currentPlotSourceID;
+      ULONG_PTR currentPlotSourceID;
 
       char windowTitle[32];
       char szName[64];
@@ -643,6 +648,8 @@
 
       static unsigned int __stdcall processSelections(void *someObject);
       static unsigned int __stdcall processMenus(void *someObject);
+      static unsigned int __stdcall processDefaultAction(void *someObject);
+      static unsigned int __stdcall processAction(void *someObject,IGraphicSegmentAction **ppRetainCallTable,boolean allowMultiple,std::function<HRESULT(IGraphicSegmentAction *pCallTable)> *pTask);
 
       friend class ContainedFunction;
       friend class ContainedDataSet;
@@ -722,8 +729,6 @@ MIDL_DEFINE_GUID(CLSID,CLSID_GSystemGraphicPropertiesFunctions,0x8CAEFE88,0x55E6
 #define HIT_TABLE_SIZE         128
 
 #define STANDARD_STATUS_TEXT_WIDTH  1
-
-#define SUPPORTED_LIGHT_COUNT  8
 
 #ifdef _DEBUG
 #define DEBUG_TONE   Beep(1000,100);

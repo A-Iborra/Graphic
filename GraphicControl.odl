@@ -244,28 +244,28 @@ library Graphic {
       HRESULT ClearAllData(); 
 
       [id(gcMethodPrepareForData),helpstring("Call PrepareForData to prepare the Graphic to recieve data, pass 0 for all plots, or a specific plot number.")] 
-      HRESULT PrepareForData( [in] long plotNumber ); 
+      HRESULT PrepareForData( [in] ULONG_PTR plotNumber ); 
 
       [id(gcMethodTakeDataString),helpstring("Call TakeData with a string of numbers x, y , and (optionally), z, separated by ' '.")] 
-      HRESULT TakeDataString( [in] BSTR stringOfNumbers, [in] long plotNumber); 
+      HRESULT TakeDataString( [in] BSTR stringOfNumbers, [in] ULONG_PTR plotNumber); 
 
       [id(gcMethodTakeDataArray),helpstring("Pass a 2-dimensional array. Dimension 1 contains the rows, dimension 2, columns. Each row is one X and (n-1) Y's (for 2-D graphics), or X and Y, and (n - 2) Z-Values (for 3-D graphics). n = # columns")] 
-      HRESULT TakeDataArray([in] SAFEARRAY(double)* pArray,[in] long plotNumber); 
+      HRESULT TakeDataArray([in] SAFEARRAY(double)* pArray,[in] ULONG_PTR plotNumber); 
 
       [id(gcMethodTakeFile),helpstring("Call TakeFile with the name of an input file containing x, y, and (optionally), z values.")] 
-      HRESULT TakeFile( [in] BSTR fileName,[in] long plotNumber); 
+      HRESULT TakeFile( [in] BSTR fileName,[in] ULONG_PTR plotNumber); 
  
       [id(gcMethodTakeDataSet),helpstring("TakeDataSet")]
-      HRESULT TakeDataSet([in] long ds,[in] long plotNumber);
+      HRESULT TakeDataSet([in] long ds,[in] ULONG_PTR plotNumber);
 
       [id(gcMethodFinishedWithData),helpstring("FinishedWithData")] 
-      HRESULT FinishedWithData( [in] long plotNumber );
+      HRESULT FinishedWithData( [in] ULONG_PTR plotNumber );
 
       [id(gcMethodPrepareForDataSets),helpstring("PrepareForDataSets")]
       HRESULT PrepareForDataSets();
 
       [id(gcMethodDraw),helpstring("PlotData")] 
-      HRESULT Draw([in] long plotNumber ); 
+      HRESULT Draw([in] ULONG_PTR plotNumber ); 
 
       [id(gcMethodSetProperties),helpstring("Set the properties")]
       HRESULT SetProperties();

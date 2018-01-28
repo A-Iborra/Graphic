@@ -261,8 +261,8 @@
    if ( type != TRUETYPE_FONTTYPE ) return 1;
    long itemIndex;
    HWND hwndList = (HWND)arg;
-   if ( (itemIndex = SendMessage(hwndList,CB_FINDSTRINGEXACT,-1L,reinterpret_cast<LPARAM>(lfa -> lfFaceName))) == CB_ERR )
-      itemIndex = SendMessage(hwndList,CB_ADDSTRING,0L,reinterpret_cast<LPARAM>(lfa -> lfFaceName));
+   if ( (itemIndex = (long)SendMessage(hwndList,CB_FINDSTRINGEXACT,-1L,reinterpret_cast<LPARAM>(lfa -> lfFaceName))) == CB_ERR )
+      itemIndex = (long)SendMessage(hwndList,CB_ADDSTRING,0L,reinterpret_cast<LPARAM>(lfa -> lfFaceName));
    if ( lfa -> lfCharSet != ANSI_CHARSET && lfa -> lfCharSet != DEFAULT_CHARSET ) return 1;
    fontListData *flData = reinterpret_cast<fontListData *>(SendMessage(hwndList,CB_GETITEMDATA,itemIndex,0L));
    if ( ! flData ) {
@@ -296,21 +296,70 @@
    return 0;
    }
 
+
+   static long pixelsY = 0.0;
+   static double cyScreenInches = 0.0;
+   static double cyScreenPixels = 0.0;
+   double logicalPixelsToActualPixels = 0.0;
+
    int Text::createFont(LOGFONT *pLogFont) {
+
    if ( ! pIOpenGLImplementation )
       return 0;
+
    if ( hFont )
       DeleteObject(hFont);
+
    HDC hdc = pIOpenGLImplementation -> TargetDC();
+
    if ( ! szFace[0] ) 
       strcpy(szFace,DEFAULT_FONT);
-   pLogFont -> lfHeight = -MulDiv((long)fontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
+
+   if ( 0 == pixelsY ) {
+
+      pixelsY = GetDeviceCaps(hdc,LOGPIXELSY);
+
+      cyScreenInches = (double)GetDeviceCaps(hdc,VERTSIZE);
+      cyScreenPixels = (double)GetDeviceCaps(hdc,VERTRES);
+      cyScreenInches /= 10.0;
+      cyScreenInches *= 0.393701;
+
+      logicalPixelsToActualPixels = cyScreenPixels / ((double)pixelsY * cyScreenInches);
+
+   }
+
+   long desiredFontSize = (long)(fontSize * logicalPixelsToActualPixels);
+
+   long fontSizeUnits;
+   propertySizeUnits -> get_longValue(&fontSizeUnits);
+
+   switch ( fontSizeUnits ) {
+   case TEXT_SIZE_PIXELS:
+      pLogFont -> lfHeight = desiredFontSize;
+      break;
+
+   case TEXT_SIZE_POINTS:
+      pLogFont -> lfHeight = -MulDiv(desiredFontSize, pixelsY, 72);
+      break;
+
+   case TEXT_SIZE_PERCENT: {
+      int viewPort[4];
+      pIOpenGLImplementation -> get_ViewPort(viewPort);
+      pLogFont -> lfHeight = (long)((double)viewPort[3] * fontSize / 100.0);
+      }
+      break;
+
+   }
+
    pLogFont -> lfQuality = PROOF_QUALITY;
    pLogFont -> lfWeight = (long)fontWeight;
    strcpy(pLogFont -> lfFaceName,szFace);
    pLogFont -> lfCharSet = DEFAULT_CHARSET;
+
    hFont = CreateFontIndirect(pLogFont);
+
    if ( hwndSample )
       SendMessage(hwndSample,WM_SETFONT,(WPARAM)hFont,(LPARAM)TRUE);
+
    return 1;
    }

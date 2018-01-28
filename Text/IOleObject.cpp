@@ -127,7 +127,7 @@ Beep(2000,100);
   Text *p = static_cast<Text *>(this);
   char szTemp[64];
   memset(szTemp,0,sizeof(szTemp));
-  WideCharToMultiByte(CP_ACP,0,olestrContainerObject,wcslen(olestrContainerObject),szTemp,64,0,0);
+  WideCharToMultiByte(CP_ACP,0,olestrContainerObject,(DWORD)wcslen(olestrContainerObject),szTemp,64,0,0);
 //  p -> pIProperties -> put_Name(szTemp);
   return S_OK;
   }

@@ -7,6 +7,7 @@
 #include "basePlot.h"
 #include <list>
 #include <map>
+#include <commctrl.h>
 
 #include "GMessage.h"
 
@@ -35,7 +36,7 @@
 
 //      IPlot
 
-     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
+     STDMETHOD(Initialize)(IDataSet *,void *pvIOpenGLImplementation,IEvaluator *,IGProperty*,IGProperty *,IGProperty *,IGProperty *,IGProperty *,
                            IGProperty*,
                            IGProperty *pPropertyXFloor,IGProperty *pPropertyXCeiling,
                            IGProperty *pPropertyYFloor,IGProperty *pPropertyYCeiling,
@@ -53,6 +54,8 @@
      STDMETHOD(RemoveText)(void *t);
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
+     STDMETHOD(DrawOpenGLText)();
+     STDMETHOD(DrawGDIText)();
      STDMETHOD(Redraw)();
      STDMETHOD(Erase)();
      STDMETHOD(Plotter)(long cntPlots,IPlot*** thePlotList);
@@ -116,7 +119,10 @@
      STDMETHOD(put_ParentWindow)(HWND);
 
      STDMETHOD(get_SegmentCount)(long *);
+
      STDMETHOD(GetSegments)(long *);
+
+     STDMETHOD(GetTextList)(void **getList);
 
      STDMETHOD(EditProperties)();
 
@@ -140,6 +146,7 @@
      STDMETHOD(RightMouse)();
      STDMETHOD(MouseMove)(POINT* ptMouse);
      STDMETHOD(MouseRelease)();
+     STDMETHOD(DefaultAction)();
 
 //      IGPropertiesClient
 
@@ -168,7 +175,7 @@
 
 //      IViewObject
 
-      STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+      STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(ULONG_PTR),ULONG_PTR);
       STDMETHOD(GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
       STDMETHOD(Freeze)(DWORD,long,void *,DWORD *);
       STDMETHOD(Unfreeze)(DWORD);
@@ -191,7 +198,7 @@
 
      HANDLE plotThread;
      HWND hwndParentWindow,hwndObjectWindow;
-     HWND hwndDimensionSettings,hwndTypeSettings,hwndColorSettings;
+     HWND hwndDimensionSettings,hwndTypeSettings,hwndColorSettings,hwndTextSettings;
      HMENU hMainMenu,hMenu;
 
      static HWND hwndSampleGraphic;
@@ -215,7 +222,9 @@
      IPlot** pIPlots;
      long currentPlotCount;
 
-     MessageTable messageTable;
+     List<IText> textList;
+     IText* newText();
+     void deleteText(IText *);
 
      IUnknown *pIUnknownOuter;
      IAdviseSink *pIViewObjectEx_IAdviseSink;
@@ -257,7 +266,9 @@
 
      IGProperty *propertyPlotNumber;
 
-     IGProperty* propertyDataSet{NULL};
+     IGProperty *propertyTexts{NULL};
+
+     IGProperty *propertyDataSet{NULL};
 
      IGProperty *propertyPlotTypesGlobal{NULL};
 
@@ -290,6 +301,7 @@
      static LRESULT CALLBACK dimensionHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK typeHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK colorHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
+     static LRESULT CALLBACK textHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK patchPainterProc(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
 
      static LRESULT CALLBACK sampleGraphicHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);

@@ -190,7 +190,7 @@
    pPropSheetPages[8].lParam = (LPARAM)pParent;
    pPropSheetPages[8].pfnCallback = NULL;
 
-   hwndSampleGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_CHILD,0,0,0,0,pParent -> hwndGraphic,NULL,hModule,(void *)pParent);
+   hwndSampleGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"G-plotSettingsGraphic","",WS_CHILD,0,0,0,0,pParent -> Canvas(),NULL,hModule,(void *)pParent);
 
    return S_OK;
    }

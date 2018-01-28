@@ -70,6 +70,7 @@
      hwndObjectWindow(NULL),
      hwndTypeSettings(NULL),
      hwndColorSettings(NULL),
+     hwndTextSettings(NULL),
      hMainMenu(NULL),
      hMenu(NULL),
 
@@ -102,12 +103,6 @@
    QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIPropertiesClient));
    pIProperties -> Advise(pIPropertiesClient);
    pIPropertiesClient -> Release();
-
-   messageTable.size = 1;
-   messageTable.start = new MessageTableEntry[messageTable.size];
-   messageTable.start -> messageNumber = (unsigned int)-1;
-   messageTable.start -> messageInterface = NULL;
-   messageTable.start -> hwndTarget = 0L;
 
    pIProperties -> Add(L"name",&propertyName);
 
@@ -164,8 +159,9 @@
 
    pIProperties -> Add(L"storage for plot types instances",&propertyPlotTypesStorage);
 
-   propertyPlotTypesStorage -> put_type(TYPE_BINARY);
+   pIProperties -> Add(L"text objects",&propertyTexts);
 
+   propertyPlotTypesStorage -> put_type(TYPE_BINARY);
 
    refCount = 0;
 
@@ -261,6 +257,7 @@
    return;
    }  
  
+
    HANDLE Plot::PlotThread() { return plotThread; }
 
 
@@ -320,7 +317,7 @@
 
          pIGSystemPlotType -> get_Name(itemIndex + 1,&bstrName);
 
-         long n = wcslen(bstrName) + 1;
+         long n = (DWORD)wcslen(bstrName) + 1;
 
          char *pszName = new char[n];
 
@@ -355,4 +352,49 @@
    }
 
    return totalCount;
+   }
+
+
+   IText *Plot::newText() {
+
+   IText *pIText;
+
+   CoCreateInstance(CLSID_Text,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pIText));
+
+   pIText -> put_PartOfWorldDomain(FALSE);
+
+   pIText -> Initialize(pIOpenGLImplementation,pIEvaluator,
+                           pIDataSetDomain,
+                           pPropertyXFloor,pPropertyXCeiling,
+                           pPropertyYFloor,pPropertyYCeiling,
+                           pPropertyZFloor,pPropertyZCeiling,
+                           NULL,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,(ULONG_PTR)whenChangedCallbackCookie);
+
+   DataPoint dpMin,dpMax;
+
+   pIDataSetDomain -> GetDomain(&dpMin,&dpMax);
+
+   dpMin.x = (dpMin.x + dpMax.x) / 2.0;
+   dpMin.y = (dpMin.y + dpMax.y) / 2.0;
+   dpMin.z = (dpMin.z + dpMax.z) / 2.0;
+
+   pIText -> put_PositionX(dpMin.x);
+   pIText -> put_PositionY(dpMin.y);
+   pIText -> put_PositionZ(dpMin.z);
+
+   pIText -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+
+   textList.Add(pIText);
+
+   return pIText;
+   }
+
+
+   void Plot::deleteText(IText *pIText) {
+
+   pIText -> Release();
+
+   textList.Remove(pIText);
+
+   return;
    }

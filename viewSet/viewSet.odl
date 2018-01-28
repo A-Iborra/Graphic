@@ -36,24 +36,21 @@ library ViewSet {
    interface IViewSet : IUnknown {
 
       [helpstring("Call Initialize with the Parent IOpenGlImplemention, Parent IEvaluator, IGProperty for the plot type, and an IGProperty ptr for each of the Phi and Theta angles (double)")]
-      HRESULT Initialize(HWND hwndOwner,
-                  IOpenGLImplementation *pIOpenGLImplementation,
-                  IEvaluator *pIEvaluator,
-                  IGProperty *parentPlotView,
-                  IGProperty *parentTheta,
-                  IGProperty *parentPhi,
-                  IGProperty *parentSpin,
-                  IGProperty *parentFloor,
-                  IGProperty *parentCeiling,
-                  IDataSet* pIDataSet,
-                  IAxis* pIAxis_X,
-                  IAxis* pIAxis_Y,
-                  IAxis* pIAxis_Z);
-
-     // [propput,helpstring("")] HRESULT ParentWindow([in]HWND hwndParent);
+      HRESULT Initialize(IOpenGLImplementation *pIOpenGLImplementation,
+                           IEvaluator *pIEvaluator,
+                           IGProperty *parentPlotView,
+                           IGProperty *parentTheta,
+                           IGProperty *parentPhi,
+                           IGProperty *parentSpin,
+                           IGProperty *parentFloor,
+                           IGProperty *parentCeiling,
+                           IDataSet* pIDataSet,
+                           IAxis* pIAxis_X,
+                           IAxis* pIAxis_Y,
+                           IAxis* pIAxis_Z);
 
       [helpstring("Call to activate the view settings page")]
-      HRESULT Properties([in] void (*pWhenDoneCallback)(void *),[in] void *pArg);
+      HRESULT Properties([in]HWND hwndParent,[in] void (*pWhenDoneCallback)(void *),[in] void *pArg);
 
    };
 

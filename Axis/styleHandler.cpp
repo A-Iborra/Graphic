@@ -48,6 +48,8 @@
 
       p -> propertyTickCount -> setWindowItemText(hwnd,IDDI_AXIS_STYLE_TICKCOUNT);
 
+      p -> propertyTicksAllPlanes -> setWindowItemChecked(hwnd,IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES);
+
       p -> propertyTickStraddleStyle -> get_longValue(&v);
 
       switch ( v ) {
@@ -74,23 +76,6 @@
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_STYLE_TICKSBELOW),p -> tickCount ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_STYLE_PCNTABOVE),p -> tickCount ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_STYLE_GRIDSPERTICK),p -> tickCount ? TRUE : FALSE);
-
-      if ( p -> hwndOwner ) {
-         RECT rectParent;
-         RECT rectThis;
-         long cx,cy;
-         GetWindowRect(p -> hwndOwner,&rectParent);
-         GetWindowRect(hwnd,&rectThis);
-         p -> rectPropertiesPosition.left += rectParent.left;
-         p -> rectPropertiesPosition.top += rectParent.top;
-         p -> rectPropertiesPosition.left = max(0,p -> rectPropertiesPosition.left);
-         p -> rectPropertiesPosition.top = max(0,p -> rectPropertiesPosition.top);
-         cx = GetSystemMetrics(SM_CXSCREEN);
-         cy = GetSystemMetrics(SM_CYSCREEN);
-         p -> rectPropertiesPosition.left = min(p -> rectPropertiesPosition.left,cx - (rectThis.right - rectThis.left));
-         p -> rectPropertiesPosition.top = min(p -> rectPropertiesPosition.top,cy - (rectThis.bottom - rectThis.top));
-         SetWindowPos(hwnd,HWND_TOP,max(0,p -> rectPropertiesPosition.left),max(0,p -> rectPropertiesPosition.top),0,0,SWP_NOSIZE);
-      }
 
       }
       return LRESULT(0);
@@ -153,11 +138,17 @@
 
       case IDDI_AXIS_STYLE_TICKLENGTH_UNITS:
          if ( CBN_SELCHANGE == notificationCode ) 
-            p -> propertyTickLengthUnits -> put_longValue(SendMessage(hwndControl,CB_GETCURSEL,0L,0L));
+            p -> propertyTickLengthUnits -> put_longValue((long)SendMessage(hwndControl,CB_GETCURSEL,0L,0L));
          break;
 
       case IDDI_AXIS_STYLE_GRIDSPERTICK:
          p -> propertyGridLinesPerTick -> getWindowItemValue(hwnd,IDDI_AXIS_STYLE_GRIDSPERTICK); 
+         break;
+
+      case IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES:
+         p -> propertyTicksAllPlanes -> getWindowItemChecked(hwnd,IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES);
+         break;
+
       default:
          break;
       }
@@ -185,7 +176,7 @@
 
          p -> Draw();
 
-         SetWindowLong(hwnd,DWL_MSGRESULT,PSNRET_NOERROR);
+         SetWindowLongPtr(hwnd,DWLP_MSGRESULT,PSNRET_NOERROR);
 
          }
          break;

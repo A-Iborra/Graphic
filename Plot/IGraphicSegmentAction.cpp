@@ -46,7 +46,13 @@
    HRESULT Plot::Selector() {
    selected = ! selected;
    char szText[MAX_PROPERTY_SIZE];
-   sprintf(szText,"Plot # %d",pID);
+   BSTR bstrName;
+   propertyName -> get_stringValue(&bstrName);
+   if ( bstrName && 0 < (DWORD)wcslen(bstrName) ) {
+      WideCharToMultiByte(CP_ACP,0,bstrName,-1,szText,MAX_PROPERTY_SIZE,0,0);
+      SysFreeString(bstrName);
+   } else
+      sprintf(szText,"Plot # %d",pID);
    if ( pIGSystemStatusBar )
       pIGSystemStatusBar -> put_StatusText(0,szText);
    return S_OK;
@@ -59,5 +65,19 @@
 
 
    HRESULT Plot::MouseRelease() {
+   return S_OK;
+   }
+
+   HRESULT Plot::DefaultAction() {
+   HWND hwndOwner = NULL;
+   POINT ptCursor = {0};
+   GetCursorPos(&ptCursor);
+   hwndOwner = WindowFromPoint(ptCursor);
+   IUnknown* pIUnknown;
+   QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
+   pIProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
+   pIUnknown -> Release();
+   if ( pWhenChangedCallback ) 
+      pWhenChangedCallback(pWhenChangedCallbackArg,whenChangedCallbackCookie);
    return S_OK;
    }

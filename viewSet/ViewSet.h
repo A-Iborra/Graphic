@@ -10,10 +10,11 @@
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+
+#include "DataSet_i.h"
 
 #include "OpenGLImplementation_i.h"
 
@@ -38,9 +39,9 @@
      STDMETHOD_(ULONG, AddRef)();
      STDMETHOD_(ULONG, Release)();
 
-     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation*,IEvaluator*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IDataSet*,IAxis*,IAxis*,IAxis*);
+     STDMETHOD(Initialize)(IOpenGLImplementation*,IEvaluator*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IDataSet*,IAxis*,IAxis*,IAxis*);
 
-     STDMETHOD(Properties)(void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
+     STDMETHOD(Properties)(HWND hwndParent,void (__stdcall *pWhenDoneCallback)(void *),void *pArg);
 
 //      IPropertiesClient
 
@@ -69,8 +70,7 @@
 
   private:
 
-     HWND hwndOwner;
-     HWND hwndParent,hwndViewSet,hwndGraphic;
+     HWND hwndViewSet,hwndGraphic;
      HWND hwndGraphicContainer;
 
      POINTL ptlFrame;
@@ -99,7 +99,7 @@
 
      int render();
      int calcSize();
-     int initWindows();
+     int initWindows(HWND hwndParent);
      int size();
 
      static LRESULT CALLBACK viewsetHandler(HWND hwnd,UINT,WPARAM,LPARAM);

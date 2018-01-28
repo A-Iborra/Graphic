@@ -35,7 +35,7 @@
  
    HRESULT Axis::Selector() {
    char szText[MAX_PROPERTY_SIZE];
-   sprintf(szText,"Axis[(%lf,%lf,%lf) <-> (%lf,%lf,%lf)]",minPoint.x,minPoint.y,minPoint.z,maxPoint.x,maxPoint.y,maxPoint.z);
+   sprintf(szText,"%c-Axis[(%lf,%lf,%lf) <-> (%lf,%lf,%lf)]",type,minPoint.x,minPoint.y,minPoint.z,maxPoint.x,maxPoint.y,maxPoint.z);
    if ( pIGSystemStatusBar )
       pIGSystemStatusBar -> put_StatusText(0,szText);
    return S_OK;
@@ -48,5 +48,20 @@
 
 
    HRESULT Axis::MouseRelease() {
+   return S_OK;
+   }
+
+
+   HRESULT Axis::DefaultAction() {
+   HWND hwndOwner = NULL;
+   POINT ptCursor = {0};
+   GetCursorPos(&ptCursor);
+   hwndOwner = WindowFromPoint(ptCursor);
+   IUnknown* pIUnknown;
+   QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
+   pIGProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
+   pIUnknown -> Release();
+   if ( pWhenChangedCallback ) 
+      pWhenChangedCallback(pWhenChangedCallbackArg,whenChangedCallbackCookie);
    return S_OK;
    }

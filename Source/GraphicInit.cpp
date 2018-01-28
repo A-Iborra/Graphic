@@ -29,7 +29,7 @@
    hMenuPlot = GetSubMenu(hMenuPlot,0);
  
    memset(&gClass,0,sizeof(WNDCLASS));
-   gClass.style = CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW;
+   gClass.style = CS_BYTEALIGNCLIENT | CS_BYTEALIGNWINDOW | CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
    gClass.lpfnWndProc = graphicFrameHandler;
    gClass.cbClsExtra = windowStorageBytes;
    gClass.cbWndExtra = windowStorageBytes;
@@ -59,14 +59,16 @@
 
    hwndFrame = CreateWindowEx(0*WS_EX_CONTROLPARENT,"G-graphic-Frame","Graphic",WS_CHILD,0,0,0,0,hwndOwner,NULL,hModule,(void *)this);
 
-   hwndGraphic = CreateWindowEx(0L,"G-graphic","Graph",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
+   RECT rcInitial{0,0,0,0};
 
-   hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,100,100,hwndFrame,NULL,hModule,(void *)this);
+   hwndCanvas = newCanvas(&rcInitial);
+
+   hwndStatusBar = CreateWindowEx(0L,STATUSCLASSNAME,"",WS_CHILD | WS_VISIBLE,0,0,0,0,hwndFrame,NULL,hModule,(void *)this);
 
    if ( defaultStatusBarHandler ) 
       SetWindowLongPtr(hwndStatusBar,GWLP_WNDPROC,(ULONG_PTR)statusBarHandler);
    else
-      defaultStatusBarHandler = (WNDPROC)SetWindowLong(hwndStatusBar,GWL_WNDPROC,(long)statusBarHandler);
+      defaultStatusBarHandler = (WNDPROC)SetWindowLongPtr(hwndStatusBar,GWLP_WNDPROC,(ULONG_PTR)statusBarHandler);
 
    DLGTEMPLATE *dt = (DLGTEMPLATE *)LoadResource(hModule,FindResource(hModule,MAKEINTRESOURCE(IDNOTEBOOK_GRAPHIC_DATASOURCES),RT_DIALOG));
 
@@ -89,7 +91,7 @@
       ShowWindow(pContainedFunction -> HWNDSite(),SW_SHOW);
    }
 
-   pIOpenGLImplementation -> SetBaseWindow(hwndGraphic);
+   pIOpenGLImplementation -> SetBaseWindow(Canvas());
 
    long plotView = 0L;
    propertyPlotView -> get_longValue(&plotView);
@@ -99,38 +101,43 @@
       pIDataSetMaster -> RemoveIncludedDomain(pIDataSet);
    }
 
-   pIOpenGLImplementation -> SetViewProperties(
-      propertyPlotView,
-      propertyViewTheta,
-      propertyViewPhi,
-      propertyViewSpin,
-      propertyPlotLeftMargin,
-      propertyPlotTopMargin,
-      propertyPlotRightMargin,
-      propertyPlotBottomMargin,
-      propertyPlotMarginUnits,
-      propertyPlotMarginsStretchAll);
+   pIOpenGLImplementation -> SetViewProperties(propertyPlotView,propertyViewTheta,propertyViewPhi,propertyViewSpin,
+                                                   propertyPlotLeftMargin,propertyPlotTopMargin,propertyPlotRightMargin,propertyPlotBottomMargin,
+                                                   propertyPlotMarginUnits,propertyPlotMarginsStretchAll);
 
-   xaxis -> Initialize(hwndGraphic,'X',xaxis,yaxis,zaxis,propertyPlotView,
+   xaxis -> Initialize('X',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)xaxis);
-   yaxis -> Initialize(hwndGraphic,'Y',xaxis,yaxis,zaxis,propertyPlotView,
+
+   yaxis -> Initialize('Y',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)yaxis);
-   zaxis -> Initialize(hwndGraphic,'Z',xaxis,yaxis,zaxis,propertyPlotView,
+
+   zaxis -> Initialize('Z',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
                               propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)zaxis);
 
-   pIViewSet -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,
+   pIViewSet -> Initialize(pIOpenGLImplementation,pIEvaluator,
                               propertyPlotView,
                               propertyViewTheta,propertyViewPhi,propertyViewSpin,
                               propertyZFloor,propertyZCeiling,pIDataSetMaster,xaxis,yaxis,zaxis);
 
    return TRUE;
    }
+
+
+   HWND G::newCanvas(RECT *pRect) {
+   if ( hwndCanvas )
+      DestroyWindow(hwndCanvas);
+   if ( ! hwndFrame )
+      return NULL;
+   hwndCanvas = CreateWindowEx(WS_EX_CONTROLPARENT,"G-graphic","Graph",WS_CHILD | WS_VISIBLE,pRect -> left,pRect -> top,pRect -> right - pRect -> left,pRect -> bottom - pRect -> top,hwndFrame,NULL,hModule,(void *)this);
+   return hwndCanvas;
+   }
+

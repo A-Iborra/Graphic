@@ -22,6 +22,16 @@
 
    case WM_SETUP_GRAPHIC: {
       pGraphicHost = new GraphicHost();
+      pGraphicHost -> initialize();
+      }
+      break;
+
+   case WM_SIZE: {
+      if ( ! pGraphicHost )
+         break;
+      RECT rcFrame;
+      GetWindowRect(hwnd,&rcFrame);
+      SetWindowPos(pGraphicHost -> HWNDSite(),HWND_TOP,64,64,rcFrame.right - rcFrame.left - 128,rcFrame.bottom - rcFrame.top - 128,0L);
       }
       break;
 

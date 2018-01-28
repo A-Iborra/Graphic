@@ -30,7 +30,7 @@
   case DLL_PROCESS_ATTACH:
      hModule = reinterpret_cast<HMODULE>(module);
      GetModuleFileName(hModule,szModuleName,1024);
-     MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName));  
+     MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, (DWORD)strlen(szModuleName));  
      break;
 
   case DLL_PROCESS_DETACH:

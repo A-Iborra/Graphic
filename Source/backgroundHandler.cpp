@@ -104,7 +104,7 @@
       NM_UPDOWN *pn = (NM_UPDOWN *)lParam;
       if ( pn -> hdr.code != UDN_DELTAPOS ) break;
       if ( pn -> hdr.idFrom >= (unsigned int)IDDI_LIGHT_BACKGROUND_RED_SPIN && pn -> hdr.idFrom <= (unsigned int)IDDI_LIGHT_BACKGROUND_BLUE_SPIN ) {
-         int k = pn -> hdr.idFrom - IDDI_LIGHT_BACKGROUND_RED_SPIN;
+         int k = (int)pn -> hdr.idFrom - IDDI_LIGHT_BACKGROUND_RED_SPIN;
          HWND hwndEdit;
          char szTemp[32];
          float x;
@@ -257,7 +257,7 @@
       HBRUSH hb;
       HDC hdc;
       IGProperty *pp = NULL;
-      int k = SendMessage(GetDlgItem(p -> hwndLightingSettings,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+      int k = (int)SendMessage(GetDlgItem(p -> hwndLightingSettings,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
       while ( TRUE ) {
          if ( hwnd == GetDlgItem(p -> hwndLightingSettings,IDDI_LIGHT_AMBIENT_BACKGROUND) ) {
             pp = p -> ppPropertyAmbientLight[k];

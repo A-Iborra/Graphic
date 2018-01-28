@@ -111,15 +111,15 @@ EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> sz
 
       isAutoEditFieldSet = false;
 
-      long countSheets = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
+      long countSheets = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
 
-      long countRanges = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
+      long countRanges = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
 
       if ( 0 == countRanges || 0 == countSheets ) {
          p -> loadExcelWorkbook(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST),GetDlgItem(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST),p -> hwndExcelSettingsError,p -> szDataSource,p -> szSpreadsheetName,p -> szNamedRange);
-         countSheets = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
-         countRanges = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
-         long currentSelection = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L);
+         countSheets = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCOUNT,0L,0L);
+         countRanges = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCOUNT,0L,0L);
+         long currentSelection = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETCURSEL,0L,0L);
          if ( -1 < currentSelection ) {
             SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST,CB_GETLBTEXT,(WPARAM)currentSelection,(LPARAM)p -> szNamedRange);
             if ( ! p -> hasHeaderRowDetermined ) 
@@ -131,7 +131,7 @@ EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> sz
          }
       }
 
-      long currentSheet = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L);
+      long currentSheet = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_SPREADSHEET_LIST,CB_GETCURSEL,0L,0L);
 
       EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGES_LIST_LABEL),countRanges ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_WB_NAMEDRANGES_LIST),countRanges ? TRUE : FALSE);
@@ -141,7 +141,7 @@ EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),( 0 < strlen(p -> sz
       EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_ENTRY),countSheets && -1 < currentSheet ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_EXCEL_RANGE_LOAD),countSheets && - 1 < currentSheet ? TRUE : FALSE);
 
-      long countData = SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS,LVM_GETITEMCOUNT,0L,0L);
+      long countData = (long)SendDlgItemMessage(hwnd,IDDI_DATASET_EXCEL_NAMEDRANGE_CONTENTS,LVM_GETITEMCOUNT,0L,0L);
 
       if ( 0 == countData && ! p -> isEmbedded ) {
          if ( p -> szCellRange[0] && p -> szSpreadsheetName[0] && ! p -> szNamedRange[0] ) {

@@ -95,17 +95,17 @@
    std::vector<char *> szValues;
    long n;
 
-   char *pszWorkingValues = new char[strlen(pszValueString) + 1];
-   memset(pszWorkingValues,0,strlen(pszValueString) + 1);
+   char *pszWorkingValues = new char[(DWORD)strlen(pszValueString) + 1];
+   memset(pszWorkingValues,0,(DWORD)strlen(pszValueString) + 1);
    strcpy(pszWorkingValues,pszValueString);
 
    char *p,*s = strtok(pszWorkingValues,", ");
    long cntChars = 0;
    while ( s ) {
-      cntChars += strlen(s) + 3;
+      cntChars += (DWORD)strlen(s) + 3;
       theValues.push_back(new double(atof(s)));
-      p = new char[strlen(s) + 1];
-      memset(p,0,strlen(s) + 1);
+      p = new char[(DWORD)strlen(s) + 1];
+      memset(p,0,(DWORD)strlen(s) + 1);
       strcpy(p,s);
       szValues.push_back(p);
       s = strtok(NULL,", ");
@@ -115,16 +115,16 @@
 
    s = pszNames;
    while ( s[0] ) {
-      cntChars += strlen(s) + 2;
+      cntChars += (DWORD)strlen(s) + 2;
       BSTR* bstrName = new BSTR;
-      *bstrName = SysAllocStringLen(NULL,n = strlen(s));
+      *bstrName = SysAllocStringLen(NULL,n = (DWORD)strlen(s));
       MultiByteToWideChar(CP_ACP,0,s,-1,*bstrName,n);
       theNames.push_back(bstrName);
       p = new char[n + 1];
       memset(p,0,n + 1);
       strcpy(p,s);
       szNames.push_back(p);
-      s += strlen(s) + 1;
+      s += (DWORD)strlen(s) + 1;
    }
 
    char *pszResults = new char[cntChars + 1];
@@ -137,14 +137,14 @@
       k++;
    }
    
-   BSTR bstrResults = SysAllocStringLen(NULL,strlen(pszResults) + 1);
-   MultiByteToWideChar(CP_ACP,0,pszResults,-1,bstrResults,strlen(pszResults) + 1);
+   BSTR bstrResults = SysAllocStringLen(NULL,(DWORD)strlen(pszResults) + 1);
+   MultiByteToWideChar(CP_ACP,0,pszResults,-1,bstrResults,(DWORD)strlen(pszResults) + 1);
 
    SAFEARRAYBOUND rgb;
    double *pd;
 
    rgb.lLbound = 1;
-   rgb.cElements = theValues.size();
+   rgb.cElements = (DWORD)theValues.size();
 
    SAFEARRAY* saValues = SafeArrayCreate(VT_R8,1,&rgb);
    SAFEARRAY* saNames = SafeArrayCreate(VT_BSTR,1,&rgb);
@@ -187,7 +187,7 @@
 
       IDataSetEvents * p = reinterpret_cast<IDataSetEvents *>(connectData.pUnk);                                         \
   
-      p -> TakeValues(iterationNumber,theValues.size(),&saNames,&saValues);
+      p -> TakeValues(iterationNumber,(DWORD)theValues.size(),&saNames,&saValues);
 
    }
 

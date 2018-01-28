@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "Graphic.h"
+
 #include <OleCtl.h>
 #include "utils.h"
 
@@ -27,7 +28,7 @@
 
    pIOleClientSite -> QueryInterface(IID_IOleInPlaceSite,(void **)&pIOleInPlaceSite);
 
-   IDispatch* pIDispatch;
+   IDispatch* pIDispatch = NULL;
 
    HRESULT rc = pIOleClientSite -> QueryInterface(IID_IDispatch,reinterpret_cast<void **>(&pIDispatch));
 
@@ -124,9 +125,12 @@
          hwndOwner = hwndParent;
          initWindows();
       }
-      SetWindowPos(hwndFrame,HWND_TOP,
-                     lprcPosRect -> left + 4,lprcPosRect -> top + 4,
-                           lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,SWP_SHOWWINDOW);
+      if ( lprcPosRect )
+         SetWindowPos(hwndFrame,HWND_TOP,
+                        lprcPosRect -> left + 4,lprcPosRect -> top + 4,
+                              lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,SWP_SHOWWINDOW);
+      else
+         ShowWindow(hwndFrame,SW_SHOW);
       break;
  
    default:
@@ -137,11 +141,6 @@
  
  
    STDMETHODIMP G::SetHostNames(LPCOLESTR szContainerApp,LPCOLESTR olestrContainerObject) {
-//   char szTemp[64];
-//   memset(szTemp,0,sizeof(szTemp));
-//   WideCharToMultiByte(CP_ACP,0,olestrContainerObject,wcslen(olestrContainerObject),szTemp,64,0,0);
-//   strncpy(szName,szTemp,sizeof(szName));
-////   name(szTemp);
    return S_OK;
    }
  
@@ -200,11 +199,9 @@
  
  
    STDMETHODIMP G::GetMiscStatus(DWORD dwAspect,DWORD *dwStatus) {
+   *dwStatus = 0;
    if ( dwAspect == DVASPECT_CONTENT )
       *dwStatus = oleMisc;
-   else
-      *dwStatus = 0;
-//   return OleRegGetMiscStatus(CLSID_GSystemGraphic,dwAspect,dwStatus);
    return S_OK;
    }
  

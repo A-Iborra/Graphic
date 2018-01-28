@@ -155,7 +155,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
          type2DIds.push_back(pvIDs[k]);
 
-         long n = wcslen(pvNames[k]);
+         long n = (DWORD)wcslen(pvNames[k]);
 
          char *pszTemp = new char[n + 1];
 
@@ -215,7 +215,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
       for ( long k = 0; k < count3DTypes; k++ ) {
          type3DIds.push_back(pvIDs[k]);
-         long n = wcslen(pvNames[k]);
+         long n = (DWORD)wcslen(pvNames[k]);
          char *pszTemp = new char[n + 1];
          pszTemp[n] = '\0';
          WideCharToMultiByte(CP_ACP,0,pvNames[k],-1,pszTemp,n,0,0);
@@ -273,7 +273,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          controlIdToType[controlId] = type2DIds.front();
          type2DIds.pop_front();
 
-         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[0],(HMENU)controlId,hModule,(void *)p);
+         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[0],(HMENU)(ULONG_PTR)controlId,hModule,(void *)p);
    
          SendMessage(hwndCheckbox,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -281,13 +281,13 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
          delete [] pszTemp;
 
-         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[0],(HMENU)(controlId + 1000),hModule,NULL);
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[0],(HMENU)(ULONG_PTR)(controlId + 1000),hModule,NULL);
 
          ShowWindow(hwndProperties,SW_HIDE);
 
          IGSystemPlotType *pIGSystemPlotType = typePropertyInstance2D.front();
 
-         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)pIGSystemPlotType);
+         SetWindowLongPtr(hwndProperties,GWLP_USERDATA,(ULONG_PTR)pIGSystemPlotType);
 
          SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -324,7 +324,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          controlIdToType[controlId] = type3DIds.front();
          type3DIds.pop_front();
 
-         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[1],(HMENU)controlId,hModule,(void *)p);
+         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[1],(HMENU)(ULONG_PTR)controlId,hModule,(void *)p);
 
          SendMessage(hwndCheckbox,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -334,12 +334,12 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
          max3DTypeControlId = controlId;
 
-         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[1],(HMENU)(controlId + 1000),hModule,NULL);
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[1],(HMENU)(ULONG_PTR)(controlId + 1000),hModule,NULL);
 
          ShowWindow(hwndProperties,SW_HIDE);
          IGSystemPlotType *pIGSystemPlotType = typePropertyInstance3D.front();
 
-         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)pIGSystemPlotType);
+         SetWindowLongPtr(hwndProperties,GWLP_USERDATA,(ULONG_PTR)pIGSystemPlotType);
 
          SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -402,12 +402,11 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
       IPlot *pIPlot = NULL;
       while ( pIPlot = p -> plotList.GetNext(pIPlot) ) {
          memset(&lvItem,0,sizeof(LVITEM));
-         long n;
          BSTR bstrExpression;
          char szTemp[128];
          pIPlot -> get_Name(&bstrExpression);
-         if ( 0 == wcslen(bstrExpression) ) 
-            sprintf(szTemp,"Plot #%d",p -> plotList.ID(pIPlot));
+         if ( 0 == (DWORD)wcslen(bstrExpression) ) 
+            sprintf(szTemp,"Plot #%lld",p -> plotList.ID(pIPlot));
          else         
             WideCharToMultiByte(CP_ACP,0,bstrExpression,-1,szTemp,64,0,0);
          SysFreeString(bstrExpression);
@@ -416,7 +415,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          lvItem.state = LVIS_SELECTED;
          lvItem.stateMask = -1;
          lvItem.pszText = szTemp;
-         lvItem.lParam = reinterpret_cast<long>(pIPlot);
+         lvItem.lParam = (LPARAM)pIPlot;
          SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
       }
 
@@ -445,7 +444,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
       long cxScroll = GetSystemMetrics(SM_CXVSCROLL);
 
-      long currentIndex = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_GETCURSEL,0L,0L);
+      long currentIndex = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_GETCURSEL,0L,0L);
 
       if ( -1 == currentIndex ) {
          SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_ARITY_TABS,TCM_SETCURSEL,0L,0L);
@@ -473,7 +472,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          si.nPos = 0;
          si.nPage = (rcTabs.bottom - rcTabs.top - 32);
 
-         needsToScroll[k] = si.nMax > si.nPage;
+         needsToScroll[k] = si.nMax > (int)si.nPage;
 
          SendMessage(hwndScrollBars[k],SBM_SETSCROLLINFO,(WPARAM)TRUE,(LPARAM)&si);
          SendMessage(hwndScrollBars[k],SBM_ENABLE_ARROWS,(WPARAM)ESB_DISABLE_UP,0L);
@@ -506,8 +505,8 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
       NMHDR *pHeader = (NMHDR *)lParam;
       switch ( wParam ) {
       case IDDI_GRAPHIC_PLOTS_LIST: {
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_PLOTS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
          if ( pHeader -> code == LVN_ITEMCHANGED ) {
             InvalidateRect(hwndSampleGraphic,NULL,TRUE);
@@ -517,7 +516,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          break;
 
       case IDDI_GRAPHIC_PLOTS_ARITY_TABS: {
-         long currentIndex = SendMessage(pHeader -> hwndFrom,TCM_GETCURSEL,0L,0L);
+         long currentIndex = (long)SendMessage(pHeader -> hwndFrom,TCM_GETCURSEL,0L,0L);
          if ( TCN_SELCHANGING == pHeader -> code ) {
             if ( -1 < currentIndex ) {
                ShowWindow(hwndPaneHosts[currentIndex],SW_HIDE);
@@ -652,8 +651,8 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
       switch ( LOWORD(wParam) ) {
 
       case IDDI_GRAPHIC_PLOTS_EDIT: {
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_PLOTS_LIST,LVM_GETITEMCOUNT,0L,0L);
          LVITEM lvItem;
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any plots to edit.","Note",MB_OK);

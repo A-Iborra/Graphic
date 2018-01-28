@@ -15,7 +15,7 @@
    DataPoint movePoint = {-DBL_MAX,-DBL_MAX,-DBL_MAX};
 
 
-   HRESULT BasePlot::Initialize(IDataSet* pDS,IOpenGLImplementation *pimp,IEvaluator *piev,
+   HRESULT BasePlot::Initialize(IDataSet* pDS,void *pvIOpenGLImplementation,IEvaluator *piev,
                                  IGProperty* propLineColor,
                                  IGProperty* propLineWeight,
                                  IGProperty* propXFloor,IGProperty* propXCeiling,
@@ -29,7 +29,7 @@
    if ( pIDataSetDomain )
       pIDataSetDomain -> AddRef();
 
-   pIOpenGLImplementation = pimp;
+   pIOpenGLImplementation = (IOpenGLImplementation *)pvIOpenGLImplementation;
 
    pIEvaluator = piev;
 
@@ -420,8 +420,9 @@
 
    pIGraphicSegment -> Close(TRUE);
  
-   IText *t = NULL;
-   while ( t = textList.GetNext(t) ) t -> Draw();
+   IText *pIText = NULL;
+   while ( pIText = textList.GetNext(pIText) )
+      pIText -> Draw();
  
    //pIOpenGLImplementation -> Flush();
  

@@ -13,15 +13,15 @@
 
 //#define DO_THREAD_RENDERING
 
-   int G::render(long sourceID) {
+   int G::render(ULONG_PTR sourceID) {
 
    if ( ! pIOpenGLImplementation )
       return 0;
 
-   if ( ! hwndGraphic ) 
+   if ( ! Canvas() ) 
       return 0;
 
-   if ( ! IsWindowVisible(hwndGraphic) )
+   if ( ! IsWindowVisible(Canvas()) )
       return 0;
 
    //if ( renderThreadList.Count() > 0 ) 
@@ -62,7 +62,7 @@
 
       if ( p -> hwndDataSourcesTab ) {
 
-         long index = SendMessage(p -> hwndDataSourcesTab,TCM_GETCURSEL,0L,0L);
+         long index = (long)SendMessage(p -> hwndDataSourcesTab,TCM_GETCURSEL,0L,0L);
 
          if ( -1 < index ) {
 
@@ -78,7 +78,7 @@
 
             if ( 0 == strcmp(szTemp,"Functions") ) {
 
-               index = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
+               index = (long)SendMessage(p -> hwndDataSourcesFunctions,TCM_GETCURSEL,0L,0L);
 
                tcItem.mask = TCIF_PARAM;
 
@@ -118,7 +118,7 @@
 
             } else if ( 0 == strcmp(szTemp,"DataSets") ) {
 
-               index = SendMessage(p -> hwndDataSourcesDataSets,TCM_GETCURSEL,0L,0L);
+               index = (long)SendMessage(p -> hwndDataSourcesDataSets,TCM_GETCURSEL,0L,0L);
 
                tcItem.mask = TCIF_PARAM;
 
@@ -238,7 +238,7 @@
    }
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
- 
+
    p -> ActivateLighting();
 
    p -> erase(); 
@@ -247,12 +247,15 @@
    while ( ax = p -> axisList.GetNext(ax) )
       ax -> Draw();
 
+   IPlot **ppIPlots = NULL;
    if ( 0 < p -> plotList.Count() ) {
-      IPlot** pIPlots = reinterpret_cast<IPlot **>(CoTaskMemAlloc(p -> plotList.Count() * sizeof(IPlot*)));
+      ppIPlots = reinterpret_cast<IPlot **>(CoTaskMemAlloc(p -> plotList.Count() * sizeof(IPlot *)));
       int n = p -> plotList.Count();
       for ( int k = 0; k < n; k++ )
-         p -> plotList.GetByIndex(k) -> QueryInterface(IID_IPlot,(void**)(&pIPlots[k]));
-      p -> plotList.GetFirst() -> Plotter(n,&pIPlots);
+         p -> plotList.GetByIndex(k) -> QueryInterface(IID_IPlot,(void**)(&ppIPlots[k]));
+      p -> plotList.GetFirst() -> Plotter(n,&ppIPlots);
+      for ( int k = 0; k < p -> plotList.Count(); k++ )
+         p -> plotList.GetByIndex(k) -> DrawOpenGLText();
    }
 
    IText *t = NULL;
@@ -265,11 +268,15 @@
       t -> Draw();
    } 
 
+   ax = NULL;
+   while ( ax = p -> axisList.GetNext(ax) )
+      ax -> DrawOpenGLLabels();
+
    p -> pIOpenGLImplementation -> Finalize();
 
    ax = NULL;
    while ( ax = p -> axisList.GetNext(ax) )
-      ax -> DrawLabels();
+      ax -> DrawGDILabels();
 
    t = NULL;
    while ( t = p -> textList.GetNext(t) ) {
@@ -280,6 +287,11 @@
       t -> PrepData();
       t -> Draw();
    } 
+
+   if ( 0 < p -> plotList.Count() ) {
+      for ( int k = 0; k < p -> plotList.Count(); k++ )
+         p -> plotList.GetByIndex(k) -> DrawGDIText();
+   }
 
    if ( p -> showStatusBar ) {
 

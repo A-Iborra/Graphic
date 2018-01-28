@@ -7,7 +7,7 @@
    HRESULT PlotTypes::get_Count(long *pCount) {
    if ( ! pCount )
       return E_POINTER;
-   *pCount = itemName.size();
+   *pCount = (DWORD)itemName.size();
    return S_OK;
    }
 

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "Graphic.h"
+#include <list>
 
 #include "Graphic_resource.h"
 #include "utils.h"
@@ -30,25 +31,49 @@
 
       delete [] pCallLists;
 
-      IText *pText = NULL;
+      std::list<List<IText> *> textLists;
 
-      while ( pText = textList.GetNext(pText) ) {
+      textLists.push_back(&textList);
 
-         boolean isOpenGLRendered = false;
+      IPlot *pIPlot = NULL;
+      while ( pIPlot = plotList.GetNext(pIPlot) ) {
+         List<IText> *pList = NULL;
+         pIPlot -> GetTextList((void **)&pList);
+         textLists.push_back(pList);
+      }
 
-         pText -> get_TextRender(&isOpenGLRendered);
-         if ( isOpenGLRendered )
-            continue;
+      IAxis *pIAxis = NULL;
+      while ( pIAxis = axisList.GetNext(pIAxis) ) {
+         List<IText> *pList = NULL;
+         pIAxis -> GetTextList((void **)&pList);
+         textLists.push_back(pList);
+      }
 
-         RECT rcText;
-         pText -> get_GDIBoundingBox(&rcText);
+      for ( List<IText> *pTextList : textLists ) {
 
-         if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
-            continue;
+         IText *pText = NULL;
 
-         hitTableHits++;
+         while ( pText = pTextList -> GetNext(pText) ) {
 
-      }      
+            boolean isOpenGLRendered = false;
+
+            pText -> get_TextRender(&isOpenGLRendered);
+
+            if ( isOpenGLRendered )
+               continue;
+
+            RECT rcText;
+
+            pText -> get_GDIBoundingBox(&rcText);
+
+            if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
+               continue;
+
+            hitTableHits++;
+
+         }
+
+      }
 
    }
 
@@ -84,24 +109,48 @@
       return FALSE;
    }
 
-   IText *pText = NULL;
    long hitTableIndex = hitTableHits * 4;
-   while ( pText = textList.GetNext(pText) ) {
-      boolean isOpenGLRendered = false;
-      pText -> get_TextRender(&isOpenGLRendered);
-      if ( isOpenGLRendered )
-         continue;
-      RECT rcText;
-      pText -> get_GDIBoundingBox(&rcText);
-      if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
-         continue;
-      long segmentID;
-      pText -> get_SegmentID(&segmentID);
-      hitTable[hitTableIndex] = 1;
-      hitTable[hitTableIndex + 3] = (unsigned int)segmentID;
-      hitTableHits++;
-      hitTableIndex += 4;
-   } 
+
+   std::list<List<IText> *> textLists;
+
+   textLists.push_back(&textList);
+
+   IPlot *pIPlot = NULL;
+   while ( pIPlot = plotList.GetNext(pIPlot) ) {
+      List<IText> *pList = NULL;
+      pIPlot -> GetTextList((void **)&pList);
+      textLists.push_back(pList);
+   }
+
+   IAxis *pIAxis = NULL;
+   while ( pIAxis = axisList.GetNext(pIAxis) ) {
+      List<IText> *pList = NULL;
+      pIAxis -> GetTextList((void **)&pList);
+      textLists.push_back(pList);
+   }
+
+   for ( List<IText> *pTextList : textLists ) {
+
+      IText *pText = NULL;
+
+      while ( pText = pTextList -> GetNext(pText) ) {
+         boolean isOpenGLRendered = false;
+         pText -> get_TextRender(&isOpenGLRendered);
+         if ( isOpenGLRendered )
+            continue;
+         RECT rcText;
+         pText -> get_GDIBoundingBox(&rcText);
+         if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )
+            continue;
+         long segmentID;
+         pText -> get_SegmentID(&segmentID);
+         hitTable[hitTableIndex] = 1;
+         hitTable[hitTableIndex + 3] = (unsigned int)segmentID;
+         hitTableHits++;
+         hitTableIndex += 4;
+      } 
+
+   }
 
    delete [] pCallLists;
 
@@ -121,176 +170,36 @@
  
    return TRUE;
    }
- 
- 
-   unsigned int __stdcall G::processSelections(void *arg) {
 
-   G *p = reinterpret_cast<G *>(arg);
 
-   unsigned int *pTable,hitID,nNamesThisHit;
-   List<unsigned int> hitList;
-   long segID;
- 
-   pTable = p -> hitTable;
- 
-   for ( unsigned int k = 0; k < p -> hitTableHits; k++ ) {
- 
-      nNamesThisHit = *pTable;
- 
-      pTable++;
-      pTable++;
-      pTable++;
- 
-      for ( unsigned int j = 0; j < nNamesThisHit; j++ ) {
- 
-         hitID = *pTable;
- 
-         pTable++;
- 
-         if ( hitList.Get((int)hitID) ) 
-            continue;
- 
-         IAxis *pAxis = NULL;
-         while ( pAxis = p -> axisList.GetNext(pAxis) ) {
-            pAxis -> get_SegmentID(&segID);
-            if ( (unsigned int)(segID) == hitID ) {
-               hitList.Add(pTable - 1,(char *)NULL,(int)hitID);
-               break;
-            }
-         }
- 
-         if ( hitList.Get((int)hitID) ) 
-            continue;
- 
-         IPlot *pPlot = NULL;
-         while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
-            pPlot -> get_SegmentID(&segID);
-            if ( (unsigned int)(segID) == hitID ) {
-               hitList.Add(pTable - 1,(char *)NULL,hitID);
-               break;
-            }
-         }
- 
-         if ( hitList.Get((int)hitID) ) 
-            continue;
- 
-         pAxis = NULL;
-         while ( pAxis = p -> axisList.GetNext(pAxis) ) {
-            List<IText> *pTextList;
-            pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
-            IText *pIText = reinterpret_cast<IText *>(NULL);
-            while ( pIText = pTextList -> GetNext(pIText) ) {
-               pIText -> get_SegmentID(&segID);
-               if ( (unsigned int)(segID) == hitID ) {
-                  hitList.Add(pTable - 1,(char *)NULL,(int)hitID);
-                  break;
-               }
-            }
-            if ( hitList.Get((int)hitID) ) break;
-         }
- 
-         if ( hitList.Get((int)hitID) ) 
-            continue;
- 
-         IText *pText = NULL;
-         while ( pText = p -> textList.GetNext(pText) ) {
-            pText -> get_SegmentID(&segID);
-            if ( (unsigned int)(segID) == hitID ) {
-               hitList.Add(pTable - 1,(char *)NULL,hitID);
-               break;
-            }
-         }
- 
-      }
+   unsigned int __stdcall G::processSelections(void *pvArg) {
+   G *p = (G *)pvArg;
+   std::function<HRESULT(IGraphicSegmentAction *)> *pTask = new std::function<HRESULT(IGraphicSegmentAction *)>( [=](IGraphicSegmentAction *pCallTable) { return pCallTable -> Selector(); });
+   HRESULT rc = processAction(pvArg,&p -> pSelectedGraphicSegmentAction,false,pTask);
+   delete pTask;
+   return rc;
    }
- 
-   IGraphicSegmentAction *pCallTable;
- 
-   unsigned int *pID = (unsigned int *)NULL;
- 
-   while ( pID = hitList.GetNext(pID) ) {
- 
-      long objectID = *pID;
- 
-      IPlot* pPlot = NULL;
-      while ( pPlot = p -> visiblePlotList.GetNext(pPlot) ) {
-         pPlot -> get_SegmentID(&segID);
-         if ( segID == objectID ) 
-            break;
-      }
- 
-      if ( pPlot ) {
-         pPlot -> get_ActionTable(&pCallTable);
-         if ( pCallTable ) 
-            pCallTable -> Selector();
-         continue;
-      }
- 
-      IAxis *pAxis = NULL;
-      while ( pAxis = p -> axisList.GetNext(pAxis) ) {
-         pAxis -> get_SegmentID(&segID);
-         if ( segID == objectID ) break;
-      }
- 
-      if ( pAxis ) {
-         pAxis -> get_ActionTable(&pCallTable);
-         if ( pCallTable ) 
-            pCallTable -> Selector();
-         continue;
-      }
- 
-      IText *pIText = NULL;
-      pAxis = NULL;
-      while ( pAxis = p -> axisList.GetNext(pAxis) ) {
-         int found = 0;
-         List<IText> *pTextList;
-         pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
-         pIText = NULL;
-         while ( pIText = pTextList -> GetNext(pIText) ) {
-            pIText -> get_SegmentID(&segID);
-            if ( segID == objectID ) {
-               pIText -> get_ActionTable(&pCallTable);
-               if ( pCallTable ) {
-                  pCallTable -> Selector();
-                  found = 1;
-                  break;
-               }
-            }
-         }
-         if ( found ) break;
-      }
- 
-      if ( pIText )
-         continue;
- 
-      while ( pIText = p -> textList.GetNext(pIText) ) {
-         pIText -> get_SegmentID(&segID);
-         if ( segID == objectID ) 
-            break;
-      }
-    
-      if ( pIText ) {
-         pIText -> get_ActionTable(&pCallTable);
-         if ( pCallTable ) {
-            if ( S_OK == pCallTable -> Selector() )
-                p -> pSelectedGraphicSegmentAction = pCallTable;
-            continue;
-         }
-      }
- 
-   }
- 
-   delete [] p -> hitTable;
-   p -> hitTable = (unsigned int *)NULL;
-   p -> hitTableHits = 0;
- 
-   return TRUE;
-   }
- 
- 
-   unsigned int __stdcall G::processMenus(void *arg) {
 
-   G *p = (G *)arg;
+
+   unsigned int __stdcall G::processMenus(void *pvArg) {
+   std::function<HRESULT(IGraphicSegmentAction *)> *pTask = new std::function<HRESULT(IGraphicSegmentAction *)>( [=](IGraphicSegmentAction *pCallTable) { return pCallTable -> MenuRequest(); });
+   HRESULT rc = processAction(pvArg,NULL,false,pTask);
+   delete pTask;
+   return rc;
+   }
+
+
+   unsigned int __stdcall G::processDefaultAction(void *pvArg) {
+   std::function<HRESULT(IGraphicSegmentAction *)> *pTask = new std::function<HRESULT(IGraphicSegmentAction *)>( [=](IGraphicSegmentAction *pCallTable) { return pCallTable -> DefaultAction(); });
+   HRESULT rc = processAction(pvArg,NULL,true,pTask);
+   delete pTask;
+   return rc;
+   }
+
+
+   unsigned int __stdcall G::processAction(void *pvArg,IGraphicSegmentAction **ppRetainCallTable,boolean allowMultiple,std::function<HRESULT(IGraphicSegmentAction *)> *pTask) {
+
+   G *p = (G *)pvArg;
    IPlot *pPlot;
    unsigned int *pTable,hitID,nNamesThisHit;
    List<unsigned int> hitList;
@@ -346,7 +255,27 @@
          pAxis = NULL;
          List<IText> *pTextList;
          while ( pAxis = p -> axisList.GetNext(pAxis) ) {
-            pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
+            pAxis -> GetTextList((void **)&pTextList);
+            IText *pIText = NULL;
+            while ( pIText = pTextList -> GetNext(pIText) ) {
+               pIText -> get_SegmentID(&segID);
+               if ( (unsigned int)(segID) == hitID ) {
+                  hitList.Add(pTable - 1,(char *)NULL,(int)hitID);
+                  found = true;
+                  break;
+               }
+            }
+ 
+            if ( found ) 
+               break;
+         }
+ 
+         if ( found ) 
+            continue;
+ 
+         pPlot = NULL;
+         while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+            pPlot -> GetTextList((void **)&pTextList);
             IText *pIText = reinterpret_cast<IText *>(NULL);
             while ( pIText = pTextList -> GetNext(pIText) ) {
                pIText -> get_SegmentID(&segID);
@@ -394,7 +323,10 @@
       if ( pPlot ) {
          pPlot -> get_ActionTable(&pCallTable);
          if ( pCallTable ) {
-            if ( pCallTable -> MenuRequest() ) {
+            HRESULT rc = (*pTask)(pCallTable);
+            if ( S_OK == rc && ppRetainCallTable )
+               *ppRetainCallTable = pCallTable;
+            if ( ! allowMultiple ) {
                delete [] p -> hitTable;
                p -> hitTable = (unsigned int *)NULL;
                p -> hitTableHits = 0;
@@ -407,13 +339,17 @@
       IAxis *pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          pAxis -> get_SegmentID(&segID);
-         if ( segID == objectID ) break;
+         if ( segID == objectID )
+            break;
       }
  
       if ( pAxis ) {
          pAxis -> get_ActionTable(&pCallTable);
          if ( pCallTable ) {
-            if ( pCallTable -> MenuRequest() ) {
+            HRESULT rc = (*pTask)(pCallTable);
+            if ( S_OK == rc && ppRetainCallTable )
+               *ppRetainCallTable = pCallTable;
+            if ( ! allowMultiple ) {
                delete [] p -> hitTable;
                p -> hitTable = (unsigned int *)NULL;
                p -> hitTableHits = 0;
@@ -426,21 +362,51 @@
       pAxis = NULL;
       while ( pAxis = p -> axisList.GetNext(pAxis) ) {
          List<IText> *pTextList;
-         pAxis -> GetTextList(reinterpret_cast<void **>(&pTextList));
-         IText *pIText = reinterpret_cast<IText *>(NULL);
+         pAxis -> GetTextList((void **)&pTextList);
+         IText *pIText = NULL;
          while ( pIText = pTextList -> GetNext(pIText) ) {
             pIText -> get_SegmentID(&segID);
-            if ( segID == objectID ) break;
+            if ( segID == objectID ) 
+               break;
          }
          if ( pIText ) {
-//            pIText -> get_ActionTable(&pCallTable);
             pAxis -> get_ActionTable(&pCallTable);
             if ( pCallTable ) {
-               pCallTable -> MenuRequest();
-               delete [] p -> hitTable;
-               p -> hitTable = (unsigned int *)NULL;
-               p -> hitTableHits = 0;
-               return TRUE;
+               HRESULT rc = (*pTask)(pCallTable);
+               if ( S_OK == rc && ppRetainCallTable )
+                  *ppRetainCallTable = pCallTable;
+               if ( ! allowMultiple ) {
+                  delete [] p -> hitTable;
+                  p -> hitTable = (unsigned int *)NULL;
+                  p -> hitTableHits = 0;
+                  return TRUE;
+               }
+            }
+         }
+      }
+ 
+      pPlot = NULL;
+      while ( pPlot = p -> plotList.GetNext(pPlot) ) {
+         List<IText> *pTextList;
+         pPlot -> GetTextList((void **)&pTextList);
+         IText *pIText = NULL;
+         while ( pIText = pTextList -> GetNext(pIText) ) {
+            pIText -> get_SegmentID(&segID);
+            if ( segID == objectID ) 
+               break;
+         }
+         if ( pIText ) {
+            pIText -> get_ActionTable(&pCallTable);
+            if ( pCallTable ) {
+               HRESULT rc = (*pTask)(pCallTable);
+               if ( S_OK == rc && ppRetainCallTable )
+                  *ppRetainCallTable = pCallTable;
+               if ( ! allowMultiple ) {
+                  delete [] p -> hitTable;
+                  p -> hitTable = (unsigned int *)NULL;
+                  p -> hitTableHits = 0;
+                  return TRUE;
+               }
             }
          }
       }
@@ -448,15 +414,17 @@
       IText* pIText = NULL;
       while ( pIText = p -> textList.GetNext(pIText) ) {
          pIText -> get_SegmentID(&segID);
-         if ( segID == objectID ) break;
+         if ( segID == objectID )
+            break;
       }
 
       if ( pIText ) {
-
          pIText -> get_ActionTable(&pCallTable);
-
          if ( pCallTable ) {
-            if ( pCallTable -> MenuRequest() ) {
+            HRESULT rc = (*pTask)(pCallTable);
+            if ( S_OK == rc && ppRetainCallTable )
+               *ppRetainCallTable = pCallTable;
+            if ( ! allowMultiple ) {
                delete [] p -> hitTable;
                p -> hitTable = (unsigned int *)NULL;
                p -> hitTableHits = 0;

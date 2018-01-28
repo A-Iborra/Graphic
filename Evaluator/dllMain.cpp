@@ -18,7 +18,7 @@
    BOOL WINAPI gsEvaluator_dllDetach();
 
    BOOL WINAPI DllMain(HANDLE module,ULONG flag,void *) {
-   switch(flag) {
+   switch ( (int)flag ) {
    case DLL_PROCESS_ATTACH: 
       gsEvaluator_dllAttach(module);
       break;

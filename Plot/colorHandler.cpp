@@ -240,7 +240,7 @@ OutputDebugString(szX); \
 
       char szTemp[32];
       HWND hwndEdit = (HWND)SendMessage(pn -> hdr.hwndFrom,UDM_GETBUDDY,(WPARAM)0L,(LPARAM)0L);
-      sprintf_s(szTemp,32,"%04ld",GetWindowLongPtr(hwndEdit,GWLP_ID));
+      sprintf_s(szTemp,32,"%04ld",(long)GetWindowLongPtr(hwndEdit,GWLP_ID));
       szTemp[3] = '\0';
       long backGroundId = 10 * atol(szTemp) + 1;
       HWND hwndBackground = GetDlgItem(GetParent(hwndEdit),backGroundId);

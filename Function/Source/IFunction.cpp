@@ -64,9 +64,9 @@
  
  
    HRESULT Function::get_Expression(BSTR *getExpression) {
-   *getExpression = SysAllocStringLen(NULL,strlen(expression) + 1);
+   *getExpression = SysAllocStringLen(NULL,(DWORD)strlen(expression) + 1);
    memset(*getExpression,0,strlen(expression) + 1);
-   MultiByteToWideChar(CP_ACP,0,expression,-1,*getExpression,strlen(expression) + 1);
+   MultiByteToWideChar(CP_ACP,0,expression,-1,*getExpression,(DWORD)strlen(expression) + 1);
    return S_OK;
    }
  
@@ -81,9 +81,9 @@
    return S_OK;
    }
    HRESULT Function::get_ExpressionLabel(BSTR *pbstrExpressionLabel) {
-   *pbstrExpressionLabel = SysAllocStringLen(NULL,strlen(expressionLabel) + 1);
+   *pbstrExpressionLabel = SysAllocStringLen(NULL,(DWORD)strlen(expressionLabel) + 1);
    memset(*pbstrExpressionLabel,0,(strlen(expressionLabel) + 1) * sizeof(OLECHAR));
-   MultiByteToWideChar(CP_ACP,0,expressionLabel,-1,*pbstrExpressionLabel,strlen(expressionLabel) + 1);
+   MultiByteToWideChar(CP_ACP,0,expressionLabel,-1,*pbstrExpressionLabel,(DWORD)strlen(expressionLabel) + 1);
    return S_OK;
    }
  
@@ -98,9 +98,9 @@
    return S_OK;
    }
    HRESULT Function::get_ResultsLabel(BSTR *pbstrResultsLabel) {
-   *pbstrResultsLabel = SysAllocStringLen(NULL,strlen(resultsLabel) + 1);
+   *pbstrResultsLabel = SysAllocStringLen(NULL,(DWORD)strlen(resultsLabel) + 1);
    memset(*pbstrResultsLabel,0,(strlen(resultsLabel) + 1) * sizeof(OLECHAR));
-   MultiByteToWideChar(CP_ACP,0,resultsLabel,-1,*pbstrResultsLabel,strlen(resultsLabel) + 1);
+   MultiByteToWideChar(CP_ACP,0,resultsLabel,-1,*pbstrResultsLabel,(DWORD)strlen(resultsLabel) + 1);
    return S_OK;
    }
  
@@ -323,7 +323,7 @@
    
    HRESULT Function::DefineIndependentVariable(BSTR variableName,BSTR minValue,BSTR maxValue,long stepCount) {
 
-   long n = wcslen(variableName) + 1;
+   long n = (DWORD)wcslen(variableName) + 1;
    char* szVariableName = new char[n];
    memset(szVariableName,0,n);
    WideCharToMultiByte(CP_ACP,0,variableName,-1,szVariableName,n,0,0);
@@ -373,7 +373,7 @@
 
    HRESULT Function::DefineSimpleVariable(BSTR variableName,VARIANT variableValue) {
 
-   long n = wcslen(variableName) + 1;
+   long n = (DWORD)wcslen(variableName) + 1;
    char* szVariableName = new char[n];
    memset(szVariableName,0,n);
    WideCharToMultiByte(CP_ACP,0,variableName,-1,szVariableName,n,0,0);
@@ -406,7 +406,7 @@
 
    HRESULT Function::UndefineVariable(BSTR bstrVariableName) {
 
-   long n = wcslen(bstrVariableName) + 1;
+   long n = (DWORD)wcslen(bstrVariableName) + 1;
    char* szVariableName = new char[n];
    memset(szVariableName,0,n);
    WideCharToMultiByte(CP_ACP,0,bstrVariableName,-1,szVariableName,n,0,0);
@@ -442,7 +442,7 @@
    if ( ! v )
       v = pManuallyAddedVariables -> GetLast();
    if ( v ) {
-      n = SendMessage(hwndVariablesTab,TCM_GETITEMCOUNT,0L,0L);
+      n = (long)SendMessage(hwndVariablesTab,TCM_GETITEMCOUNT,0L,0L);
       SendMessage(hwndVariablesTab,TCM_SETCURSEL,n - 1,0L);
       v -> get_HWND(&hwndV);
       ShowWindow(hwndV,SW_SHOW);
@@ -581,7 +581,7 @@
    return S_OK;
    }
 
-   STDMETHODIMP Function::Initialize(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
+   STDMETHODIMP Function::Initialize(IDataSet* pIDataSet_Domain,void *pvIOpenGLImplementation,
                                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                                           IGProperty *parentPropertyPlotView,
                                           IGProperty *parentPropertyDefault2DPlotSubType,
@@ -600,7 +600,8 @@
    pWhenChangedCallbackArg = pArg;
    whenChangedCallbackCookie = callbackCookie;
 
-   HRESULT rc = pIPlot -> Initialize(pIDataSet_Domain,pIOpenGLImplementation,evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
+   HRESULT rc = pIPlot -> Initialize(pIDataSet_Domain,(IOpenGLImplementation *)pvIOpenGLImplementation,
+                                       evaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
                                        parentPropertyBackgroundColor,
                                        parentPropertyXFloor,parentPropertyXCeiling,
                                        parentPropertyYFloor,parentPropertyYCeiling,

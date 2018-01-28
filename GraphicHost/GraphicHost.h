@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 #include "Graphic_resource.h"
-
+#include "utils.h"
 #include "GraphicControl_i.h"
 #include "Properties_i.h"
 
@@ -15,8 +15,11 @@
   public:
 
      GraphicHost();
-
      ~GraphicHost();
+
+      void initialize();
+
+      HWND HWNDSite() { return hwndSite; };
 
    // IUnknown
 
@@ -94,6 +97,7 @@
       IGProperties *pIGProperties{NULL};
       IGProperty *pIGProperty_Graphic{NULL};
       IGPropertiesClient *pIGPropertiesClient_Graphic{NULL};
+      IGProperty *pIGProperty_SizeAndPos{NULL};
 
       IGSGraphic *pIGraphic{NULL};
 
@@ -105,6 +109,8 @@
       unsigned int refCount{0};
 
       DWORD dwConnectionCookie{0};
+
+      RECT rcFrame{0,0,0,0};
 
       static LRESULT EXPENTRY graphicHandler(HWND,UINT,WPARAM,LPARAM);
 

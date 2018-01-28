@@ -10,7 +10,7 @@
 #include "Graphic.h"
 
 
-   ContainedFunction::ContainedFunction(G* pp,long pID,HWND hwndT,IGSFunctioNater *pIFunction,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
+   ContainedFunction::ContainedFunction(G* pp,ULONG_PTR pID,HWND hwndT,IGSFunctioNater *pIFunction,IUnknown* pIUnknownObject,REFIID riidEventsInterface) : 
       plotID(pID),
       pIGSFunctioNater(pIFunction),
       ContainedObject(pp,hwndT,pIUnknownObject,riidEventsInterface) {};

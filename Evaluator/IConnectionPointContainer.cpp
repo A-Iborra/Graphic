@@ -94,8 +94,8 @@
 
       IEvaluatorEvents* pIEvaluatorEvents = reinterpret_cast<IEvaluatorEvents*>(connectData.pUnk);
 
-      BSTR bstrVariableName = SysAllocStringLen(NULL,strlen(varName) + 1); 
-      MultiByteToWideChar(CP_ACP,0,varName,-1,bstrVariableName,strlen(varName) + 1);
+      BSTR bstrVariableName = SysAllocStringLen(NULL,(DWORD)strlen(varName) + 1); 
+      MultiByteToWideChar(CP_ACP,0,varName,-1,bstrVariableName,(DWORD)strlen(varName) + 1);
 
       pIEvaluatorEvents -> UnknownVariable(bstrVariableName);
 
@@ -123,8 +123,8 @@
 
       IEvaluatorEvents* pIEvaluatorEvents = reinterpret_cast<IEvaluatorEvents*>(connectData.pUnk);
 
-      BSTR bstrFunctionName = SysAllocStringLen(NULL,strlen(funName) + 1); 
-      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,strlen(funName) + 1);
+      BSTR bstrFunctionName = SysAllocStringLen(NULL,(DWORD)strlen(funName) + 1); 
+      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,(DWORD)strlen(funName) + 1);
 
       pIEvaluatorEvents -> UnknownFunction(bstrFunctionName);
  
@@ -152,8 +152,8 @@
 
       IEvaluatorEvents* pIEvaluatorEvents = reinterpret_cast<IEvaluatorEvents*>(connectData.pUnk);
 
-      BSTR bstrFunctionName = SysAllocStringLen(NULL,strlen(funName) + 1); 
-      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,strlen(funName) + 1);
+      BSTR bstrFunctionName = SysAllocStringLen(NULL,(DWORD)strlen(funName) + 1); 
+      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,(DWORD)strlen(funName) + 1);
 
       pIEvaluatorEvents -> MathError(bstrFunctionName,argument);
  
@@ -229,8 +229,8 @@
 
       IEvaluatorEvents* pIEvaluatorEvents = reinterpret_cast<IEvaluatorEvents*>(connectData.pUnk);
 
-      BSTR bstrFunctionName = SysAllocStringLen(NULL,strlen(funName) + 1); 
-      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,strlen(funName) + 1);
+      BSTR bstrFunctionName = SysAllocStringLen(NULL,(DWORD)strlen(funName) + 1); 
+      MultiByteToWideChar(CP_ACP,0,funName,-1,bstrFunctionName,(DWORD)strlen(funName) + 1);
 
       pIEvaluatorEvents -> InvalidArgument(bstrFunctionName,invalidValue);
  

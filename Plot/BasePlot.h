@@ -13,10 +13,11 @@
 #include "GSystem_i.h"
 #include "GraphicControl_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+
+#include "DataSet_i.h"
 
 #include "OpenGLImplementation_i.h"
 #include "Plot_i.h"
@@ -37,7 +38,7 @@
 
   protected:
 
-     STDMETHOD(Initialize)(IDataSet *,IOpenGLImplementation *,IEvaluator *,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*);
+     STDMETHOD(Initialize)(IDataSet *,void *pvIOpenGLImplementation,IEvaluator *,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*);
 
      STDMETHOD(Erase)();
      STDMETHOD(AddText)(void *text,char *name,int id);

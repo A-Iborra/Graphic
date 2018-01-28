@@ -31,13 +31,13 @@
 
       holdEquationUpdate = true;
 
-      long currentSelection = SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
+      long currentSelection = (long)SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
 
       p -> pIPropertyExpression -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_PROPERTIES_EQUATION_ENTRY);
       p -> pIPropertyExpressionLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_EXPRESSION_LABEL);
       p -> pIPropertyResultsLabel -> setWindowItemText(p -> hwndProperties,IDDI_FUNCTION_RESULT_LABEL);
 
-      long newSelection = SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
+      long newSelection = (long)SendMessage(p -> hwndVariablesTab,TCM_GETCURSEL,0L,0L);
 
       NMHDR notifyHeader = {0};
 
@@ -91,7 +91,7 @@
                BSTR bstrName;
                long n;
                pManuallyAddedVariable -> get_Name(&bstrName);
-               char* pszName = new char[n = (wcslen(bstrName) + 1)];
+               char* pszName = new char[n = ((DWORD)wcslen(bstrName) + 1)];
                memset(pszName,0,n);
                WideCharToMultiByte(CP_ACP,0,bstrName,-1,pszName,n,0,0);
                if ( CB_ERR == SendDlgItemMessage(hwnd,IDDI_FUNCTION_PROPERTIES_VARIABLES,CB_FINDSTRINGEXACT,-1L,(LPARAM)pszName) )

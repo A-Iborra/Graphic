@@ -42,7 +42,7 @@
 
       SIZEL sizelFunctionsUI{0,0};
 
-      long functionCount = SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L);
+      long functionCount = (long)SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L);
 
       for ( int k = 0; k < functionCount; k++ ) {
 
@@ -76,7 +76,7 @@
 
       }
 
-      long dataSetCount = SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEMCOUNT,0L,0L);
+      long dataSetCount = (long)SendMessage(p -> hwndDataSourcesDataSets,TCM_GETITEMCOUNT,0L,0L);
 
       SIZEL sizelDataSetsUI{0,0};
 
@@ -112,7 +112,7 @@
       if ( 0 < dataSetCount )
          SetWindowPos(p -> hwndDataSourcesDataSets,HWND_TOP,8,32,sizelDataSetsUI.cx + 16,min(cy - 74,sizelDataSetsUI.cy + 32),SWP_NOREDRAW);
 
-      long countTabs = SendMessage(p -> hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L);
+      long countTabs = (long)SendMessage(p -> hwndDataSourcesTab,TCM_GETITEMCOUNT,0L,0L);
 
       long functionTabIndex = -1;
       long dataSetTabIndex = -1;
@@ -183,7 +183,7 @@
       if ( ! ( TCN_SELCHANGE == pn -> code ) && ! ( TCN_SELCHANGING == pn -> code ) )
          break;
 
-      int k = SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
+      int k = (long)SendMessage(pn -> hwndFrom,TCM_GETCURSEL,0,0);
 
       if ( -1 == k )
          break;
@@ -211,7 +211,7 @@
 
       if ( ! ( NULL == hwndTab ) ) {
 
-         long currentIndex = SendMessage(hwndTab,TCM_GETCURSEL,0L,0L);
+         long currentIndex = (long)SendMessage(hwndTab,TCM_GETCURSEL,0L,0L);
 
          if ( -1 == currentIndex )
             break;

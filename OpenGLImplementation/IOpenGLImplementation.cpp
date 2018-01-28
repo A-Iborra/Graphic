@@ -320,7 +320,8 @@ Sleep(10);
  
 
    HRESULT OpenGLImplementor::Erase(IGProperty *pPropBackgroundColor) {
-   if ( ! plotWindow ) return E_FAIL;
+   if ( ! plotWindow ) 
+      return E_FAIL;
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_ERASE,pPropBackgroundColor)
    return S_OK;
    }

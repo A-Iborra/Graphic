@@ -41,7 +41,7 @@
   
    RegisterClass(&gClass);
 
-   hwndFrame = CreateWindowEx(0L,L"Graphic-Host",L"InnoVisioNate Graphic Host",WS_OVERLAPPEDWINDOW | WS_VISIBLE,0,0,1600,1024,NULL,NULL,hInstance,NULL);
+   hwndFrame = CreateWindowEx(0L,L"Graphic-Host",L"InnoVisioNate Graphic Host",WS_OVERLAPPEDWINDOW,0,0,0,0,NULL,NULL,hInstance,NULL);
 
    MSG msg;
    while ( GetMessage(&msg,NULL,0L,0L) ) {

@@ -2,12 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "Graphic.h"
-#include <stdio.h>
+#include "Plot.h"
 
-   LRESULT CALLBACK G::textHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+#include "Graphic_resource.h"
 
-   G *p = (G *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+#include "List.cpp"
+
+   static char szTemp[MAX_PROPERTY_SIZE];
+
+   LRESULT CALLBACK Plot::textHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
+
+   Plot *p = (Plot *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
    switch ( msg ) {
 
@@ -15,29 +20,32 @@
 
       PROPSHEETPAGE *pPage = (PROPSHEETPAGE *)lParam;
 
-      p = (G *)pPage -> lParam;
+      p = (Plot *)pPage -> lParam;
 
       SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
       p -> hwndTextSettings = hwnd;
 
-      char szTemp[128];
+      if ( ! hwndSampleGraphic )
+         hwndSampleGraphic = CreateWindowEx(WS_EX_CLIENTEDGE,"plot-sample-graphic","",WS_CHILD,0,0,0,0,hwnd,NULL,hModule,(void *)p);
+
+      p -> propertyName -> setWindowItemText(hwnd,IDDI_PLOT_TEXT_PLOT_NAME);
 
       sprintf(szTemp,"There are %ld text components defined",p -> textList.Count());
 
-      SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_COUNT),szTemp);
+      SetWindowText(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_COUNT),szTemp);
 
       RECT rect;
 
       LVCOLUMN lvColumn;
       LVITEM lvItem;
-      GetWindowRect(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_LIST),&rect);
+      GetWindowRect(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_LIST),&rect);
       memset(&lvColumn,0,sizeof(LVCOLUMN));
       lvColumn.mask = LVCF_TEXT | LVCF_WIDTH;
       lvColumn.fmt = LVCFMT_LEFT;
       lvColumn.cx = rect.right - rect.left - 4;
       lvColumn.pszText = "Text";
-      SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_INSERTCOLUMN,0,(LPARAM)&lvColumn);
+      SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_INSERTCOLUMN,0,(LPARAM)&lvColumn);
 
       IText *pIText = NULL;
 
@@ -48,7 +56,6 @@
          pIText -> get_Text(&bstrName);
 
          long n = min(MAX_PATH,(DWORD)wcslen(bstrName));
-         char szTemp[MAX_PATH];
          memset(szTemp,0,sizeof(szTemp));
          if ( 0 == n )
             strcpy(szTemp,"<nocontent>");
@@ -63,43 +70,86 @@
          lvItem.pszText = szTemp;
          lvItem.lParam = (LPARAM)pIText;
 
-         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
 
       }
 
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_EDIT),FALSE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_DELETE),FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_EDIT),FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_DELETE),FALSE);
 
       }
-      return LRESULT(FALSE);
 
-   case WM_NOTIFY:
-      switch ( wParam ) {
-      case IDDI_GRAPHIC_TEXTS_LIST: {
-         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
-         }
+      return (LRESULT)0L;
+
+   case WM_DESTROY:
+      hwndSampleGraphic = NULL;
+      break;
+
+   case WM_SHOWWINDOW: {
+
+      if ( ! wParam )
          break;
+
+      if ( lParam )
+         break;
+
+      HWND hwndSampleParent = GetParent(hwndSampleGraphic);
+
+      if ( ! ( hwndSampleParent == hwnd ) ) {
+ 
+         SetParent(hwndSampleGraphic,hwnd);
+
+         RECT rcSample,rcDialog,rcBox;
+
+         GetWindowRect(hwnd,&rcDialog);
+
+         GetWindowRect(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_DRAG_INSTRUCTIONS),&rcBox);
+
+         rcSample.left = 10;
+         rcSample.top = rcBox.bottom - rcDialog.top + 2;
+         rcSample.right = rcSample.left + (rcDialog.right - rcDialog.left) - 20;
+         rcSample.bottom = rcSample.top + (rcDialog.bottom - rcBox.bottom) - 4;
+
+         SendMessage(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,0L,(LPARAM)&rcSample);
+
+      }
+
+      sprintf(szTemp,"There are %ld text components defined",p -> textList.Count());
+
+      SetWindowText(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_COUNT),szTemp);
+
+      long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+      long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+      EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_PLOT_TEXTS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
+
       }
       break;
+
+   case WM_NOTIFY:
+      textHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+      break;
  
-   case WM_COMMAND:
+   case WM_COMMAND: {
+         
+      long notifyCode = HIWORD(wParam);
 
       switch ( LOWORD(wParam) ) {
 
-      case IDDI_GRAPHIC_TEXTS_ADD: {
+      case IDDI_PLOT_TEXT_PLOT_NAME:
+         if ( ! ( EN_CHANGE == notifyCode ) )
+            return (LRESULT)0L;
+         p -> propertyName -> getWindowItemText(hwnd,IDDI_PLOT_TEXT_PLOT_NAME);
+         break;
+
+      case IDDI_PLOT_TEXTS_ADD: {
 
          IText *pIText = p -> newText();
          IUnknown* pIUnknown;
          pIText -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-         p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
+         p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
          pIUnknown -> Release();
 
-         //G::sampleGraphicHandler(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,0L,(LPARAM)NULL);
-
-         char szTemp[MAX_PROPERTY_SIZE];
          BSTR bstrExpression;
          pIText -> get_Text(&bstrExpression);
          memset(szTemp,0,sizeof(szTemp));
@@ -117,20 +167,17 @@
          lvItem.stateMask = -1;
          lvItem.pszText = szTemp;
          lvItem.lParam = (LPARAM)pIText;
-         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
 
-         sprintf(szTemp,"There are %ld text components defined",p -> textList.Count());
-         SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_COUNT),szTemp);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_EDIT),TRUE);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_DELETE),TRUE);
+         InvalidateRect(hwndSampleGraphic,NULL,TRUE);
 
          }
          break;
 
-      case IDDI_GRAPHIC_TEXTS_EDIT: {
+      case IDDI_PLOT_TEXTS_EDIT: {
 
-         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
          LVITEM lvItem;
 
          if ( ! itemCount ) {
@@ -152,20 +199,17 @@
             lvItem.iItem = k;
             lvItem.mask = LVIF_STATE | LVIF_PARAM;
             lvItem.stateMask = LVIS_SELECTED;
-            SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETITEM,0L,(LPARAM)&lvItem);
+            SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETITEM,0L,(LPARAM)&lvItem);
 
             if ( lvItem.state && LVIS_SELECTED ) {
 
-               char szTemp[MAX_PROPERTY_SIZE];
                BSTR bstr;
                IText *pIText = (IText *)lvItem.lParam;
 
                IUnknown* pIUnknown;
                pIText -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
-               p -> pIGProperties -> ShowProperties(hwnd,pIUnknown);
+               p -> pIProperties -> ShowProperties(hwnd,pIUnknown);
                pIUnknown -> Release();
-
-              // G::sampleGraphicHandler(hwndSampleGraphic,WMG_POSITION_SAMPLE_GRAPHIC,1L,(LPARAM)NULL);
 
                lvItem.mask = LVIF_TEXT;
                lvItem.pszText = szTemp;
@@ -175,22 +219,23 @@
                WideCharToMultiByte(CP_ACP,0,bstr,MAX_PROPERTY_SIZE,szTemp,MAX_PROPERTY_SIZE,0,0);
                SysFreeString(bstr);
 
-               SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_SETITEM,0L,(LPARAM)&lvItem);
+               SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_SETITEM,0L,(LPARAM)&lvItem);
 
                break;
             }
 
          }
 
+         InvalidateRect(hwndSampleGraphic,NULL,TRUE);
+
          }
          break;
 
-      case IDDI_GRAPHIC_TEXTS_DELETE: {
+      case IDDI_PLOT_TEXTS_DELETE: {
 
          LVITEM lvItem;
-         char szTemp[MAX_PROPERTY_SIZE];
-         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any components to delete.","Note",MB_OK);
             break;
@@ -202,7 +247,8 @@
          long response = IDYES;
          if ( 1 < selectedCount ) 
             response = MessageBox(GetParent(hwnd),"Are you sure you want to delete the selected text components?","Note",MB_YESNO | MB_DEFBUTTON2);
-         if ( IDNO == response )
+
+         if ( IDNO == response ) 
             break;
 
          List<int> toDelete;
@@ -213,7 +259,7 @@
          lvItem.cchTextMax = MAX_PROPERTY_SIZE;
          for ( int k = 0; k < itemCount; k++ ) {
             lvItem.iItem = k;
-            SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETITEM,0L,(LPARAM)&lvItem);
+            SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_GETITEM,0L,(LPARAM)&lvItem);
             if ( lvItem.state && LVIS_SELECTED ) {
                if ( 1 == selectedCount ) {
                   char szPrompt[MAX_PROPERTY_SIZE];
@@ -229,17 +275,12 @@
 
          int* pi;
          while ( pi = toDelete.GetLast() ) {
-            SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_DELETEITEM,(WPARAM)*pi,0L);
+            SendDlgItemMessage(hwnd,IDDI_PLOT_TEXTS_LIST,LVM_DELETEITEM,(WPARAM)*pi,0L);
             toDelete.Remove(pi);
             delete pi;
          }
 
-         selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_TEXTS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-
-         sprintf(szTemp,"There are %ld text components defined",p -> textList.Count());
-         SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_COUNT),szTemp);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_EDIT),0 < p -> textList.Count() ? TRUE : FALSE);
-         EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_TEXTS_DELETE),0 < p -> textList.Count() && 0 < selectedCount ? TRUE : FALSE);
+         InvalidateRect(hwndSampleGraphic,NULL,TRUE);
 
          }
          break;
@@ -249,9 +290,14 @@
 
       }
 
+      textHandler(hwnd,WM_SHOWWINDOW,1L,0L);
+
+      }
+      return (LRESULT)0L;
+ 
    default:
       break;
    }
-
-   return LRESULT(FALSE);
+ 
+   return (LRESULT)0L;
    }

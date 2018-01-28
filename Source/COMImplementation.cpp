@@ -70,9 +70,9 @@
       hModule = reinterpret_cast<HMODULE>(module);
 
       GetModuleFileName(hModule,szModuleName,1024);
-      bstrModuleName = SysAllocStringLen(NULL,strlen(szModuleName) + 1);
+      bstrModuleName = SysAllocStringLen(NULL,(DWORD)strlen(szModuleName) + 1);
       memset(bstrModuleName,0,(strlen(szModuleName) + 1) * sizeof(OLECHAR));
-      MultiByteToWideChar(CP_ACP,0,szModuleName,-1,bstrModuleName,strlen(szModuleName));
+      MultiByteToWideChar(CP_ACP,0,szModuleName,-1,bstrModuleName,(DWORD)strlen(szModuleName));
  
       ITypeLib *ptLib;
       LoadTypeLib(bstrModuleName,&ptLib);
@@ -86,7 +86,7 @@
       sprintf(szLibrary,"%s\\%ld",szModuleName,(long)FUNCTION_TYPELIB_ID);
       BSTR bstrLibrary = SysAllocStringLen(NULL,256);
       memset(bstrLibrary,0,strlen(szLibrary) + 1);
-      MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,strlen(szLibrary) + 1);
+      MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,(DWORD)strlen(szLibrary) + 1);
 
       LoadTypeLib(bstrLibrary,&ptLib);
       hr = ptLib -> GetTypeInfoOfGuid(DIID_IGSFunctioNaterEvents,&pITypeInfo_IGSFunctioNaterEvents);
@@ -208,7 +208,7 @@ CLSID OBJECT_CLSID[] = {CLSID_GSystemGraphicPropertiesPosSize,
    sprintf(szLibrary,"%s\\%ld",szModuleName,(long)GSYSTEMS_TYPELIB_ID);
    BSTR bstrLibrary = SysAllocStringLen(NULL,256);
    memset(bstrLibrary,0,strlen(szLibrary) + 1);
-   MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,strlen(szLibrary) + 1);
+   MultiByteToWideChar(CP_ACP,0,szLibrary,-1,bstrLibrary,(DWORD)strlen(szLibrary) + 1);
    utilsDllRegisterTypeLib(bstrLibrary);
    utilsDllRegisterObject(CLSID_GSystems,LIBID_GSystems,hModule,szModuleName,"InnoVisioNate Graphic Common Definitions Type Library","InnoVisioNate.GraphicCommonDefinitions","InnoVisioNate.GraphicCommonDefinitions.1",
                                     (CATID *)NULL,0,oleMisc,false,false,true);

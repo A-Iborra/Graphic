@@ -55,7 +55,7 @@
       memset(&tie,0,sizeof(TC_ITEM));
       tie.mask = TCIF_TEXT; 
       tie.pszText = name;
-      tie.cchTextMax = strlen(name);
+      tie.cchTextMax = (DWORD)strlen(name);
       SendMessage(hwndTabControl,TCM_SETITEM,(WPARAM)tabIndex,(LPARAM)&tie);
    }
 

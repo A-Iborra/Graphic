@@ -82,12 +82,12 @@
          SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_EXPORT_CELL,p -> szExportWorksheetTopLeftCell);
    
       if ( ! p -> isFunction ) {
-         LoadString(hModule,IDSTRING_DATASET_DATASOURCE_EMBED_INSTRUCTIONS,szTemp,512);
+         LoadString(hModule,IDSTRING_DATASET_DATASOURCE_EMBED_INST,szTemp,512);
          SetDlgItemText(hwnd,IDDI_DATASET_DATASOURCE_EMBED_INSTRUCTIONS,szTemp);
          SendMessage(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_IS_EMBEDDED),BM_SETCHECK,(WPARAM)(p -> isEmbedded ? BST_CHECKED : BST_UNCHECKED),0L);
          EnableWindow(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE),p -> isEmbedded ? TRUE : FALSE);
       } else {
-         ShowWindow(GetDlgItem(hwnd,IDSTRING_DATASET_DATASOURCE_EMBED_INSTRUCTIONS),SW_HIDE);
+         ShowWindow(GetDlgItem(hwnd,IDSTRING_DATASET_DATASOURCE_EMBED_INST),SW_HIDE);
          ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_IS_EMBEDDED),SW_HIDE);
          ShowWindow(GetDlgItem(hwnd,IDDI_DATASET_DATASOURCE_EMBEDDED_UPDATE),SW_HIDE);
       }
@@ -322,7 +322,7 @@
          memset(szFile,0,sizeof(szFile));
                      
          sprintf(szFilter,"Excel files");
-         long k = strlen(szFilter) + sprintf(szFilter + strlen(szFilter) + 1,"*.xl*");
+         long k = (DWORD)strlen(szFilter) + sprintf(szFilter + (DWORD)strlen(szFilter) + 1,"*.xl*");
          k = k + sprintf(szFilter + k + 2,"All Files");
          sprintf(szFilter + k + 3,"*.*");
                      

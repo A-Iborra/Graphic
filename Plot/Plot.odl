@@ -16,7 +16,6 @@ import "oaidl.idl";
 library Plot { 
 
    importlib(STDOLE_TLB); 
-   importlib(STDTYPE_TLB);
 
    importlib("Properties.tlb");
    importlib("GSystem.tlb");
@@ -43,6 +42,7 @@ library Plot {
       [helpstring("After receiving a call to Selector and if you return S_OK from that call, you will recieve this call if the user is moving the mouse with the button still down from that selection")]
       HRESULT MouseMove(POINT* ptMouse);
       HRESULT MouseRelease();
+      HRESULT DefaultAction();
 
    };
 
@@ -52,7 +52,7 @@ library Plot {
    ] 
    interface IGraphicSegment : IUnknown {
 
-     HRESULT Initialize(IOpenGLImplementation *openGLImplementation,IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight);
+     HRESULT Initialize(void *pvOpenGLImplementation,IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight);
 
      [propget,helpstring("")]
      HRESULT SegmentID([out,retval] long* getID);
@@ -135,7 +135,8 @@ library Plot {
      HRESULT Create([out,retval]long *segmentID);
      HRESULT Destroy();
 
-     HRESULT Initialize(IDataSet *pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
+     HRESULT Initialize(IDataSet *pIDataSet_Domain,
+                           void *pvIOpenGLImplementation,IEvaluator *pIEvaluator,
                            IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                            IGProperty *pIPropertyXFloor,IGProperty *pIPropertyXCeiling,
                            IGProperty *pIPropertyYFloor,IGProperty *pIPropertyYCeiling,
@@ -272,7 +273,9 @@ library Plot {
      [hidden]
      HRESULT GetSegments([in]long *pSegmentArray);
 
-     HRESULT Initialize(IDataSet* pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,IEvaluator *pIEvaluator,
+     HRESULT GetTextList([out,retval] void **getList);
+
+     HRESULT Initialize(IDataSet* pIDataSet_Domain,void *pvIOpenGLImplementation,IEvaluator *pIEvaluator,
                            IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                            IGProperty *parentPropertyPlotView,
                            IGProperty *parentPropertyDefault2DPlotSubType,
@@ -303,6 +306,10 @@ library Plot {
      HRESULT Draw();
 
      HRESULT Redraw();
+
+     HRESULT DrawOpenGLText();
+
+     HRESULT DrawGDIText();
 
      HRESULT Erase();
 

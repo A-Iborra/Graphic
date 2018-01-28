@@ -17,7 +17,6 @@ import "ocidl.idl";
    library FunctioNater {
 
    importlib(STDOLE_TLB); 
-   importlib(STDTYPE_TLB);
 
    importlib("Properties.tlb");
    importlib("GSystem.tlb");
@@ -270,10 +269,12 @@ import "ocidl.idl";
       [propput,id(401)] HRESULT IDataSet([in] void *pIDataSet);
       [propget,id(401)] HRESULT IDataSet([out,retval] void **ppIDataSet);
 
-      [id(402),helpstring("IF you want the Function to create it's own plot, rather than have an existing one created by it's client, call Initialize to pass the plot parameters to the IPlot the Function will create.")]
 
-      HRESULT Initialize(IDataSet *pIDataSet_Domain,IOpenGLImplementation *pIOpenGLImplementation,
-                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
+      [id(402),helpstring("IF you want the Function to create it's own plot, rather than have an existing one created by it's client, call Initialize to pass the plot parameters to the IPlot the Function will create.")]
+      HRESULT Initialize(IDataSet *pIDataSet_Domain,
+                           void *pIOpenGLImplementation, // WHY IN THE FUCK CAN I NOT GET ENOUGH DIAGNOSTIC INFORMATION FROM THE FUCKING MIDL COMPILER TO FIGURE OUT WHY IT CANNOT SEE THIS INTERFACE ?!?!?!?!?!?!?!
+                           IGProperty* pIPropertyLineColor,
+                           IGProperty* pIPropertyLineWeight,
                            IGProperty *parentPropertyPlotView,
                            IGProperty *parentPropertyDefault2DPlotSubType,
                            IGProperty *parentPropertyDefault3DPlotSubType,
@@ -282,6 +283,7 @@ import "ocidl.idl";
                            IGProperty *parentPropertyYFloor,IGProperty *parentPropertyYCeiling,
                            IGProperty *parentPropertyZFloor,IGProperty *parentPropertyZCeiling,
                            [in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);
+
 
       [helpstring("Set a callback the Function can use when something has changed so the client can act accordingly. At some point, IPropertyNotifyChanged events would be implemented.")]
       [propput,id(403)] HRESULT OnChangeCallback([in] void (*pCallback)(void *,ULONG_PTR),[in] void *pArg,[in] ULONG_PTR callbackCookie);

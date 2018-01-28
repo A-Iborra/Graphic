@@ -10,17 +10,16 @@
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+
+#include "DataSet_i.h"
 
 #include "OpenGLImplementation_i.h"
 
 #include "plot_i.h"
 #include "text_i.h"
-
-#include "graphics_commands.h"
 
 #include "list.h"
 #include "General.h"
@@ -153,7 +152,7 @@
 
      STDMETHOD(put_TextNotify)(ITextNotify *);
 
-     STDMETHOD(Initialize)(HWND hwndOwner,IOpenGLImplementation *,IEvaluator *,IDataSet *,
+     STDMETHOD(Initialize)(IOpenGLImplementation *,IEvaluator *,IDataSet *,
                               IGProperty *pPropXFloor,IGProperty* pPropXCeiling,
                               IGProperty *pPropYFloor,IGProperty* pPropYCeiling,
                               IGProperty *pPropZFloor,IGProperty* pPropZCeiling,
@@ -256,6 +255,7 @@
      STDMETHOD(RightMouse)();
      STDMETHOD(MouseMove)(POINT* ptMouse);
      STDMETHOD(MouseRelease)();
+     STDMETHOD(DefaultAction)();
 
   private:
 
@@ -313,7 +313,6 @@
      HCURSOR moveCursor;
      LOGFONT logicalFont;
 
-     HWND hwndOwner;
      HWND hwndFrame;
      HWND hwndObjectWindow,hwndSample,hwndStyle,hwndContent,hwndOrientation;
 
@@ -322,6 +321,7 @@
      HBITMAP hbmBoundingBoxBackground{NULL};
      RECT rcOnScreen{0,0,0,0};
      RECT rcSavedBoundingBox{0,0,0,0};
+     RECT rcFallBackBoundingBox{0,0,0,0};
 
      TextFormat format;
      CoordinatePlane coordinatePlane;

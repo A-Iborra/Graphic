@@ -7,6 +7,9 @@
 #include "list.cpp"
 #include "utils.h"
 
+// See also in OpenGLImplementation:
+#define SUPPORTED_LIGHT_COUNT    8
+
 #define ENABLE_WINDOWS(enabled) {                                                        \
          EnableWindow(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_RED),enabled);                  \
          EnableWindow(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_GREEN),enabled);                \
@@ -172,17 +175,17 @@
       SendDlgItemMessage(hwnd,IDDI_LIGHT_SPECULAR_GREEN_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
       SendDlgItemMessage(hwnd,IDDI_LIGHT_SPECULAR_BLUE_SPIN,UDM_SETRANGE,0,MAKELONG(100,0));
  
-      SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWL_USERDATA,(long)p);
-      SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_DIFFUSE_BACKGROUND),GWL_USERDATA,(long)p);
-      SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_SPECULAR_BACKGROUND),GWL_USERDATA,(long)p);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_DIFFUSE_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_SPECULAR_BACKGROUND),GWLP_USERDATA,(ULONG_PTR)p);
  
       if ( ! p -> defaultPatchPainter ) 
-         p -> defaultPatchPainter = (WNDPROC)SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
+         p -> defaultPatchPainter = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
       else
-         SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
+         SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_AMBIENT_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
  
-      SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_DIFFUSE_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
-      SetWindowLong(GetDlgItem(hwnd,IDDI_LIGHT_SPECULAR_BACKGROUND),GWL_WNDPROC,(LONG)patchPainterProc);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_DIFFUSE_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
+      SetWindowLongPtr(GetDlgItem(hwnd,IDDI_LIGHT_SPECULAR_BACKGROUND),GWLP_WNDPROC,(ULONG_PTR)patchPainterProc);
 
       GetWindowText(GetDlgItem(hwnd,IDDI_LIGHT_POS_X_EVALED),szPositionFormat,64);
  
@@ -289,7 +292,7 @@
       if ( pn -> hdr.code != UDN_DELTAPOS ) break;
       if ( pn -> hdr.idFrom < (unsigned int)IDDI_LIGHT_AMBIENT_RED_SPIN || pn -> hdr.idFrom > (unsigned int)IDDI_LIGHT_SPECULAR_BLUE_SPIN ) 
          break;
-      int k = pn -> hdr.idFrom - IDDI_LIGHT_AMBIENT_RED_SPIN;
+      int k = (int)pn -> hdr.idFrom - IDDI_LIGHT_AMBIENT_RED_SPIN;
       HWND hwndEdit,hwndBackground;
       char szTemp[32];
       float x;
@@ -337,7 +340,7 @@
       if ( x >= 0.0f && x <= 1.0 ) {
          sprintf(szTemp,"%3.1f",x);
          SetWindowText(hwndEdit,szTemp);
-         int j = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+         int j = (int)SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
          GET_VALUES(j)
          RECT rect,rect2;
          GetWindowRect(hwndBackground,&rect);
@@ -363,7 +366,7 @@
       switch ( LOWORD(wParam) ) {
       case IDDI_LIGHT_ENABLED:
          if ( notifyCode == BN_CLICKED ) {
-            int k = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+            int k = (int)SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
             p -> ppPropertyLightOn[k] -> getWindowItemChecked(hwnd,IDDI_LIGHT_ENABLED);
             if ( SendMessage((HWND)lParam,BM_GETCHECK,0,0) != BST_CHECKED ) {
                ENABLE_WINDOWS(FALSE);
@@ -378,7 +381,7 @@
       case IDDI_LIGHT_POS_Z: 
          if ( notifyCode == EN_CHANGE ) {
              if ( holdUpdates ) break;
-             int k = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+             int k = (int)SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
              GET_VALUES(k)
              holdUpdates = true;
              SET_WINDOWS(k,LOWORD(wParam));
@@ -390,7 +393,7 @@
       case IDDI_LIGHT_DIFFUSE_CHOOSE:
       case IDDI_LIGHT_SPECULAR_CHOOSE: {
          IGProperty *pp;
-         int k = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+         int k = (int)SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
          HWND hwndBackground;
          switch ( LOWORD(wParam) ) {
          case IDDI_LIGHT_AMBIENT_CHOOSE:
@@ -460,7 +463,7 @@
          switch ( notifyCode ) {
          case EN_CHANGE: {
             if ( holdUpdates ) break;
-            int k = SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
+            int k = (int)SendMessage(GetDlgItem(hwnd,IDDI_CHOOSE_LIGHT_NO),SBM_GETPOS,0,0);
             GET_VALUES(k)
             RECT rect,rect2;
             HWND hwndBackground;

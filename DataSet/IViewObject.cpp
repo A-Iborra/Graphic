@@ -7,7 +7,7 @@
 
    STDMETHODIMP DataSet::Draw(DWORD dvAspect,long index,void *pvAspect,DVTARGETDEVICE *ptd,
                           HDC hicTarget,HDC hdcDraw,const struct _RECTL *rectlClient,
-                          const struct _RECTL *rectlMetaFile,int (__stdcall *cancelFunction)(DWORD),DWORD cancelParameter) {
+                          const struct _RECTL *rectlMetaFile,int (__stdcall *cancelFunction)(ULONG_PTR),ULONG_PTR cancelParameter) {
  
 #if 0
    if ( dvAspect != DVASPECT_CONTENT ) return S_OK;

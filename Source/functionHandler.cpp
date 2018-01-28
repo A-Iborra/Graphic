@@ -50,7 +50,7 @@
          long n;
          BSTR bstrExpression;
          pIFunction -> get_Expression(&bstrExpression);
-         char* pszTemp = new char[n = wcslen(bstrExpression) + 1];
+         char* pszTemp = new char[n = (DWORD)wcslen(bstrExpression) + 1];
          memset(pszTemp,0,n);
          WideCharToMultiByte(CP_ACP,0,bstrExpression,n,pszTemp,n,0,0);
          SysFreeString(bstrExpression);
@@ -59,7 +59,7 @@
          lvItem.state = LVIS_SELECTED;
          lvItem.stateMask = -1;
          lvItem.pszText = pszTemp;
-         lvItem.lParam = reinterpret_cast<long>(pIFunction);
+         lvItem.lParam = (LPARAM)pIFunction;
          SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
       }
 
@@ -74,8 +74,8 @@
    case WM_NOTIFY:
       switch ( wParam ) {
       case IDDI_GRAPHIC_FUNCTIONS_LIST: {
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
          }
@@ -108,7 +108,7 @@
             lvItem.state = LVIS_SELECTED;
             lvItem.stateMask = -1;
             lvItem.pszText = szTemp;
-            lvItem.lParam = reinterpret_cast<long>(pFunction);
+            lvItem.lParam = (LPARAM)pFunction;
             SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
             sprintf(szTemp,"There are %ld functions defined",p -> functionList.Count());
             SetWindowText(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_COUNT),szTemp);
@@ -118,7 +118,7 @@
             while ( pf = p -> containedFunctionList.GetNext(pf) )
                ShowWindow(pf -> HWNDSite(),SW_HIDE);
             SendMessage(p -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)(SendMessage(p -> hwndDataSourcesFunctions,TCM_GETITEMCOUNT,0L,0L) - 1),0L);
-            pf = p -> containedFunctionList.Get(reinterpret_cast<long>(pFunction));
+            pf = p -> containedFunctionList.Get((ULONG_PTR)pFunction);
             ShowWindow(pf -> HWNDSite(),SW_SHOW);
          } else {
             p -> deleteFunction(pFunction);
@@ -127,8 +127,8 @@
          break;
 
       case IDDI_GRAPHIC_FUNCTIONS_EDIT: {
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
          LVITEM lvItem;
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any functions to edit.","Note",MB_OK);
@@ -172,8 +172,8 @@
       case IDDI_GRAPHIC_FUNCTIONS_DELETE: {
          LVITEM lvItem;
          char szTemp[MAX_PROPERTY_SIZE];
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any functions to delete.","Note",MB_OK);
             break;
@@ -227,8 +227,8 @@
       }
  
    case WM_PAINT: {
-      long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
-      long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+      long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETITEMCOUNT,0L,0L);
+      long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_FUNCTIONS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
       EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_FUNCTIONS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
       }

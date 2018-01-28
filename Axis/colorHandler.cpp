@@ -149,7 +149,7 @@
 
          p -> Draw();
 
-         SetWindowLong(hwnd,DWL_MSGRESULT,PSNRET_NOERROR);
+         SetWindowLongPtr(hwnd,DWLP_MSGRESULT,PSNRET_NOERROR);
 
          }
          break;
@@ -181,7 +181,7 @@
             }
          }
 
-         int k = pn -> hdr.idFrom - spinIndex;
+         int k = (int)pn -> hdr.idFrom - spinIndex;
          HWND hwndEdit;
          char szTemp[32];
          float x;

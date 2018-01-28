@@ -11,16 +11,17 @@
 
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+
+#include "DataSet_i.h"
 
 #include "OpenGLImplementation_i.h"
 
 #include "Plot_i.h"
 
-#include "graphics_commands.h"
+#define SUPPORTED_LIGHT_COUNT  8
 
    class OpenGLImplementor;
  
@@ -391,7 +392,7 @@
  
 //      IViewObject
  
-      STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(unsigned long),unsigned long);
+      STDMETHOD(Draw)(unsigned long,long,void *,DVTARGETDEVICE *,HDC,HDC,const struct _RECTL *,const struct _RECTL *,int (__stdcall *)(ULONG_PTR),ULONG_PTR);
       STDMETHOD(GetColorSet)(DWORD,long,void *,DVTARGETDEVICE *,HDC,LOGPALETTE **);
       STDMETHOD(Freeze)(DWORD,long,void *,DWORD *);
       STDMETHOD(Unfreeze)(DWORD);
@@ -487,6 +488,12 @@
    }
 #endif
 
+#ifdef _WIN64
+#define CALL_DEBUG DebugBreak();
+#else
+#define CALL_DEBUG _asm { int 3 }
+#endif
+
 #if defined(_DEBUG) 
 #define OPENGL_ERROR_CHECK    { \
    char szError[1024];                      \
@@ -496,7 +503,7 @@
       errorCode = MessageBox(NULL,szError,"OpenGL usage exception",MB_YESNOCANCEL); \
       if ( IDCANCEL == errorCode ) _exit(0);\
       if ( IDYES == errorCode ) {           \
-      _asm {   int 3   }                    \
+         CALL_DEBUG                         \
       }                                     \
    }                                        \
    }
@@ -513,7 +520,7 @@
       errorCode = MessageBox(NULL,szError,"Windows usage exception",MB_YESNOCANCEL); \
       if ( IDCANCEL == errorCode ) _exit(0);\
       if ( IDYES == errorCode ) {           \
-      _asm {   int 3   }                    \
+         CALL_DEBUG                         \
       }                                     \
    }                                        \
    }

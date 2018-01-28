@@ -44,7 +44,7 @@
    statusPosition();
 
    if ( ! moveCursor )
-      moveCursor = SetCursor(LoadCursor(NULL,MAKEINTRESOURCE(IDC_SIZEALL)));
+      moveCursor = SetCursor(LoadCursor(NULL,IDC_SIZEALL));
 
    pIOpenGLImplementation -> get_MousePositionClient(&ptSelectPoint);
 
@@ -115,14 +115,6 @@
 
    statusPosition();
 
-//HWND hwndOwner = NULL;
-//POINT ptCursor = {0};
-//GetCursorPos(&ptCursor);
-//hwndOwner = WindowFromPoint(ptCursor);
-//UpdateWindow(pIOpenGLImplementation->TargetHWND());
-//Beep(2000,100);
-Sleep(20);
-
    return S_OK;
    }
 
@@ -154,5 +146,20 @@ Sleep(20);
 
    Draw();
 
+   return S_OK;
+   }
+
+
+   HRESULT Text::DefaultAction() {
+   HWND hwndOwner = NULL;
+   POINT ptCursor = {0};
+   GetCursorPos(&ptCursor);
+   hwndOwner = WindowFromPoint(ptCursor);
+   IUnknown* pIUnknown;
+   QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknown));
+   pIProperties -> ShowProperties(hwndOwner ? hwndOwner : GetForegroundWindow(),pIUnknown);
+   pIUnknown -> Release();
+   if ( pWhenChangedCallback ) 
+      pWhenChangedCallback(pWhenChangedCallbackArg,whenChangedCallbackCookie);
    return S_OK;
    }

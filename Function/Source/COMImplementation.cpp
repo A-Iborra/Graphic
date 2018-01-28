@@ -53,9 +53,9 @@
       memset(szLibraryName,0,1024);
       sprintf(szLibraryName,"%s\\%d",szModuleName,FUNCTION_TYPELIB_ID);
 
-      BSTR bstrLibraryName = SysAllocStringLen(NULL,strlen(szLibraryName) + 1);
+      BSTR bstrLibraryName = SysAllocStringLen(NULL,(DWORD)strlen(szLibraryName) + 1);
 
-      MultiByteToWideChar(CP_ACP,0,szLibraryName,-1,bstrLibraryName,strlen(szLibraryName) + 1);  
+      MultiByteToWideChar(CP_ACP,0,szLibraryName,-1,bstrLibraryName,(DWORD)strlen(szLibraryName) + 1);  
  
       LoadTypeLib(bstrLibraryName,&ptLib);
       SysFreeString(bstrLibraryName);
@@ -67,18 +67,18 @@
       {
       char szEvaluatorLib[1026];
       sprintf(szEvaluatorLib,"%s\\%d",szModuleName,EVALUATOR_TYPELIB_ID);
-      BSTR bstrEvaluatorLib = SysAllocStringLen(NULL,strlen(szEvaluatorLib) + 1);
+      BSTR bstrEvaluatorLib = SysAllocStringLen(NULL,(DWORD)strlen(szEvaluatorLib) + 1);
       memset(bstrEvaluatorLib,0,(strlen(szEvaluatorLib) + 1) * sizeof(OLECHAR));
-      MultiByteToWideChar(CP_ACP,0,szEvaluatorLib,-1,bstrEvaluatorLib,strlen(szEvaluatorLib) + 1);
+      MultiByteToWideChar(CP_ACP,0,szEvaluatorLib,-1,bstrEvaluatorLib,(DWORD)strlen(szEvaluatorLib) + 1);
 
       LoadTypeLib(bstrEvaluatorLib,&ptLib);
       ptLib -> GetTypeInfoOfGuid(IID_IEvaluatorEvents,&pIEvaluatorEventsTypeInfo);
       SysFreeString(bstrEvaluatorLib);
       }
 
-      wstrModuleName = SysAllocStringLen(NULL,strlen(szModuleName) + 1);
+      wstrModuleName = SysAllocStringLen(NULL,(DWORD)strlen(szModuleName) + 1);
       memset(wstrModuleName,0,(strlen(szModuleName) + 1) * sizeof(OLECHAR));
-      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, strlen(szModuleName) + 1);  
+      MultiByteToWideChar(CP_ACP, 0, szModuleName, -1, wstrModuleName, (DWORD)strlen(szModuleName) + 1);  
 
       }
       break;
@@ -127,9 +127,6 @@
  
  
    STDAPI DllRegisterServer() {
-
-   HKEY hKey;                             
-   DWORD dwDisposition;
 
    utilsDllRegisterTypeLib(wstrModuleName);
 

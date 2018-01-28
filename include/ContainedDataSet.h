@@ -13,7 +13,7 @@
 
    public:
 
-      ContainedDataSet(G *pParent,long plotID,HWND hwndTab,IDataSet *pIDataSet,IUnknown* pIUnknownObject,REFIID riidEventsInterface);
+      ContainedDataSet(G *pParent,ULONG_PTR plotID,HWND hwndTab,IDataSet *pIDataSet,IUnknown* pIUnknownObject,REFIID riidEventsInterface);
 
       IDataSet *pDataSet() { return pIDataSet; };
 
@@ -30,7 +30,7 @@
 
   private:
 
-     long plotID;
+     ULONG_PTR plotID;
 
      IDataSet *pIDataSet;
 

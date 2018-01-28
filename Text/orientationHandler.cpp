@@ -129,12 +129,12 @@
             p -> coordinatePlane = CoordinatePlane_ZY;
             break;
          case IDDI_TEXT_FLIP_LR: {
-            long isChecked = SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_LR,BM_GETCHECK,0L,0L);
+            long isChecked = (long)SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_LR,BM_GETCHECK,0L,0L);
             p -> flipHorizontal = isChecked == BST_CHECKED ? TRUE : FALSE;
             }
             break;
          case IDDI_TEXT_FLIP_TB: {
-            long isChecked = SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_TB,BM_GETCHECK,0L,0L);
+            long isChecked = (long)SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_TB,BM_GETCHECK,0L,0L);
             p -> flipVertical = isChecked == BST_CHECKED ? TRUE : FALSE;
             }
             break;

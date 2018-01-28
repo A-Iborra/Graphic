@@ -13,12 +13,10 @@
    }
 
    if ( propertyDataSet ) {
-
       propertyDataSet -> clearStorageObjects();
       propertyDataSet -> addStorageObject(pIDataSet);
       propertyDataSet -> writeStorageObjects();
       propertyDataSet -> clearStorageObjects();
-
    }
 
    if ( propertyPlotTypesGlobal ) {
@@ -50,7 +48,7 @@
 
    SAFEARRAYBOUND rgsaBound[1];
    memset(rgsaBound,0,sizeof(SAFEARRAYBOUND));
-   rgsaBound[0].cElements = max(3,3 * plotType2DInstanceGUIDS.size());
+   rgsaBound[0].cElements = max(3,3 * (DWORD)plotType2DInstanceGUIDS.size());
    rgsaBound[0].lLbound = 0;
 
    SAFEARRAY *pArray = SafeArrayCreate(VT_BSTR,1,rgsaBound);
@@ -72,7 +70,6 @@
       pValues[k] = SysAllocString(szwType);
       k++;
 
-      BSTR bstr;
       StringFromCLSID(pair.second,&pValues[k]);
       k++;
 
@@ -98,7 +95,7 @@
    //SafeArrayDestroy(pArray);
 
    memset(rgsaBound,0,sizeof(SAFEARRAYBOUND));
-   rgsaBound[0].cElements = max(3,3 * plotType3DInstanceGUIDS.size());
+   rgsaBound[0].cElements = max(3,3 * (DWORD)plotType3DInstanceGUIDS.size());
    rgsaBound[0].lLbound = 0;
 
    pArray = SafeArrayCreate(VT_BSTR,1,rgsaBound);
@@ -118,7 +115,6 @@
       pValues[k] = SysAllocString(szwType);
       k++;
 
-      BSTR bstr;
       StringFromCLSID(pair.second,&pValues[k]);
       k++;
 
@@ -144,9 +140,19 @@
 
    void *pPlotTypeData = GlobalLock(hPlotTypeData);
 
-   propertyPlotTypesStorage -> put_binaryValue(GlobalSize(hPlotTypeData),(BYTE *)pPlotTypeData);
+   propertyPlotTypesStorage -> put_binaryValue((DWORD)GlobalSize(hPlotTypeData),(BYTE *)pPlotTypeData);
 
    pIStream -> Release();
+
+   propertyTexts -> clearStorageObjects();
+
+   IText *pIText = (IText *)NULL;
+   while ( pIText = textList.GetNext(pIText) ) 
+      propertyTexts -> addStorageObject(pIText);
+
+   propertyTexts -> writeStorageObjects();
+
+   propertyTexts -> clearStorageObjects();
 
    return S_OK;
    }
@@ -209,6 +215,13 @@
    overrideOwnerType = false;
  
    propertyName -> put_stringValue(L"");
+
+   //propertyCreateLegend -> put_boolValue(FALSE);
+   //propertyLegendUseName -> put_boolValue(TRUE);
+   //propertyLegendText -> put_stringValue(L"");
+   //propertyLegendDoLeader -> put_boolValue(TRUE);
+   //propertyLegendLeaderPixelsLength -> put_longValue(DEFAULT_LEGEND_LEADER_LENGTH);
+   //propertyLegendTextColorTracks -> put_boolValue(TRUE);
 
    return Loaded();
    }
@@ -399,6 +412,32 @@
 
    }
 
+   long cntObjects;
+
+   propertyTexts -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+
+      IText *pIText = (IText *)NULL;
+      while ( pIText = textList.GetFirst() ) {
+         pIText -> Release();
+         textList.Remove(pIText);
+      }
+
+      for ( long k = 0; k < cntObjects; k++ )
+         newText();
+
+      propertyTexts -> clearStorageObjects();
+
+      pIText = (IText *)NULL;
+      while ( pIText = textList.GetNext(pIText) ) 
+         propertyTexts -> addStorageObject(pIText);
+
+      propertyTexts -> readStorageObjects();
+
+      propertyTexts -> clearStorageObjects();
+
+   }
    return S_OK;
    }
  

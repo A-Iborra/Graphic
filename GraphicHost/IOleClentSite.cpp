@@ -1,20 +1,10 @@
-/*
-
-                       Copyright (c) 1996,1997,1998,1999,2000,2001,2002 Nathan T. Clark
-
-*/
 
 #include <windows.h>
 
-//#include "Graphic.h"
-
 #include "GraphicHost.h"
 
-//#include "GraphicControl_i.h"
-
-
    GraphicHost::_IOleClientSite::_IOleClientSite(GraphicHost *pp)
-    : pParent(pp)//,iDispatch(this) 
+    : pParent(pp)
    {
    };
 

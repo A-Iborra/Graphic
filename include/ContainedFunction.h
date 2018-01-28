@@ -16,7 +16,7 @@
 
   public:
 
-     ContainedFunction(G* pParent,long plotID,HWND hwndTab,IGSFunctioNater *pIFunction,IUnknown* pIUnknownObject,REFIID riidEventsInterface);
+     ContainedFunction(G* pParent,ULONG_PTR plotID,HWND hwndTab,IGSFunctioNater *pIFunction,IUnknown* pIUnknownObject,REFIID riidEventsInterface);
 
      IGSFunctioNater *pFunction() { return pIGSFunctioNater; };
 
@@ -44,7 +44,7 @@
      STDMETHOD(TakeResults)(long iterationNumber,BSTR bstrResults);
      STDMETHOD(Finished)();
 
-     long plotID;
+     ULONG_PTR plotID;
 
      IGSFunctioNater *pIGSFunctioNater;
 

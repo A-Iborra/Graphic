@@ -55,7 +55,7 @@
       pIViewSet(NULL),
 
       hwndFrame(NULL),
-      hwndGraphic(NULL),
+      hwndCanvas(NULL),
       hwndOwner(NULL),
       hwndStatusBar(NULL),
       hMenuPlot(NULL),
@@ -436,7 +436,7 @@
 
    IGSFunctioNater *pf;
    while ( pf = functionList.GetFirst() ) { 
-      ContainedFunction* pContainedFunction = containedFunctionList.Get(reinterpret_cast<long>(pf));
+      ContainedFunction* pContainedFunction = containedFunctionList.Get((ULONG_PTR)pf);
       if ( pContainedFunction ) {
          IOleObject *pIOleObject;
          pf -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
@@ -451,7 +451,7 @@
 
    IDataSet *pds;
    while ( pds = dataSetList.GetFirst() ) { 
-      ContainedDataSet* pContainedDataSet = containedDataSetList.Get(reinterpret_cast<long>(pds));
+      ContainedDataSet* pContainedDataSet = containedDataSetList.Get((ULONG_PTR)pds);
       if ( pContainedDataSet ) {
          IOleObject *pIOleObject;
          pf -> QueryInterface(IID_IOleObject,reinterpret_cast<void**>(&pIOleObject));
@@ -586,16 +586,14 @@ Beep(2000,100);
 
    pDataSet_IClassFactory -> CreateInstance(pIUnknownOuter,IID_IDataSet,reinterpret_cast<void **>(&pIDataSet));
 
-   pIDataSet -> Initialize((void *)pIDataSetMaster,(void *)pIOpenGLImplementation,NULL,NULL,
+   pIDataSet -> Initialize((void *)pIDataSetMaster,(void *)pIOpenGLImplementation,pIEvaluator,NULL,NULL,
                               propertyPlotView,
                               propertyDefault2DPlotType,
                               propertyDefault3DPlotType,
                               propertyBackgroundColor,
-
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
-
                               someObjectChanged,(void *)this,(ULONG_PTR)pIDataSet);
 
    IPlot *pIPlot = NULL;
@@ -644,7 +642,7 @@ Beep(2000,100);
 
    pContainedDataSet -> connectEvents();
 
-   containedDataSetList.Add(pContainedDataSet,NULL,(long)pIDataSet);
+   containedDataSetList.Add(pContainedDataSet,NULL,(ULONG_PTR)pIDataSet);
 
    pIOleObject -> Release();
 
@@ -668,7 +666,7 @@ Beep(2000,100);
    if ( pIPlot )
       plotList.Remove(pIPlot);
 
-   ContainedDataSet *pContainedDataSet = containedDataSetList.Get(reinterpret_cast<long>(pIDataSet));
+   ContainedDataSet *pContainedDataSet = containedDataSetList.Get((ULONG_PTR)pIDataSet);
 
    containedDataSetList.Remove(pContainedDataSet);
 
@@ -686,7 +684,7 @@ Beep(2000,100);
 
    IGSFunctioNater* G::newFunction(bool connectNow) {
 
-   long functionID = (long)PlotIdBands::plotIdFunctions + functionList.Count() + 1;
+   ULONG_PTR functionID = (ULONG_PTR)PlotIdBands::plotIdFunctions + (ULONG_PTR)(functionList.Count() + 1);
 
    IGSFunctioNater *pIFunction = (IGSFunctioNater*)NULL;
 
@@ -753,7 +751,7 @@ Beep(2000,100);
 
    pContainedFunction -> connectEvents();
 
-   containedFunctionList.Add(pContainedFunction,NULL,(long)pIFunction);
+   containedFunctionList.Add(pContainedFunction,NULL,(ULONG_PTR)pIFunction);
 
    pIOleObject -> Release();
 
@@ -770,7 +768,7 @@ Beep(2000,100);
    pIOleObject -> SetClientSite(NULL);
    pIOleObject -> Release();
 
-   ContainedFunction* pContainedFunction = containedFunctionList.Get(reinterpret_cast<long>(pIFunction));
+   ContainedFunction* pContainedFunction = containedFunctionList.Get((ULONG_PTR)pIFunction);
 
    containedFunctionList.Remove(pContainedFunction);
 
@@ -807,7 +805,7 @@ Beep(2000,100);
 
    pIText -> put_PartOfWorldDomain(FALSE);
 
-   pIText -> Initialize(hwndGraphic,pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,
+   pIText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetMaster,
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
@@ -831,7 +829,7 @@ Beep(2000,100);
    }
 
  
-   IPlot* G::newPlot(long plotID) {
+   IPlot* G::newPlot(ULONG_PTR plotID) {
 
    IPlot* pIPlot;
 
@@ -868,7 +866,7 @@ Beep(2000,100);
  
    pIPlot -> AdviseGSystemStatusBar(pIGSystemStatusBar);
 
-   pIPlot -> put_ParentWindow(hwndGraphic);
+   pIPlot -> put_ParentWindow(Canvas());
 
    pIPlot -> put_PlotViewProperty(propertyPlotView);
 
@@ -998,9 +996,9 @@ Beep(2000,100);
 
    G *p = (G *)pArg;
 
-   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+   p -> pIOpenGLImplementation -> SetTargetWindow(p -> Canvas());
 
-   long k = p -> plotList.ID((IPlot *)cookie);
+   ULONG_PTR k = p -> plotList.ID((IPlot *)cookie);
 
    if ( 0 < k ) {
       p -> render(k);
@@ -1052,7 +1050,7 @@ Beep(2000,100);
 
    void G::menuHandlerSomeObjectChanged(void *pArg) {
    G *p = (G *)pArg;
-   p -> pIOpenGLImplementation -> SetTargetWindow(p -> hwndGraphic);
+   p -> pIOpenGLImplementation -> SetTargetWindow(p -> Canvas());
    p -> render(0);
    return;
    }

@@ -47,6 +47,7 @@ library DataSet {
       [propget] HRESULT IPlot([out,retval] void **ppIPlot);
 
       HRESULT Initialize(void *pvIDataSet_Domain,void *pIOpenGLImplementation,
+                           IEvaluator *pIEvaluator,
                            IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                            IGProperty *parentPropertyPlotView,
                            IGProperty *parentPropertyDefault2DPlotSubType,
@@ -145,7 +146,7 @@ library DataSet {
 
       HRESULT GenerateBoundingBox(IDataSet* pIDataSetBoundingBox);
 
-      HRESULT GenerateGDICoordinates(IUnknown *castablePtrToIOpenGLImplementation);
+      HRESULT GenerateGDICoordinates(void *pIOpenGLImplementation);
 
       HRESULT PushExtents();
       

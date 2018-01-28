@@ -13,9 +13,9 @@
 #include "resource.h"
 #include "GSystem_i.h"
 #include "Properties_i.h"
-#include "DataSet_i.h"
 #include "Variable_i.h"
 #include "Evaluator_i.h"
+#include "DataSet_i.h"
 #include "OpenGLImplementation_i.h"
 #include "Plot_i.h"
 

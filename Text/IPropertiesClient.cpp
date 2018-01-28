@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "Text.h"
+#include <stdio.h>
 
    long __stdcall Text::_IGPropertiesClient::QueryInterface(REFIID riid,void **ppv) {
    return pParent -> QueryInterface(riid,ppv);
@@ -19,8 +20,6 @@
 
    float fvBlack[] = {CLR_BLACK};
    float fvWhite[] = {CLR_WHITE};
-
-//   pParent -> propertyText -> put_szValue("");
 
    pParent -> propertyFormat -> put_longValue((long)TEXT_FORMAT_NONE);
 
@@ -54,6 +53,7 @@
 #else
    pParent -> partOfWorldDomain = TRUE;
 #endif
+
    pParent -> partOfMainGraphic = TRUE;
 
    return Loaded();

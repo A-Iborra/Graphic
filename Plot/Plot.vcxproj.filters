@@ -111,6 +111,9 @@
     <ClCompile Include="IPlotServices.cpp">
       <Filter>Source Files\COM Interface Files</Filter>
     </ClCompile>
+    <ClCompile Include="textHandler.cpp">
+      <Filter>Source Files\handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="PlotControl.def">

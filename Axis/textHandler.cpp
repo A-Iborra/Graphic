@@ -156,7 +156,7 @@
 
       case IDDI_AXIS_TEXT_TICK_LABEL_SIZE_UNITS:
          if ( CBN_SELCHANGE == notificationCode ) 
-            p -> propertyTickLabelSizeUnits -> put_longValue(SendMessage(hwndControl,CB_GETCURSEL,0L,0L));
+            p -> propertyTickLabelSizeUnits -> put_longValue((long)SendMessage(hwndControl,CB_GETCURSEL,0L,0L));
          break;
 
       case IDDI_AXIS_TEXT_LABELTEXT: {

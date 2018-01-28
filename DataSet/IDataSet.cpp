@@ -53,7 +53,7 @@
    HRESULT DataSet::get_Name(BSTR *pName) {
    if ( ! pName ) 
       return E_POINTER;
-   *pName = SysAllocStringLen(NULL,strlen(szName));
+   *pName = SysAllocStringLen(NULL,(DWORD)strlen(szName));
    MultiByteToWideChar(CP_ACP,0,szName,-1,*pName,64);
    return S_OK;
    }
@@ -67,7 +67,7 @@
    HRESULT DataSet::get_DataSource(BSTR *pDataSource) {
    if ( ! pDataSource ) 
       return E_POINTER;
-   *pDataSource = SysAllocStringLen(NULL,strlen(szDataSource));
+   *pDataSource = SysAllocStringLen(NULL,(DWORD)strlen(szDataSource));
    MultiByteToWideChar(CP_ACP,0,szDataSource,-1,*pDataSource,MAX_PATH);
    return S_OK;
    }
@@ -123,7 +123,7 @@
    return S_OK;
    }
 
-   STDMETHODIMP DataSet::Initialize(void* pvIDataSet_Domain,void *pvIOpenGLImplementation,
+   STDMETHODIMP DataSet::Initialize(void* pvIDataSet_Domain,void *pvIOpenGLImplementation,IEvaluator *piev,
                                           IGProperty* pIPropertyLineColor,IGProperty* pIPropertyLineWeight,
                                           IGProperty *parentPropertyPlotView,
                                           IGProperty *parentPropertyDefault2DPlotSubType,
@@ -144,8 +144,13 @@
    pWhenChangedCallbackArg = pArg;
    whenChangedCallbackCookie = callbackCookie;
 
+   if ( pIEvaluator )
+      pIEvaluator -> Release();
+
+   pIEvaluator = piev;
+
    HRESULT rc = pIPlot -> Initialize((IDataSet *)pvIDataSet_Domain,(IOpenGLImplementation *)pvIOpenGLImplementation,
-                                       NULL/*evaluator*/,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
+                                       pIEvaluator,pIPropertyLineColor,pIPropertyLineWeight,parentPropertyPlotView,parentPropertyDefault2DPlotSubType,parentPropertyDefault3DPlotSubType,
                                        parentPropertyBackgroundColor,
                                        parentPropertyXFloor,parentPropertyXCeiling,
                                        parentPropertyYFloor,parentPropertyYCeiling,
@@ -1260,9 +1265,9 @@
    }
 
 
-   HRESULT DataSet::GenerateGDICoordinates(IUnknown* pxOpenGL) {
+   HRESULT DataSet::GenerateGDICoordinates(void *pvOpenGL) {
 
-   IOpenGLImplementation* pOpenGL = reinterpret_cast<IOpenGLImplementation*>(pxOpenGL);
+   IOpenGLImplementation *pOpenGL = (IOpenGLImplementation *)pvOpenGL;
 
    if ( xMin == DBL_MAX && xMax == -DBL_MAX &&
         yMin == DBL_MAX && yMax == -DBL_MAX &&
@@ -1273,11 +1278,14 @@
 
    get_countPoints(&cp);
 
-   if ( ! cp ) return E_UNEXPECTED;
+   if ( ! cp ) 
+      return E_UNEXPECTED;
    
-   if ( gdiData ) delete [] gdiData;
+   if ( gdiData ) 
+      delete [] gdiData;
 
    gdiData = new DataList[cp];
+
    memset(gdiData,0,cp * sizeof(DataList));
 
    DataList *p = gdiData;
@@ -1287,6 +1295,7 @@
       p -> next -> previous = p;
       p = p -> next;
    }
+
    memcpy((&gdiData[cp - 1]) -> colorRGB,&currentColor,sizeof(currentColor));
    gdiData[cp - 1].next = NULL;
    gdiData[0].previous = NULL;

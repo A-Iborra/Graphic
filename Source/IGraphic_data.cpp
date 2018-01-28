@@ -37,7 +37,7 @@
    }
 
 
-   STDMETHODIMP G::PrepareForData(long plotID) {
+   STDMETHODIMP G::PrepareForData(ULONG_PTR plotID) {
 
    IPlot *pPlot = NULL;
    if ( plotID || 0 == plotList.Count() ) {
@@ -67,7 +67,7 @@
    }
  
   
-   STDMETHODIMP G::TakeDataString(BSTR inputBstr,long plotID) {
+   STDMETHODIMP G::TakeDataString(BSTR inputBstr,ULONG_PTR plotID) {
 
    DataPoint dpLast;
 
@@ -92,7 +92,7 @@
    }
  
 
-   STDMETHODIMP G::TakeDataArray(SAFEARRAY **ppArray,long plotID) {
+   STDMETHODIMP G::TakeDataArray(SAFEARRAY **ppArray,ULONG_PTR plotID) {
 
    DataPoint dpLast;
    double *pData;
@@ -121,7 +121,7 @@
    }
 
  
-   STDMETHODIMP G::TakeFile(BSTR fileName,long plotID) {
+   STDMETHODIMP G::TakeFile(BSTR fileName,ULONG_PTR plotID) {
    FILE *f;
    char szTemp[256];
    BSTR bstrString;
@@ -164,12 +164,12 @@
    }
  
  
-   STDMETHODIMP G::TakeDataSet(long dsi,long plotID) {
+   STDMETHODIMP G::TakeDataSet(long dsi,ULONG_PTR plotID) {
    return E_NOTIMPL;
    }
  
  
-   STDMETHODIMP G::FinishedWithData(long plotID) {
+   STDMETHODIMP G::FinishedWithData(ULONG_PTR plotID) {
    return S_OK;
    }
  

@@ -47,7 +47,7 @@
 
       p = (Text *)pPage -> lParam;
 
-      SetWindowLongPtr(hwnd,GWLP_USERDATA,(long)p);
+      SetWindowLongPtr(hwnd,GWLP_USERDATA,(ULONG_PTR)p);
 
       p -> hwndStyle = hwnd;
 
@@ -102,13 +102,13 @@
    
       DeleteDC(hdc); 
    
-      long n = strlen(p -> szFace);
+      long n = (DWORD)strlen(p -> szFace);
       char *pszFontName = new char[n + 1];
       char *pszFontStyle;
       memset(pszFontName,0,(n + 1) * sizeof(char));
       strcpy(pszFontName,p -> szFace);
    
-      n = SendMessage(hwndListBox,CB_FINDSTRINGEXACT,-1L,(LPARAM)pszFontName);
+      n = (long)SendMessage(hwndListBox,CB_FINDSTRINGEXACT,-1L,(LPARAM)pszFontName);
 
       SendMessage(hwndListBox,CB_SETCURSEL,(WPARAM)n,0L);
    
@@ -125,10 +125,10 @@
          sprintf(pszFontStyle,"Regular");
       }
    
-      n = SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST),CB_FINDSTRINGEXACT,-1L,(LPARAM)pszFontStyle);
+      n = (long)SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST),CB_FINDSTRINGEXACT,-1L,(LPARAM)pszFontStyle);
       if ( n == CB_ERR ) {
          p -> propertyFaceStyle -> put_szValue("Regular");
-         n = SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST),CB_SELECTSTRING,-1L,(LPARAM)"Regular");
+         n = (long)SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST),CB_SELECTSTRING,-1L,(LPARAM)"Regular");
       }
       SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST),CB_SETCURSEL,n,0L);
    
@@ -175,7 +175,7 @@
       }
       if ( pn -> hdr.idFrom < (unsigned int)IDDI_TEXT_TEXTCOLOR_RED_SPIN || pn -> hdr.idFrom > (unsigned int)IDDI_TEXT_TEXTCOLOR_BLUE_SPIN ) 
          break;
-      int k = pn -> hdr.idFrom - IDDI_TEXT_TEXTCOLOR_RED_SPIN;
+      int k = (int)pn -> hdr.idFrom - IDDI_TEXT_TEXTCOLOR_RED_SPIN;
       HWND hwndEdit,hwndBackground;
       float x;
       switch ( k ) {
@@ -236,7 +236,7 @@
          case CBN_SELCHANGE: {
 
             HWND hwndAvailableStyles = GetDlgItem(hwnd,IDDI_TEXT_FONTSTYLELIST);
-            long itemIndex = SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L);
+            long itemIndex = (long)SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L);
             char *fontStyle = NULL;
             RECT rect;
             fontListData *flData = (fontListData *)SendMessage((HWND)lParam,CB_GETITEMDATA,itemIndex,0L);
@@ -246,14 +246,14 @@
             if ( flData ) {
                for ( long k = 0; k < flData -> countVariations; k++ ) {
                   lfa = &flData -> lf[k];
-                  if ( lfa -> lfWeight & FW_REGULAR ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(long)"Regular");
-                  if ( lfa -> lfWeight & FW_BOLD ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(long)"Bold");
-                  if ( lfa -> lfWeight & FW_BLACK ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(long)"Black");
-                  if ( lfa -> lfItalic ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(long)"Italic");
-                  if ( lfa -> lfUnderline ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(long)"Underline");
+                  if ( lfa -> lfWeight & FW_REGULAR ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(LPARAM)"Regular");
+                  if ( lfa -> lfWeight & FW_BOLD ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(LPARAM)"Bold");
+                  if ( lfa -> lfWeight & FW_BLACK ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(LPARAM)"Black");
+                  if ( lfa -> lfItalic ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(LPARAM)"Italic");
+                  if ( lfa -> lfUnderline ) SendMessage(hwndAvailableStyles,CB_ADDSTRING,-1L,(LPARAM)"Underline");
                }
                GetWindowRect(hwndAvailableStyles,&rect);
-               rect.bottom = 16 + (SendMessage(hwndAvailableStyles,CB_GETCOUNT,0,0) + 1) * SendMessage(hwndAvailableStyles,CB_GETITEMHEIGHT,0,0);
+               rect.bottom = 16 + ((long)SendMessage(hwndAvailableStyles,CB_GETCOUNT,0,0) + 1) * (long)SendMessage(hwndAvailableStyles,CB_GETITEMHEIGHT,0,0);
                SetWindowPos(hwndAvailableStyles,HWND_TOP,0,0,rect.right - rect.left,rect.bottom,SWP_NOMOVE | SWP_NOZORDER);
             }
  
@@ -266,10 +266,10 @@
                fontStyle = new char[32];
                strcpy(fontStyle,"Regular");
             }
-            itemIndex = SendMessage(hwndAvailableStyles,CB_FINDSTRINGEXACT,-1L,(LPARAM)fontStyle);
+            itemIndex = (long)SendMessage(hwndAvailableStyles,CB_FINDSTRINGEXACT,-1L,(LPARAM)fontStyle);
             if ( itemIndex == CB_ERR ) {
                p -> propertyFaceStyle -> put_szValue("Regular");
-               itemIndex = SendMessage(hwndAvailableStyles,CB_SELECTSTRING,-1L,(LPARAM)"Regular");
+               itemIndex = (long)SendMessage(hwndAvailableStyles,CB_SELECTSTRING,-1L,(LPARAM)"Regular");
             }
             SendMessage(hwndAvailableStyles,CB_SETCURSEL,itemIndex,0L);
 
@@ -295,7 +295,7 @@
          switch ( HIWORD(wParam) ) {
          case CBN_SELENDOK: {
             char fontStyle[32];
-            long itemIndex = SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L);
+            long itemIndex = (long)SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L);
             SendMessage((HWND)lParam,CB_GETLBTEXT,itemIndex,reinterpret_cast<LPARAM>(fontStyle));
             p -> propertyFaceStyle -> put_szValue(fontStyle);
          }
@@ -309,7 +309,7 @@
       case IDDI_TEXT_FONTSIZEUNITSLIST: {
          switch ( HIWORD(wParam) ) {
          case CBN_SELENDOK:
-            p -> propertySizeUnits -> put_longValue(SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L));
+            p -> propertySizeUnits -> put_longValue((long)SendMessage((HWND)lParam,CB_GETCURSEL,0L,0L));
          }
 
          p -> createFont(&p -> logicalFont);
@@ -433,7 +433,7 @@
 
 
    LRESULT CALLBACK Text::patchPainterProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
-   Text *p = (Text *)GetWindowLong(hwnd,GWL_USERDATA);
+   Text *p = (Text *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
    switch ( msg ) {
    case WM_PAINT: {
       PAINTSTRUCT ps;

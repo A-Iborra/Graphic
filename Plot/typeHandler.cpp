@@ -131,7 +131,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
       for ( long k = 0; k < count2DTypes; k++ ) {
          type2DIds.push_back(pvIDs[k]);
-         long n = wcslen(pvNames[k]);
+         long n = (DWORD)wcslen(pvNames[k]);
          char *pszTemp = new char[n + 1];
          pszTemp[n] = '\0';
          WideCharToMultiByte(CP_ACP,0,pvNames[k],-1,pszTemp,n,0,0);
@@ -165,7 +165,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
       for ( long k = 0; k < count3DTypes; k++ ) {
          type3DIds.push_back(pvIDs[k]);
-         long n = wcslen(pvNames[k]);
+         long n = (DWORD)wcslen(pvNames[k]);
          char *pszTemp = new char[n + 1];
          pszTemp[n] = '\0';
          WideCharToMultiByte(CP_ACP,0,pvNames[k],-1,pszTemp,n,0,0);
@@ -206,15 +206,15 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          controlIdToType[controlId] = type2DIds.front();
          type2DIds.pop_front();
 
-         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[0],(HMENU)controlId,hModule,NULL);
+         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[0],(HMENU)(ULONG_PTR)controlId,hModule,NULL);
    
          SendMessage(hwndCheckbox,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
-         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[0],(HMENU)(controlId + 1000),hModule,NULL);
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[0],(HMENU)(ULONG_PTR)(controlId + 1000),hModule,NULL);
 
          ShowWindow(hwndProperties,SW_HIDE);
 
-         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)typePropertyInstance2D.front());
+         SetWindowLongPtr(hwndProperties,GWLP_USERDATA,(ULONG_PTR)typePropertyInstance2D.front());
 
          SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -255,15 +255,15 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
          controlIdToType[controlId] = type3DIds.front();
          type3DIds.pop_front();
 
-         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[1],(HMENU)controlId,hModule,NULL);
+         HWND hwndCheckbox = CreateWindowEx(0L,"BUTTON",pszTemp,BS_AUTOCHECKBOX | WS_CHILD | WS_VISIBLE,xCheckbox,yCheckbox,cxCheckbox,cyCheckbox,hwndScrollPanes[1],(HMENU)(ULONG_PTR)controlId,hModule,NULL);
 
          SendMessage(hwndCheckbox,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
-         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[1],(HMENU)(controlId + 1000),hModule,NULL);
+         HWND hwndProperties = CreateWindowEx(0L,"BUTTON","...",BS_PUSHBUTTON | WS_CHILD | WS_VISIBLE,xCheckbox + 80,yCheckbox - 2,32,cyCheckbox + 4,hwndScrollPanes[1],(HMENU)(ULONG_PTR)(controlId + 1000),hModule,NULL);
 
          ShowWindow(hwndProperties,SW_HIDE);
 
-         SetWindowLongPtr(hwndProperties,GWL_USERDATA,(ULONG_PTR)typePropertyInstance3D.front());
+         SetWindowLongPtr(hwndProperties,GWLP_USERDATA,(ULONG_PTR)typePropertyInstance3D.front());
 
          SendMessage(hwndProperties,WM_SETFONT,(LPARAM)hGUIFont,0L);
 
@@ -367,7 +367,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
 
       } else {
 
-         long currentIndex = SendMessage(hwndArityTabs,TCM_GETCURSEL,0L,0L);
+         long currentIndex = (long)SendMessage(hwndArityTabs,TCM_GETCURSEL,0L,0L);
 
          if ( -1 == currentIndex ) {
             SendMessage(hwndArityTabs,TCM_SETCURSEL,0L,0L);
@@ -422,7 +422,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
             si.nPos = 0;
             si.nPage = (rcTabs.bottom - rcTabs.top - 32);
 
-            needsToScroll[k] = si.nMax > si.nPage;
+            needsToScroll[k] = si.nMax > (int)si.nPage;
 
             SendMessage(hwndScrollBars[k],SBM_SETSCROLLINFO,(WPARAM)TRUE,(LPARAM)&si);
             SendMessage(hwndScrollBars[k],SBM_ENABLE_ARROWS,(WPARAM)ESB_DISABLE_UP,0L);
@@ -464,7 +464,7 @@ for ( std::pair<long,HWND> pPair : type3DToCheckBox ) {                         
       NMHDR *pHeader = (NMHDR *)lParam;
       switch ( wParam ) {
       case IDDI_PLOT_TYPE_ARITY_TABS: {
-         long currentIndex = SendMessage(pHeader -> hwndFrom,TCM_GETCURSEL,0L,0L);
+         long currentIndex = (long)SendMessage(pHeader -> hwndFrom,TCM_GETCURSEL,0L,0L);
          if ( TCN_SELCHANGING == pHeader -> code ) {
             if ( -1 < currentIndex ) {
                ShowWindow(hwndPaneHosts[currentIndex],SW_HIDE);

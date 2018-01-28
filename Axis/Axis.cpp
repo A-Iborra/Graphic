@@ -34,7 +34,6 @@
      refCount(0),
      defaultPatchPainter(NULL),
      defaultPatchPainter2(NULL),
-     hwndOwner(0),
      hwndStyleSettings(0),
      hwndPositionSettings(0),
      hwndTextSettings(0),
@@ -49,8 +48,11 @@
      tickAbove(0.0),
      tickBelow(0.0),
      tickLength(0.0),
+     tickLabelSize(0.0),
+     tickLabelSizeUnits(0),
      gridLinesPerTick(0),
      tickPctAbove(0.0),
+     ticksOnAllNormalPlanes(FALSE),
      drawAxisLabel(false),
 
      pWhenChangedCallback(NULL),
@@ -112,6 +114,7 @@
    pIGProperties -> Add(L"straddle pcnt above",&propertyTickStraddleAbove);
    pIGProperties -> Add(L"tick length",&propertyTickLength);
    pIGProperties -> Add(L"tick unit type",&propertyTickLengthUnits);
+   pIGProperties -> Add(L"ticks on all normal planes",&propertyTicksAllPlanes);
 
    pIGProperties -> Add(L"origin at minpoint",&propertyOriginAtMinpoint);
    pIGProperties -> Add(L"origin x value",&propertyOriginXValue);
@@ -147,6 +150,9 @@
    pIGProperties -> Add(L"tick label color",&propertyTickLabelColor);
    pIGProperties -> Add(L"tick label color track",&propertyTickLabelColorTrackLineColor);
 
+   propertyTickLabelSize -> directAccess(TYPE_DOUBLE,&tickLabelSize,sizeof(double));
+   propertyTickLabelSizeUnits -> directAccess(TYPE_LONG,&tickLabelSizeUnits,sizeof(tickLabelSizeUnits));
+
    pIGProperties -> Add(L"text count",&propertyTextCount);
 
    pIGProperties -> Add(L"default font",&propertyDefaultFont);
@@ -179,18 +185,11 @@
    propertyTickLength -> directAccess(TYPE_DOUBLE,&tickLength,sizeof(tickLength));
    propertyGridLinesPerTick -> directAccess(TYPE_LONG,&gridLinesPerTick,sizeof(gridLinesPerTick));
    propertyTickStraddleAbove -> directAccess(TYPE_DOUBLE,&tickPctAbove,sizeof(tickPctAbove));
+   propertyTicksAllPlanes -> directAccess(TYPE_BOOL,&ticksOnAllNormalPlanes,sizeof(ticksOnAllNormalPlanes));
 
-   CoCreateInstance(CLSID_Text,
-                    NULL,
-                    CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                    IID_IText,
-                    reinterpret_cast<void **>(&pLabel));
+   CoCreateInstance(CLSID_Text,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pLabel));
 
-   CoCreateInstance(CLSID_Text,
-                    NULL,
-                    CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                    IID_IText,
-                    reinterpret_cast<void **>(&pRepresentativeText));
+   CoCreateInstance(CLSID_Text,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pRepresentativeText));
 
    pRepresentativeText -> put_Description(L"Values to appear along the axis, separated by commas.\nTo include a comma, specify \\, (backslash - comma).");
 
@@ -328,19 +327,19 @@
       strcpy(szNumber,c);
       *errorBack = lastError;
       if ( !strchr(szNumber,'.') ) {
-         BSTR bstrNumber = SysAllocStringLen(NULL,strlen(szNumber));
-         MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,strlen(szNumber));
+         BSTR bstrNumber = SysAllocStringLen(NULL,(DWORD)strlen(szNumber));
+         MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,(DWORD)strlen(szNumber));
          return bstrNumber;
       }
-      c = szNumber + strlen(szNumber) - 1;
+      c = szNumber + (DWORD)strlen(szNumber) - 1;
       while ( c > szNumber && *c == '0' ) 
          if ( *(c - 1) != '.' )
             *c-- = '\0';
          else
             break;
 
-      BSTR bstrNumber = SysAllocStringLen(NULL,strlen(szNumber));
-      MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,strlen(szNumber));
+      BSTR bstrNumber = SysAllocStringLen(NULL,(DWORD)strlen(szNumber));
+      MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,(DWORD)strlen(szNumber));
       return bstrNumber;
    }
   
@@ -371,18 +370,18 @@
    }
    *errorBack = lastError;
    if ( !strchr(szNumber,'.') ) {
-      BSTR bstrNumber = SysAllocStringLen(NULL,strlen(szNumber));
-      MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,strlen(szNumber));
+      BSTR bstrNumber = SysAllocStringLen(NULL,(DWORD)strlen(szNumber));
+      MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,(DWORD)strlen(szNumber));
       return bstrNumber;
    }
-   c = szNumber + strlen(szNumber) - 1;
+   c = szNumber + (DWORD)strlen(szNumber) - 1;
    while ( c > szNumber && *c == '0' )
       if ( *(c - 1) != '.' ) 
          *c-- = '\0';
       else
          break;
-   BSTR bstrNumber = SysAllocStringLen(NULL,strlen(szNumber));
-   MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,strlen(szNumber));
+   BSTR bstrNumber = SysAllocStringLen(NULL,(DWORD)strlen(szNumber));
+   MultiByteToWideChar(CP_ACP,0,szNumber,-1,bstrNumber,(DWORD)strlen(szNumber));
    return bstrNumber;
    }
  

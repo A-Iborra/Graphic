@@ -294,7 +294,7 @@
 
    if ( hwndSpecDialog ) {
       DestroyWindow(hwndSpecDialog);
-      SetWindowLong(hwndSpecDialog,GWL_USERDATA,0);  
+      SetWindowLongPtr(hwndSpecDialog,GWLP_USERDATA,0);  
    }
 
    if ( hwndVariables ) 
@@ -674,7 +674,7 @@
    int Function::showVariableTab(IVariable* pV,char* pszVariableName) {
    if ( ! pV ) return 0;
    HWND hwndV;
-   long n = SendMessage(hwndVariablesTab,TCM_GETITEMCOUNT,0L,0L);
+   long n = (long)SendMessage(hwndVariablesTab,TCM_GETITEMCOUNT,0L,0L);
    for ( long k = 0; k < n; k++) {
       TCITEM tcItem;
       char szName[MAX_PROPERTY_SIZE];

@@ -1,8 +1,11 @@
 
 #include "GraphicHost.h"
-#include "utils.h"
 
    GraphicHost::GraphicHost() {
+   return;
+   }
+
+   void GraphicHost::initialize() {
 
    WNDCLASS gClass;
 
@@ -36,27 +39,15 @@
 
    pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
 
-   RECT rect;
-   GetWindowRect(hwndSite,&rect);
-
-   RECT rcAdjust{0,0,0,0};
-
-   AdjustWindowRectEx(&rcAdjust,GetWindowLongPtr(hwndSite,GWL_STYLE),FALSE,GetWindowLongPtr(hwndSite,GWL_EXSTYLE));
-
-   long cx = rect.right - rect.left - (rcAdjust.right - rcAdjust.left);
-   long cy = rect.bottom - rect.top - (rcAdjust.bottom - rcAdjust.top);
-
-   SIZEL sizel{cx,cy};
-
-   pixelsToHiMetric(&sizel,&sizel);
-
-   pIOleObject_Graphic -> SetExtent(DVASPECT_CONTENT,&sizel);
-
    CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
 
    pIGProperties -> Add(L"Graphic",&pIGProperty_Graphic);
 
    pIGProperty_Graphic -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
+
+   pIGProperties -> Add(L"size and position",&pIGProperty_SizeAndPos);
+
+   pIGProperty_SizeAndPos ->directAccess(TYPE_BINARY,&rcFrame,sizeof(RECT));
 
    WCHAR szwSettingsFile[MAX_PATH];
 
@@ -67,6 +58,11 @@
    pIGProperties -> put_FileName(szwSettingsFile);
 
    pIOleObject_Graphic -> QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIGPropertiesClient_Graphic));
+
+   rcFrame.left = 100;
+   rcFrame.top = 100;
+   rcFrame.right = 1600;
+   rcFrame.bottom = 1124;
 
    VARIANT_BOOL wasSuccessful;
 
@@ -79,11 +75,13 @@
       pIGProperty_Graphic -> clearStorageObjects();
    }
 
+   SetWindowPos(hwndFrame,HWND_TOP,rcFrame.left,rcFrame.top,rcFrame.right - rcFrame.left,rcFrame.bottom - rcFrame.top,SWP_SHOWWINDOW);
+
    pIGraphic -> put_AllowUserSetFunctionVisibility(VARIANT_TRUE);
 
    pIGraphic -> put_UseStatusBar(VARIANT_TRUE);
 
-   pIOleObject_Graphic -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndSite,&rect);
+   pIOleObject_Graphic -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndSite,NULL);//&rect);
 
    return;
    }
@@ -97,6 +95,8 @@
    pIGProperty_Graphic -> addStorageObject(pIOleObject_Graphic);
    pIGProperty_Graphic -> writeStorageObjects();
    pIGProperty_Graphic -> clearStorageObjects();
+
+   GetWindowRect(hwndFrame,&rcFrame);
 
    pIGProperties -> Save();
    pIGraphic -> Release();

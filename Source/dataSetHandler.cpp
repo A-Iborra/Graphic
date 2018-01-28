@@ -49,7 +49,7 @@
          memset(&lvItem,0,sizeof(LVITEM));
          BSTR bstrName;
          pIDataSet -> get_Name(&bstrName);
-         long n = min(MAX_PATH,wcslen(bstrName));
+         long n = min(MAX_PATH,(DWORD)wcslen(bstrName));
          char szTemp[MAX_PATH];
          memset(szTemp,0,sizeof(szTemp));
          if ( 0 == n )
@@ -63,15 +63,15 @@
          lvItem.state = LVIS_SELECTED;
          lvItem.stateMask = -1;
          lvItem.pszText = szTemp;
-         lvItem.lParam = reinterpret_cast<long>(pIDataSet);
+         lvItem.lParam = (LPARAM)pIDataSet;
 
-         lvItem.iItem = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
 
          lvItem.mask = LVIF_TEXT;
 
          pIDataSet -> get_DataSource(&bstrName);
 
-         n = min(MAX_PATH,wcslen(bstrName));
+         n = min(MAX_PATH,(DWORD)wcslen(bstrName));
          memset(szTemp,0,sizeof(szTemp));
          if ( 0 == n )
             strcpy(szTemp,"<unspecified>");
@@ -96,8 +96,8 @@
    case WM_NOTIFY:
       switch ( wParam ) {
       case IDDI_GRAPHIC_DATASETS_LIST: {
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
          EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
          }
@@ -136,8 +136,8 @@
          lvItem.state = LVIS_SELECTED;
          lvItem.stateMask = -1;
          lvItem.pszText = szTemp;
-         lvItem.lParam = reinterpret_cast<long>(pDataSet);
-         lvItem.iItem = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
+         lvItem.lParam = (LPARAM)pDataSet;
+         lvItem.iItem = (int)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_INSERTITEM,0L,(LPARAM)&lvItem);
 
          pDataSet -> get_DataSource(&bstrExpression);
          memset(szTemp,0,sizeof(szTemp));
@@ -160,8 +160,8 @@
 
       case IDDI_GRAPHIC_DATASETS_EDIT: {
 
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
          LVITEM lvItem;
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any data sets to edit.","Note",MB_OK);
@@ -224,8 +224,8 @@
 
          LVITEM lvItem;
          char szTemp[MAX_PROPERTY_SIZE];
-         long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
-         long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+         long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
+         long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
          if ( ! itemCount ) {
             MessageBox(GetParent(hwnd),"There aren't any data sets to delete.","Note",MB_OK);
             break;
@@ -273,8 +273,8 @@
       }
  
    case WM_PAINT: {
-      long itemCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
-      long selectedCount = SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
+      long itemCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETITEMCOUNT,0L,0L);
+      long selectedCount = (long)SendDlgItemMessage(hwnd,IDDI_GRAPHIC_DATASETS_LIST,LVM_GETSELECTEDCOUNT,0L,0L);
       EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_EDIT),itemCount && selectedCount ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_GRAPHIC_DATASETS_DELETE),itemCount && selectedCount ? TRUE : FALSE);
       }

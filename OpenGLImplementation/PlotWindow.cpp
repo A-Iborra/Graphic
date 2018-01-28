@@ -20,6 +20,8 @@
          PFD_TYPE_RGBA,   
          24,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,PFD_MAIN_PLANE,0,0,0,0};
 
+   HGLRC wglCreateContextAttribsARB(HDC hDC, HGLRC hshareContext, const int *attribList);
+
    PlotWindow::PlotWindow(HWND h,OpenGLImplementor *pp,IEvaluator *piev) :
 
        deviceContext(NULL),
@@ -110,6 +112,13 @@
 
    isRendered = false;
 
+   if ( renderingContext ) {
+      ReleaseDC(hwnd,deviceContext);
+      wglMakeCurrent(NULL,NULL);
+      wglDeleteContext(renderingContext);
+      renderingContext = NULL;
+   }
+
    deviceContext = GetDC(hwnd);
   
    if ( 0 == pixelFormat ) {
@@ -124,11 +133,6 @@
    }
 
    SetPixelFormat(deviceContext,pixelFormat,&pfd);
-
-   if ( renderingContext ) {
-      wglDeleteContext(renderingContext);
-      renderingContext = NULL;
-   }
 
    if ( 0 == openGLState.windowCX || 0 == openGLState.windowCY )
       return FALSE;
@@ -166,7 +170,6 @@
    GetWindowRect(hwnd,&rect);
    openGLState.windowCX = rect.right - rect.left;
    openGLState.windowCY = rect.bottom - rect.top;
-
 
    if ( tm ) {
 
@@ -405,7 +408,7 @@ OPENGL_ERROR_CHECK
    double phi,theta,spin;
 
    GetWindowRect(hwnd,&rect);
- 
+
    if ( ! renderingContext || ! ( ( rect.right - rect.left ) == openGLState.windowCX ) || ! ( ( rect.bottom - rect.top ) == openGLState.windowCY) ) {
       openGLState.windowCX = rect.right - rect.left;
       openGLState.windowCY = rect.bottom - rect.top;
@@ -566,7 +569,8 @@ OPENGL_ERROR_CHECK
          openGLState.viewPortMargins[1] = 8;
    }
 
-   if ( pszUnits ) delete [] pszUnits;
+   if ( pszUnits ) 
+      delete [] pszUnits;
 
    if ( pPropStretchToMargins ) {
       pPropStretchToMargins -> get_boolValue(&stretchToMargins);
@@ -613,6 +617,7 @@ OPENGL_ERROR_CHECK
 
    if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
       openGLState.extentsZMax += 0.1 * openGLState.extentsZMin;
+
    if ( openGLState.extentsZMin == openGLState.extentsZMax ) 
       openGLState.extentsZMax = 1.0;
 
@@ -685,6 +690,64 @@ OPENGL_ERROR_CHECK
    }
 
    initialized = true;
+
+#if 0
+DataPoint dpSource,dpData;
+
+double mMatrix[16],pMatrix[16];
+      DataPoint dpWorking;
+      int vport[4];
+   
+glGetDoublev(GL_MODELVIEW_MATRIX,mMatrix);
+glGetDoublev(GL_PROJECTION_MATRIX,pMatrix);
+glGetIntegerv(GL_VIEWPORT,vport);
+
+GLint bufferSize[4] = {0};
+glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
+   
+char szX[512];
+sprintf_s(szX,256,"ViewPort:%ld %ld %ld %ld. Window: %ld %ld Scissor: %ld %ld %ld %ld\n",vport[0],vport[1],vport[2],vport[3],openGLState.windowCX,openGLState.windowCY,bufferSize[0],bufferSize[1],bufferSize[2],bufferSize[3]);
+OutputDebugStringA(szX);
+
+glBegin(GL_LINE_STRIP);
+
+dpSource.x = openGLState.viewPort[0] + 1;
+dpSource.y = openGLState.viewPort[1] + 1;
+dpSource.z = 0;
+double y = (double)openGLState.windowCY - dpSource.y;
+gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
+glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
+
+dpSource.x = openGLState.viewPort[0] + openGLState.viewPort[2] - 2;
+dpSource.y = openGLState.viewPort[1] + 1;
+dpSource.z = 0;
+y = (double)openGLState.windowCY - dpSource.y;
+gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
+glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
+
+dpSource.x = openGLState.viewPort[0] + openGLState.viewPort[2] - 2;
+dpSource.y = openGLState.viewPort[1] + openGLState.viewPort[3] - 2;
+dpSource.z = 0;
+y = (double)openGLState.windowCY - dpSource.y;
+gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
+glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
+
+dpSource.x = openGLState.viewPort[0] + 1;
+dpSource.y = openGLState.viewPort[1] + openGLState.viewPort[3] - 2;
+dpSource.z = 0;
+y = (double)openGLState.windowCY - dpSource.y;
+gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
+glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
+
+dpSource.x = openGLState.viewPort[0] + 1;
+dpSource.y = openGLState.viewPort[1] + 1;
+dpSource.z = 0;
+y = (double)openGLState.windowCY - dpSource.y;
+gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
+glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
+
+glEnd();
+#endif
 
    return;
    }

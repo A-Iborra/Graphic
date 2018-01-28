@@ -18,7 +18,7 @@
 
    GetCursorPos(&ptMouse);
 
-   GetWindowRect(hwndGraphic,&rectWindow);
+   GetWindowRect(Canvas(),&rectWindow);
 
    if ( ptMouse.x > rectWindow.right || ptMouse.y > rectWindow.bottom || ptMouse.x < rectWindow.left || ptMouse.y < rectWindow.top ) 
       return 0;
@@ -52,12 +52,12 @@
    //NTC: 12-05-2017: I am going to rethink how to have a 3-D cursor.
    //
    if ( gcPlotView3D == plotView ) {
-      HDC hdc = GetDC(hwndGraphic);
+      HDC hdc = GetDC(Canvas());
       erasePickBox(hdc);
       savePickBox(hdc,pPtlPickBox);
       if ( doPickBox )
          drawPickBox(hdc,pPtlPickBox);
-      ReleaseDC(hwndGraphic,hdc);
+      ReleaseDC(Canvas(),hdc);
       ptlPickBox.x = pPtlPickBox -> x;
       ptlPickBox.y = pPtlPickBox -> y; 
       return 0;
@@ -210,7 +210,7 @@
    if ( gcPlotView3D == plotView ) 
       itemCount = 12;
 
-   HDC hdc = GetDC(hwndGraphic);
+   HDC hdc = GetDC(Canvas());
 
    HDC hdcTarget = CreateCompatibleDC(NULL);
 
@@ -300,7 +300,7 @@
    if ( doPickBox )
       drawPickBox(hdc,pPtlPickBox);
 
-   ReleaseDC(hwndGraphic,hdc);
+   ReleaseDC(Canvas(),hdc);
 
    return 0;
    }
@@ -377,14 +377,14 @@
    if ( ! useGraphicsCursor ) 
       return 0;
 
-   HDC hdc = GetDC(hwndGraphic);
+   HDC hdc = GetDC(Canvas());
 
    //
    //NTC: 12-05-2017: I am going to rethink how to have a 3-D cursor.
    //
    if ( gcPlotView3D == plotView ) {
       erasePickBox(hdc);
-      ReleaseDC(hwndGraphic,hdc);
+      ReleaseDC(Canvas(),hdc);
       return 0;
    }
 
@@ -418,7 +418,7 @@
 
    erasePickBox(hdc);
 
-   ReleaseDC(hwndGraphic,hdc);
+   ReleaseDC(Canvas(),hdc);
 
    return 0;
    }

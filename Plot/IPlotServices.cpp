@@ -14,7 +14,7 @@
    SAFEARRAYBOUND rgb;
 
    rgb.lLbound = 1;
-   rgb.cElements = plotType2DProviderNames.size();
+   rgb.cElements = (DWORD)plotType2DProviderNames.size();
 
    SAFEARRAY *pSA2DIds = SafeArrayCreate(VT_I4,1,&rgb);
    SAFEARRAY *pSA2DNames = SafeArrayCreate(VT_BSTR,1,&rgb);
@@ -41,7 +41,7 @@
 
       pvIDs[k] = (long)pPair.first;
 
-      long n = strlen(pPair.second) + 1;
+      long n = (DWORD)strlen(pPair.second) + 1;
 
       pvNames[k] = SysAllocStringLen(NULL,n);
 
@@ -85,7 +85,7 @@
    SafeArrayUnaccessData(pSA2DInstances);
 
    rgb.lLbound = 1;
-   rgb.cElements = plotType3DProviderNames.size();
+   rgb.cElements = (DWORD)plotType3DProviderNames.size();
 
    SAFEARRAY *pSA3DIds = SafeArrayCreate(VT_I4,1,&rgb);
    SAFEARRAY *pSA3DNames = SafeArrayCreate(VT_BSTR,1,&rgb);
@@ -108,7 +108,7 @@
 
       pvIDs[k] = (long)pPair.first;
 
-      long n = strlen(pPair.second) + 1;
+      long n = (DWORD)strlen(pPair.second) + 1;
 
       pvNames[k] = SysAllocStringLen(NULL,n);
 

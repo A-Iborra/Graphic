@@ -6,8 +6,8 @@
 
 #include "Utils.h"
  
-   STDMETHODIMP Plot::Initialize(IDataSet* pIDataSetDomain,
-                                 IOpenGLImplementation *pimp,
+   STDMETHODIMP Plot::Initialize(IDataSet* pIDataSetWorld,
+                                 void *pvIOpenGLImplementation,
                                  IEvaluator *piev,
                                  IGProperty* pPropColor,
                                  IGProperty* pPropLineWeight,
@@ -40,7 +40,7 @@
    pWhenChangedCallbackArg = pCallbarkArg;
    whenChangedCallbackCookie = callbackCookie;
 
-   BasePlot::Initialize(pIDataSetDomain,pimp,piev,propertyLineColor,propertyLineWeight,parentXFloor,parentXCeiling,parentYFloor,parentYCeiling,parentZFloor,parentZCeiling);
+   BasePlot::Initialize(pIDataSetWorld,pvIOpenGLImplementation,piev,propertyLineColor,propertyLineWeight,parentXFloor,parentXCeiling,parentYFloor,parentYCeiling,parentZFloor,parentZCeiling);
 
    InitNew();
 
@@ -319,6 +319,12 @@
    return BasePlot::GetSegments(pSegmentArray);
    }
 
+   HRESULT Plot::GetTextList(void **ppvResult) {
+   if ( ! ppvResult )
+      return E_POINTER;
+   *ppvResult = (void *)&textList;
+   return S_OK;
+   }
 
    HRESULT Plot::StubPlot() {
    return BasePlot::StubPlot();
@@ -334,6 +340,34 @@
    }
  
  
+   HRESULT Plot::DrawOpenGLText() {
+   IText *pIText = NULL;
+   while ( pIText = textList.GetNext(pIText) ) {
+      boolean isOpenGL;
+      pIText -> get_TextRender(&isOpenGL);
+      if ( ! isOpenGL )
+         continue;
+      pIText -> PrepData();
+      pIText -> Draw();
+   }
+   return S_OK;
+   }
+
+
+   HRESULT Plot::DrawGDIText() {
+   IText *pIText = NULL;
+   while ( pIText = textList.GetNext(pIText) ) {
+      boolean isOpenGL;
+      pIText -> get_TextRender(&isOpenGL);
+      if ( isOpenGL )
+         continue;
+      pIText -> PrepData();
+      pIText -> Draw();
+   }
+   return S_OK;
+   }
+
+
    HRESULT Plot::Redraw() { 
    return BasePlot::Redraw();
    }

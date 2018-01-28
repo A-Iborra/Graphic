@@ -59,7 +59,7 @@
    return hr;
    } 
  
-   STDMETHODIMP G::Draw(long sourceID) {
+   STDMETHODIMP G::Draw(ULONG_PTR sourceID) {
    render(sourceID);
    return S_OK;
    }
@@ -69,7 +69,7 @@
    IAxis *pIAxis;
    pAxis -> QueryInterface(IID_IAxis,reinterpret_cast<void**>(&pIAxis));
    axisList.Add(pIAxis);
-   pIAxis -> Initialize(hwndGraphic,type,xaxis,yaxis,zaxis,propertyPlotView,
+   pIAxis -> Initialize(type,xaxis,yaxis,zaxis,propertyPlotView,
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
@@ -101,7 +101,7 @@
    t -> Draw();
    IUnknown* pIUnknownText;
    t -> QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownText));
-   pIGProperties -> ShowProperties(hwndGraphic,pIUnknownText);
+   pIGProperties -> ShowProperties(Canvas(),pIUnknownText);
    pIUnknownText -> Release();
 
    t -> Draw();
@@ -149,7 +149,7 @@
    ContainedFunction *pf = (ContainedFunction *)NULL;
    while ( pf = containedFunctionList.GetNext(pf) )
       ShowWindow(pf -> HWNDSite(),SW_HIDE);
-   pf = containedFunctionList.Get(reinterpret_cast<long>(f));
+   pf = containedFunctionList.Get((ULONG_PTR)f);
    ShowWindow(pf -> HWNDSite(),SW_SHOW);
    if ( ppFunction )
       f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppFunction));
@@ -180,7 +180,7 @@
       ContainedFunction *pf = (ContainedFunction *)NULL;
       while ( pf = containedFunctionList.GetNext(pf) )
          ShowWindow(pf -> HWNDSite(),SW_HIDE);
-      pf = containedFunctionList.Get(reinterpret_cast<long>(f));
+      pf = containedFunctionList.Get((ULONG_PTR)f);
       ShowWindow(pf -> HWNDSite(),SW_SHOW);
       if ( ppFunction )
          f -> QueryInterface(IID_IDispatch,reinterpret_cast<void**>(ppFunction));
