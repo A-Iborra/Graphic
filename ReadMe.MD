@@ -4,7 +4,7 @@
 
 This one is my lifelong passion - or, put another way - something I've been stuck with for what seems like forever !
 
-![text example](http://www.cursivison.com/dmdocuments/textExample.png)
+![text example](http://www.cursivision.com/docs/textExample.png)
 
 I don't know why - but for some reason, Sibelius and Scientific Computer Graphics grabbed my ass sometime in 1980 or so. And, to this date, almost 40 years later, they both still have full control over me.
 
