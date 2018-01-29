@@ -34,10 +34,13 @@
    HRESULT rc = CoCreateInstance(CLSID_GSystemGraphic,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Graphic));
 
    pIOleObject_Graphic -> QueryInterface(IID_IGSGraphic,reinterpret_cast<void **>(&pIGraphic));
+#if 0
 
    pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
 
    pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
+
+#endif
 
    CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
 
@@ -47,7 +50,7 @@
 
    pIGProperties -> Add(L"size and position",&pIGProperty_SizeAndPos);
 
-   pIGProperty_SizeAndPos ->directAccess(TYPE_BINARY,&rcFrame,sizeof(RECT));
+   pIGProperty_SizeAndPos -> directAccess(TYPE_BINARY,&rcFrame,sizeof(RECT));
 
    WCHAR szwSettingsFile[MAX_PATH];
 
@@ -75,13 +78,15 @@
       pIGProperty_Graphic -> clearStorageObjects();
    }
 
-   SetWindowPos(hwndFrame,HWND_TOP,rcFrame.left,rcFrame.top,rcFrame.right - rcFrame.left,rcFrame.bottom - rcFrame.top,SWP_SHOWWINDOW);
-
    pIGraphic -> put_AllowUserSetFunctionVisibility(VARIANT_TRUE);
 
    pIGraphic -> put_UseStatusBar(VARIANT_TRUE);
 
-   pIOleObject_Graphic -> DoVerb(OLEIVERB_SHOW,NULL,pIOleClientSite,0L,hwndSite,NULL);//&rect);
+#if 1
+   pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
+   pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
+#endif
+   SetWindowPos(hwndFrame,HWND_TOP,rcFrame.left,rcFrame.top,rcFrame.right - rcFrame.left,rcFrame.bottom - rcFrame.top,SWP_SHOWWINDOW);
 
    return;
    }

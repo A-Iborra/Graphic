@@ -630,8 +630,6 @@
                            pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    initWindows();
- 
-   InitNew();
 
    pRepresentativeText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                        pParentPropertyXFloor,pParentPropertyXCeiling,

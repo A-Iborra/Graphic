@@ -168,8 +168,8 @@ library OpenGLImplementor {
 
       HRESULT Finalize();
 
-      HRESULT SetColor(IGProperty*);
-      HRESULT SetLineWeight(IGProperty*);
+      HRESULT SetColor(float *);
+      HRESULT SetLineWeight(float);
       HRESULT Normal3dv(double *normal);
 
       HRESULT SetColor3dv(double *);

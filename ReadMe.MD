@@ -27,7 +27,32 @@ I would not have put it here unless I am confident it is of real use right now -
 
 And, so, here it is - number graphics - on Windows - in COM - and when I say COM - I mean COM.
 
-![text example](http://www.cursivision.com/docs/3-DLightingAndShading.png)
+![shading example](http://www.cursivision.com/docs/3-DLightingAndShading.png)
+
+## How is this software different ?
+----
+This system treats your graphics much more like documents. In other words - you create the graphic much as you would create a document using MS Word, for example. Everything you do can be saved as a file and restored at any time. 
+Contrast this with more of a script driven system. Yes - you can probably save the script and re-create the graphic - but that is not remotely the same as building up the graphic using well known modern user interface techniques.
+For example, every object on your graphic has properties available simply by double clicking the object. Text objects can be grabbed with the mouse and moved to different locations, soon, this will apply to axis objects as well.
+Data is at your fingertips right in the system. For example, a control panel is created where you manage data sets and functions - two sources of data for plotting. The following figure is a screenshot of the UI.
+
+![UI example](http://www.cursivision.com/docs/FunctionPanel.png)
+
+Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x*x + y*y)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variablew
+which also ranges from 0 - 12 in 80 steps.
+
+Here's an example of where the "UI" difference comes in: this function was created very simply - by entering it into a standard edit-text field. The independent variables were detected automatically and the UI components to 
+specify the range were automatically shown. Sure - that's typical UI - the point is that it is there - there is NO script like function definition you have to learn - and worse - remember in the future.
+
+Note that if I wanted to - I could change this function right in the field to the right of the Properties button. 
+
+So, while I'm creating my graphic "document" using the control panel - I can define any number of functions or data sets - and combine them into the resulting graphic in any way I choose. The graphic shown in the first figure above 
+is simply two 2-dimensional functions that took about 1 minute to enter the system. Note in this case that each function has a different domain (range of x) - this is properly accounted for when data sets (which is created by the functions)
+are combined.
+
+Note also that this system has very powerful data integration capabilities with MS Excel. When you create a dataset you can import/export live out of and into Excel. You can also either embed the data from the workbook OR have the 
+system automatically go out and get the data every time you open up this particular graphic "document".
+
 
 ## What is this software ?
 ----
@@ -36,6 +61,7 @@ This software is <strong>both</strong> a full featured scientific numeric plotti
 It is intended to be embedded into other systems by developers who want full featured number graphics at their fingertips. Yet it needs very little 
 "container" support. In fact, the "application" that installs with this system is itself a very simple container of perhaps 200 or so lines of code. That application was primarily written as an 
 example to show you HOW to embedd the control, but it is powerful enough at the same time to <strong>BE</strong> the hosting application.
+
 
 It is incredibly easy to pop this tool into just about any system imaginable. 
 You can even instantiate this directly in MS Excel with no programming at all ! It has been a lifelong goal of mine to rid the earth of those "Excel" charts you see everywhere - this does that nicely.

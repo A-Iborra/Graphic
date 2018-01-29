@@ -18,14 +18,16 @@
 
    long __stdcall ContainedDataSet::QueryInterface(REFIID riid,void **ppv) {
 
-   if ( IID_IDataSetEvents == riid ) 
+   if ( IID_IDataSetEvents == riid ) {
       *ppv = static_cast<IDataSetEvents *>(this);
-   else
+      AddRef();
+      return S_OK;
+   }
 
-      return ContainedObject::QueryInterface(riid,ppv);
+   if ( S_OK == ContainedObject::QueryInterface(riid,ppv) ) 
+      return S_OK;
 
-   reinterpret_cast<IUnknown*>(*ppv) -> AddRef();
-   return S_OK;
+   return pDataSet() -> QueryInterface(riid,ppv);
    }
    unsigned long __stdcall ContainedDataSet::AddRef() { return ContainedObject::AddRef(); }
    unsigned long __stdcall ContainedDataSet::Release() { return ContainedObject::Release(); }

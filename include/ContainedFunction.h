@@ -20,7 +20,7 @@
 
      IGSFunctioNater *pFunction() { return pIGSFunctioNater; };
 
-     STDMETHOD(QueryInterface)(REFIID riid,void **ppv);
+     HRESULT __stdcall QueryInterface(REFIID riid,void **ppv);
 
      STDMETHOD_ (ULONG, AddRef)();
      STDMETHOD_ (ULONG, Release)();

@@ -380,17 +380,17 @@ Sleep(10);
    }
  
  
-   HRESULT OpenGLImplementor::SetColor(IGProperty* pColor) {
-   GLfloat fv[4];
-   BYTE *pb = (BYTE *)fv;
-   pColor -> get_binaryValue(sizeof(fv),(BYTE**)&pb);
+   HRESULT OpenGLImplementor::SetColor(float *pfv) {
+   GLfloat fv[] = {pfv[0],pfv[1],pfv[2],pfv[3]};
+   //BYTE *pb = (BYTE *)fv;
+   //pColor -> get_binaryValue(sizeof(fv),(BYTE**)&pb);
    SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETCOLOR,fv)
    return S_OK;
    }
  
  
-   HRESULT OpenGLImplementor::SetLineWeight(IGProperty* pLineWeight) {
-   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETLINEWEIGHT,pLineWeight)
+   HRESULT OpenGLImplementor::SetLineWeight(float lineWeight) {
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SETLINEWEIGHT,(WPARAM)lineWeight)
    return S_OK;
    }
  

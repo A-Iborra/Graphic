@@ -131,7 +131,7 @@
  
    propertyPlotType -> put_longValue(gcPlotType2DExternal1);
    
-   return Loaded();
+   return S_OK;//Loaded();
    }
  
  

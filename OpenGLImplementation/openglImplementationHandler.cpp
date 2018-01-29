@@ -175,13 +175,13 @@
       break;
 
    case WM_OPENGLIMPLEMENTATION_SETLINEWEIGHT: {
-      IGProperty *pLineWeight = (IGProperty *)wParam;
-      long lw = 0;
-      float lineWeight;
-      if ( pLineWeight ) 
-         pLineWeight -> get_longValue(&lw);
-      lineWeight = (float)lw;
-      glLineWidth(lineWeight);
+      //IGProperty *pLineWeight = (IGProperty *)wParam;
+      //long lw = 0;
+      //float lineWeight;
+      //if ( pLineWeight ) 
+      //   pLineWeight -> get_longValue(&lw);
+      //lineWeight = (float)lw;
+      glLineWidth((GLfloat)(float)wParam);
       }
       break;
 

@@ -13,9 +13,9 @@ IDMENU_AXIS MENU DISCARDABLE
 BEGIN
     POPUP "Axis Menu"
     BEGIN
-        MENUITEM "Axis Menu",                   IDMENU_AXIS_AXIS,INACTIVE
+        MENUITEM "Axis Menu",IDMENU_AXIS_AXIS,INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "&Properties",                 IDMI_AXIS_SET_PROPERTIES
+        MENUITEM "&Properties",IDMI_AXIS_SET_PROPERTIES
     END
 END
 

@@ -82,14 +82,21 @@
  
  
    STDMETHODIMP G::SetExtent(DWORD dwDrawAspect,SIZEL *pSizel) {
-   if ( dwDrawAspect != DVASPECT_CONTENT ) return S_OK;
+
+   if ( dwDrawAspect != DVASPECT_CONTENT )
+      return S_OK;
+
    SIZEL tempSizel;
    RECT rect = {0,0,0,0};
+
    hiMetricToPixel(pSizel,&tempSizel);
    rect.right = tempSizel.cx;
    rect.bottom = tempSizel.cy;
+
    SetWindowPos(hwndFrame,HWND_TOP,0L,0L,rect.right - rect.left,rect.bottom - rect.top,SWP_NOMOVE);
+
    memcpy(&containerSize,&tempSizel,sizeof(SIZEL));
+
    return S_OK;
    }
  
@@ -131,6 +138,7 @@
                               lprcPosRect-> right - lprcPosRect -> left - 8,lprcPosRect -> bottom - lprcPosRect -> top - 8,SWP_SHOWWINDOW);
       else
          ShowWindow(hwndFrame,SW_SHOW);
+
       break;
  
    default:

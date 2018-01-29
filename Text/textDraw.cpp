@@ -236,6 +236,7 @@
       if ( partOfMainGraphic ) {
          //pIOpenGLImplementation -> Push();
          //pIOpenGLImplementation -> SetUp(pIDataSet);
+         pIOpenGLImplementation -> SetLineWeight(1.0f);
          pIBasePlot -> Draw();
          //pIOpenGLImplementation -> Pop();
       }

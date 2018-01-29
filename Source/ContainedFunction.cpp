@@ -18,18 +18,22 @@
 
    long __stdcall ContainedFunction::QueryInterface(REFIID riid,void **ppv) {
 
-   if ( DIID_IGSFunctioNaterEvents == riid ) 
+   if ( DIID_IGSFunctioNaterEvents == riid ) { 
       *ppv = static_cast<IGSFunctioNaterEvents*>(this);
-   else
+      AddRef();
+      return S_OK;
+   }
 
-   if ( IID_IDispatch == riid ) 
+   if ( IID_IDispatch == riid ) {
       *ppv = static_cast<IDispatch*>(this);
-   else
+      AddRef();
+      return S_OK;
+   }
 
-      return ContainedObject::QueryInterface(riid,ppv);
+   if ( S_OK == ContainedObject::QueryInterface(riid,ppv) ) 
+      return S_OK;
 
-   reinterpret_cast<IUnknown*>(*ppv) -> AddRef();
-   return S_OK;
+   return pFunction() -> QueryInterface(riid,ppv);
    }
    unsigned long __stdcall ContainedFunction::AddRef() { return ContainedObject::AddRef(); }
    unsigned long __stdcall ContainedFunction::Release() { return ContainedObject::Release(); }

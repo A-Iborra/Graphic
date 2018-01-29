@@ -118,7 +118,8 @@
                      "MinX=Ox MinY=Oy MinZ=Oz MaxX=Mx MaxY=My MaxZ=Mz"};
 
    char *pszTemp = szAll;
-   while ( *pszTemp ) evalConsume(pIEvaluator,pszTemp);
+   while ( *pszTemp ) 
+      evalConsume(pIEvaluator,pszTemp);
 
    propertyOriginAtMinpoint -> get_boolValue(&originAtMinpoint);
 
@@ -420,7 +421,7 @@
       }
    }
  
-   if ( TICK_UNITS_DATA == tickLengthUnits || UNIT_PIXEL == tickLengthUnits ) {
+   if ( UNIT_PIXEL == tickLengthUnits ) {
       tickAbove /= (primaryOtherMax - primaryOtherMin);
       tickBelow /= (primaryOtherMax - primaryOtherMin);
       secondaryTickAbove /= (secondaryOtherMax - secondaryOtherMin);
@@ -753,7 +754,7 @@
          step = division / sinPhi;
          gridSpace = gridSpace / sinPhi;
 
-         progress = -step;
+         progress = origin.z - step;
 
          for ( tickNumber = 1; tickNumber <= nTicks + 1; tickNumber++ ) {
 
@@ -786,7 +787,7 @@
                }
 
             }
-       
+
             if ( drawTickLabels ) {
   
                dp.x = origin.x + progress * cosPhi * cosTheta;

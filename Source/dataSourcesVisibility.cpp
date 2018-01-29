@@ -63,20 +63,20 @@
 
    std::vector<IGSFunctioNater *> visibleFunctions;
 
-   IGSFunctioNater *pIFunction = NULL;
+   ContainedFunction *pIFunction = NULL;
 
-   while ( pIFunction = functionList.GetNext(pIFunction) ) {
+   while ( pIFunction = containedFunctionList.GetNext(pIFunction) ) {
 
       IOleObject* pIOleObject_Function;
 
       VARIANT_BOOL isAnyControlVisible;
 
-      pIFunction -> get_AnyControlVisible(&isAnyControlVisible);
+      pIFunction -> pFunction() -> get_AnyControlVisible(&isAnyControlVisible);
 
       if ( ! isAnyControlVisible ) 
          continue;
 
-      visibleFunctions.push_back(pIFunction);
+      visibleFunctions.push_back(pIFunction -> pFunction());
 
       anyFunctionVisible = true;
 
@@ -108,9 +108,9 @@
 
    IOleObject* pIOleObject_DataSet;
 
-   IDataSet *pIDataSet = NULL;
+   ContainedDataSet *pIDataSet = NULL;
 
-   while ( pIDataSet = dataSetList.GetNext(pIDataSet) ) {
+   while ( pIDataSet = containedDataSetList.GetNext(pIDataSet) ) {
 
       anyDataSetVisible = true;
 

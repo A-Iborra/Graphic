@@ -96,7 +96,7 @@
          sizelDataSetsUI.cy = max(sizelDataSetsUI.cy,sizeDataSet.cy);
 
       }
-#if 1
+
       for ( int k = 0; k < dataSetCount; k++ ) {
 
          TC_ITEM tie = {0};
@@ -108,7 +108,7 @@
          ((ContainedFunction *)tie.lParam) -> ReSize();
 
       }
-#endif
+
       if ( 0 < dataSetCount )
          SetWindowPos(p -> hwndDataSourcesDataSets,HWND_TOP,8,32,sizelDataSetsUI.cx + 16,min(cy - 74,sizelDataSetsUI.cy + 32),SWP_NOREDRAW);
 

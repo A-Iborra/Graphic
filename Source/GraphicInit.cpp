@@ -82,14 +82,39 @@
 
    hwndDataSourcesDataSets = GetDlgItem(hwndDataSourcesDialog,IDDI_DATASOURCES_DATASETS_TAB);
 
+
+      IGSFunctioNater *pIFunction = NULL;
+      while ( pIFunction = functionList.GetNext(pIFunction) )
+         connectFunction(pIFunction);
+
+      ContainedFunction *pcf = (ContainedFunction *)NULL;
+      while ( pcf = containedFunctionList.GetNext(pcf) )
+         ShowWindow(pcf -> HWNDSite(),SW_HIDE);
+
+      //SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
+
+      IDataSet *pIDataSet = NULL;
+      while ( pIDataSet = dataSetList.GetNext(pIDataSet) )
+         connectDataSet(pIDataSet);
+
+      ContainedDataSet *pCds = (ContainedDataSet *)NULL;
+      while ( pCds = containedDataSetList.GetNext(pCds) )
+         ShowWindow(pCds -> HWNDSite(),SW_HIDE);
+
+      SendMessage(hwndDataSourcesDataSets,TCM_SETCURSEL,(WPARAM)0,0L);
+
+      if ( 0 < containedFunctionList.Count() ) {
+         SendMessage(hwndDataSourcesFunctions,TCM_SETCURSEL,0L,0L);
+         ContainedFunction* pContainedFunction = containedFunctionList.GetFirst();
+         ShowWindow(pContainedFunction -> HWNDSite(),SW_SHOW);
+      }
+
+      setDataSourcesVisibility(NULL,NULL);
+
+
+
    put_PlotView(plotView);
    put_PlotType(default2DPlotType);
-
-   if ( containedFunctionList.Count() > 0 ) {
-      SendMessage(hwndDataSourcesFunctions,TCM_SETCURSEL,0L,0L);
-      ContainedFunction* pContainedFunction = containedFunctionList.GetFirst();
-      ShowWindow(pContainedFunction -> HWNDSite(),SW_SHOW);
-   }
 
    pIOpenGLImplementation -> SetBaseWindow(Canvas());
 

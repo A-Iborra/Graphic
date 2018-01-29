@@ -88,9 +88,9 @@
 
    pParent -> propertyAxiis -> clearStorageObjects();
 
-   IAxis *a = (IAxis *)NULL;
-   while ( a = pParent -> axisList.GetNext(a) ) 
-      pParent -> propertyAxiis -> addStorageObject(a);
+   IAxis *pIAxis = (IAxis *)NULL;
+   while ( pIAxis = pParent -> axisList.GetNext(pIAxis) ) 
+      pParent -> propertyAxiis -> addStorageObject(pIAxis);
 
    pParent -> propertyAxiis -> writeStorageObjects();
 
@@ -245,7 +245,7 @@
    dp[1].z = 1.0;
    pParent -> propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<BYTE *>(dp));
 
-   return Loaded();
+   return S_OK;//Loaded();
    }
  
  
@@ -285,18 +285,6 @@
 
       pParent -> propertyFunctions -> clearStorageObjects();
 
-      p = NULL;
-      while ( p = pParent -> functionList.GetNext(p) )
-         pParent -> connectFunction(p);
-
-      pParent -> setDataSourcesVisibility(NULL,NULL);
-
-      ContainedFunction *pcf = (ContainedFunction *)NULL;
-      while ( pcf = pParent -> containedFunctionList.GetNext(pcf) )
-         ShowWindow(pcf -> HWNDSite(),SW_HIDE);
-
-      SendMessage(pParent -> hwndDataSourcesFunctions,TCM_SETCURSEL,(WPARAM)0,0L);
-
    }
 
    pParent -> propertyDataSets -> get_storedObjectCount(&cntObjects);
@@ -321,18 +309,6 @@
       pParent -> propertyDataSets -> readStorageObjects();
 
       pParent -> propertyDataSets -> clearStorageObjects();
-
-      p = NULL;
-      while ( p = pParent -> dataSetList.GetNext(p) )
-         pParent -> connectDataSet(p);
-
-      pParent -> setDataSourcesVisibility(NULL,NULL);
-
-      ContainedDataSet *pCds = (ContainedDataSet *)NULL;
-      while ( pCds = pParent -> containedDataSetList.GetNext(pCds) )
-         ShowWindow(pCds -> HWNDSite(),SW_HIDE);
-
-      SendMessage(pParent -> hwndDataSourcesDataSets,TCM_SETCURSEL,(WPARAM)0,0L);
 
    }
 
@@ -387,9 +363,6 @@
          delete [] pText;
       }
    }
-
-   if ( pParent -> hwndFrame ) 
-      pParent -> setDataSourcesVisibility(NULL,NULL);
 
    pParent -> propertyPlotServicesObject -> get_storedObjectCount(&cntObjects);
 

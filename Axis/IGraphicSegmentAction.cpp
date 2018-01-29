@@ -35,7 +35,7 @@
  
    HRESULT Axis::Selector() {
    char szText[MAX_PROPERTY_SIZE];
-   sprintf(szText,"%c-Axis[(%lf,%lf,%lf) <-> (%lf,%lf,%lf)]",type,minPoint.x,minPoint.y,minPoint.z,maxPoint.x,maxPoint.y,maxPoint.z);
+   sprintf(szText,"%c-Axis[(%lf,%lf,%lf) <-> (%lf,%lf,%lf)]",type,origin.x,origin.y,origin.z,endPoint.x,endPoint.y,endPoint.z);
    if ( pIGSystemStatusBar )
       pIGSystemStatusBar -> put_StatusText(0,szText);
    return S_OK;

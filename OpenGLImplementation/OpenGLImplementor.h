@@ -299,8 +299,8 @@
       STDMETHOD(get_ViewPhi)(double* pViewPhi);
       STDMETHOD(get_ViewSpin)(double *);
 
-      STDMETHOD(SetColor)(IGProperty*);
-      STDMETHOD(SetLineWeight)(IGProperty*);
+      STDMETHOD(SetColor)(float *);
+      STDMETHOD(SetLineWeight)(float);
 
       STDMETHOD(Normal3dv)(double *normal);
  

@@ -12,8 +12,8 @@
 
 #include "list.cpp"
 
-   Axis::Axis(IUnknown *pUnkOuter) 
-   :
+   Axis::Axis(IUnknown *pUnkOuter) :
+
      selected(FALSE),
      pIUnknownOuter(pUnkOuter),
      pIOpenGLImplementation(NULL),
@@ -101,7 +101,7 @@
    pIGProperties -> Advise(pIPropertiesClient);
    pIPropertiesClient -> Release();
  
-   pIGProperties -> Add(L"custom colors"         ,&propertyCustomColors );
+   pIGProperties -> Add(L"custom colors",&propertyCustomColors );
    propertyCustomColors -> put_type(TYPE_BINARY);
    propertyCustomColors -> put_size(4 * sizeof(double));
 

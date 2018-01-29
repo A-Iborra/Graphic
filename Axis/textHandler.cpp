@@ -71,8 +71,10 @@
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Z),p -> labelPositionNatural ? FALSE : TRUE);
 
       p -> propertyTickLabelSize -> get_doubleValue(&d);
+
       sprintf(szTemp,"%6.1f",d);
       SetDlgItemText(hwnd,IDDI_AXIS_TEXT_TICK_LABEL_SIZE,szTemp);
+
       p -> propertyTickLabelSizeUnits -> get_longValue(&v);
       SendMessage(GetDlgItem(hwnd,IDDI_AXIS_TEXT_TICK_LABEL_SIZE_UNITS),CB_GETLBTEXT,v,(LPARAM)szTemp);
       SendMessage(GetDlgItem(hwnd,IDDI_AXIS_TEXT_TICK_LABEL_SIZE_UNITS),CB_SELECTSTRING,0,(LPARAM)szTemp);
