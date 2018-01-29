@@ -27,11 +27,12 @@ I would not have put it here unless I am confident it is of real use right now -
 
 And, so, here it is - number graphics - on Windows - in COM - and when I say COM - I mean COM.
 
-![shading example](http://www.cursivision.com/docs/3-DLightingAndShading.png)
+![shading example](http://www.cursivision.com/docs/3-DLightingAndShading3.png)
 
 ## How is this software different ?
 ----
-This system treats your graphics much more like documents. In other words - you create the graphic much as you would create a document using MS Word, for example. Everything you do can be saved as a file and restored at any time. 
+This system treats your graphics more like documents than I believe most of the peer systems do. In other words - you create the graphic much as you would create a document using MS Word, for example. 
+Everything you do can be saved as a file and restored at any time. 
 Contrast this with more of a script driven system. Yes - you can probably save the script and re-create the graphic - but that is not remotely the same as building up the graphic using well known modern user interface techniques.
 For example, every object on your graphic has properties available simply by double clicking the object. Text objects can be grabbed with the mouse and moved to different locations, soon, this will apply to axis objects as well.
 Data is at your fingertips right in the system. For example, a control panel is created where you manage data sets and functions - two sources of data for plotting. The following figure is a screenshot of the UI.
@@ -88,7 +89,7 @@ You can also export datasets to Excel, the data generated,from a function, for e
 
 ## If you want to build the system ...
 
-The application installed is really just a sample showing how you can embedd this tool in any windows application. The source for that application is in the "GraphicHost" sub-directory. 
+The application installed is really just a sample showing how you can embed this tool in any windows application. The source for that application is in the "GraphicHost" sub-directory. 
 
 Having run the installer - all the binaries in the system will have been registered, so you can begin build and test cycles for each component one at a time.
 
