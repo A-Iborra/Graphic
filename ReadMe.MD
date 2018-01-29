@@ -1,5 +1,6 @@
 
 # The InnoVisioNate Graphics System
+### Serious Scientific/Numerical Graphics
 ----
 
 This one is my lifelong passion - or, put another way - something I've been stuck with for what seems like forever !
@@ -15,7 +16,7 @@ I'll never know the answer to that - but I do know that for whatever angst, tria
 contribution back to that realm that somehow roped me into this bullshit, irratitating, and frustrating career that I love so much...
 
 And, so, here it is - number graphics - on Windows - in COM - and when I say COM - I mean COM.
-
+![text example](http://www.cursivision.com/docs/3-DLightingAndShading.png)
 ## What is this software ?
 ----
 
