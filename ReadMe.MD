@@ -41,15 +41,15 @@ Data is at your fingertips right in the system. For example, a control panel is 
 In the figure above - the executable running IS the very small "hosting" application written as an example of how to embed the Graphic object into ANY application. If you are a software developer, note that you can put the inner part of the
 above figure (the "meat of it") in YOUR system in about 2 seconds flat. Note also that having done so, you can also control many aspects about the UI in that system (hide the UI to the left, for example). More about that in the next section.
 
-Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x*x + y*y)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variable
+Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x^2 + y^2)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variable
 which also ranges from 0 - 12 in 80 steps.
 
 Here's an example of where the "UI" difference comes in: this function was created very simply - by entering it into a standard edit-text field. The independent variables were detected automatically and the UI components to 
-specify the range were automatically shown. Sure - that's typical UI - the point is that it is there - there is NO script like function definition you have to learn - and worse - remember in the future.
+specify the range were automatically shown. Sure - that's typical UI - the point is that it is there - there is NO script like function definition you have to learn - and worse - have to remember in the future.
 
 Note that if I wanted to - I could change this function right in the field to the right of the Properties button. 
 
-So, while I'm creating my graphic "document" using the control panel - I can define any number of functions or data sets - and combine them into the resulting graphic in any way I choose. The graphic shown in the first figure above 
+So, while I'm creating my graphic "document" using the panel to the left - I can define any number of functions or data sets - and combine them into the resulting graphic in any way I choose. The graphic shown in the first figure above 
 is simply two 2-dimensional functions that took about 1 minute to enter into the system. Note in this case that each function has a different domain (range of x) - this is properly accounted for when data sets (which are created by 
 functions OR explicitly provided with, for example, Excel data) are combined.
 
@@ -81,10 +81,12 @@ So, my friends, join me in this - embrace the fact that software development of 
 
 ### Run the installer
 ----
-You will find the NSIS built installer in the "Installer Support" directory. This installer will put a "Graphic" icon on your desktop. 
+You will find the NSIS built installer in the "Installer Support" directory. This installer will put a "Graphic" icon on your desktop which is a shortcut to the aforementioned sample application. 
 You can get to know how the system works quickly by right clicking on the empty graphic and choosing "Functions", then click "Add" to define a new function (default 3-D functions are provided).
 You can also integrate directly with excel. To do this, right click, choose properties, then DataSets. When you add a dataset you can import existing data from Excel workbooks.
 You can also export datasets to Excel, the data generated,from a function, for example.
+
+## If you want to build the system ...
 
 The application installed is really just a sample showing how you can embedd this tool in any windows application. The source for that application is in the "GraphicHost" sub-directory. 
 
