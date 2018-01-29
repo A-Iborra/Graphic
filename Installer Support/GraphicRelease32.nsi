@@ -1,9 +1,9 @@
 
 ;!define DONT_SIGN
 
-!define INFILE GraphicRelease.nsi
+!define INFILE GraphicRelease32.nsi
 
-!define OUTFILE GraphicSetup.exe
+!define OUTFILE GraphicSetup_x86.exe
 
 !define ARCH win32
 
