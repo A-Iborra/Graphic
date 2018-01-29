@@ -38,7 +38,10 @@ Data is at your fingertips right in the system. For example, a control panel is 
 
 ![UI example](http://www.cursivision.com/docs/FunctionPanel.png)
 
-Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x*x + y*y)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variablew
+In the figure above - the executable running IS the very small "hosting" application written as an example of how to embed the Graphic object into ANY application. If you are a software developer, note that you can put the inner part of the
+above figure (the "meat of it") in YOUR system in about 2 seconds flat. Note also that having done so, you can also control many aspects about the UI in that system (hide the UI to the left, for example). More about that in the next section.
+
+Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x*x + y*y)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variable
 which also ranges from 0 - 12 in 80 steps.
 
 Here's an example of where the "UI" difference comes in: this function was created very simply - by entering it into a standard edit-text field. The independent variables were detected automatically and the UI components to 
@@ -47,8 +50,8 @@ specify the range were automatically shown. Sure - that's typical UI - the point
 Note that if I wanted to - I could change this function right in the field to the right of the Properties button. 
 
 So, while I'm creating my graphic "document" using the control panel - I can define any number of functions or data sets - and combine them into the resulting graphic in any way I choose. The graphic shown in the first figure above 
-is simply two 2-dimensional functions that took about 1 minute to enter the system. Note in this case that each function has a different domain (range of x) - this is properly accounted for when data sets (which is created by the functions)
-are combined.
+is simply two 2-dimensional functions that took about 1 minute to enter into the system. Note in this case that each function has a different domain (range of x) - this is properly accounted for when data sets (which are created by 
+functions OR explicitly provided with, for example, Excel data) are combined.
 
 Note also that this system has very powerful data integration capabilities with MS Excel. When you create a dataset you can import/export live out of and into Excel. You can also either embed the data from the workbook OR have the 
 system automatically go out and get the data every time you open up this particular graphic "document".
