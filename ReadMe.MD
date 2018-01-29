@@ -9,14 +9,26 @@ This one is my lifelong passion - or, put another way - something I've been stuc
 
 I don't know why - but for some reason, Sibelius and Scientific Computer Graphics grabbed my ass sometime in 1980 or so. And, to this date, almost 40 years later, they both still have full control over me.
 
-I should have known when, having dropped a stack of FORTRAN punch cards - yes - punch cards (and YES, FORTRAN), I studiously put them ALL back in order absolutely adament about saving that work - that I was forever in the 
-unrelenting grip of software development and that I would never ever be free from it ! I wonder now, that if at THAT point time I could see the future 40 years hence, should I have hitailed my ass out of there right then and there ?
+During the first part of my career - like many engineers - I wrote a numerical analysis and graphics package. First it was on IBM MainFrame OS-360 in FORTRAN, using some package of subroutines whose name I can't remember and these 
+horrible green, perhaps "phosphorous", displays.
+I do remember there being certain static "allowed" numbers of parameters, for example, "up to 10", etc., etc. And I thought to myself that there should be no such limits in software of any kind, and for that reason, went ahead and started writing
+a graphic system on my own that would never have any limitiations. That was 1982, even then, I was thinking about software "extensibility" - an idea I'm still trying to preach and demonstrate in everything I do.
 
-I'll never know the answer to that - but I do know that for whatever angst, trials, and tribulations I've endured during these 40 years - if there will be some good that comes out of it - it may as well be a
-contribution back to that realm that somehow roped me into this bullshit, irratitating, and frustrating career that I love so much...
+In 1988, I left that job because OS/2 was about to become "popular" - and I was bound and determined to replicate that graphics system (which had grown very powerful and feature rich over the years) in the PC world and bring graphics to the masses.
+
+Well, OS/2 (undeservedly) fizzled and other aspects of life got in the way. 
+
+Very recently, December '17, I dusted off the cover and re-opened this book, this time, determined to get some headway on publishing it. From my notes and other factors in the code - I can see that I worked on this in 1992, then again in '96 and '97, 
+a little bit in 2002, and in 2008.
+
+I am currently unemployed yet writing software is what I truly love to do with my time - so it was a perfect opportunity to really polish this off. Therefore over the last 2 months I've been heads down getting this ready to get out into the world. 
+I believe it is there - ready to use, I don't open source it because I want help finishing it - I open source it to get it out there so people can see what I've done - it is as simple as that. Therefore, you can be assured that 
+I would not have put it here unless I am confident it is of real use right now - today. And so that people can follow me as I keep this one on the front burner and make it better and more powerful all the time.
 
 And, so, here it is - number graphics - on Windows - in COM - and when I say COM - I mean COM.
+
 ![text example](http://www.cursivision.com/docs/3-DLightingAndShading.png)
+
 ## What is this software ?
 ----
 
