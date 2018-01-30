@@ -338,7 +338,7 @@
    pIGProperties -> Add(L"opengl axis text",&propertyRenderOpenGLAxisText);
    propertyRenderOpenGLAxisText -> put_type(TYPE_BOOL);
    propertyRenderOpenGLAxisText -> put_size(sizeof(BOOL));
-   //propertyRenderOpenGLAxisText -> put_boolValue(FALSE);
+   propertyRenderOpenGLAxisText -> put_boolValue(FALSE);
    
    pIGProperties -> DirectAccess(L"auto clear",TYPE_BOOL,&autoClear,sizeof(autoClear));
    pIGProperties -> DirectAccess(L"plot view",TYPE_LONG,&plotView,sizeof(plotView));
