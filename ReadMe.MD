@@ -31,9 +31,9 @@ And, so, here it is - number graphics - on Windows - in COM - and when I say COM
 
 ## How is this software different ?
 ----
-This system treats your graphics more like documents than I believe most of the peer systems do. In other words - you create the graphic much as you would create a document using MS Word, for example. 
+This system treats your graphics more like documents than I believe most of the peer systems do. In other words - you create the graphic much as you would create a document using MS Word. 
 Everything you do can be saved as a file and restored at any time. 
-Contrast this with more of a script driven system. Yes - you can probably save the script and re-create the graphic - but that is not remotely the same as building up the graphic using well known modern user interface techniques.
+Contrast this with more of a script driven system. Yes - you can save the script and re-create the graphic - but that is not remotely the same as building up the graphic using well known modern user interface techniques.
 For example, every object on your graphic has properties available simply by double clicking the object. Text objects can be grabbed with the mouse and moved to different locations, soon, this will apply to axis objects as well.
 Data is at your fingertips right in the system. For example, a control panel is created where you manage data sets and functions - two sources of data for plotting. The following figure is a screenshot of the UI.
 
@@ -42,7 +42,7 @@ Data is at your fingertips right in the system. For example, a control panel is 
 In the figure above - the executable running IS the very small "hosting" application written as an example of how to embed the Graphic object into ANY application. If you are a software developer, note that you can put the inner part of the
 above figure (the "meat of it") in YOUR system in about 2 seconds flat. Note also that having done so, you can also control many aspects about the UI in that system (hide the UI to the left, for example). More about that in the next section.
 
-Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x^2 + y^2)) / (x + 9) and this this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variable
+Note in the figure - a 3-dimensional function has been defined, specifically: z = cos(sqrt(x^2 + y^2)) / (x + 9) and this function is evaluated from x = 0 to 12 in 80 steps. Not visible is the same panel for the y- independent Variable
 which also ranges from 0 - 12 in 80 steps.
 
 Here's an example of where the "UI" difference comes in: this function was created very simply - by entering it into a standard edit-text field. The independent variables were detected automatically and the UI components to 
@@ -89,7 +89,7 @@ You can also export datasets to Excel, the data generated,from a function, for e
 
 ## If you want to build the system ...
 
-The application installed is really just a sample showing how you can embed this tool in any windows application. The source for that application is in the "GraphicHost" sub-directory. 
+The application installed is really just a sample showing how you can embed this tool in any windows application. The source for that application is in the "GraphicHost" sub-directory (that is, from the repository, not related to the installer). 
 
 Having run the installer - all the binaries in the system will have been registered, so you can begin build and test cycles for each component one at a time.
 
@@ -117,10 +117,10 @@ for now I live with it.
 Note that the systems interrelate through the generated <fileName>_i.h and <fileName>_i.c files from the MIDL compiler. I DO check these into the repositories for the very reason that they need to be there for the first build. Note, 
 however, that because they are generated, a build "clean" or "rebuild all" will delete them. As I say, if anyone knows a better way - that does NOT drive the object model, I'd love to hear it.
 
-<strong>By the way</strong> ALL artifacts build into subdirectories of "\Common\Artifacts" - this includes generated files needed across projects.
+<strong>By the way</strong> ALL binary artifacts build into subdirectories of "\Common\Artifacts" and generated files will be found under \Common in the appropriate place, for example, in \Common\include for the "..._i.h" files.
 
 Anyway - there ARE issues with MIDL puking on just about everything with absolutely no useful information. I have not always been able to get interfaces formally into '.odl files - for example, sometimes I have to resort
-to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are total bullshit and it's way past time that we should be given the respect, by MS 
+to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are a total crock and it's way past time that we should be given the respect, by MS 
 and others, for that matter, to be provided better tools, or at least tools that can be the best they can be.
 
 ### Building the system
@@ -133,8 +133,8 @@ they slip through.
 A quick synopsis of the components in the system is (ALL of these are COM objects):
 
 1. Graphic - the core "central" component - hosts the graphic drawing window and UI components for interacting with Functions, DataSets, Plots and properties for the whole system. This is the main ActiveX/COM component control of the system.
-2. Axis - The x, y, and z axiis for the plots.
-3. DataSet - The data. That which will be plotted. This object also has very extensive import/export MS Excel capabilities.
+2. Axis - The x, y, and z axiis for the plots. Specifically, there are 3 "instances" of this object, and more can be added by the user (to define additional domains, for example).
+3. DataSet - The data. That which will be plotted. This object also has very extensive import/export MS Excel capabilities. 
 4. Documentation - just a place holder for now, some stuff I had started in the early 2000s time frame, but documentation IS lacking here
 5. Evaluator - Evaluates mathematical expressions. Given a string representation of any algebraic equation - will provide the results of it. It will detect independent variables that the user would need to provide range(s) for.
 6. Function - tightly integrated with the Evaluator to provide the ability to define arbitrarily complex algebraic functions whose data is then tightly integrated with Graphic to achieve plotting (as well as the UI host for the function definitions)
@@ -142,7 +142,7 @@ A quick synopsis of the components in the system is (ALL of these are COM object
 8. GraphicHost - The sample C++ embedding application. This very simple application is the "application" installed by the installer. By containing (hosting) the Graphic Control - it is in itself a very powerful graphics system. You would almost think
 that this executable WAS the system - but it's not - any windows application can use the Graphic control and appear just as full featured.
 9. OpenGLImplementation - All calls to the OpenGL library are made here - essentially nothing in the entire system <i>except</i> this component knows or cares even a little bit about OpenGL. Instead, other components use the interfaces 
-to this object to produce graphics. Essentially - one could use any underlying graphics API by re-implementing this component over that API. This particular project shows one way how to access OpenGL in a multi-threaded system correctly.
+to this object to produce graphics. Essentially - one could use any underlying graphics API by re-implementing this component over that API. This particular project shows one way how to access OpenGL in a multi-threaded system safely and correctly.
 10. Plot - The graphic itself - the drawing, or "representation" of the data. Note there are only a few plot "types" defined at this point, natural (line), wireframe, surface (again you can see these almost instantly by running the 
 sample application and creating functions). However - What is important is that the plot types themselves <strong>are also</strong> COM objects ! In other words - Anybody can create any new plottype they can dream up (in any language For
 that matter) and it will seamlessly integrate into the entire system - as if it were natively built in - this is but one very good example of the power of raw COM.
