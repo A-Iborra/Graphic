@@ -309,6 +309,8 @@
       pIGPropertiesClient -> Release();
    }
 
+   pParent -> reInitializeAxiis();
+
    return S_OK;//Loaded();
    }
  
@@ -438,6 +440,8 @@
       pParent -> propertyPlotServicesObject -> clearStorageObjects();
 
    }
+
+   pParent -> isInitializing = FALSE;
 
    return S_OK;
    }

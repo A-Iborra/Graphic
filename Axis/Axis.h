@@ -284,8 +284,6 @@
      short drawTickLabels,doAutoPrecision,determinesDomain;
      short drawAxisLabel,labelPositionNatural,labelAnglePerpendicular,labelAngleParallel,labelAngleOther;
 
-     WNDPROC oldSampleHandler;
-
      static LRESULT CALLBACK handler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK styleHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);
      static LRESULT CALLBACK positionHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);

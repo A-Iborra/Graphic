@@ -37,7 +37,7 @@
    propertyDrawLabel -> put_boolValue(FALSE);
    propertyAxisLabelColorTrackLineColor -> put_boolValue(TRUE);
 
-   propertyAxisLabelSize -> put_doubleValue(10.0);
+   propertyAxisLabelSize -> put_doubleValue(16.0);
    propertyAxisLabelSizeUnits -> put_longValue(TEXT_SIZE_POINTS);
 
    propertyLabelPositionNatural -> put_boolValue(TRUE);   
@@ -46,7 +46,7 @@
    propertyLabelAngleOther -> put_boolValue(FALSE);
    propertyLabelAngleOtherValue -> put_szValue("0.0");
 
-   propertyTickLabelSize -> put_doubleValue(10.0);
+   propertyTickLabelSize -> put_doubleValue(16.0);
    propertyTickLabelSizeUnits  -> put_longValue(TEXT_SIZE_POINTS);
 
    propertyTickLabelColorTrackLineColor -> put_boolValue(TRUE);

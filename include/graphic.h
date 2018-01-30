@@ -412,9 +412,10 @@
       HMENU hwndMenuPlot() { return hMenuPlot; };
 
       int initWindows();
+      void reInitializeAxiis();
       void setDataSourcesVisibility(IDataSet *pIDataSet_Relevant,IGSFunctioNater *pIFunction_Relevant);
 
-      IPlot* newPlot(ULONG_PTR plotID);
+      IPlot *newPlot(ULONG_PTR plotID);
 
       IGSFunctioNater* newFunction(bool connectNow);
       void connectFunction(IGSFunctioNater *);
@@ -532,6 +533,7 @@
       BOOL allowUserFunctionControlVisibilityAccess;
       BOOL denyUserPropertySettings;
       BOOL isRunning;
+      BOOL isInitializing;
 
       char plotMarginUnits[16];
       char ***lightPositions;

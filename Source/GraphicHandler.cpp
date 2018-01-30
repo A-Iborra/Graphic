@@ -17,6 +17,8 @@
    bool isOpenGLActive = true;
 
    if ( WM_MOUSEFIRST <= msg && msg <= WM_MOUSELAST ) {
+      if ( p && p -> isInitializing )
+         return DefWindowProc(hwnd,msg,wParam,lParam);
       HWND hwndCurrent = p -> pIOpenGLImplementation -> TargetHWND();
       if ( ! ( hwnd == hwndCurrent ) )
          isOpenGLActive = false;
@@ -507,7 +509,12 @@
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_NEW: {
+         p -> isInitializing = TRUE;
          p -> pIGProperties -> New();
+         p -> pIPropertiesClient -> Loaded();
+         p -> isInitializing = TRUE;
+         p -> render(0);
+         p -> isInitializing = FALSE;
          }
          break;
 
