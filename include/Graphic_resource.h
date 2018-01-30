@@ -67,8 +67,9 @@
       #define IDMI_GRAPHIC_MENU_TITLE                                      6006
       #define IDMI_GRAPHIC_SAVE_AS                                         6007
       #define IDMI_GRAPHIC_OPEN                                            6008
-      #define IDMI_GRAPHIC_PRINT                                           6009
-      #define IDMI_GRAPHIC_VIEW_2D                                         6010
+      #define IDMI_GRAPHIC_NEW                                             6009
+      #define IDMI_GRAPHIC_PRINT                                           6010
+      #define IDMI_GRAPHIC_VIEW_2D                                         6011
       #define IDMI_GRAPHIC_VIEW_3D                                         6015
       #define IDMI_GRAPHIC_VIEW_SET                                        6018
       #define IDMI_GRAPHIC_EVALUATE                                        6030

@@ -107,6 +107,50 @@
 
    HRESULT G::_IGPropertiesClient::InitNew() {
 
+   long cntObjects = 0;
+
+   pParent -> propertyFunctions -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+
+      IGSFunctioNater *pIFunction = (IGSFunctioNater *)NULL;
+      while ( pIFunction = pParent -> functionList.GetFirst() ) {
+         pParent -> deleteFunction(pIFunction);
+         pParent -> functionList.Remove(pIFunction);
+      }
+
+   }
+
+   pParent -> propertyDataSets -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+
+      IDataSet *pIDataSet = (IDataSet *)NULL;
+      while ( pIDataSet = pParent -> dataSetList.GetFirst() ) {
+         pParent -> deleteDataSet(pIDataSet);
+         pParent -> dataSetList.Remove(pIDataSet);
+      }
+
+   }
+
+   pParent -> propertyTexts -> get_storedObjectCount(&cntObjects);
+
+   if ( cntObjects ) {
+
+      IText *pIText = (IText *)NULL;
+      while ( pIText = pParent -> textList.GetFirst() ) {
+         pIText -> Release();
+         pParent -> textList.Remove(pIText);
+      }
+
+   }
+
+   IAxis *pIAxis = NULL;
+   while ( pIAxis = pParent -> axisList.GetFirst() ) {
+      pIAxis -> Release();
+      pParent -> axisList.Remove(pIAxis);
+   }
+
    float fvAmbient[4],fvDiffuse[4],fvSpecular[4];
    float clrBlack[] = {CLR_BLACK};
    float clrGreen[] = {CLR_GREEN};
@@ -244,6 +288,26 @@
    dp[1].y = 1.0;
    dp[1].z = 1.0;
    pParent -> propertyDataExtents -> put_binaryValue(sizeof(dp),reinterpret_cast<BYTE *>(dp));
+
+   CoCreateInstance(CLSID_GSystemAxis,pParent -> pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&pParent -> xaxis));
+   CoCreateInstance(CLSID_GSystemAxis,pParent -> pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&pParent -> yaxis));
+   CoCreateInstance(CLSID_GSystemAxis,pParent -> pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&pParent -> zaxis));
+
+   pParent -> xaxis -> AdviseGSystemStatusBar(pParent -> pIGSystemStatusBar);
+   pParent -> yaxis -> AdviseGSystemStatusBar(pParent -> pIGSystemStatusBar);
+   pParent -> zaxis -> AdviseGSystemStatusBar(pParent -> pIGSystemStatusBar);
+
+   pParent -> axisList.Add(pParent -> xaxis);
+   pParent -> axisList.Add(pParent -> yaxis);
+   pParent -> axisList.Add(pParent -> zaxis);
+
+   pIAxis = NULL;
+   while ( pIAxis = pParent -> axisList.GetNext(pIAxis) ) {
+      IGPropertiesClient *pIGPropertiesClient = NULL;
+      pIAxis -> QueryInterface(IID_IGPropertiesClient,reinterpret_cast<void **>(&pIGPropertiesClient));
+      pIGPropertiesClient -> InitNew();
+      pIGPropertiesClient -> Release();
+   }
 
    return S_OK;//Loaded();
    }

@@ -53,6 +53,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Save as ...",        IDMI_GRAPHIC_SAVE_AS
         MENUITEM "Open ...",           IDMI_GRAPHIC_OPEN
+        MENUITEM "New",                IDMI_GRAPHIC_NEW
         MENUITEM SEPARATOR
         MENUITEM "Print ...",          IDMI_GRAPHIC_PRINT
         MENUITEM SEPARATOR

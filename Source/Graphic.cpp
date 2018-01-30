@@ -377,17 +377,17 @@
    propertyPlotMargins -> directAccess(TYPE_BINARY,&margins,sizeof(RECT));
    propertyPlotMarginsStretchAll -> directAccess(TYPE_BOOL,&stretchToMargins,sizeof(BOOL));
 
-   CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&xaxis));
-   CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&yaxis));
-   CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&zaxis));
+   //CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&xaxis));
+   //CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&yaxis));
+   //CoCreateInstance(CLSID_GSystemAxis,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IAxis,reinterpret_cast<void **>(&zaxis));
 
-   xaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
-   yaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
-   zaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+   //xaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+   //yaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+   //zaxis -> AdviseGSystemStatusBar(pIGSystemStatusBar);
 
-   axisList.Add(xaxis);
-   axisList.Add(yaxis);
-   axisList.Add(zaxis);
+   //axisList.Add(xaxis);
+   //axisList.Add(yaxis);
+   //axisList.Add(zaxis);
 
    rc = CoCreateInstance(CLSID_ViewSet,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IViewSet,reinterpret_cast<void **>(&pIViewSet));
 

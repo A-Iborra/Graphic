@@ -506,6 +506,11 @@
          }
          return LRESULT(TRUE);
 
+      case IDMI_GRAPHIC_NEW: {
+         p -> pIGProperties -> New();
+         }
+         break;
+
       case IDMI_GRAPHIC_PRINT: {
 
          PRINTDLG printDlg = {0};
