@@ -49,9 +49,6 @@
       p -> propertyDrawLabel -> put_boolValue(1 < n ? TRUE : FALSE);
 
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_NATURAL),p -> drawAxisLabel ? TRUE : FALSE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_X),p -> drawAxisLabel ? TRUE : FALSE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Y),p -> drawAxisLabel ? TRUE : FALSE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Z),p -> drawAxisLabel ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_PERPENDICULAR),p -> drawAxisLabel ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_PARALLEL),p -> drawAxisLabel ? TRUE : FALSE);
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_ISOTHER),p -> drawAxisLabel ? TRUE : FALSE);
@@ -63,12 +60,16 @@
       p -> propertyLabelAngleOther -> setWindowItemChecked(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_ISOTHER);
       p -> propertyLabelAngleOtherValue -> setWindowItemText(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_OTHER);
 
+      p -> propertyLabelPositionXValue -> setWindowItemText(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_X);
+      p -> propertyLabelPositionYValue -> setWindowItemText(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Y);
+      p -> propertyLabelPositionZValue -> setWindowItemText(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Z);
+
       EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_ANGLE_OTHER),p -> labelAngleOther ? TRUE : FALSE);
 
       p -> propertyLabelPositionNatural -> setWindowItemChecked(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_NATURAL);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_X),p -> labelPositionNatural ? FALSE : TRUE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Y),p -> labelPositionNatural ? FALSE : TRUE);
-      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Z),p -> labelPositionNatural ? FALSE : TRUE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_X),p -> drawAxisLabel && p -> labelPositionNatural ? FALSE : TRUE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Y),p -> drawAxisLabel && p -> labelPositionNatural ? FALSE : TRUE);
+      EnableWindow(GetDlgItem(hwnd,IDDI_AXIS_TEXT_LABEL_POSITION_Z),p -> drawAxisLabel && p -> labelPositionNatural ? FALSE : TRUE);
 
       p -> propertyTickLabelSize -> get_doubleValue(&d);
 

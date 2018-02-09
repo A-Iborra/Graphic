@@ -5,7 +5,7 @@
 #include "Text.h"
 #include <olectl.h>
 
-#include "utils.h"
+#include "utilities.h"
 #include "Graphic_resource.h"
 
   STDMETHODIMP Text::SetClientSite(IOleClientSite *pcs) {
@@ -77,7 +77,7 @@ Beep(2000,100);
   SIZEL tempSizel;
   RECT rect = {0,0,0,0};
   
-  hiMetricToPixel(pSizel,&tempSizel);
+  hiMetricToPixels(pSizel,&tempSizel);
   rect.right = tempSizel.cx;
   rect.bottom = tempSizel.cy;
 
@@ -106,7 +106,6 @@ Beep(2000,100);
      break;
 
   case OLEIVERB_UIACTIVATE:
-     errorSound();
      break;
 
   case OLEIVERB_INPLACEACTIVATE:

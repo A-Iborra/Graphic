@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include "Function.h"
+
 #include <olectl.h>
 
 
@@ -105,7 +106,7 @@
    if ( ! ( dwDrawAspect & DVASPECT_CONTENT ) )
       return E_NOTIMPL;
    SIZEL sizel{pSizel -> cx,pSizel -> cy};
-   hiMetricToPixel(&sizel,&sizel);
+   hiMetricToPixels(&sizel,&sizel);
    resultingWidth = sizel.cx;
    resultingHeight = sizel.cy;
    SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,resultingWidth,resultingHeight,SWP_NOMOVE);

@@ -5,6 +5,10 @@
 #include "axis.h"
 #include "utils.h"
 
+   HRESULT Axis::put_Type(char t) {
+   type = t;
+   return S_OK;
+   }
 
    HRESULT Axis::get_Type(char *getType) {
    if ( ! getType ) return E_POINTER;
@@ -700,38 +704,17 @@
    }
 
 
-   HRESULT Axis::DrawOpenGLLabels() {
+   HRESULT Axis::DrawLabels() {
    IText *pIText = NULL;
    boolean isOpenGL;
-   while ( pIText = textList.GetNext(pIText) ) {
-      pIText -> get_TextRender(&isOpenGL);
-      if ( ! isOpenGL )
-         continue;
+   while ( pIText = textList.GetNext(pIText) ) 
       pIText -> Draw();
-   }
    if ( ! pLabel ) 
       return S_OK;
-   pLabel -> get_TextRender(&isOpenGL);
-   if ( ! isOpenGL )
-      return S_OK;
-   pLabel -> Draw();
-   return S_OK;
-   }
-
-   HRESULT Axis::DrawGDILabels() {
-   IText *pIText = NULL;
-   boolean isOpenGL;
-   while ( pIText = textList.GetNext(pIText) ) {
-      pIText -> get_TextRender(&isOpenGL);
-      if ( isOpenGL )
-         continue;
-      pIText -> Draw();
-   }
-   if ( ! pLabel ) 
-      return S_OK;
-   pLabel -> get_TextRender(&isOpenGL);
+   pLabel -> get_TextRenderOpenGL(&isOpenGL);
    if ( isOpenGL )
       return S_OK;
+   pLabel -> PrepData();
    pLabel -> Draw();
    return S_OK;
    }

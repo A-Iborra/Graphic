@@ -6,6 +6,19 @@ import "oaidl.idl";
 
 #include <olectl.h>
 
+//cpp_quote("struct DataList {")
+//cpp_quote("struct DataList *previous,*next;")
+//cpp_quote("struct DataPoint data;")
+//cpp_quote("void ( *pAction)(void *pArg1,void *pArg2);")
+//cpp_quote("void *pvArg1;")
+//cpp_quote("void *pvArg2;")
+//cpp_quote("double colorRGB[3];")
+//cpp_quote("};")
+
+// So I put the above in to try to get around MIDL not being able to handle the pointer to function
+// And what does MIDL do !?! It put's the content in the _i.h file inside "extern "C" {" <- Why in the FUCK would it do that ?
+//
+
 [ 
    uuid(8CAEFD9B-55E6-11d3-8365-006008BD5BC3),
    helpstring("GSystems Common definitions Library"), 
@@ -22,11 +35,20 @@ library GSystems {
       double x,y,z;
    };
 
+#if 1
    struct DataList {
       struct DataList *previous,*next;
       struct DataPoint data;
+      void *pvAction;//(*pAction)(void *pArg1,void *pArg2);
+      //
+      // It is total 100% absolute fucking bullshit that I have to resort to things like this because the mother-fucking
+      // MIDL compiler just cannot be bothered to provide decent diagnostics.
+      // And I'm pretty sick of it.
+      void *pvArg1;
+      void *pvArg2;
       double colorRGB[3];
    };
+#endif
 
    enum CoordinatePlane {
       CoordinatePlane_unspecified,

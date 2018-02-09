@@ -78,9 +78,9 @@
 
    pParent -> propertyTexts -> clearStorageObjects();
 
-   IText *t = (IText *)NULL;
-   while ( t = pParent -> textList.GetNext(t) ) 
-      pParent -> propertyTexts -> addStorageObject(t);
+   IText *pIText = (IText *)NULL;
+   while ( pIText = pParent -> textList.GetNext(pIText) ) 
+      pParent -> propertyTexts -> addStorageObject(pIText);
 
    pParent -> propertyTexts -> writeStorageObjects();
 
@@ -107,42 +107,22 @@
 
    HRESULT G::_IGPropertiesClient::InitNew() {
 
-   long cntObjects = 0;
-
-   pParent -> propertyFunctions -> get_storedObjectCount(&cntObjects);
-
-   if ( cntObjects ) {
-
-      IGSFunctioNater *pIFunction = (IGSFunctioNater *)NULL;
-      while ( pIFunction = pParent -> functionList.GetFirst() ) {
-         pParent -> deleteFunction(pIFunction);
-         pParent -> functionList.Remove(pIFunction);
-      }
-
+   IGSFunctioNater *pIFunction = (IGSFunctioNater *)NULL;
+   while ( pIFunction = pParent -> functionList.GetFirst() ) {
+      pParent -> deleteFunction(pIFunction);
+      pParent -> functionList.Remove(pIFunction);
    }
 
-   pParent -> propertyDataSets -> get_storedObjectCount(&cntObjects);
-
-   if ( cntObjects ) {
-
-      IDataSet *pIDataSet = (IDataSet *)NULL;
-      while ( pIDataSet = pParent -> dataSetList.GetFirst() ) {
-         pParent -> deleteDataSet(pIDataSet);
-         pParent -> dataSetList.Remove(pIDataSet);
-      }
-
+   IDataSet *pIDataSet = (IDataSet *)NULL;
+   while ( pIDataSet = pParent -> dataSetList.GetFirst() ) {
+      pParent -> deleteDataSet(pIDataSet);
+      pParent -> dataSetList.Remove(pIDataSet);
    }
 
-   pParent -> propertyTexts -> get_storedObjectCount(&cntObjects);
-
-   if ( cntObjects ) {
-
-      IText *pIText = (IText *)NULL;
-      while ( pIText = pParent -> textList.GetFirst() ) {
-         pIText -> Release();
-         pParent -> textList.Remove(pIText);
-      }
-
+   IText *pIText = (IText *)NULL;
+   while ( pIText = pParent -> textList.GetFirst() ) {
+      pIText -> Release();
+      pParent -> textList.Remove(pIText);
    }
 
    IAxis *pIAxis = NULL;
@@ -298,6 +278,11 @@
    pParent -> zaxis -> AdviseGSystemStatusBar(pParent -> pIGSystemStatusBar);
 
    pParent -> axisList.Add(pParent -> xaxis);
+
+   pParent -> xaxis -> put_Type('X');
+   pParent -> yaxis -> put_Type('Y');
+   pParent -> zaxis -> put_Type('Z');
+
    pParent -> axisList.Add(pParent -> yaxis);
    pParent -> axisList.Add(pParent -> zaxis);
 

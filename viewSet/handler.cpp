@@ -42,18 +42,21 @@
    case WM_VSCROLL:
    case WM_HSCROLL: {
       if ( ! p ) break;
+
       RECT rectDialog,rectItem,rectBar,rectEntryField;
       HWND hwndBar = (HWND)lParam;
       long pos = (long)SendMessage(hwndBar,TBM_GETPOS,0,0);
  	   char szTemp[32];
       GetWindowRect(hwndBar,&rectBar);
       GetWindowRect(p -> hwndViewSet,&rectDialog);
+
       if ( WM_VSCROLL == msg ) {
 
          long controlID = (long)GetWindowLongPtr(hwndBar,GWLP_ID);
 
          switch ( controlID ) {
          case IDDI_VIEWSET_PHISET: {
+
             long y;
 
             p -> parentPropertyPhi -> put_doubleValue(90.0 - (double)pos);
@@ -81,10 +84,12 @@
                ShowWindow(GetDlgItem(hwnd,IDDI_VIEWSET_PHITEXT_MAX),SW_HIDE);
             else
                ShowWindow(GetDlgItem(hwnd,IDDI_VIEWSET_PHITEXT_MAX),SW_SHOW);
+
             }
             break;
 
          case IDDI_VIEWSET_SPINSET: {
+
             long y;
 
             p -> parentPropertySpin -> put_doubleValue(360.0 - (double)pos);
@@ -112,6 +117,7 @@
                ShowWindow(GetDlgItem(hwnd,IDDI_VIEWSET_SPINTEXT_MAX),SW_HIDE);
             else
                ShowWindow(GetDlgItem(hwnd,IDDI_VIEWSET_SPINTEXT_MAX),SW_SHOW);
+
             }
             break;
          }
@@ -148,6 +154,7 @@
       }
 
       p -> render();
+
       }
 
       break;

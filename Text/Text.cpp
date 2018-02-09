@@ -56,12 +56,6 @@
 
        coordinatePlane(CoordinatePlane_XY),
 
-#ifdef USE_OPENGL_RENDERING
-       doOpenGLRendering(TRUE),
-#else
-       doOpenGLRendering(FALSE),
-#endif
-
        flipHorizontal(FALSE),
        flipVertical(FALSE),
        showContentPropertyPage(TRUE),
@@ -75,14 +69,17 @@
        fontWidth(0.0),
        fontHeight(0.0),
        fontAscent(0.0),
-       fontDescent(0.0)
+       fontDescent(0.0),
+      
+       rotation(0.0)
    {
   
    refCount = 100;
 
    memset(&dpStart,0,sizeof(DataPoint));
-   memset(&dpEnd,0,sizeof(DataPoint));
+   memset(&dpCenterGDI,0,sizeof(DataPoint));
    memset(&dpSelectOffsetRestore,0,sizeof(DataPoint));
+   memset(&dpTranslateFormatGDI,0,sizeof(DataPoint));
    memset(&ptSelectPoint,0,sizeof(POINT));
    memset(&ptSelectOffset,0,sizeof(POINT));
 
@@ -148,16 +145,19 @@
    propertyContent -> put_type(TYPE_STRING);
 
    pIProperties -> Add(L"opengl rendering",&propertyOpenGLRendering);
-   pIProperties -> DirectAccess(L"opengl rendering",TYPE_BOOL,(void *)&doOpenGLRendering,sizeof(doOpenGLRendering));
+   //pIProperties -> DirectAccess(L"opengl rendering",TYPE_BOOL,(void *)&doOpenGLRendering,sizeof(doOpenGLRendering));
 
    propertyFormat -> directAccess(TYPE_LONG,reinterpret_cast<void*>(&format),sizeof(format));
 
    propertyForwardDirection -> directAccess(TYPE_BINARY,reinterpret_cast<void*>(&directionForward),sizeof(directionForward));
-   propertyUpDirection -> directAccess(TYPE_BINARY,reinterpret_cast<void*>(&directionUp),sizeof(directionUp));
 
    pIProperties -> DirectAccess(L"text font",TYPE_SZSTRING,reinterpret_cast<void*>(szFace),MAX_PATH);
    pIProperties -> DirectAccess(L"text size",TYPE_DOUBLE,reinterpret_cast<void*>(&fontSize),sizeof(double));
    pIProperties -> DirectAccess(L"text font weight",TYPE_DOUBLE,reinterpret_cast<void*>(&fontWeight),sizeof(double));
+
+   pIProperties -> Add(L"rotation",&propertyRotation);
+
+   propertyRotation -> directAccess(TYPE_DOUBLE,&rotation,sizeof(double));
 
    propertyCoordinatePlane -> directAccess(TYPE_LONG,reinterpret_cast<void*>(&coordinatePlane),sizeof(coordinatePlane));
    propertyFlipHorizontal -> directAccess(TYPE_BOOL,reinterpret_cast<void*>(&flipHorizontal),sizeof(flipHorizontal));
@@ -297,7 +297,7 @@
    }
 
 
-   static long pixelsY = 0.0;
+   static long pixelsY = 0;
    static double cyScreenInches = 0.0;
    static double cyScreenPixels = 0.0;
    double logicalPixelsToActualPixels = 0.0;

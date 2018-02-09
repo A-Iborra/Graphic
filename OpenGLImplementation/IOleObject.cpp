@@ -5,7 +5,7 @@
 #include "OpenGLImplementor.h"
 #include <olectl.h>
 
-#include "utils.h"
+#include "utilities.h"
 
 
    STDMETHODIMP OpenGLImplementor::SetClientSite(IOleClientSite *pcs) {
@@ -62,7 +62,7 @@
    SIZEL tempSizel;
    RECT rect = {0,0,0,0};
    
-   hiMetricToPixel(pSizel,&tempSizel);
+   hiMetricToPixels(pSizel,&tempSizel);
    rect.right = tempSizel.cx;
    rect.bottom = tempSizel.cy;
    SetWindowPos(hwndControl,HWND_TOP,0L,0L,rect.right - rect.left + 2,rect.bottom - rect.top + 2,SWP_NOMOVE);

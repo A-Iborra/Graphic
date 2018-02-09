@@ -27,9 +27,11 @@
     <Filter Include="Source Files\COM Files\Connected Evaluator\Evaluator Events">
       <UniqueIdentifier>{c648c486-05a7-4545-bd3a-a1960b6c1437}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\COM Implementation">
+      <UniqueIdentifier>{438a0a23-972c-4f2b-8b18-2d70874c146b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,31 +47,87 @@
     <ClCompile Include="..\..\Common\source\VList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\COMImplementation.cpp" />
-    <ClCompile Include="Source\ConnectedEvaluator.cpp" />
-    <ClCompile Include="Source\defineFunction.cpp" />
-    <ClCompile Include="Source\Function.cpp" />
-    <ClCompile Include="Source\functionSpecDialogHandler.cpp" />
-    <ClCompile Include="Source\IConnectionPoint.cpp" />
-    <ClCompile Include="Source\IConnectionPointContainer.cpp" />
-    <ClCompile Include="Source\IDataObject.cpp" />
-    <ClCompile Include="Source\IEnumConnectionPoints.cpp" />
-    <ClCompile Include="Source\IEnumerateConnections.cpp" />
-    <ClCompile Include="Source\IEvaluatorEvents.cpp" />
-    <ClCompile Include="Source\IFunction.cpp" />
-    <ClCompile Include="Source\IGSFunctioNaterEvents.cpp" />
-    <ClCompile Include="Source\IOleControl.cpp" />
-    <ClCompile Include="Source\IOleInPlaceActiveObject.cpp" />
-    <ClCompile Include="Source\IOleInPlaceObject.cpp" />
-    <ClCompile Include="Source\IOleObject.cpp" />
-    <ClCompile Include="Source\IPropertiesClient.cpp" />
-    <ClCompile Include="Source\IPropertyPageClient.cpp" />
-    <ClCompile Include="Source\IProvideClassInfo.cpp" />
-    <ClCompile Include="Source\IQuickActivate.cpp" />
-    <ClCompile Include="Source\IRunnableObject.cpp" />
-    <ClCompile Include="Source\IUnknown.cpp" />
-    <ClCompile Include="Source\IViewObject.cpp" />
-    <ClCompile Include="Source\propertiesHandler.cpp" />
+    <ClCompile Include="Source\IConnectionPoint.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IConnectionPointContainer.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IEnumConnectionPoints.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IEnumerateConnections.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IGSFunctioNaterEvents.cpp">
+      <Filter>Source Files\COM Files\Function Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IDataObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOleControl.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOleInPlaceActiveObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOleInPlaceObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IOleObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IQuickActivate.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IRunnableObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IUnknown.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IViewObject.cpp">
+      <Filter>Source Files\COM Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\COMImplementation.cpp">
+      <Filter>Source Files\COM Implementation</Filter>
+    </ClCompile>
+    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\defineFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ConnectedEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\functionSpecDialogHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IEvaluatorEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IFunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IPropertiesClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IPropertyPageClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IProvideClassInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\propertiesHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Function.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\source\utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConnectedEvaluator.h">

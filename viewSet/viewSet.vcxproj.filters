@@ -60,6 +60,18 @@
     <ClCompile Include="handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IConnectionPointContainer.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumConnectionPoints.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IConnectionPoint.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IEnumerateConnections.cpp">
+      <Filter>Source Files\COM Interface Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="ViewSet.def">

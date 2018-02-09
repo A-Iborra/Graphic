@@ -215,14 +215,16 @@
       if ( p -> plotView != gcPlotView3D && 'Z' == type )
          continue;
 
-      ax -> PrepData();
-
       IDataSet *pIDataSet;
 
       ax -> get_DataSet(&pIDataSet);
 
       DataPoint *pMin = new DataPoint();
       DataPoint *pMax = new DataPoint();
+
+      pIDataSet -> GetDomain(pMin,pMax);
+
+      ax -> PrepData();
 
       pIDataSet -> GetDomain(pMin,pMax);
 
@@ -236,6 +238,15 @@
       delete pair.second;
       delete pair.first;
    }
+
+   // I can now use text in the world domain to adjust the ultimate world domain extents
+#if 0
+   IText *pIText = NULL;
+   while ( pIText = p -> textList.GetNext(pIText) ) {
+      pIText -> PrepData();
+      pIText -> Draw();
+   } 
+#endif
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
 
@@ -258,34 +269,26 @@
          p -> plotList.GetByIndex(k) -> DrawOpenGLText();
    }
 
-   IText *t = NULL;
-   while ( t = p -> textList.GetNext(t) ) {
-      boolean doOpenGLRendering = FALSE;
-      t -> get_TextRender(&doOpenGLRendering);
-      if ( ! doOpenGLRendering ) 
-         continue;
-      t -> PrepData();
-      t -> Draw();
-   } 
-
-   ax = NULL;
-   while ( ax = p -> axisList.GetNext(ax) )
-      ax -> DrawOpenGLLabels();
+   //IText *pIText = NULL;
+   //while ( pIText = p -> textList.GetNext(pIText) ) {
+   //   boolean doOpenGLRendering = FALSE;
+   //   pIText -> get_TextRenderOpenGL(&doOpenGLRendering);
+   //   if ( ! doOpenGLRendering ) 
+   //      continue;
+   //   pIText -> PrepData();
+   //   pIText -> Draw();
+   //} 
 
    p -> pIOpenGLImplementation -> Finalize();
 
    ax = NULL;
    while ( ax = p -> axisList.GetNext(ax) )
-      ax -> DrawGDILabels();
+      ax -> DrawLabels();
 
-   t = NULL;
-   while ( t = p -> textList.GetNext(t) ) {
-      boolean doOpenGLRendering = FALSE;
-      t -> get_TextRender(&doOpenGLRendering);
-      if ( doOpenGLRendering ) 
-         continue;
-      t -> PrepData();
-      t -> Draw();
+   IText *pIText = NULL;
+   while ( pIText = p -> textList.GetNext(pIText) ) {
+      pIText -> PrepData();
+      pIText -> Draw();
    } 
 
    if ( 0 < p -> plotList.Count() ) {

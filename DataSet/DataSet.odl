@@ -100,7 +100,7 @@ library DataSet {
 
       HRESULT pushString(char *valueString);
 
-      HRESULT pushDataPoint(struct DataPoint *point);
+      HRESULT pushDataPoint(struct DataPoint *point,[optional,defaultvalue(0)] void (*pAction)(void *,void *),[optional,defaultvalue(0)] void *pArg1,[optional,defaultvalue(0)] void *pArg2);
 
       HRESULT popDataPoint(struct DataPoint *point);
 
@@ -130,6 +130,8 @@ library DataSet {
 
       HRESULT SetColorRGB(double *red,double *green,double *blue);
 
+      HRESULT GetFirstNaturalPoint(struct DataPoint *pPoint);
+
       HRESULT Scale(struct DataPoint* scaleVector);
 
       HRESULT Translate(struct DataPoint* translate);
@@ -146,7 +148,11 @@ library DataSet {
 
       HRESULT GenerateBoundingBox(IDataSet* pIDataSetBoundingBox);
 
-      HRESULT GenerateGDICoordinates(void *pIOpenGLImplementation);
+      HRESULT GenerateGDICoordinates();
+
+      HRESULT ConvertGDIToWorld();
+
+      HRESULT SaveAsGDICoordinates();
 
       HRESULT PushExtents();
       

@@ -13,6 +13,10 @@
    int PlotWindow::pixelFormat = 0;
    HGLRC PlotWindow::renderingContext = NULL;
 
+   static double piOver2 = 0.0;
+
+   //static double piOver2 = 2.0 * atan(1.0);
+
    PIXELFORMATDESCRIPTOR pfd = {
          sizeof(PIXELFORMATDESCRIPTOR),
          1,
@@ -21,6 +25,8 @@
          24,0,0,0,0,0,0,0,0,0,0,0,0,0,32,0,0,PFD_MAIN_PLANE,0,0,0,0};
 
    HGLRC wglCreateContextAttribsARB(HDC hDC, HGLRC hshareContext, const int *attribList);
+
+   void lookAtMatrix(GLfloat *eyePosition3D,GLfloat *center3D,GLfloat *upVector3D,GLfloat *pResult);
 
    PlotWindow::PlotWindow(HWND h,OpenGLImplementor *pp,IEvaluator *piev) :
 
@@ -390,16 +396,16 @@ OPENGL_ERROR_CHECK
 
 
    HRESULT PlotWindow::setUp(IDataSet *pIMasterDataSet,
-                             IGProperty *pPropPlotView,
-                             IGProperty *pPropRotationTheta,
-                             IGProperty *pPropRotationPhi,
-                             IGProperty *pPropRotationSpin,
-                             IGProperty *pPropLeftMargin,
-                             IGProperty *pPropTopMargin,
-                             IGProperty *pPropRightMargin,
-                             IGProperty *pPropBottomMargin,
-                             IGProperty *pPropMarginUnits,
-                             IGProperty *pPropStretchToMargins) {
+                                IGProperty *pPropPlotView,
+                                IGProperty *pPropRotationTheta,
+                                IGProperty *pPropRotationPhi,
+                                IGProperty *pPropRotationSpin,
+                                IGProperty *pPropLeftMargin,
+                                IGProperty *pPropTopMargin,
+                                IGProperty *pPropRightMargin,
+                                IGProperty *pPropBottomMargin,
+                                IGProperty *pPropMarginUnits,
+                                IGProperty *pPropStretchToMargins) {
 
    RECT rect;
    char *pszUnits = NULL;
@@ -609,6 +615,15 @@ OPENGL_ERROR_CHECK
    openGLState.viewPort[2] = (GLint)(openGLState.windowCX - openGLState.viewPortMargins[0] - openGLState.viewPortMargins[2]);
    openGLState.viewPort[3] = (GLint)(openGLState.windowCY - openGLState.viewPortMargins[1] - openGLState.viewPortMargins[3]);
 
+   if ( 0.0 == piOver2 )
+      piOver2 = 2.0 * atan(1.0);
+
+   openGLState.rotationTheta = theta * piOver2 / 90.0;
+   openGLState.rotationPhi = phi * piOver2 / 90.0;
+   openGLState.rotationSpin = spin * piOver2 / 90.0;
+
+   openGLState.plotView = plotView;
+
    glViewport(openGLState.viewPort[0],openGLState.viewPort[1],(GLsizei)openGLState.viewPort[2],(GLsizei)openGLState.viewPort[3]);
 
    if ( openGLState.extentsXMin == DBL_MAX || openGLState.extentsXMax == -DBL_MAX || openGLState.extentsYMin == DBL_MAX || 
@@ -631,6 +646,7 @@ OPENGL_ERROR_CHECK
       openGLState.yScaleFactor = 2.0 / (openGLState.extentsYMax - openGLState.extentsYMin);
       openGLState.zScaleFactor = 2.0 / (openGLState.extentsZMax - openGLState.extentsZMin);
 
+#if 0
       glRotated(phi,1.0,0.0,0.0);
       glRotated(-theta,0.0,1.0,0.0);
       glRotated(-90.0,1.0,0.0,0.0);
@@ -640,12 +656,35 @@ OPENGL_ERROR_CHECK
       glScaled(openGLState.xScaleFactor,openGLState.yScaleFactor,openGLState.zScaleFactor);
 
       glTranslated(-openGLState.extentsXMin,-openGLState.extentsYMin,-openGLState.extentsZMin);
+#else
+
+      GLfloat matrix[16];
+      GLfloat eyePos[3] = {(GLfloat)(cos(openGLState.rotationPhi) * cos(openGLState.rotationTheta) * openGLState.extentsXMax),
+                                 (GLfloat)(cos(openGLState.rotationPhi) * sin(openGLState.rotationTheta) * openGLState.extentsYMax),
+                                 (GLfloat)(sin(openGLState.rotationPhi) * openGLState.extentsZMax)};
+      GLfloat upVector[] = {0.0,0.0,1.0};
+      GLfloat center[] = {(GLfloat)openGLState.extentsXMin,(GLfloat)openGLState.extentsYMin,(GLfloat)openGLState.extentsZMin};
+
+      lookAtMatrix(eyePos,center,upVector,matrix);
+
+      glLoadMatrixf(matrix);
+
+      if ( ! ( 0.0 == spin ) )
+         glRotated(spin,1.0,1.0,1.0);
+
+      glScaled(openGLState.xScaleFactor,openGLState.yScaleFactor,openGLState.zScaleFactor);
+
+#endif
 
    } else {
 
       openGLState.xScaleFactor = 1.0;
       openGLState.yScaleFactor = 1.0;
       openGLState.zScaleFactor = 1.0;
+
+      openGLState.rotationTheta = 0.0;
+      openGLState.rotationPhi = 0.0;
+      openGLState.rotationSpin = 0.0;
 
    }
 
@@ -690,64 +729,6 @@ OPENGL_ERROR_CHECK
    }
 
    initialized = true;
-
-#if 0
-DataPoint dpSource,dpData;
-
-double mMatrix[16],pMatrix[16];
-      DataPoint dpWorking;
-      int vport[4];
-   
-glGetDoublev(GL_MODELVIEW_MATRIX,mMatrix);
-glGetDoublev(GL_PROJECTION_MATRIX,pMatrix);
-glGetIntegerv(GL_VIEWPORT,vport);
-
-GLint bufferSize[4] = {0};
-glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
-   
-char szX[512];
-sprintf_s(szX,256,"ViewPort:%ld %ld %ld %ld. Window: %ld %ld Scissor: %ld %ld %ld %ld\n",vport[0],vport[1],vport[2],vport[3],openGLState.windowCX,openGLState.windowCY,bufferSize[0],bufferSize[1],bufferSize[2],bufferSize[3]);
-OutputDebugStringA(szX);
-
-glBegin(GL_LINE_STRIP);
-
-dpSource.x = openGLState.viewPort[0] + 1;
-dpSource.y = openGLState.viewPort[1] + 1;
-dpSource.z = 0;
-double y = (double)openGLState.windowCY - dpSource.y;
-gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
-glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
-
-dpSource.x = openGLState.viewPort[0] + openGLState.viewPort[2] - 2;
-dpSource.y = openGLState.viewPort[1] + 1;
-dpSource.z = 0;
-y = (double)openGLState.windowCY - dpSource.y;
-gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
-glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
-
-dpSource.x = openGLState.viewPort[0] + openGLState.viewPort[2] - 2;
-dpSource.y = openGLState.viewPort[1] + openGLState.viewPort[3] - 2;
-dpSource.z = 0;
-y = (double)openGLState.windowCY - dpSource.y;
-gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
-glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
-
-dpSource.x = openGLState.viewPort[0] + 1;
-dpSource.y = openGLState.viewPort[1] + openGLState.viewPort[3] - 2;
-dpSource.z = 0;
-y = (double)openGLState.windowCY - dpSource.y;
-gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
-glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
-
-dpSource.x = openGLState.viewPort[0] + 1;
-dpSource.y = openGLState.viewPort[1] + 1;
-dpSource.z = 0;
-y = (double)openGLState.windowCY - dpSource.y;
-gluUnProject(dpSource.x,y,dpSource.z,mMatrix,pMatrix,vport,&dpWorking.x,&dpWorking.y,&dpWorking.z);
-glVertex3d(dpWorking.x,dpWorking.y,dpWorking.z);
-
-glEnd();
-#endif
 
    return;
    }
@@ -1232,6 +1213,51 @@ OPENGL_ERROR_CHECK
    DeleteObject(hbmMerged);
 
    isRendered = true;
+
+   return;
+   }
+
+
+   void lookAtMatrix(GLfloat *pEyePos,GLfloat *pCenter,GLfloat *pUpVector,GLfloat *pResult) {
+
+   GLfloat forward[3],side[3],up[3];
+
+   forward[0] = pCenter[0] - pEyePos[0];
+   forward[1] = pCenter[1] - pEyePos[1];
+   forward[2] = pCenter[2] - pEyePos[2];
+
+   unitVector(forward,forward);
+
+   // Side = forward x up
+
+   VxV(forward,pUpVector,side);
+
+   unitVector(side,side);
+
+   // Recompute up as: up = side x forward
+
+   VxV(side,forward,up);
+
+   memset(pResult,0,16 * sizeof(GLfloat));
+
+   pResult[0] = side[0];
+   pResult[4] = side[1];
+   pResult[8] = side[2];
+   pResult[12] = 0.0;
+
+   pResult[1] = up[0];
+   pResult[5] = up[1];
+   pResult[9] = up[2];
+   pResult[13] = 0.0;
+
+   pResult[2] = -forward[0];
+   pResult[6] = -forward[1];
+   pResult[10] = -forward[2];
+   pResult[14] = 0.0;
+
+   pResult[3] = pResult[7];
+   pResult[11] = 0.0;
+   pResult[15] = 1.0;
 
    return;
    }

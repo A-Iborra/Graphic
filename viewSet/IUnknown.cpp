@@ -44,6 +44,10 @@
          *ppv = static_cast<IGPropertyPageClient *>(this);
       else
 
+      if ( riid == IID_IConnectionPointContainer )
+         *ppv = static_cast<IConnectionPointContainer *>(this);
+      else
+
          return E_NOINTERFACE;
 
   AddRef(); 

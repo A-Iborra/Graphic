@@ -63,8 +63,8 @@
      STDMETHOD(put_Text)(BSTR setText);
      STDMETHOD(get_Text)(BSTR *getText);
 
-     STDMETHOD(put_TextRender)(boolean doRender);
-     STDMETHOD(get_TextRender)(boolean *pDoRender);
+     STDMETHOD(put_TextRenderOpenGL)(boolean doRender);
+     STDMETHOD(get_TextRenderOpenGL)(boolean *pDoRender);
 
      STDMETHOD(put_Format)(long setFormat);
      STDMETHOD(get_Format)(long* getFormat);
@@ -88,23 +88,6 @@
      STDMETHOD(put_WindowPosition)(POINTL *setPosition);
      STDMETHOD(get_WindowPosition)(POINTL *getPosition);
 
-     STDMETHOD(put_DirectionForward)(SAFEARRAY *setDirection);
-     STDMETHOD(get_DirectionForward)(SAFEARRAY **getDirection);
-     STDMETHOD(put_DirectionForwardX)(double);
-     STDMETHOD(get_DirectionForwardX)(double*);
-     STDMETHOD(put_DirectionForwardY)(double);
-     STDMETHOD(get_DirectionForwardY)(double*);
-     STDMETHOD(put_DirectionForwardZ)(double);
-     STDMETHOD(get_DirectionForwardZ)(double*);
-     STDMETHOD(put_DirectionUp)(SAFEARRAY *setDirection);
-     STDMETHOD(get_DirectionUp)(SAFEARRAY **getDirection);
-     STDMETHOD(put_DirectionUpX)(double);
-     STDMETHOD(get_DirectionUpX)(double*);
-     STDMETHOD(put_DirectionUpY)(double);
-     STDMETHOD(get_DirectionUpY)(double*);
-     STDMETHOD(put_DirectionUpZ)(double);
-     STDMETHOD(get_DirectionUpZ)(double*);
-
      STDMETHOD(put_Color)(SAFEARRAY *);
      STDMETHOD(get_Color)(SAFEARRAY **);
 
@@ -122,6 +105,9 @@
      STDMETHOD(get_FlipHorizontal)(VARIANT_BOOL *);
      STDMETHOD(put_FlipVertical)(VARIANT_BOOL);
      STDMETHOD(get_FlipVertical)(VARIANT_BOOL *);
+
+     STDMETHOD(put_Rotation)(double);
+     STDMETHOD(get_Rotation)(double *);
 
      STDMETHOD(get_minX)(double*);
      STDMETHOD(get_minY)(double*);
@@ -327,17 +313,19 @@
      CoordinatePlane coordinatePlane;
      DataPoint directionForward,directionUp;
      DataPoint dpStart;
-     DataPoint dpEnd,dpSelectOffsetRestore;
+     DataPoint dpSelectOffsetRestore;
+     DataPoint dpCenterGDI;
+     DataPoint dpTranslateFormatGDI;
      char szFace[MAX_PATH];
      double planeHeight;
      double fontHeight,fontWidth,fontAscent,fontDescent;
      double fontSize,fontWeight;
+     double rotation;
      BOOL flipHorizontal,flipVertical;
      BOOL partOfWorldDomain;
      BOOL showContentPropertyPage;
      BOOL enablePositionSettings;
      BOOL partOfMainGraphic;
-     BOOL doOpenGLRendering;
 
      unsigned int refCount;
 
@@ -375,6 +363,8 @@
      IGProperty *propertyContent;
      IGProperty *propertyOpenGLRendering;
 
+     IGProperty *propertyRotation;
+
      long renderText(HDC hdc = (HDC)NULL,char *theText = (char*)NULL);
      long renderGlyph(HDC hdc,char c,DataPoint& startPosition);
      int drawSample();
@@ -382,6 +372,13 @@
      void saveBoundingBoxBackground();
      int statusPosition();
      int createFont(LOGFONT *);
+
+     void renderOpenGLPoints();
+
+     static void __stdcall renderTextNewGlyph(void *pvThis,void *pvOther);
+     static void __stdcall renderTextNewContour(void *pvThis,void *pvOther);
+     static void __stdcall renderTextEndContour(void *pvThis,void *pvOther);
+     static void __stdcall renderTextEndGlyph(void *pvThis,void *pvOther);
 
      WNDPROC oldSampleHandler;
      WNDPROC defaultPatchPainter;

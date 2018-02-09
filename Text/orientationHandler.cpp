@@ -24,6 +24,21 @@
 
       p -> hwndOrientation = hwnd;
 
+      }
+      return LRESULT(TRUE);
+ 
+   case WM_SHOWWINDOW: {
+
+      if ( ! (BOOL)wParam )
+         break;
+
+      SendDlgItemMessage(hwnd,IDDI_TEXT_XYPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+      SendDlgItemMessage(hwnd,IDDI_TEXT_YXPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+      SendDlgItemMessage(hwnd,IDDI_TEXT_YZPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+      SendDlgItemMessage(hwnd,IDDI_TEXT_ZXPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+      SendDlgItemMessage(hwnd,IDDI_TEXT_ZYPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+      SendDlgItemMessage(hwnd,IDDI_TEXT_SCREENPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
+
       switch ( p -> coordinatePlane ) {
       case CoordinatePlane_XY:
          SendDlgItemMessage(hwnd,IDDI_TEXT_XYPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
@@ -58,11 +73,11 @@
       SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)static_cast<long>(100.0 * (1.0 - p -> planeHeight)));
 
       char szTemp[32];
-      sprintf(szTemp,"%5.2f",p -> dpStart.x);
+      sprintf(szTemp,"%g",p -> dpStart.x);
       SetDlgItemText(hwnd,IDDI_TEXT_XCOORDINATE,szTemp);
-      sprintf(szTemp,"%5.2f",p -> dpStart.y);
+      sprintf(szTemp,"%g",p -> dpStart.y);
       SetDlgItemText(hwnd,IDDI_TEXT_YCOORDINATE,szTemp);
-      sprintf(szTemp,"%5.2f",p -> dpStart.y);
+      sprintf(szTemp,"%g",p -> dpStart.z);
       SetDlgItemText(hwnd,IDDI_TEXT_ZCOORDINATE,szTemp);
 
       EnableWindow(GetDlgItem(hwnd,IDDI_TEXT_XCOORDINATE),p -> enablePositionSettings);
@@ -88,45 +103,59 @@
          else
             SendDlgItemMessage(hwnd,IDDI_TEXT_FORMAT_LEFT,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
       }
-
       }
-      return LRESULT(TRUE);
- 
+      break;
+
    case WM_COMMAND: {
-      if ( ! p ) break;
+      if ( ! p ) 
+         break;
       int id = LOWORD(wParam);
       int notificationCode = HIWORD(wParam);
       switch ( notificationCode ) {
       case EN_CHANGE: {
          char szTemp[32];
-         GetDlgItemText(hwnd,IDDI_TEXT_XCOORDINATE,szTemp,32);
-         p -> propertyPositionX -> put_szValue(szTemp);
-         GetDlgItemText(hwnd,IDDI_TEXT_YCOORDINATE,szTemp,32);
-         p -> propertyPositionY -> put_szValue(szTemp);
-         GetDlgItemText(hwnd,IDDI_TEXT_ZCOORDINATE,szTemp,32);
-         p -> propertyPositionZ -> put_szValue(szTemp);
+         switch ( id) {
+         case IDDI_TEXT_XCOORDINATE:
+            GetDlgItemText(hwnd,IDDI_TEXT_XCOORDINATE,szTemp,32);
+            p -> propertyPositionX -> put_szValue(szTemp);
+            break;
+         case IDDI_TEXT_YCOORDINATE:
+            GetDlgItemText(hwnd,IDDI_TEXT_YCOORDINATE,szTemp,32);
+            p -> propertyPositionY -> put_szValue(szTemp);
+            break;
+         case IDDI_TEXT_ZCOORDINATE:
+            GetDlgItemText(hwnd,IDDI_TEXT_ZCOORDINATE,szTemp,32);
+            p -> propertyPositionZ -> put_szValue(szTemp);
+            break;
+         }
          }
          break;
 
       case BN_CLICKED: {
          switch ( id ) {
          case IDDI_TEXT_XYPLANE:
-            p -> coordinatePlane = CoordinatePlane_XY;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_XY;
             break;
          case IDDI_TEXT_XZPLANE:
-            p -> coordinatePlane = CoordinatePlane_XZ;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_XZ;
             break;
          case IDDI_TEXT_YXPLANE:
-            p -> coordinatePlane = CoordinatePlane_YX;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_YX;
             break;
          case IDDI_TEXT_YZPLANE:
-            p -> coordinatePlane = CoordinatePlane_YZ;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_YZ;
             break;
          case IDDI_TEXT_ZXPLANE:
-            p -> coordinatePlane = CoordinatePlane_ZX;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_ZX;
             break;
          case IDDI_TEXT_ZYPLANE:
-            p -> coordinatePlane = CoordinatePlane_ZY;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_ZY;
             break;
          case IDDI_TEXT_FLIP_LR: {
             long isChecked = (long)SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_LR,BM_GETCHECK,0L,0L);
@@ -139,7 +168,8 @@
             }
             break;
          case IDDI_TEXT_SCREENPLANE:
-            p -> coordinatePlane = CoordinatePlane_screen;
+            if ( BST_CHECKED == SendDlgItemMessage(hwnd,id,BM_GETCHECK,0L,0L) )
+               p -> coordinatePlane = CoordinatePlane_screen;
             break;
 
          case IDDI_TEXT_FORMAT_FROM_BOTTOM:

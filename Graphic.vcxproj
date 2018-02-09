@@ -270,6 +270,7 @@
     <ClCompile Include="Source\dataSourcesVisibility.cpp" />
     <ClCompile Include="Source\graphicCursor.cpp" />
     <ClCompile Include="Source\IGraphicServices.cpp" />
+    <ClCompile Include="Source\IGSGraphicEvents.cpp" />
     <ClCompile Include="Source\IPropertyPage.cpp" />
     <ClCompile Include="Source\ISpecifyPropertyPages.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />

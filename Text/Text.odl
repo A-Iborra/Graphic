@@ -41,14 +41,6 @@ library Text {
       textPropertyPositionY = 9,
       textPropertyPositionZ = 10,
       textPropertyWindowPosition = 11,
-      textPropertyDirectionForward = 12,
-      textPropertyDirectionForwardX = 13,
-      textPropertyDirectionForwardY = 14,
-      textPropertyDirectionForwardZ = 15,
-      textPropertyDirectionUp = 16,
-      textPropertyDirectionUpX = 17,
-      textPropertyDirectionUpY = 18,
-      textPropertyDirectionUpZ = 19,
       textPropertyColor = 20,
       textPropertyLineWeight = 21,
       textPropertySegmentiD = 22,
@@ -56,20 +48,21 @@ library Text {
       textPropertyCoordinatePlane = 24,
       textPropertyFlipHorizontal = 25,
       textPropertyFlipVertical = 26,
-      textPropertyMinX = 27,
-      textPropertyMinY = 28,
-      textPropertyMinZ = 29,
-      textPropertyMaxX = 30,
-      textPropertyMaxY = 31,
-      textPropertyMaxZ = 32,
-      textPropertyPartOfWorldDomain = 33,
-      textPropertyDescription = 34,
-      textpropertyPartOfMainGraphic = 35,
-      textPropertyShowContentPropertyPage = 36,
-      textPropertyEnablePositionSettings = 37,
-      textPropertyTextNotify = 38,
-      textPropertyPositionString = 39,
-      textPropertyRender = 40 };
+      textPropertyRotation = 27,
+      textPropertyMinX = 28,
+      textPropertyMinY = 29,
+      textPropertyMinZ = 30,
+      textPropertyMaxX = 31,
+      textPropertyMaxY = 32,
+      textPropertyMaxZ = 33,
+      textPropertyPartOfWorldDomain = 34,
+      textPropertyDescription = 35,
+      textpropertyPartOfMainGraphic = 36,
+      textPropertyShowContentPropertyPage = 37,
+      textPropertyEnablePositionSettings = 38,
+      textPropertyTextNotify = 39,
+      textPropertyPositionString = 40,
+      textPropertyRender = 41 };
 
    enum TextMethodsID {
       textMethodInitialize = 101,
@@ -94,8 +87,8 @@ library Text {
      [propget,id(textPropertyText),helpstring("")] HRESULT Text([out,retval] BSTR *getText);
 
      [propput,id(textPropertyRender),helpstring("To draw text in OpenGL, by rendering the data as if it where a plot, set this property to true (best for 3-D views)")] 
-         HRESULT TextRender([in] boolean);
-     [propget,id(textPropertyRender),helpstring("")] HRESULT TextRender([out,retval] boolean *);
+         HRESULT TextRenderOpenGL([in] boolean);
+     [propget,id(textPropertyRender),helpstring("")] HRESULT TextRenderOpenGL([out,retval] boolean *);
 
      [propput,id(textPropertyFormat),helpstring("")] HRESULT Format([in] long setTextFormat);
      [propget,id(textPropertyFormat),helpstring("")] HRESULT Format([out,retval] long * getTextFormat);
@@ -129,7 +122,9 @@ library Text {
      [propput,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([in] POINTL *putWindowPoint);
      [propget,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([out,retval] POINTL *getWindowPoint);
 
-     [propput,id(textPropertyDirectionForward),helpstring("")] HRESULT DirectionForward([in]SAFEARRAY(double) direction);
+#if 0
+     [propput,id(textPropertyDirectionForward),helpstring("The combination of the text direction vector and the coordinate plan chosen determine the 3-d positioning of the text")]
+       HRESULT DirectionForward([in]SAFEARRAY(double) direction);
      [propget,id(textPropertyDirectionForward),helpstring("")] HRESULT DirectionForward([out,retval] SAFEARRAY(double) *pDirection);
 
      [propput,id(textPropertyDirectionForwardX),helpstring("")] HRESULT DirectionForwardX([in]double directionX);
@@ -140,18 +135,7 @@ library Text {
 
      [propput,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([in]double directionZ);
      [propget,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([out,retval] double *pDirectionZ);
-
-     [propput,id(textPropertyDirectionUp),helpstring("")] HRESULT DirectionUp([in]SAFEARRAY(double) direction);
-     [propget,id(textPropertyDirectionUp),helpstring("")] HRESULT DirectionUp([out,retval] SAFEARRAY(double) *pDirection);
-
-     [propput,id(textPropertyDirectionUpX),helpstring("")] HRESULT DirectionUpX([in]double directionX);
-     [propget,id(textPropertyDirectionUpX),helpstring("")] HRESULT DirectionUpX([out,retval] double *pDirectionX);
-
-     [propput,id(textPropertyDirectionUpY),helpstring("")] HRESULT DirectionUpY([in]double directionY);
-     [propget,id(textPropertyDirectionUpY),helpstring("")] HRESULT DirectionUpY([out,retval] double *pDirectionY);
-
-     [propput,id(textPropertyDirectionUpZ),helpstring("")] HRESULT DirectionUpZ([in]double directionZ);
-     [propget,id(textPropertyDirectionUpZ),helpstring("")] HRESULT DirectionUpZ([out,retval] double *pDirectionZ);
+#endif
 
      [propput,id(textPropertyColor),helpstring("")] HRESULT Color([in]SAFEARRAY(double) color);
      [propget,id(textPropertyColor),helpstring("")] HRESULT Color([out,retval]SAFEARRAY(double) *pColor);
@@ -171,6 +155,11 @@ library Text {
 
      [propput,id(textPropertyFlipVertical),helpstring("")] HRESULT FlipVertical([in]VARIANT_BOOL);
      [propget,id(textPropertyFlipVertical),helpstring("")] HRESULT FlipVertical([out,retval]VARIANT_BOOL *);
+
+     [propput,id(textPropertyRotation),helpstring("Rotate the text x degrees counter-clockwise from the forward direction on the coordinate plane")]
+      HRESULT Rotation([in]double rotation);
+     [propget,id(textPropertyRotation)]
+      HRESULT Rotation([out,retval] double *pRotation);
 
      [propget,id(textPropertyMinX),helpstring("")] HRESULT minX([out,retval] double*);
      [propget,id(textPropertyMinY),helpstring("")] HRESULT minY([out,retval] double*);

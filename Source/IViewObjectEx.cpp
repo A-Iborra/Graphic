@@ -5,7 +5,7 @@
 #include "Graphic.h"
 #include "Graphic_resource.h"
 
-#include "utils.h"
+#include "utilities.h"
 
 
    STDMETHODIMP G::Draw(DWORD dvAspect,long index,void *pvAspect,DVTARGETDEVICE *ptd,

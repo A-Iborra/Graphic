@@ -37,6 +37,9 @@
     <Filter Include="Source Files\COM Interface Files\Properties COM Interface Files">
       <UniqueIdentifier>{28cd6dd2-842b-47ed-bd28-834c10710307}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\IGSGraphicEvents">
+      <UniqueIdentifier>{fecf1e08-765d-4f04-bae2-54a152c3d3e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="\Common\Utils\mathUtils.cpp">
@@ -200,6 +203,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\Utils\imageUtilities.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\IGSGraphicEvents.cpp">
+      <Filter>Source Files\IGSGraphicEvents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

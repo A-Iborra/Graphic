@@ -83,11 +83,7 @@
    IUnknown *pIUnknownThis;
    QueryInterface(IID_IUnknown,reinterpret_cast<void**>(&pIUnknownThis));
 
-   CoCreateInstance(CLSID_InnoVisioNateProperties,
-                      pIUnknownThis,
-                      CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                      IID_IUnknown,
-                      reinterpret_cast<void **>(&pIUnknownProperties));
+   CoCreateInstance(CLSID_InnoVisioNateProperties,pIUnknownThis,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IUnknown,reinterpret_cast<void **>(&pIUnknownProperties));
  
    pIUnknownProperties -> QueryInterface(IID_IGProperties,reinterpret_cast<void**>(&pIGProperties));
 
@@ -388,13 +384,18 @@
  
    double Axis::myRound(double x,int k) {
  
-   if ( k > 31 ) return myRound(x,k - 1);
-   if ( k < -31 ) return myRound(x,k + 1);
+   if ( k > 31 ) 
+      return myRound(x,k - 1);
+
+   if ( k < -31 ) 
+      return myRound(x,k + 1);
    
    double y,whole,fraction,power = pow(10.0,k);
    y = x * power;
    whole = (long)y;
    fraction = y - whole;
-   if ( fraction >= 0.5 ) whole = whole + 1.0;
+   if ( fraction >= 0.5 ) 
+      whole = whole + 1.0;
+
    return whole / power;
    }

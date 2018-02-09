@@ -56,6 +56,8 @@
 
    pParent -> partOfMainGraphic = TRUE;
 
+   pParent -> rotation = 0.0;
+
    return Loaded();
    }
  

@@ -15,7 +15,8 @@
 #include "GSystem_i.h"
 
 #include "list.h"
-#include "Utils.h"
+#include "utils.h"
+#include "utilities.h"
 
 #include "VList.h"
 

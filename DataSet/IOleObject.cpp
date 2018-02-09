@@ -69,7 +69,7 @@
    if ( ! ( dwDrawAspect & DVASPECT_CONTENT ) )
       return E_NOTIMPL;
    SIZEL containerSize;
-   hiMetricToPixel(pSizel,&containerSize);
+   hiMetricToPixels(pSizel,&containerSize);
    if ( hwndSpecDialog )
       SetWindowPos(hwndSpecDialog,HWND_TOP,0,0,containerSize.cx,containerSize.cy,SWP_NOMOVE);
    return S_OK;

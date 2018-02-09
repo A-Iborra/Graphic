@@ -12,7 +12,12 @@
 
    int Axis::preparePlot() {
 
-   IText *pText;
+   IText *pText = NULL;
+   while ( pText = textList.GetFirst() ) {
+      pText -> Release();
+      textList.Remove(pText);
+   }
+ 
    PlotViews plotView;
  
    pParentPropertyPlotView -> get_longValue((long*)&plotView);
@@ -46,15 +51,6 @@
 
    short originAtMinpoint,endpointAtMaxpoint;
 
-   SAFEARRAYBOUND rgsa;
-   double *pDirectionForwardData,*pDirectionUpData;
-   rgsa.cElements = 3;
-   rgsa.lLbound = 0;
-   SAFEARRAY *pDirectionForward = SafeArrayCreate(VT_R8,1,&rgsa);
-   SAFEARRAY *pDirectionUp = SafeArrayCreate(VT_R8,1,&rgsa);
-   SafeArrayAccessData(pDirectionForward,reinterpret_cast<void **>(&pDirectionForwardData));
-   SafeArrayAccessData(pDirectionUp,reinterpret_cast<void **>(&pDirectionUpData));
-
    if ( 0.0 == piover2 )
       piover2 = 2.0 * atan(1.0);
 
@@ -78,21 +74,6 @@
 
    if ( -DBL_MAX == minPoint.x || DBL_MAX == minPoint.x )
       return 0;
-  
-   //if ( minPoint.x == maxPoint.x ) {
-   //   if ( minPoint.x < 0.0 )
-   //      maxPoint.x = -minPoint.x;
-   //   else {
-   //      maxPoint.x = minPoint.x;
-   //      minPoint.x = -minPoint.x;
-   //   }
-   //}
-
-   //if ( minPoint.y == maxPoint.y )
-   //   maxPoint.y = minPoint.y + 1.0;
-   //
-   //if ( minPoint.z == maxPoint.z )
-   //   maxPoint.z = minPoint.z + 1.0;
 
    char szVariable[1024];
 
@@ -153,6 +134,7 @@
       origin.x = minPoint.x;
       origin.y = minPoint.y;
       origin.z = minPoint.z;
+
    }
 
    propertyEndpointAtMaxpoint -> get_boolValue(&endpointAtMaxpoint);
@@ -209,53 +191,18 @@
 
    unitPoint(&uvDirection,&uvDirection);
 
-   pDirectionForwardData[0] = uvDirection.x;
-   pDirectionForwardData[1] = uvDirection.y;
-   pDirectionForwardData[2] = uvDirection.z;
+   theta = radiansFromXY(uvDirection.x,uvDirection.y);
 
-   if ( 0.0 != uvDirection.x ) {
-
-      if ( 1.0 == uvDirection.x ) {
-
-         theta = 1.0;
-         cosTheta = 1.0;
-         sinTheta = 0.0;
-
-      } else {
-
-         theta = atan(uvDirection.y / uvDirection.x);
-
-         if ( uvDirection.x < 0.0 && uvDirection.y > 0.0 ) {
-            theta = 2.0 * piover2 + theta;
-         } else {
-            if ( uvDirection.x < 0.0 && uvDirection.y < 0.0 )
-               theta = 2.0 * piover2 - theta;
-            else {
-               if ( uvDirection.x > 0.0 && uvDirection. y < 0.0 )
-                  theta += 4.0 * piover2;
-            }
-         }
-
-         cosTheta = cos(theta);
-         sinTheta = sin(theta);
-      }
-
-   } else {
-
-      theta = piover2;
-      cosTheta = 0.0;
-      sinTheta = 1.0;
-
-   }
-
-   pDirectionUpData[0] = uvDirection.x * cos(theta) - uvDirection.y * sin(theta);   // This is just a simple rotation about 'Z'
-   pDirectionUpData[1] = uvDirection.x * sin(theta) + uvDirection.y * cos(theta);   // which may not always be correct
-   pDirectionUpData[2] = uvDirection.z;
+   cosTheta = cos(theta);
+   sinTheta = sin(theta);
 
    if ( 0.0 == uvDirection.x && 0.0 == uvDirection.y ) {
       phi = piover2;
       cosPhi = 0.0;
       sinPhi = 1.0;
+      theta = 0.0;
+      cosTheta = 0.0;
+      sinTheta = 0.0;
    } else {
       phi = atan(uvDirection.z/sqrt(uvDirection.x*uvDirection.x + uvDirection.y*uvDirection.y));
       cosPhi = cos(phi);
@@ -434,12 +381,6 @@
       division = (max - min) / 50.0;
    }
 
-   pText = NULL;
-   while ( pText = textList.GetFirst() ) {
-      pText -> Release();
-      textList.Remove(pText);
-   }
- 
    char *pszOriginalLabels = (char *)NULL,*pszLabels = (char *)NULL,*pszNextLabel = (char *)NULL;
    long cbLabels = 0;
    BSTR bstrLabels = NULL;
@@ -469,282 +410,283 @@
  
    case 'X':
 
-      if ( cosTheta != 0.0 && ( drawTickLabels || tickCount || gridLinesPerTick ) ) {
+      if ( 0.0 == cosTheta )
+         break;
+
+      if ( ! drawTickLabels && ! tickCount && ! gridLinesPerTick )
+         break;
+
+      step = division / cosPhi / cosTheta;
+      gridSpace = gridSpace / cosPhi / cosTheta;
+
+      dp.z = origin.z;
+
+      progress = -step;
+
+      for ( tickNumber = 1; tickNumber <= nTicks + 1; tickNumber++ ) {
  
-         step = division / cosPhi / cosTheta;
-         gridSpace = gridSpace / cosPhi / cosTheta;
+         progress += step;
 
-         dp.z = origin.z;
+         double xAtAxis = origin.x + progress * cosPhi * cosTheta;
+         double yAtAxis = origin.y + progress * cosPhi * sinTheta;
 
-         progress = -step;
+         if ( tickCount ) {
 
-         for ( tickNumber = 1; tickNumber <= nTicks + 1; tickNumber++ ) {
- 
-            progress += step;
+            pIPlot -> TakeDataPoint(&movePoint);
+            dp.x = xAtAxis + tickBelow * cosPhi * sinTheta;
+            dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
+            pIPlot -> TakeDataPoint(&dp);
+            dp.x = xAtAxis - tickAbove * cosPhi * sinTheta;
+            dp.y = yAtAxis + tickAbove * cosPhi * cosTheta;
+            pIPlot -> TakeDataPoint(&dp);
 
-            double xAtAxis = origin.x + progress * cosPhi * cosTheta;
-            double yAtAxis = origin.y + progress * cosPhi * sinTheta;
-
-            if ( tickCount ) {
-
+            if ( ticksOnAllNormalPlanes ) {
                pIPlot -> TakeDataPoint(&movePoint);
-               dp.x = xAtAxis + tickBelow * cosPhi * sinTheta;
-               dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
-               pIPlot -> TakeDataPoint(&dp);
-               dp.x = xAtAxis - tickAbove * cosPhi * sinTheta;
-               dp.y = yAtAxis + tickAbove * cosPhi * cosTheta;
-               pIPlot -> TakeDataPoint(&dp);
+               DataPoint dp2;
+               dp2.x = xAtAxis;
+               dp2.y = yAtAxis;
+               dp2.z = origin.z + secondaryTickAbove;
+               pIPlot -> TakeDataPoint(&dp2);
+               dp2.z = origin.z - secondaryTickBelow;
+               pIPlot -> TakeDataPoint(&dp2);
+            }
 
-               if ( ticksOnAllNormalPlanes ) {
+         }
+ 
+         if ( drawTickLabels ) {
+ 
+            dp.x = xAtAxis + tickBelow * cosPhi * sinTheta;
+            dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
+
+            if ( ! ( pText = textList.Get(tickNumber) ) ) {
+               CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
+               textList.Add(pText,NULL,tickNumber);
+            }
+ 
+            pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                 pParentPropertyXFloor,pParentPropertyXCeiling,
+                                 pParentPropertyYFloor,pParentPropertyYCeiling,
+                                 pParentPropertyZFloor,pParentPropertyZCeiling,
+                                 pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+
+            pText -> CopyFrom(pRepresentativeText);
+
+            BSTR bstrAxisValue = NULL;
+            if ( pszOriginalLabels ) {
+               pszNextLabel = nextLabel(&pszLabels);
+               if ( ! pszNextLabel ) 
+                  break;
+               long n = (DWORD)strlen(pszNextLabel) + 1;
+               bstrAxisValue = SysAllocStringLen(NULL,n);
+               MultiByteToWideChar(CP_ACP,0,pszNextLabel,-1,bstrAxisValue,n);
+            } else
+               bstrAxisValue = axisValue(xAtAxis,max - min,&precision,maxError,&foundError,&answer,FALSE,&power);
+
+            pText -> put_Text(bstrAxisValue);
+            pText -> TextColorProperty(propertyTickLabelColor);
+            pText -> put_PositionX(dp.x);
+            pText -> put_PositionY(dp.y);
+            pText -> put_PositionZ(dp.z);
+            pText -> put_CoordinatePlane(CoordinatePlane_XY);
+            pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+            pText -> put_PartOfWorldDomain(TRUE);
+
+            SysFreeString(bstrAxisValue);
+
+         }
+
+         if ( gridLinesPerTick && tickNumber < nTicks + 1 ) {
+
+            double oldProgress = progress;
+
+            DataPoint dpClipPlaneLowerLeft = {min(origin.x,endPoint.x),min(primaryOtherMin,primaryOtherMax),0.0};
+            DataPoint dpClipPlaneUpperRight = {max(origin.x,endPoint.x),max(primaryOtherMin,primaryOtherMax),0.0};
+
+            for ( long gridNumber = 0; gridNumber <= gridLinesPerTick; gridNumber++ ) {
+
+               DataPoint dpStart = {0.0,0.0,dp.z};
+               DataPoint dpEnd = {0.0,0.0,dp.z};
+
+               dpStart.y = primaryOtherMin;
+               dpStart.x = xAtAxis + (yAtAxis - dpStart.y) * sinTheta / cosTheta;
+               dpEnd.y = primaryOtherMax;
+               dpEnd.x = xAtAxis + (yAtAxis - dpEnd.y) * sinTheta / cosTheta;
+
+               if ( S_OK == pIOpenGLImplementation -> ClipPlane(&dpStart,&dpEnd,&dpClipPlaneLowerLeft,&dpClipPlaneUpperRight) ) {
                   pIPlot -> TakeDataPoint(&movePoint);
-                  DataPoint dp2;
-                  dp2.x = xAtAxis;
-                  dp2.y = yAtAxis;
-                  dp2.z = origin.z + secondaryTickAbove;
-                  pIPlot -> TakeDataPoint(&dp2);
-                  dp2.z = origin.z - secondaryTickBelow;
-                  pIPlot -> TakeDataPoint(&dp2);
+                  pIPlot -> TakeDataPoint(&dpStart);
+                  pIPlot -> TakeDataPoint(&dpEnd);
                }
 
-            }
- 
-            if ( drawTickLabels ) {
- 
-               dp.x = xAtAxis + tickBelow * cosPhi * sinTheta;
-               dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
- 
-               if ( ! ( pText = textList.Get(tickNumber) ) ) {
-                  CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
-                  textList.Add(pText,NULL,tickNumber);
-               }
- 
-               pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
-                                    pParentPropertyXFloor,pParentPropertyXCeiling,
-                                    pParentPropertyYFloor,pParentPropertyYCeiling,
-                                    pParentPropertyZFloor,pParentPropertyZCeiling,
-                                    pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+               progress += gridSpace;
 
-               pText -> CopyFrom(pRepresentativeText);
-
-               BSTR bstrAxisValue = NULL;
-               if ( pszOriginalLabels ) {
-                  pszNextLabel = nextLabel(&pszLabels);
-                  if ( ! pszNextLabel ) 
-                     break;
-                  long n = (DWORD)strlen(pszNextLabel) + 1;
-                  bstrAxisValue = SysAllocStringLen(NULL,n);
-                  MultiByteToWideChar(CP_ACP,0,pszNextLabel,-1,bstrAxisValue,n);
-               } else
-                  bstrAxisValue = axisValue(xAtAxis,max - min,&precision,maxError,&foundError,&answer,FALSE,&power);
-
-               pText -> put_Text(bstrAxisValue);
-               pText -> TextColorProperty(propertyTickLabelColor);
-               pText -> put_PositionX(dp.x);
-               pText -> put_PositionY(dp.y);
-               pText -> put_PositionZ(dp.z);
-               pText -> put_CoordinatePlane(CoordinatePlane_XY);
-               pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
-               pText -> put_PartOfWorldDomain(TRUE);
-               pText -> put_DirectionForward(pDirectionForward);
-               pText -> put_DirectionUp(pDirectionUp);
-
-               SysFreeString(bstrAxisValue);
+               xAtAxis = origin.x + progress * cosPhi * cosTheta;
+               yAtAxis = origin.y + progress * cosPhi * sinTheta;
 
             }
- 
-            if ( gridLinesPerTick && tickNumber < nTicks + 1 ) {
 
-               double oldProgress = progress;
-
-               DataPoint dpClipPlaneLowerLeft = {min(origin.x,endPoint.x),min(primaryOtherMin,primaryOtherMax),0.0};
-               DataPoint dpClipPlaneUpperRight = {max(origin.x,endPoint.x),max(primaryOtherMin,primaryOtherMax),0.0};
-
-               for ( long gridNumber = 0; gridNumber <= gridLinesPerTick; gridNumber++ ) {
-
-                  DataPoint dpStart = {0.0,0.0,dp.z};
-                  DataPoint dpEnd = {0.0,0.0,dp.z};
-
-                  dpStart.y = primaryOtherMin;
-                  dpStart.x = xAtAxis + (yAtAxis - dpStart.y) * sinTheta / cosTheta;
-                  dpEnd.y = primaryOtherMax;
-                  dpEnd.x = xAtAxis + (yAtAxis - dpEnd.y) * sinTheta / cosTheta;
-
-                  if ( S_OK == pIOpenGLImplementation -> ClipPlane(&dpStart,&dpEnd,&dpClipPlaneLowerLeft,&dpClipPlaneUpperRight) ) {
-                     pIPlot -> TakeDataPoint(&movePoint);
-                     pIPlot -> TakeDataPoint(&dpStart);
-                     pIPlot -> TakeDataPoint(&dpEnd);
-                  }
-
-                  progress += gridSpace;
-
-                  xAtAxis = origin.x + progress * cosPhi * cosTheta;
-                  yAtAxis = origin.y + progress * cosPhi * sinTheta;
-
-               }
-
-               progress = oldProgress;
-
-            }
+            progress = oldProgress;
 
          }
 
-         if ( gridLinesPerTick ) {
-            pIPlot -> TakeDataPoint(&movePoint);
-            dp.x = origin.x;
-            dp.y = primaryOtherMax;
-            pIPlot -> TakeDataPoint(&dp);
-            dp.x = origin.x + progress * cosPhi * cosTheta;
-            pIPlot -> TakeDataPoint(&dp);
+      }
 
-            pIPlot -> TakeDataPoint(&movePoint);
-            dp.y = primaryOtherMin;
-            pIPlot -> TakeDataPoint(&dp);
-            dp.x = origin.x;
-            pIPlot -> TakeDataPoint(&dp);
-         }
+      if ( gridLinesPerTick ) {
+         pIPlot -> TakeDataPoint(&movePoint);
+         dp.x = origin.x;
+         dp.y = primaryOtherMax;
+         pIPlot -> TakeDataPoint(&dp);
+         dp.x = origin.x + progress * cosPhi * cosTheta;
+         pIPlot -> TakeDataPoint(&dp);
 
+         pIPlot -> TakeDataPoint(&movePoint);
+         dp.y = primaryOtherMin;
+         pIPlot -> TakeDataPoint(&dp);
+         dp.x = origin.x;
+         pIPlot -> TakeDataPoint(&dp);
       }
 
       break;
  
    case 'Y':
 
-      if ( sinTheta != 0.0 && (drawTickLabels || tickCount || gridLinesPerTick) ) {
+      if ( 0.0 == sinTheta )
+         break;
+
+      if ( ! drawTickLabels && ! tickCount && ! gridLinesPerTick )
+         break;
  
-         step = division / cosPhi / sinTheta;
-         gridSpace = gridSpace / cosPhi / sinTheta;
+      step = division / cosPhi / sinTheta;
 
-         dp.z = origin.z;
+      gridSpace = gridSpace / cosPhi / sinTheta;
 
-         progress = -step;
+      dp.z = origin.z;
 
-         for ( tickNumber = 1; tickNumber <= nTicks + 1; tickNumber++ ) {
+      progress = -step;
+
+      for ( tickNumber = 1; tickNumber <= nTicks + 1; tickNumber++ ) {
  
-            progress += step;
+         progress += step;
  
-            double xAtAxis = origin.x + progress * cosPhi * cosTheta;
-            double yAtAxis = origin.y + progress * cosPhi * sinTheta;
+         double xAtAxis = origin.x + progress * cosPhi * cosTheta;
+         double yAtAxis = origin.y + progress * cosPhi * sinTheta;
 
-            if ( tickCount ) {
+         if ( tickCount ) {
 
+            pIPlot -> TakeDataPoint(&movePoint);
+            dp.x = xAtAxis + tickAbove * cosPhi * sinTheta;
+            dp.y = yAtAxis - tickAbove * cosPhi * cosTheta;
+            pIPlot -> TakeDataPoint(&dp);
+            dp.x = xAtAxis - tickBelow * cosPhi * sinTheta;
+            dp.y = yAtAxis + tickBelow * cosPhi * cosTheta;
+            pIPlot -> TakeDataPoint(&dp);
+
+            if ( ticksOnAllNormalPlanes ) {
                pIPlot -> TakeDataPoint(&movePoint);
-               dp.x = xAtAxis + tickAbove * cosPhi * sinTheta;
-               dp.y = yAtAxis - tickAbove * cosPhi * cosTheta;
-               pIPlot -> TakeDataPoint(&dp);
-               dp.x = xAtAxis - tickBelow * cosPhi * sinTheta;
-               dp.y = yAtAxis + tickBelow * cosPhi * cosTheta;
-               pIPlot -> TakeDataPoint(&dp);
+               DataPoint dp2;
+               dp2.x = xAtAxis;
+               dp2.y = yAtAxis;
+               dp2.z = origin.z + secondaryTickAbove;
+               pIPlot -> TakeDataPoint(&dp2);
+               dp2.z = origin.z - secondaryTickBelow;
+               pIPlot -> TakeDataPoint(&dp2);
+            }
 
-               if ( ticksOnAllNormalPlanes ) {
+         }
+
+         if ( drawTickLabels ) {
+ 
+            dp.x = xAtAxis - tickBelow * cosPhi * sinTheta;
+            dp.y = yAtAxis + tickBelow * cosPhi * cosTheta;
+ 
+            if ( ! ( pText = textList.Get(tickNumber) ) ) {
+               CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
+               textList.Add(pText,NULL,tickNumber);
+            }
+ 
+            pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
+                                 pParentPropertyXFloor,pParentPropertyXCeiling,
+                                 pParentPropertyYFloor,pParentPropertyYCeiling,
+                                 pParentPropertyZFloor,pParentPropertyZCeiling,
+                                 pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+
+            pText -> CopyFrom(pRepresentativeText);
+
+            BSTR bstrAxisValue;
+            if ( pszOriginalLabels ) {
+               pszNextLabel = nextLabel(&pszLabels);
+               if ( ! pszNextLabel ) 
+                  break;
+               long n = (DWORD)strlen(pszNextLabel) + 1;
+               bstrAxisValue = SysAllocStringLen(NULL,n);
+               MultiByteToWideChar(CP_ACP,0,pszNextLabel,-1,bstrAxisValue,n);
+            } else
+               bstrAxisValue = axisValue(yAtAxis,max - min,&precision,maxError,&foundError,&answer,FALSE,&power);
+
+            pText -> put_Text(bstrAxisValue);
+            pText -> TextColorProperty(propertyTickLabelColor);
+            pText -> put_PositionX(dp.x);
+            pText -> put_PositionY(dp.y);
+            pText -> put_PositionZ(dp.z);
+            pText -> put_CoordinatePlane(CoordinatePlane_YX);
+            pText -> put_FlipHorizontal(VARIANT_TRUE);
+            pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+            pText -> put_PartOfWorldDomain(TRUE);
+
+            SysFreeString(bstrAxisValue);
+ 
+         }
+
+         if ( tickNumber < nTicks + 1 && gridLinesPerTick ) {
+
+            double oldProgress = progress;
+
+            DataPoint dpClipPlaneLowerLeft = {min(primaryOtherMin,primaryOtherMax),min(origin.y,endPoint.y),0.0};
+            DataPoint dpClipPlaneUpperRight = {max(primaryOtherMin,primaryOtherMax),max(origin.y,endPoint.y),0.0};
+
+            for ( long gridNumber = 0; gridNumber <= gridLinesPerTick; gridNumber++ ) {
+
+               DataPoint dpStart = {0.0,0.0,dp.z};
+               DataPoint dpEnd = {0.0,0.0,dp.z};
+
+               dpStart.x = primaryOtherMin;
+               dpStart.y = yAtAxis + (xAtAxis - dpStart.x) * cosTheta / sinTheta;
+               dpEnd.x = primaryOtherMax;
+               dpEnd.y = yAtAxis + (xAtAxis - dpEnd.x) * cosTheta / sinTheta;
+
+               if ( S_OK == pIOpenGLImplementation -> ClipPlane(&dpStart,&dpEnd,&dpClipPlaneLowerLeft,&dpClipPlaneUpperRight) ) {
                   pIPlot -> TakeDataPoint(&movePoint);
-                  DataPoint dp2;
-                  dp2.x = xAtAxis;
-                  dp2.y = yAtAxis;
-                  dp2.z = origin.z + secondaryTickAbove;
-                  pIPlot -> TakeDataPoint(&dp2);
-                  dp2.z = origin.z - secondaryTickBelow;
-                  pIPlot -> TakeDataPoint(&dp2);
+                  pIPlot -> TakeDataPoint(&dpStart);
+                  pIPlot -> TakeDataPoint(&dpEnd);
                }
 
-            }
-    
-            if ( drawTickLabels ) {
- 
-               dp.x = xAtAxis - tickBelow * cosPhi * sinTheta;
-               dp.y = yAtAxis - tickBelow * cosPhi * cosTheta;
- 
-               if ( ! ( pText = textList.Get(tickNumber) ) ) {
-                  CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
-                  textList.Add(pText,NULL,tickNumber);
-               }
- 
-               pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
-                                    pParentPropertyXFloor,pParentPropertyXCeiling,
-                                    pParentPropertyYFloor,pParentPropertyYCeiling,
-                                    pParentPropertyZFloor,pParentPropertyZCeiling,
-                                    pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+               progress += gridSpace;
 
-               pText -> CopyFrom(pRepresentativeText);
-
-               BSTR bstrAxisValue;
-               if ( pszOriginalLabels ) {
-                  pszNextLabel = nextLabel(&pszLabels);
-                  if ( ! pszNextLabel ) 
-                     break;
-                  long n = (DWORD)strlen(pszNextLabel) + 1;
-                  bstrAxisValue = SysAllocStringLen(NULL,n);
-                  MultiByteToWideChar(CP_ACP,0,pszNextLabel,-1,bstrAxisValue,n);
-               } else
-                  bstrAxisValue = axisValue(yAtAxis,max - min,&precision,maxError,&foundError,&answer,FALSE,&power);
-
-               pText -> put_Text(bstrAxisValue);
-               pText -> TextColorProperty(propertyTickLabelColor);
-
-               pText -> put_PositionX(dp.x);
-               pText -> put_PositionY(dp.y);
-               pText -> put_PositionZ(dp.z);
-               pText -> put_CoordinatePlane(CoordinatePlane_YX);
-               pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_BOTTOM);
-               pText -> put_PartOfWorldDomain(TRUE);
-               pText -> put_DirectionForward(pDirectionForward);
-               pText -> put_DirectionUp(pDirectionUp);
-
-               SysFreeString(bstrAxisValue);
- 
-            }
- 
-            if ( tickNumber < nTicks + 1 && gridLinesPerTick ) {
-
-               double oldProgress = progress;
-
-               DataPoint dpClipPlaneLowerLeft = {min(primaryOtherMin,primaryOtherMax),min(origin.y,endPoint.y),0.0};
-               DataPoint dpClipPlaneUpperRight = {max(primaryOtherMin,primaryOtherMax),max(origin.y,endPoint.y),0.0};
-
-               for ( long gridNumber = 0; gridNumber <= gridLinesPerTick; gridNumber++ ) {
-
-                  DataPoint dpStart = {0.0,0.0,dp.z};
-                  DataPoint dpEnd = {0.0,0.0,dp.z};
-
-                  dpStart.x = primaryOtherMin;
-                  dpStart.y = yAtAxis + (xAtAxis - dpStart.x) * cosTheta / sinTheta;
-                  dpEnd.x = primaryOtherMax;
-                  dpEnd.y = yAtAxis + (xAtAxis - dpEnd.x) * cosTheta / sinTheta;
-
-                  if ( S_OK == pIOpenGLImplementation -> ClipPlane(&dpStart,&dpEnd,&dpClipPlaneLowerLeft,&dpClipPlaneUpperRight) ) {
-                     pIPlot -> TakeDataPoint(&movePoint);
-                     pIPlot -> TakeDataPoint(&dpStart);
-                     pIPlot -> TakeDataPoint(&dpEnd);
-                  }
-
-                  progress += gridSpace;
-
-                  xAtAxis = origin.x + progress * cosPhi * cosTheta;
-                  yAtAxis = origin.y + progress * cosPhi * sinTheta;
-
-               }
-
-               progress = oldProgress;
+               xAtAxis = origin.x + progress * cosPhi * cosTheta;
+               yAtAxis = origin.y + progress * cosPhi * sinTheta;
 
             }
- 
+
+            progress = oldProgress;
+
          }
-
-         if ( gridLinesPerTick ) {
-            pIPlot -> TakeDataPoint(&movePoint);
-            dp.x = primaryOtherMax;
-            dp.y = origin.y;
-            pIPlot -> TakeDataPoint(&dp);
-            dp.y = origin.y + progress * cosPhi * sinTheta;
-            pIPlot -> TakeDataPoint(&dp);
-            pIPlot -> TakeDataPoint(&movePoint);
-            dp.x = primaryOtherMin;
-            pIPlot -> TakeDataPoint(&dp);
-            dp.y = origin.y;            
-            pIPlot -> TakeDataPoint(&dp);
-         }
-
+ 
       }
- 
+
+      if ( gridLinesPerTick ) {
+         pIPlot -> TakeDataPoint(&movePoint);
+         dp.x = primaryOtherMax;
+         dp.y = origin.y;
+         pIPlot -> TakeDataPoint(&dp);
+         dp.y = origin.y + progress * cosPhi * sinTheta;
+         pIPlot -> TakeDataPoint(&dp);
+         pIPlot -> TakeDataPoint(&movePoint);
+         dp.x = primaryOtherMin;
+         pIPlot -> TakeDataPoint(&dp);
+         dp.y = origin.y;            
+         pIPlot -> TakeDataPoint(&dp);
+      }
+
       break;
  
    case 'Z':
@@ -790,9 +732,9 @@
 
             if ( drawTickLabels ) {
   
-               dp.x = origin.x + progress * cosPhi * cosTheta;
-               dp.y = origin.y + progress * cosPhi * sinTheta;
-               dp.z = origin.z + progress * sinPhi;
+               dp.x = xAtAxis + 2.0 * tickBelow;
+               dp.y = yAtAxis;
+               dp.z = progress;
  
                if ( ! ( pText = textList.Get(tickNumber) ) ) {
                   CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
@@ -825,11 +767,10 @@
                pText -> put_PositionX(dp.x);
                pText -> put_PositionY(dp.y);
                pText -> put_PositionZ(dp.z);
-               pText -> put_CoordinatePlane(CoordinatePlane_XY);
-               pText -> put_Format(TEXT_FORMAT_RIGHT);
+               pText -> put_CoordinatePlane(CoordinatePlane_XZ);
+               pText -> put_FlipVertical(VARIANT_TRUE);
+               pText -> put_Format(TEXT_FORMAT_RIGHT | TEXT_COORDINATES_FROM_CENTER);
                pText -> put_PartOfWorldDomain(TRUE);
-               pText -> put_DirectionForward(pDirectionForward);
-               pText -> put_DirectionUp(pDirectionUp);
  
             }
 
@@ -898,8 +839,6 @@
 
    if ( pszOriginalLabels ) 
       delete [] pszOriginalLabels;
-
-   SafeArrayDestroy(pDirectionForward);
 
    return 0;
    }

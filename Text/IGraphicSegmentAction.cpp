@@ -91,9 +91,9 @@
 
    pIDataSetBoundingBox -> Translate(&dpTranslate);
 
-   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+   pIDataSet -> GenerateGDICoordinates();
 
-   pIDataSetBoundingBox -> GenerateGDICoordinates(pIOpenGLImplementation);
+   pIDataSetBoundingBox -> GenerateGDICoordinates();
 
    pIDataSet -> TranslateGDI(&ptSelectOffset);
 

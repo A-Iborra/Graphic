@@ -31,17 +31,19 @@
    }
  
  
-   HRESULT Text::put_TextRender(boolean doRender) {
-   doOpenGLRendering = doRender;
-   if ( ! doOpenGLRendering && pIDataSetWorld )
+   HRESULT Text::put_TextRenderOpenGL(boolean doRender) {
+   propertyOpenGLRendering -> put_boolValue(doRender);
+   if ( ! doRender && pIDataSetWorld )
       pIDataSetWorld -> RemoveIncludedDomain(pIDataSet);
    return S_OK;
    }
 
-   HRESULT Text::get_TextRender(boolean *pDoRender) {
+   HRESULT Text::get_TextRenderOpenGL(boolean *pDoRender) {
    if ( ! pDoRender )
       return E_POINTER;
-   *pDoRender = doOpenGLRendering;
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
+   *pDoRender = doOpenGLRendering ? true : false;
    return S_OK;
    }
 
@@ -66,10 +68,16 @@
    whenChangedCallbackCookie = changedCallbackCookie;
 
    if ( pPropRenderUsingOpenGL ) {
-      short v;
-      pPropRenderUsingOpenGL -> get_boolValue(&v);
-      doOpenGLRendering = v ? TRUE : FALSE;
+      if ( propertyOpenGLRendering ) {
+         propertyOpenGLRendering -> Release();
+         pIProperties -> Remove(L"opengl rendering");
+      }
+      propertyOpenGLRendering = pPropRenderUsingOpenGL;
+      propertyOpenGLRendering -> AddRef();
    }
+
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
 
    pIBasePlot -> Initialize(doOpenGLRendering ? pIDataSetWorld : NULL,pIOpenGLImplementation,pIEvaluator,
                               propertyTextColor,propertyLineWeight,
@@ -527,96 +535,6 @@
    gp -> y = static_cast<long>(dpTarget.y);
    return S_OK;
    }
- 
- 
-   HRESULT Text::put_DirectionForward(SAFEARRAY *pDirection) {
-   if ( ! pDirection ) return E_POINTER;
-   GetDataPointSafeArray(pDirection,&directionForward);
-   return S_OK;
-   }
- 
- 
-   HRESULT Text::get_DirectionForward(SAFEARRAY **pArray) {
-   return PutDataPointSafeArray(pArray,&directionForward);
-   }
- 
- 
-   HRESULT Text::put_DirectionForwardX(double x) {
-   directionForward.x = x;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionForwardX(double *px) {
-   if ( ! px ) return E_POINTER;
-   *px = directionForward.x;
-   return S_OK;
-   }
-
-
-   HRESULT Text::put_DirectionForwardY(double y) {
-   directionForward.y = y;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionForwardY(double *py) {
-   if ( ! py ) return E_POINTER;
-   *py = directionForward.y;
-   return S_OK;
-   }
-
-
-   HRESULT Text::put_DirectionForwardZ(double z) {
-   directionForward.z = z;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionForwardZ(double *pz) {
-   if ( ! pz ) return E_POINTER;
-   *pz = directionForward.z;
-   return S_OK;
-   }
-
-
-   HRESULT Text::put_DirectionUp(SAFEARRAY *pDirection) {
-   if ( ! pDirection ) return E_POINTER;
-   GetDataPointSafeArray(pDirection,&directionUp);
-   return S_OK;
-   }
- 
- 
-   HRESULT Text::get_DirectionUp(SAFEARRAY **pArray) {
-   return PutDataPointSafeArray(pArray,&directionUp);
-   }
- 
- 
-   HRESULT Text::put_DirectionUpX(double x) {
-   directionUp.x = x;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionUpX(double *px) {
-   if ( ! px ) return E_POINTER;
-   *px = directionUp.x;
-   return S_OK;
-   }
-
-
-   HRESULT Text::put_DirectionUpY(double y) {
-   directionUp.y = y;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionUpY(double *py) {
-   if ( ! py ) return E_POINTER;
-   *py = directionUp.y;
-   return S_OK;
-   }
-
-
-   HRESULT Text::put_DirectionUpZ(double z) {
-   directionUp.z = z;
-   return S_OK;
-   }
-   HRESULT Text::get_DirectionUpZ(double *pz) {
-   if ( ! pz ) return E_POINTER;
-   *pz = directionUp.z;
-   return S_OK;
-   }
 
 
    HRESULT Text::put_Color(SAFEARRAY *pColor) {
@@ -681,6 +599,19 @@
    }
 
 
+   HRESULT Text::put_Rotation(double v) {
+   rotation = v;
+   return S_OK;
+   }
+
+   HRESULT Text::get_Rotation(double *pv) {
+   if ( ! pv )
+      return E_POINTER;
+   *pv = rotation;
+   return S_OK;
+   }
+
+
    HRESULT Text::get_minX(double *pv) {
    if ( ! pv ) return E_POINTER;
    return pIDataSet -> get_minX(pv);
@@ -720,6 +651,8 @@
    HRESULT Text::put_PartOfWorldDomain(VARIANT_BOOL b) {
    partOfWorldDomain = b;
    if (  b ) {
+      short doOpenGLRendering;
+      propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
       if ( pIDataSetWorld && doOpenGLRendering )
          pIDataSetWorld -> IncludeDomain(pIDataSet);
    } else {
@@ -733,6 +666,8 @@
    HRESULT Text::get_PartOfWorldDomain(VARIANT_BOOL *pb) {
    if ( ! pb ) 
       return E_POINTER;
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
    if ( ! doOpenGLRendering )
       *pb = false;
    else
@@ -874,10 +809,11 @@
 
    pIDataSet -> pushDataPoint(&dpTarget);
 
-   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+   pIDataSet -> GenerateGDICoordinates();
 
    return S_OK;
    }
+
 
    STDMETHODIMP Text::get_GDIBoundingBox(RECT *pRect) {
 
@@ -887,11 +823,13 @@
    DataPoint minPoint,maxPoint;
 
    if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) {
-      pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
-      if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) {
-         memcpy(pRect,&rcFallBackBoundingBox,sizeof(RECT));
-         return E_UNEXPECTED;
-      }
+//Beep(2000,100);
+return E_FAIL;
+      //pIDataSet -> GenerateGDICoordinates();
+      //if ( S_OK != pIDataSet -> GetDomainGDI(&minPoint,&maxPoint) ) {
+      //   memcpy(pRect,&rcFallBackBoundingBox,sizeof(RECT));
+      //   return E_UNEXPECTED;
+      //}
    }
 
    pRect -> left = (long)minPoint.x;
@@ -899,13 +837,36 @@
    pRect -> right = (long)maxPoint.x;
    pRect -> bottom = (long)maxPoint.y;
 
+   propertyPositionX -> get_doubleValue(&dpStart.x);
+   propertyPositionY -> get_doubleValue(&dpStart.y);
+   propertyPositionZ -> get_doubleValue(&dpStart.z);
+
+   DataPoint dpOriginGDI;
+
+   pIOpenGLImplementation -> DataToWindow(&dpStart,UNIT_PIXEL,&dpOriginGDI);
+
+   pRect -> left += (long)dpOriginGDI.x;
+   pRect -> right += (long)dpOriginGDI.x;
+   pRect -> top += (long)dpOriginGDI.y;
+   pRect -> bottom += (long)dpOriginGDI.y;
+
+   pRect -> left += (long)dpTranslateFormatGDI.x;
+   pRect -> right += (long)dpTranslateFormatGDI.x;
+   pRect -> top += (long)dpTranslateFormatGDI.y;
+   pRect -> bottom += (long)dpTranslateFormatGDI.y;
+
    return S_OK;
    }
 
+
    STDMETHODIMP Text::LineUp() {
+
    DataPoint minPoint,maxPoint;
+
    pIDataSet -> GetDomain(&minPoint,&maxPoint);
+
    DataPoint dpTranslate = {0.0,0.0,0.0};
+
    switch ( coordinatePlane ) {
    case CoordinatePlane_XY:
       dpTranslate.y -= maxPoint.y - minPoint.y;
@@ -918,8 +879,17 @@
    default:
       return E_UNEXPECTED;   
    }
+
    pIDataSet -> Translate(&dpTranslate);
-   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
+
+   DataPoint dpGDI;
+
+   pIOpenGLImplementation -> DataToWindow(&dpTranslate,UNIT_PIXEL,&dpGDI);
+
+   POINT ptGDI{(int)dpGDI.x,(int)dpGDI.y};
+
+   pIDataSet -> TranslateGDI(&ptGDI);
+
    return S_OK;
    }
 

@@ -152,7 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\source\utilities.cpp" />
-    <ClCompile Include="..\..\Common\source\Utils.cpp" />
+    <ClCompile Include="..\..\Common\Utils\Utils.cpp" />
     <ClCompile Include="graphicHandler.cpp" />
     <ClCompile Include="GraphicHost.cpp" />
     <ClCompile Include="IOleInPlaceSite.cpp" />

@@ -75,6 +75,7 @@
 
 //      IAxis
 
+     STDMETHOD(put_Type)(char setType);
      STDMETHOD(get_Type)(char *getType);
 
       /* Text properties */
@@ -144,8 +145,7 @@
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
-     STDMETHOD(DrawOpenGLLabels)();
-     STDMETHOD(DrawGDILabels)();
+     STDMETHOD(DrawLabels)();
      STDMETHOD(Redraw)();
      STDMETHOD(Erase)();
 

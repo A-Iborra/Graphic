@@ -125,29 +125,6 @@
                                                    propertyPlotLeftMargin,propertyPlotTopMargin,propertyPlotRightMargin,propertyPlotBottomMargin,
                                                    propertyPlotMarginUnits,propertyPlotMarginsStretchAll);
 
-   //xaxis -> Initialize('X',xaxis,yaxis,zaxis,propertyPlotView,
-   //                           propertyXFloor,propertyXCeiling,
-   //                           propertyYFloor,propertyYCeiling,
-   //                           propertyZFloor,propertyZCeiling,
-   //                           propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)xaxis);
-
-   //yaxis -> Initialize('Y',xaxis,yaxis,zaxis,propertyPlotView,
-   //                           propertyXFloor,propertyXCeiling,
-   //                           propertyYFloor,propertyYCeiling,
-   //                           propertyZFloor,propertyZCeiling,
-   //                           propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)yaxis);
-
-   //zaxis -> Initialize('Z',xaxis,yaxis,zaxis,propertyPlotView,
-   //                           propertyXFloor,propertyXCeiling,
-   //                           propertyYFloor,propertyYCeiling,
-   //                           propertyZFloor,propertyZCeiling,
-   //                           propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)zaxis);
-
-   //pIViewSet -> Initialize(pIOpenGLImplementation,pIEvaluator,
-   //                           propertyPlotView,
-   //                           propertyViewTheta,propertyViewPhi,propertyViewSpin,
-   //                           propertyZFloor,propertyZCeiling,pIDataSetMaster,xaxis,yaxis,zaxis);
-
    return TRUE;
    }
 

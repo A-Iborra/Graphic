@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include "utils.h"
+#include "utilities.h"
 
 #include "List.cpp"
 
@@ -142,7 +142,7 @@
 
    if ( anyDataSourceVisible ) {
 
-      hiMetricToPixel(&sizeUI,&sizeUI);
+      hiMetricToPixels(&sizeUI,&sizeUI);
       cxDataSourcesAdjust = sizeUI.cx + 52;
       xGraphic = cxDataSourcesAdjust;
       cxGraphic -= cxDataSourcesAdjust;

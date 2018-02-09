@@ -305,10 +305,10 @@
          SetMenuItemInfo(hmenuTemp,p -> plotView == gcPlotView2D ? 0 : 1,TRUE,&mi);
          mi.fState = MFS_UNCHECKED;
          SetMenuItemInfo(hmenuTemp,p -> plotView == gcPlotView2D ? 1 : 0,TRUE,&mi);
-         mi.fState = MFS_DISABLED;
-         if ( p -> plotView == gcPlotView3D )
-            mi.fState = MFS_ENABLED;
-         SetMenuItemInfo(hmenuTemp,2,TRUE,&mi);
+         //mi.fState = MFS_DISABLED;
+         //if ( p -> plotView == gcPlotView3D )
+         //   mi.fState = MFS_ENABLED;
+         //SetMenuItemInfo(hmenuTemp,2,TRUE,&mi);
          }
          break;
 
@@ -505,11 +505,23 @@
          BSTR openedFile = SysAllocStringLen(NULL,1024);
          p -> pIGProperties -> Open(&openedFile);
          SysFreeString(openedFile);
+         p -> render(0);
          }
          return LRESULT(TRUE);
 
       case IDMI_GRAPHIC_NEW: {
+
          p -> isInitializing = TRUE;
+
+         p -> propertyFunctions -> clearStorageObjects();
+         p -> propertyFunctions -> writeStorageObjects();
+         p -> propertyDataSets -> clearStorageObjects();
+         p -> propertyDataSets -> writeStorageObjects();
+         p -> propertyTexts -> clearStorageObjects();
+         p -> propertyTexts -> writeStorageObjects();
+         p -> propertyAxiis -> clearStorageObjects();
+         p -> propertyAxiis -> writeStorageObjects();
+
          p -> pIGProperties -> New();
          p -> pIPropertiesClient -> Loaded();
          p -> isInitializing = TRUE;

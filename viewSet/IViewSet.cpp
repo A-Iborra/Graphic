@@ -5,20 +5,18 @@
 #include "ViewSet.h"
 
    HRESULT ViewSet::Initialize(IOpenGLImplementation *pIOpenGLImp,
-                               IEvaluator *piev,
-                               IGProperty* parentPlotView,
-                               IGProperty *parentTheta,
-                               IGProperty *parentPhi,
-                               IGProperty *parentSpin,
-                               IGProperty *parentFloor,
-                               IGProperty *parentCeiling,
-                               IDataSet* pIDS,
-                               IAxis* pIAxis_x,
-                               IAxis* pIAxis_y,
-                               IAxis* pIAxis_z) {
+                                  IEvaluator *piev,
+                                  IGProperty* parentPlotView,
+                                  IGProperty *parentTheta,
+                                  IGProperty *parentPhi,
+                                  IGProperty *parentSpin,
+                                  IGProperty *parentFloor,
+                                  IGProperty *parentCeiling,
+                                  IDataSet* pIDS,
+                                  IAxis* pIAxis_x,
+                                  IAxis* pIAxis_y,
+                                  IAxis* pIAxis_z) {
  
-   //hwndOwner = ho;
-
    pIOpenGLImplementation = pIOpenGLImp;
    pIEvaluator = piev;
    parentPropertyPlotView = parentPlotView;

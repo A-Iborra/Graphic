@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "OpenGLImplementor.h"
-#include "utils.h"
+#include "utilities.h"
 
    STDMETHODIMP OpenGLImplementor::Draw(DWORD dvAspect,long index,void *pvAspect,DVTARGETDEVICE *ptd,
                           HDC hicTarget,HDC hdcDraw,

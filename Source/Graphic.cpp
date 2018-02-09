@@ -114,6 +114,10 @@
       adviseSink_dwAspect(0),
       adviseSink_advf(0),
 
+      pIGSGraphicEvents(NULL),
+      pIConnectionPointViewSet(NULL),
+      dwViewSetEventSourceCookie(0),
+
       xPixelsPerUnit(0),
       yPixelsPerUnit(0),
 
@@ -389,8 +393,6 @@
 
    pIPropertiesClient -> InitNew();
 
-   refCount = 0;
-
    pIPropertyPage[0] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesPosSize);
    pIPropertyPage[1] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesStyle);
    pIPropertyPage[2] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesBackground);
@@ -400,6 +402,36 @@
    pIPropertyPage[6] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesPlot);
    pIPropertyPage[7] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesDataSets);
    pIPropertyPage[8] = new _IPropertyPage(this,CLSID_GSystemGraphicPropertiesFunctions);
+
+   pIGSGraphicEvents = new _IGSGraphicEvents(this);
+
+   refCount = 0;
+
+   IConnectionPointContainer *pIConnectionPointContainer = NULL;
+
+   rc = pIViewSet -> QueryInterface(IID_IConnectionPointContainer,reinterpret_cast<void **>(&pIConnectionPointContainer));
+
+   if ( ! ( S_OK == rc ) )
+      return;
+
+   rc = pIConnectionPointContainer -> FindConnectionPoint(IID_IGSGraphicEvents,&pIConnectionPointViewSet);
+
+   if ( ! ( S_OK == rc ) ) {
+      pIConnectionPointContainer -> Release();
+      return;
+   }
+
+   refCount = 100;
+
+   IUnknown *pIUnknownThis = NULL;
+
+   QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknownThis));
+
+   pIConnectionPointViewSet -> Advise(pIUnknownThis,&dwViewSetEventSourceCookie);
+
+   pIUnknownThis -> Release();
+
+   refCount = 0;
 
    return;
    }
@@ -460,8 +492,10 @@
    }
    textList.Delete();
  
-   if ( pIViewSet )
+   if ( pIViewSet ) {
+      pIConnectionPointViewSet -> Unadvise(dwViewSetEventSourceCookie);
       pIViewSet -> Release();
+   }
 
    if ( xaxis ) xaxis -> Release();
    if ( yaxis ) yaxis -> Release();

@@ -255,7 +255,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\source\utilities.cpp" />
-    <ClCompile Include="..\..\Common\source\Utils.cpp" />
+    <ClCompile Include="..\..\Common\Utils\Utils.cpp" />
     <ClCompile Include="IPlotServices.cpp" />
     <ClCompile Include="textHandler.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />

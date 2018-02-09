@@ -263,7 +263,7 @@
    IText *pIText = NULL;
    while ( pIText = p -> textList.GetNext(pIText) ) {
       boolean isOpenGLRendered;
-      pIText -> get_TextRender(&isOpenGLRendered);
+      pIText -> get_TextRenderOpenGL(&isOpenGLRendered);
       if ( ! isOpenGLRendered )
          continue;
       if ( pIText == pIText_MoveCandidate )
@@ -275,7 +275,7 @@
 
    while ( pIText = p -> textList.GetNext(pIText) ) {
       boolean isOpenGLRendered;
-      pIText -> get_TextRender(&isOpenGLRendered);
+      pIText -> get_TextRenderOpenGL(&isOpenGLRendered);
       if ( isOpenGLRendered )
          continue;
       if ( pIText == pIText_MoveCandidate )

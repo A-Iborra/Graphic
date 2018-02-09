@@ -34,6 +34,10 @@
       pPostDialogClientCallback(NULL),
       pPostDialogClientCallbackArg(NULL),
 
+      pIConnectionPoint(NULL),
+      pIEnumConnectionPoints(NULL),
+      pIEnumerateConnections(NULL),
+
       hwndGraphicContainer(NULL),
       hwndViewSet(NULL) {
  
@@ -70,6 +74,8 @@
    iProperties -> DirectAccess(L"cx",TYPE_LONG,&sizelFrame.cx,sizeof(long));
    iProperties -> DirectAccess(L"cy",TYPE_LONG,&sizelFrame.cy,sizeof(long));
 
+   pIConnectionPoint = new _IConnectionPoint(this,IID_IGSGraphicEvents);
+
    refCount = 0;
 
    return;
@@ -91,10 +97,15 @@
 
    if ( pIAxis_X )
       pIAxis_X -> Release();
+
    if ( pIAxis_Y )
       pIAxis_Y -> Release();
+
    if ( pIAxis_Z )
       pIAxis_Z -> Release();
+
+   if ( pIConnectionPoint )
+      delete pIConnectionPoint;
 
    return;
    }
@@ -235,6 +246,8 @@
    //pIText_Z -> put_PartOfWorldDomain(FALSE);
 
    pIOpenGLImplementation -> Finalize();
+
+   fire_ReDraw();
 
    return 0;
    }

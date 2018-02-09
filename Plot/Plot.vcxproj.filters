@@ -102,9 +102,6 @@
     <ClCompile Include="typeHandler.cpp">
       <Filter>Source Files\handlers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\source\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\source\utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,6 +110,9 @@
     </ClCompile>
     <ClCompile Include="textHandler.cpp">
       <Filter>Source Files\handlers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

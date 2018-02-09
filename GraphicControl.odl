@@ -85,13 +85,11 @@ library Graphic {
    [  uuid(8CAEFD71-55E6-11d3-8365-006008BD5BC3),
       helpstring("GSystems Graphic Control (G), Events Interface"),
    ]
-   dispinterface IGSGraphicEvents {
+   interface IGSGraphicEvents {
 
-      properties:
+      HRESULT Clicked();
 
-      methods:
-
-      [id(1)] HRESULT Clicked();
+      HRESULT ReDraw();
 
    };
 

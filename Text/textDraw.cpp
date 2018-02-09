@@ -11,24 +11,8 @@
 #define EPSILON 1.0E-6
 
    static DataPoint movePoint = {-DBL_MAX,-DBL_MAX,-DBL_MAX};
+
    static double piover2 = 0.0;
- 
-   static double mapX(FIXED fx) {
-   long lx = *(LONG *)&fx;
-   return ((double)(lx) / 65536.0);
-   }
- 
-   static double mapY(FIXED fy) {
-   long ly = *(LONG *)&fy;
-   return ((double)(ly) / 65536.0);
-   }
- 
-   static FIXED doubleToFixed(double d) {
-   long x;
-   x = static_cast<long>(d * 65536L);
-   return *(FIXED *)&x;
-   }
- 
  
    HRESULT Text::PrepData() {
 
@@ -40,188 +24,262 @@
 
    HDC hdc = pIOpenGLImplementation -> TargetDC();
 
-   DataPoint dpMin,dpMax;
+   DataPoint dpMinWorld,dpMaxWorld;
 
-   pIDataSetWorld -> GetDomain(&dpMin,&dpMax);
+   pIDataSetWorld -> GetDomain(&dpMinWorld,&dpMaxWorld);
 
-   if ( ( -DBL_MAX == dpMin.x && DBL_MAX == dpMax.x ) || ( DBL_MAX == dpMin.x && -DBL_MAX == dpMax.x ) )
+   if ( ( -DBL_MAX == dpMinWorld.x && DBL_MAX == dpMaxWorld.x ) || ( DBL_MAX == dpMinWorld.x && -DBL_MAX == dpMaxWorld.x ) )
       return 0;
 
-   double textMinX,textMaxX,textMinY,textMaxY,textMinZ,textMaxZ;
    int viewPort[4];
 
    pIOpenGLImplementation -> get_ViewPort(viewPort);
+
+   long plotView = PlotViews::gcPlotView2D;
+
+   pIOpenGLImplementation -> get_PlotView(&plotView);
 
    short partOfWorldDomain;
 
    get_PartOfWorldDomain(&partOfWorldDomain);
 
    long fontSizeUnits;
-   double dyScale,dxScale;
 
    propertySizeUnits -> get_longValue(&fontSizeUnits);
 
-   if ( ! doOpenGLRendering ) {
+   DataPoint dpMinGDI,dpMaxGDI;
 
-      memset(&logicalFont,0,sizeof(LOGFONT));
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
+
+   memset(&logicalFont,0,sizeof(LOGFONT));
       
-      createFont(&logicalFont);
+   createFont(&logicalFont);
 
-      hOriginalFont = (HFONT)SelectObject(hdc,hFont);
+   hOriginalFont = (HFONT)SelectObject(hdc,hFont);
 
-      TEXTMETRIC tm;
+   if ( ! renderText() ) 
+      return S_OK;
 
-      GetTextMetrics(hdc,&tm);
-
-      fontHeight = tm.tmHeight;
-      fontWidth = tm.tmAveCharWidth;
-      fontAscent = tm.tmAscent;
-      fontDescent = tm.tmDescent;
-
-      memset(&rcOnScreen,0,sizeof(RECT));
-
-      DrawText(hdc,(char *)propertyContent -> pointer(),-1L,&rcOnScreen,DT_CALCRECT);
-
-      pIDataSet -> ReSet();
-
-      pIDataSet -> pushDataPoint(&movePoint);
- 
-      DataPoint dp;
-
-      dp.x = (double)rcOnScreen.left;
-      dp.y = (double)rcOnScreen.top;
-      dp.z = 0.0;
-
-      pIDataSet -> pushDataPoint(&dp);
-
-      dp.x = rcOnScreen.right;
-      dp.y = rcOnScreen.bottom + fontDescent;
-      dp.z = 0.0;
-
-      pIDataSet -> pushDataPoint(&dp);
-
-      pIDataSet -> get_minX(&textMinX);
-      pIDataSet -> get_maxX(&textMaxX);
-      pIDataSet -> get_minY(&textMinY);
-      pIDataSet -> get_maxY(&textMaxY);
-      pIDataSet -> get_minZ(&textMinZ);
-      pIDataSet -> get_maxZ(&textMaxZ);
-
-// The rectangle of the text is in pixels
+   dpTranslateFormatGDI = {0.0,0.0,0.0};
    
-   } else {
+   DataPoint dpScaleGDIToWorld{1.0,1.0,1.0};
 
-      renderText(NULL,"M");
+   pIDataSet -> GetDomain(&dpMinGDI,&dpMaxGDI);
 
-      pIDataSet -> get_minX(&textMinX);
-      pIDataSet -> get_maxX(&textMaxX);
-      pIDataSet -> get_minY(&textMinY);
-      pIDataSet -> get_maxY(&textMaxY);
-      pIDataSet -> get_minZ(&textMinZ);
-      pIDataSet -> get_maxZ(&textMaxZ);
+   double textWidth = dpMaxGDI.x - dpMinGDI.x;
+   double textHeight = dpMaxGDI.y - dpMinGDI.y;
 
-      fontWidth = textMaxX - textMinX;
-      fontHeight = textMaxY - textMinY;
+   char verticalAxis = ' ';
+   char horizontalAxis = ' ';
 
-      if ( ! renderText() ) 
-         return S_OK;
+   switch ( coordinatePlane ) {
 
+   case CoordinatePlane_XY:
+
+      if ( format & TEXT_FORMAT_CENTER )
+         dpTranslateFormatGDI.x -= textWidth / 2.0;
+      
+      if ( format & TEXT_FORMAT_RIGHT ) 
+         dpTranslateFormatGDI.x -= textWidth;
+
+      if ( format & TEXT_COORDINATES_FROM_TOP ) 
+         dpTranslateFormatGDI.y -= textHeight;
+
+      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
+         dpTranslateFormatGDI.y -= textHeight/2.0;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+
+      horizontalAxis = 'X';
+      verticalAxis = 'Y';
+
+      break;
+
+   case CoordinatePlane_YX: {
+
+      DataPoint dpOldMin = dpMinGDI;
+
+      pIDataSet -> Rotate('Z',90.0);
+      pIDataSet -> Rotate('Y',180.0);
+
+      pIDataSet -> GetDomain(&dpMinGDI,&dpMaxGDI);
+
+      dpTranslateFormatGDI.x = dpOldMin.x - dpMinGDI.x;
+      dpTranslateFormatGDI.y = dpOldMin.y - dpMinGDI.y;
+      dpTranslateFormatGDI.z = dpOldMin.z - dpMinGDI.z;
+
+      if ( format & TEXT_FORMAT_CENTER )
+         dpTranslateFormatGDI.y -= textHeight / 2.0;
+
+      if ( format & TEXT_FORMAT_RIGHT ) 
+{
+Beep(2000,100);
+         dpTranslateFormatGDI.y -= textWidth; // ? This isn't correct yet
+}
+
+      if ( format & TEXT_COORDINATES_FROM_TOP ) 
+         dpTranslateFormatGDI.x -= textWidth;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
+{
+Beep(2000,100);
+         dpTranslateFormatGDI.x -= textWidth / 2.0;
+}
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+
+      horizontalAxis = 'Y';
+      verticalAxis = 'X';
+
+      //if ( flipHorizontal )
+      //   pIDataSet -> Rotate('Y',180.0);
+
+      //if ( flipVertical )
+      //   pIDataSet -> Rotate('X',180.0);
+
+      }
+      break;
+
+   case CoordinatePlane_XZ:
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+      dpScaleGDIToWorld.z = (dpMaxWorld.z - dpMinWorld.z) / (double)viewPort[3];
+
+      pIDataSet -> Rotate('X',90.0);
+
+      dpTranslateFormatGDI.z += textHeight / 2.0;
+      dpTranslateFormatGDI.y -= textHeight / 2.0;
+
+      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
+         dpTranslateFormatGDI.z -= textHeight / 2.0;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      horizontalAxis = 'X';
+      verticalAxis = 'Z';
+
+      break;
+
+   case CoordinatePlane_YZ: 
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+      dpScaleGDIToWorld.z = (dpMaxWorld.z - dpMinWorld.z) / (double)viewPort[3];
+
+      pIDataSet -> Rotate('Z',90.0);
+      pIDataSet -> Rotate('Y',90.0);
+
+      dpTranslateFormatGDI.y += textWidth / 2.0;
+      dpTranslateFormatGDI.y -= textHeight / 2.0;
+      dpTranslateFormatGDI.x -= textWidth / 2.0;
+      dpTranslateFormatGDI.z += textHeight / 2.0;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      horizontalAxis = 'Y';
+      verticalAxis = 'Z';
+
+      break;
+
+   case CoordinatePlane_ZY:
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+      dpScaleGDIToWorld.z = (dpMaxWorld.z - dpMinWorld.z) / (double)viewPort[3];
+
+      pIDataSet -> Rotate('Z',90.0);
+      pIDataSet -> Rotate('Y',90.0);
+      pIDataSet -> Rotate('X',90.0);
+      pIDataSet -> Rotate('Z',180.0);
+
+      dpTranslateFormatGDI.x -= textWidth / 2.0;
+      dpTranslateFormatGDI.z += textWidth / 2.0;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      horizontalAxis = 'Z';
+      verticalAxis = 'Y';
+
+      break;
+
+   case CoordinatePlane_ZX:
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+      dpScaleGDIToWorld.z = (dpMaxWorld.z - dpMinWorld.z) / (double)viewPort[3];
+
+      pIDataSet -> Rotate('Z',-90.0);
+      pIDataSet -> Rotate('X',-90.0);
+
+      dpTranslateFormatGDI.x -= textWidth / 2.0;
+      dpTranslateFormatGDI.x += textHeight / 2.0;
+      dpTranslateFormatGDI.y -= textHeight / 2.0;
+      dpTranslateFormatGDI.z += textWidth / 2.0;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      horizontalAxis = 'Z';
+      verticalAxis = 'X';
+
+      break;
+
+   case CoordinatePlane_screen: {
+
+      if ( flipVertical ) 
+         pIDataSet -> Rotate('X',180.0);
+
+      if ( flipHorizontal )
+         pIDataSet -> Rotate('Y',180.0);
+
+      if ( gcPlotView3D == plotView ) {
+         double viewTheta,viewPhi;
+         pIOpenGLImplementation -> get_ViewThetaDegrees(&viewTheta);
+         pIOpenGLImplementation -> get_ViewPhiDegrees(&viewPhi);
+         pIDataSet -> Rotate('y',90.0);
+         pIDataSet -> Rotate('X',90.0);
+         pIDataSet -> Rotate('Y',-viewPhi);
+         pIDataSet -> Rotate('Z',viewTheta);
+      }
+
+      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
+      dpScaleGDIToWorld.z = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+
+      }
+      break;
    }
 
-   pIDataSet -> GenerateBoundingBox(pIDataSetBoundingBox);
+   if ( flipVertical )
+      pIDataSet -> Rotate(verticalAxis,180.0);
 
-   dyScale = (dpMax.y - dpMin.y) / (double)viewPort[3];
-   dxScale = (dpMax.x - dpMin.x) / (double)viewPort[2];
+   if ( flipHorizontal )
+      pIDataSet -> Rotate(horizontalAxis,180.0);
+
+   pIDataSet -> SaveAsGDICoordinates();
+
+   pIDataSet -> GetDomain(&dpMinGDI,&dpMaxGDI);
+
+   dpCenterGDI.x = (dpMaxGDI.x + dpMinGDI.x) / 2.0;
+   dpCenterGDI.y = (dpMaxGDI.y + dpMinGDI.y) / 2.0;
+   dpCenterGDI.z = (dpMaxGDI.z + dpMinGDI.z) / 2.0;
+
+   pIDataSet -> Scale(&dpScaleGDIToWorld);
 
    propertyPositionX -> get_doubleValue(&dpStart.x);
    propertyPositionY -> get_doubleValue(&dpStart.y);
    propertyPositionZ -> get_doubleValue(&dpStart.z);
 
-   DataPoint dpScale = {dxScale,dyScale,1.0};
-
-   DataPoint minPoint,maxPoint,dpTranslateFormat = {0.0,0.0,0.0};
-   
-   pIDataSet -> GetDomain(&minPoint,&maxPoint);
-
-   switch ( coordinatePlane ) {
-
-   case CoordinatePlane_XY:
-      if ( format & TEXT_FORMAT_CENTER )
-         dpTranslateFormat.x -= (maxPoint.x - minPoint.x) / 2.0;
-      
-      if ( format & TEXT_FORMAT_RIGHT ) 
-         dpTranslateFormat.x -= maxPoint.x - minPoint.x;
-      
-      if ( format & TEXT_COORDINATES_FROM_TOP ) 
-         dpTranslateFormat.y -= maxPoint.y - minPoint.y;
-      
-      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
-         dpTranslateFormat.y -= (maxPoint.y - minPoint.y)/2.0;
-      break;
-
-   case CoordinatePlane_YX: 
-      pIDataSet -> Rotate('Z',90.0);
-      pIDataSet -> GetDomain(&minPoint,&maxPoint);
-      if ( format & TEXT_FORMAT_CENTER )
-         dpTranslateFormat.y -= (maxPoint.y - minPoint.y) / 2.0;
-      
-      if ( format & TEXT_FORMAT_RIGHT ) 
-         dpTranslateFormat.y -= maxPoint.y - minPoint.y;
-      
-      if ( format & TEXT_COORDINATES_FROM_TOP ) 
-         dpTranslateFormat.x -= maxPoint.x - minPoint.x;
-      
-      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
-         dpTranslateFormat.x -= (maxPoint.x - minPoint.x)/2.0;
-      logicalFont.lfOrientation = (long)900.0;
-      logicalFont.lfEscapement = (long)900.0;
-      break;
-
-   case CoordinatePlane_XZ:
-      pIDataSet -> Rotate('X',90.0);
-      break;
-
-   case CoordinatePlane_YZ:
-      pIDataSet -> Rotate('Y',90.0);
-      pIDataSet -> Rotate('X',90.0);
-      break;
-
-   case CoordinatePlane_ZY:
-      pIDataSet -> Rotate('Y',-90.0);
-      break;
-
-   case CoordinatePlane_ZX:
-      pIDataSet -> Rotate('Z',-90.0);
-      pIDataSet -> Rotate('X',-90.0);
-      break;
-
-   case CoordinatePlane_screen: {
-      double viewTheta,viewPhi;
-      if ( flipVertical ) 
-         pIDataSet -> Rotate('X',180.0);
-      if ( flipHorizontal )
-         pIDataSet -> Rotate('Y',180.0);
-      pIOpenGLImplementation -> get_ViewTheta(&viewTheta);
-      pIOpenGLImplementation -> get_ViewPhi(&viewPhi);
-      pIDataSet -> Rotate('y',90.0);
-      pIDataSet -> Rotate('X',90.0);
-      pIDataSet -> Rotate('Y',-viewPhi);
-      pIDataSet -> Rotate('Z',viewTheta);
-      }
-      break;
-   }
-
-   pIDataSet -> Translate(&dpTranslateFormat);
-   
-   pIDataSet -> Scale(&dpScale);
-
    pIDataSet -> Translate(&dpStart);
 
-   pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation);
-
    pIDataSet -> GenerateBoundingBox(pIDataSetBoundingBox);
-
-   pIDataSetBoundingBox -> GenerateGDICoordinates(pIOpenGLImplementation);
 
    SelectObject(hdc,hOriginalFont);
 
@@ -230,90 +288,14 @@
 
 
    HRESULT Text::Draw() {
-
-#if 1
-   if ( doOpenGLRendering ) {
-      if ( partOfMainGraphic ) {
-         //pIOpenGLImplementation -> Push();
-         //pIOpenGLImplementation -> SetUp(pIDataSet);
-         pIOpenGLImplementation -> SetLineWeight(1.0f);
-         pIBasePlot -> Draw();
-         //pIOpenGLImplementation -> Pop();
-      }
-      if ( partOfWorldDomain ) {
-         pIBasePlot -> Draw();
-      }
-      return S_OK;
-   }
-#endif
-
-   if ( ! propertyContent -> pointer() )
-      return S_OK;
-
-   HDC hdc = pIOpenGLImplementation -> TargetDC();
-
-   createFont(&logicalFont);
-
-   hOriginalFont = (HFONT)SelectObject(hdc,hFont);
-
-   DataPoint minPoint,maxPoint;
-
-   RECT rectText{0,0,0,0};
-
-   if ( E_UNEXPECTED == pIDataSet -> GenerateGDICoordinates(pIOpenGLImplementation) ) {
-
-      get_GDIBoundingBox(&rectText);
-
-      if ( 0 == rectText.right - rectText.left ) {
-         DrawText(hdc,(char *)propertyContent -> pointer(),-1,&rectText,DT_CALCRECT);
-         put_GDIBoundingBox(&rectText);
-      }
-
-   } else {
-
-      pIDataSet -> GetDomainGDI(&minPoint,&maxPoint);
-
-      rectText.left = (long)minPoint.x;
-      rectText.top = (long)minPoint.y;
-      rectText.right = (long)maxPoint.x;
-      rectText.bottom = (long)maxPoint.y;
-
-      if ( CoordinatePlane_YX == coordinatePlane ) {
-         long cy = rectText.bottom - rectText.top;
-         rectText.bottom += cy;
-         rectText.top += cy;
-      }
-
-   }
-
-   int oldBackground = SetBkMode(hdc,TRANSPARENT);
-
-   float fv[4];
-   BYTE *pb = (BYTE *)fv;
-
-   propertyTextColor -> get_binaryValue(4 * sizeof(long),(BYTE **)&pb);
-
-   BYTE vb[3];
-   COLORREF cr;
-   vb[0] = (BYTE)(255.0f*fv[0]);
-   vb[1] = (BYTE)(255.0f*fv[1]);
-   vb[2] = (BYTE)(255.0f*fv[2]);
-
-   cr = RGB(vb[0],vb[1],vb[2]);
-   
-   SetTextColor(hdc,cr);
-
-   DrawText(hdc,(char *)propertyContent -> pointer(),-1L,&rectText,DT_NOCLIP | DT_LEFT | DT_BOTTOM);
-
-   SetBkMode(hdc,oldBackground);
-
-   SelectObject(hdc,hOriginalFont);
-
+   renderOpenGLPoints();
    return S_OK;
    }
  
- 
    HRESULT Text::Erase() {
+
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
 
    if ( partOfMainGraphic && doOpenGLRendering ) {
       pIOpenGLImplementation -> Push();
@@ -339,6 +321,9 @@
 
    HRESULT Text::Redraw() {
 
+   short doOpenGLRendering;
+   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
+
    if ( ! doOpenGLRendering ) 
       return Draw();
 
@@ -350,204 +335,6 @@
    }
 
    return S_OK;
-   }
- 
- 
-   long Text::renderText(HDC hdcp,char* theText) {
-
-   HDC hdc = hdcp;
-
-   if ( ! hdc ) 
-      hdc = pIOpenGLImplementation -> TargetDC();
-
-   if ( ! hFont ) {
-      if ( ! szFace[0] )
-         strcpy(szFace,DEFAULT_FONT);
-      memset(&logicalFont,0,sizeof(LOGFONT));
-      logicalFont.lfHeight = -MulDiv((long)fontSize, GetDeviceCaps(hdc, LOGPIXELSY), 72);
-      logicalFont.lfQuality = PROOF_QUALITY;
-      logicalFont.lfWeight = FW_NORMAL;
-      strcpy(logicalFont.lfFaceName,szFace);
-      logicalFont.lfCharSet = DEFAULT_CHARSET;
-      hOriginalFont = (HFONT)SelectObject(hdc,hFont = CreateFontIndirect(&logicalFont));
-   }
-
-   TEXTMETRIC fontMetrics;
-   memset(&fontMetrics,0,sizeof(TEXTMETRIC));
-   GetTextMetrics(hdc,&fontMetrics);
-
-   int charWidth;
-   char *c;
-   char *text;
-
-   DataPoint startPoint = {0.0,0.0,0.0};
-
-   pIDataSet -> ReSet();
-
-   if ( ! theText ) {
-      if ( ! propertyContent -> pointer() )
-         return 0;
-      long n = (DWORD)strlen((char *)propertyContent -> pointer()) + 1;
-      text = new char[n];
-      memset(text,0,n * sizeof(char));
-      strcpy(text,(char *)propertyContent -> pointer());
-   } else {
-      long n = (DWORD)strlen(theText);
-      text = new char[n + 1];
-      strcpy(text,theText);
-   }
-
-   c = text;
-   while ( *c && *c > 0 ) {
-      if ( *c == (char)0x0A || *c == (char)0x0D || *c == '\n' ) {
-         if ( *c == (char)0x0D ) {
-            c++;
-            if ( *c == (char)0x0A ) c++;
-         } else {
-            if ( *c == (char)0x0A ) {
-               c++;
-               if ( *c == (char)0X0D ) c++;
-            } else {
-               c++;
-            }
-         }
-         startPoint.x = 0;
-         startPoint.y -= fontMetrics.tmHeight;
-      } else {
-         renderGlyph(hdc,*c,startPoint);
-         GetCharWidth32(hdc,*c,*c,&charWidth);
-         startPoint.x += charWidth;
-         c++;
-      }
-   }
-
-   pIDataSet -> get_maxX(&dpEnd.x);
-   pIDataSet -> get_maxY(&dpEnd.y);
-   pIDataSet -> get_maxZ(&dpEnd.z);
-
-   delete [] text;
-
-   return 1;
-   }
- 
- 
-   long Text::renderGlyph(HDC hdc,char c,DataPoint& dpStart) {
-   static MAT2 matrix = {0,0,0,0};
-   GLYPHMETRICS glyphMetrics;
-   long cbPolygon,cbCharacter;
-   TTPOLYGONHEADER *pPolygonHeader;
-   TTPOLYCURVE *pPolyCurve;
-   double Ax,Ay,x,y,xText,yText,zText;
-   long k,n;
-   BYTE *b,*bInner;
-   DataPoint dp;
- 
-   if ( 0 == matrix.eM11.value ) {
-      matrix.eM11 = doubleToFixed(1.0);
-      matrix.eM12 = doubleToFixed(0.0);
-      matrix.eM21 = doubleToFixed(0.0);
-      matrix.eM22 = doubleToFixed(1.0);
-   }
-
-   xText = dpStart.x;
-   yText = dpStart.y;
-   zText = dpStart.z;
-
-long xx = GDI_ERROR;
- 
-   cbCharacter = GetGlyphOutline(hdc,c,GGO_NATIVE,&glyphMetrics,0,NULL,&matrix);
-   if ( cbCharacter < 0 ) 
-      return 0;
-
-   b = new BYTE[cbCharacter];
-   cbCharacter = GetGlyphOutline(hdc,c,GGO_NATIVE,&glyphMetrics,cbCharacter,b,&matrix);
- 
-   pPolygonHeader = reinterpret_cast<TTPOLYGONHEADER *>(b);
- 
-   dp.z = zText;
-   while ( cbCharacter > 0 ) {
- 
-      pPolyCurve = reinterpret_cast<TTPOLYCURVE *>(reinterpret_cast<BYTE *>(pPolygonHeader) + sizeof(TTPOLYGONHEADER));
- 
-      cbPolygon = (long)pPolygonHeader -> cb - sizeof(TTPOLYGONHEADER);
- 
-      Ax = mapX(pPolygonHeader -> pfxStart.x);
-      Ay = mapY(pPolygonHeader -> pfxStart.y);
- 
-      pIDataSet -> pushDataPoint(&movePoint);
- 
-      dp.x = xText + Ax;
-      dp.y = yText + Ay;
-      pIDataSet -> pushDataPoint(&dp);
- 
-      while ( cbPolygon > 0 ) {
- 
-         switch ( pPolyCurve -> wType ) {
-         case TT_PRIM_LINE:
-            for ( k = 0; k < pPolyCurve -> cpfx; k++ ) {
-               Ax = mapX(pPolyCurve -> apfx[k].x);
-               Ay = mapY(pPolyCurve -> apfx[k].y);
-               dp.x = xText + Ax;
-               dp.y = yText + Ay;
-               pIDataSet -> pushDataPoint(&dp);
-            }
-            break;
- 
-         case TT_PRIM_QSPLINE: {
-            double Bx,Cx,By,Cy;
- 
-            dp.x = xText + Ax;
-            dp.y = yText + Ay;
-            pIDataSet -> pushDataPoint(&dp);
- 
-            for ( k = 0; k < pPolyCurve -> cpfx - 1; k++ ) {
-               Bx = mapX(pPolyCurve -> apfx[k].x);
-               By = mapY(pPolyCurve -> apfx[k].y);
-               if ( k < pPolyCurve -> cpfx - 2) {
-                  Cx = (Bx + mapX(pPolyCurve -> apfx[k + 1].x)) / 2.0;
-                  Cy = (By + mapY(pPolyCurve -> apfx[k + 1].y)) / 2.0;
-               } else {
-                  Cx = mapX(pPolyCurve -> apfx[k + 1].x);
-                  Cy = mapY(pPolyCurve -> apfx[k + 1].y);
-               }
-               for ( double t = 0.0; t <= 1.0; t += 0.25 ) {
-                  x = (Ax - 2.0*Bx + Cx) * t*t + (2.0 * Bx - 2.0 * Ax) * t + Ax;
-                  y = (Ay - 2.0*By + Cy) * t*t + (2.0 * By - 2.0 * Ay) * t + Ay;
-                  dp.x = xText + x;
-                  dp.y = yText + y;
-                  pIDataSet -> pushDataPoint(&dp);
-               }
-               Ax = Cx;
-               Ay = Cy;
-            }
- 
-            }
-            break;
-
-         }
- 
-         bInner = reinterpret_cast<BYTE *>(pPolyCurve);
-         n = sizeof(TTPOLYCURVE) + sizeof(POINTFX) * (pPolyCurve -> cpfx - 1);
-         bInner += n;
-         pPolyCurve = reinterpret_cast<TTPOLYCURVE *>(bInner);
-         cbPolygon -= n;
-
-      }
- 
-      dp.x = xText + mapX(pPolygonHeader -> pfxStart.x);
-      dp.y = yText + mapY(pPolygonHeader -> pfxStart.y);
-
-      pIDataSet -> pushDataPoint(&dp);
- 
-      cbCharacter -= pPolygonHeader -> cb;
-
-      pPolygonHeader = reinterpret_cast<TTPOLYGONHEADER *>(pPolyCurve);
-
-   }
- 
-   delete [] b;
- 
-   return 0;
    }
 
 

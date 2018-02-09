@@ -118,6 +118,10 @@
          *ppv = static_cast<IGSGraphicServices *>(this);
       else
 
+      if ( riid == IID_IGSGraphicEvents )
+         return pIGSGraphicEvents -> QueryInterface(riid,ppv);
+      else
+
       // Container Interfaces
 
 /*
@@ -142,7 +146,7 @@
  
    unsigned long __stdcall G::Release() {
    refCount--;
-   if ( refCount == 0 ) {
+   if ( 0 == refCount ) {
       stop();
       delete this;
       pStaticObject = NULL;

@@ -344,7 +344,7 @@
    IText *pIText = NULL;
    while ( pIText = textList.GetNext(pIText) ) {
       boolean isOpenGL;
-      pIText -> get_TextRender(&isOpenGL);
+      pIText -> get_TextRenderOpenGL(&isOpenGL);
       if ( ! isOpenGL )
          continue;
       pIText -> PrepData();
@@ -358,7 +358,7 @@
    IText *pIText = NULL;
    while ( pIText = textList.GetNext(pIText) ) {
       boolean isOpenGL;
-      pIText -> get_TextRender(&isOpenGL);
+      pIText -> get_TextRenderOpenGL(&isOpenGL);
       if ( isOpenGL )
          continue;
       pIText -> PrepData();

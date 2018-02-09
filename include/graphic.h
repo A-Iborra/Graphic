@@ -47,7 +47,7 @@
         public ISpecifyPropertyPages,
         public IGSGraphic, 
         public IGSGraphicServices,
-        public IGSystemStatusBar  {
+        public IGSystemStatusBar {
 
 //      IDispatch
 
@@ -354,40 +354,64 @@
 
 //      ISpecifyPropertyPages
 
-     STDMETHOD(GetPages)(CAUUID *pPages);
+      STDMETHOD(GetPages)(CAUUID *pPages);
 
-     class _IPropertyPage : public IPropertyPage {
-     public:
+      class _IPropertyPage : public IPropertyPage {
+      public:
 
-        _IPropertyPage(G *p,CLSID clsid) : pParent(p),theCLSID(clsid) {};
-        ~_IPropertyPage() {};
+         _IPropertyPage(G *p,CLSID clsid) : pParent(p),theCLSID(clsid) {};
+         ~_IPropertyPage() {};
 
-        // IUnknown
+         // IUnknown
 
-        STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
-        STDMETHOD_ (ULONG, AddRef)();
-        STDMETHOD_ (ULONG, Release)();
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
 
-        // IPropertyPage
+         // IPropertyPage
 
-     private:
+      private:
 
-        STDMETHOD(SetPageSite)(IPropertyPageSite *pPageSite);
-        STDMETHOD(Activate)(HWND hWndParent, LPCRECT prc, BOOL fModal);
-        STDMETHOD(Deactivate)();
-        STDMETHOD(GetPageInfo)(PROPPAGEINFO *pPageInfo);
-        STDMETHOD(SetObjects)(ULONG cObjects, IUnknown **ppUnk);
-        STDMETHOD(Show)(UINT nCmdShow);
-        STDMETHOD(Move)(LPCRECT prc);
-        STDMETHOD(IsPageDirty)();
-        STDMETHOD(Apply)();
-        STDMETHOD(Help)(LPCOLESTR pszHelpDir);
-        STDMETHOD(TranslateAccelerator)(LPMSG pMsg);
+         STDMETHOD(SetPageSite)(IPropertyPageSite *pPageSite);
+         STDMETHOD(Activate)(HWND hWndParent, LPCRECT prc, BOOL fModal);
+         STDMETHOD(Deactivate)();
+         STDMETHOD(GetPageInfo)(PROPPAGEINFO *pPageInfo);
+         STDMETHOD(SetObjects)(ULONG cObjects, IUnknown **ppUnk);
+         STDMETHOD(Show)(UINT nCmdShow);
+         STDMETHOD(Move)(LPCRECT prc);
+         STDMETHOD(IsPageDirty)();
+         STDMETHOD(Apply)();
+         STDMETHOD(Help)(LPCOLESTR pszHelpDir);
+         STDMETHOD(TranslateAccelerator)(LPMSG pMsg);
 
-        G *pParent;
-        CLSID theCLSID;
+         G *pParent;
+         CLSID theCLSID;
 
-     } *pIPropertyPage[8];
+      } *pIPropertyPage[8];
+
+
+      class _IGSGraphicEvents : public IGSGraphicEvents {
+
+      public:
+
+         _IGSGraphicEvents(G *pParent);
+         ~_IGSGraphicEvents();
+
+         // IUnknown
+
+         STDMETHOD (QueryInterface)(REFIID riid,void **ppv);
+         STDMETHOD_ (ULONG, AddRef)();
+         STDMETHOD_ (ULONG, Release)();
+
+         STDMETHOD(Clicked)();
+         STDMETHOD(ReDraw)();
+
+      private:
+   
+         G *pParent;
+         long refCount;
+
+      } *pIGSGraphicEvents;
 
 /* Not in the interface */
 
@@ -460,6 +484,9 @@
       IAdviseSink *pAdviseSink;
 
       DWORD adviseSink_dwAspect,adviseSink_advf;
+
+      IConnectionPoint *pIConnectionPointViewSet;
+      DWORD dwViewSetEventSourceCookie;
 
       int refCount;
 

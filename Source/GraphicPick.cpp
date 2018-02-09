@@ -57,7 +57,7 @@
 
             boolean isOpenGLRendered = false;
 
-            pText -> get_TextRender(&isOpenGLRendered);
+            pText -> get_TextRenderOpenGL(&isOpenGLRendered);
 
             if ( isOpenGLRendered )
                continue;
@@ -135,7 +135,7 @@
 
       while ( pText = pTextList -> GetNext(pText) ) {
          boolean isOpenGLRendered = false;
-         pText -> get_TextRender(&isOpenGLRendered);
+         pText -> get_TextRenderOpenGL(&isOpenGLRendered);
          if ( isOpenGLRendered )
             continue;
          RECT rcText;

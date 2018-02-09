@@ -18,6 +18,8 @@
 #include "Evaluator_i.h"
 #include "Evaluator_i.c"
 
+#include "GraphicControl_i.c"
+
   HMODULE hModule;
   char szModuleName[1024];
   OLECHAR wstrModuleName[1024];
@@ -73,12 +75,7 @@
 
 
   STDAPI DllRegisterServer() {	
-  return utilsDllRegisterObject(CLSID_ViewSet,LIBID_ViewSet,hModule,
-                                 szModuleName,
-                                 "InnoVisioNate ViewSet Object",
-                                 "InnoVisioNate.ViewSet",
-                                 "InnoVisioNate.ViewSet.1",
-                                 (CATID*)NULL,0,0,false,true,true);
+  return utilsDllRegisterObject(CLSID_ViewSet,LIBID_ViewSet,hModule,szModuleName,"InnoVisioNate ViewSet Object","InnoVisioNate.ViewSet","InnoVisioNate.ViewSet.1",(CATID*)NULL,0,0,false,true,true);
   }
 
 

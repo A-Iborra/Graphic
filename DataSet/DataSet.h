@@ -45,6 +45,7 @@ using namespace VBIDE;
 
 #include "List.h"
 #include "utils.h"
+#include "utilities.h"
 
 #define EXCEL_VALUE_SIZE MAX_PATH
 #define ERROR_MESSAGE_DURATION   5000
@@ -153,7 +154,7 @@ using namespace VBIDE;
 
       STDMETHOD(pushString)(char *valueString);
  
-      STDMETHOD(pushDataPoint)(DataPoint *point);
+      STDMETHOD(pushDataPoint)(DataPoint *point,void (__stdcall *pAction)(void *,void *) = NULL,void *pvArg1 = NULL,void *pvArg2 = NULL);
  
       STDMETHOD(popDataPoint)(DataPoint *point);
  
@@ -167,21 +168,23 @@ using namespace VBIDE;
 
       STDMETHOD(makeUnitSize)();
  
-      STDMETHOD(ResetLimits)(DataPoint*);
+      STDMETHOD(ResetLimits)(DataPoint* );
  
-      STDMETHOD(SetDomain)(DataPoint*,DataPoint*);
+      STDMETHOD(SetDomain)(DataPoint *,DataPoint *);
 
       STDMETHOD(SetDomainXYZ)(double *xmin,double *ymin,double *zmin,double *xmax,double *ymax,double *zmax);
  
-      STDMETHOD(GetDomain)(DataPoint*,DataPoint*);
+      STDMETHOD(GetDomain)(DataPoint *,DataPoint *);
  
-      STDMETHOD(IncludeDomain)(IDataSet*);
+      STDMETHOD(IncludeDomain)(IDataSet *);
  
       STDMETHOD(get_IsIncludedDomain)(IDataSet*,boolean *);
 
       STDMETHOD(RemoveIncludedDomain)(IDataSet*);
  
       STDMETHOD(SetColorRGB)(double *red,double *green,double *blue);
+
+      STDMETHOD(GetFirstNaturalPoint)(DataPoint *pDataPoint);
 
       STDMETHOD(Scale)(DataPoint*);
  
@@ -199,7 +202,11 @@ using namespace VBIDE;
  
       STDMETHOD(GenerateBoundingBox)(IDataSet*);
  
-      STDMETHOD(GenerateGDICoordinates)(void *pIOpenGLImplementation);
+      STDMETHOD(GenerateGDICoordinates)( );
+
+      STDMETHOD(ConvertGDIToWorld)();
+
+      STDMETHOD(SaveAsGDICoordinates)();
 
       STDMETHOD(PushExtents)();
 
@@ -626,6 +633,8 @@ using namespace VBIDE;
       IGSFunctioNater *pIFunction{NULL};
 
       IPlot *pIPlot{NULL};
+
+      IOpenGLImplementation *pIOpenGLImplementation{NULL};
 
       void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR);
       void *pWhenChangedCallbackArg;

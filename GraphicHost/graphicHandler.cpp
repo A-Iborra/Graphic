@@ -1,5 +1,6 @@
 
 #include "GraphicHost.h"
+#include "utilities.h"
 
    LRESULT EXPENTRY GraphicHost::graphicHandler(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam) {
 

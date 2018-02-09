@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "axis.h"
-
+#include "Axis.h"
 
    // Properties
 
@@ -71,50 +70,75 @@
       theTickLabels.insert(theTickLabels.end(),pIText);
    }
 
+#if 0
    bool overlap = false;
 
    while ( pIText = textList.GetNext(pIText) ) {
+
       RECT rcOuter;
+
       pIText -> get_GDIBoundingBox(&rcOuter);
+
       long cx = rcOuter.right - rcOuter.left;
+
       rcOuter.left = rcOuter.left - (long)(0.25 * (double)cx);
       rcOuter.right = rcOuter.right + (long)(0.25 * (double)cx);
+
       cx = rcOuter.bottom - rcOuter.top;
+
       rcOuter.top = rcOuter.top - (long)(0.25 * (double)cx);
       rcOuter.bottom = rcOuter.bottom + (long)(0.25 * (double)cx);
-      for ( std::list<IText *>::iterator it = theTickLabels.begin(); it != theTickLabels.end(); it++ ) {
-         if ( (*it) == pIText )
+
+      for ( IText *pt : theTickLabels ) {
+
+         if ( pt == pIText )
             continue;
+
          RECT rcInner;
-         (*it) -> get_GDIBoundingBox(&rcInner);
+
+         pt -> get_GDIBoundingBox(&rcInner);
+
          cx = rcInner.right - rcInner.left;
+
          rcInner.left = rcInner.left - (long)(0.25 * (double)cx);
+
          rcInner.right = rcInner.right + (long)(0.25 * (double)cx);
+
          cx = rcInner.bottom - rcInner.top;
+
          rcInner.top = rcInner.top - (long)(0.25 * (double)cx);
+
          rcInner.bottom = rcInner.bottom + (long)(0.25 * (double)cx);
+
          if ( rcInner.left > rcOuter.right || rcInner.right < rcOuter.left || rcInner.top > rcOuter.bottom || rcInner.bottom < rcOuter.top ) 
             continue;
+
          overlap = true;
+
          break;
+
       }
       if ( overlap )
          break;
    }
 
    pIText = NULL;
-   long k = 0;
 
-   if ( overlap ) while ( pIText = textList.GetNext(pIText) ) {
-      k++;
-      if ( k % 2 ) {
-         pIText -> LineUp();
+   if ( overlap ) {
+      long k = 0;
+      while ( pIText = textList.GetNext(pIText) ) {
+         k++;
+         if ( k % 2 ) 
+            pIText -> LineUp();
       }
    }
+#endif
 
    if ( drawAxisLabel ) {
+
       double decent,maxDecentX = DBL_MAX,maxDecentY = DBL_MAX;
       DataPoint dp;
+
       IText *pIText = NULL;
       while ( pIText = textList.GetNext(pIText) ) {
          pIText -> get_minX(&decent);
@@ -122,11 +146,14 @@
          pIText -> get_minY(&decent);
          maxDecentY = min(maxDecentY,decent);
       }
+
       if ( DBL_MAX == maxDecentX && DBL_MAX == maxDecentY ) {
          maxDecentX = 0.0;
          maxDecentY = 0.0;
       }
+
       pLabel -> put_SizeProperty(propertyAxisLabelSize,propertyAxisLabelSizeUnits);
+
       BSTR bstrLabel;
       propertyLabel -> get_stringValue(&bstrLabel);
       pLabel -> put_Text(bstrLabel);

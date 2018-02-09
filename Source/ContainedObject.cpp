@@ -4,7 +4,7 @@
 
 #include "Graphic.h"
 
-#include "utils.h"
+#include "utilities.h"
 
 #include "ContainedObject.h"
 
@@ -100,7 +100,7 @@
 
    pIOleObject -> GetExtent(DVASPECT_CONTENT,pSizel);
 
-   hiMetricToPixel(pSizel,pSizel);
+   hiMetricToPixels(pSizel,pSizel);
 
    return;
    }

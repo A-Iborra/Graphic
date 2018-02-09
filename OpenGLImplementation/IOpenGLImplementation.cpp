@@ -573,29 +573,88 @@ Sleep(10);
    }
 
 
-   HRESULT OpenGLImplementor::get_ViewTheta(double *pTheta) {
-   if ( ! pTheta ) return E_POINTER;
-   if ( ! plotWindow ) return E_UNEXPECTED;
-   if ( ! plotWindow -> pSaved_RotationTheta ) return E_UNEXPECTED;
-   plotWindow -> pSaved_RotationTheta -> get_doubleValue(pTheta);
+   static double piOver2 = 0.0;
+
+   HRESULT OpenGLImplementor::get_ViewThetaRadians(double *pTheta) {
+
+   if ( ! pTheta )
+      return E_POINTER;
+
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+
+   *pTheta = plotWindow -> openGLState.rotationTheta;
+
    return S_OK;
    }
 
 
-   HRESULT OpenGLImplementor::get_ViewPhi(double *pPhi) {
-   if ( ! pPhi ) return E_POINTER;
-   if ( ! plotWindow ) return E_UNEXPECTED;
-   if ( ! plotWindow -> pSaved_RotationPhi ) return E_UNEXPECTED;
-   plotWindow -> pSaved_RotationPhi -> get_doubleValue(pPhi);
+   HRESULT OpenGLImplementor::get_ViewPhiRadians(double *pPhi) {
+
+   if ( ! pPhi )
+      return E_POINTER;
+
+   if ( ! plotWindow )
+      return E_UNEXPECTED;
+
+   *pPhi = plotWindow -> openGLState.rotationPhi;
+
    return S_OK;
    }
 
 
-   HRESULT OpenGLImplementor::get_ViewSpin(double *pSpin) {
-   if ( ! pSpin ) return E_POINTER;
-   if ( ! plotWindow ) return E_UNEXPECTED;
-   if ( ! plotWindow -> pSaved_RotationSpin ) return E_UNEXPECTED;
-   plotWindow -> pSaved_RotationSpin -> get_doubleValue(pSpin);
+   HRESULT OpenGLImplementor::get_ViewSpinRadians(double *pSpin) {
+   if ( ! pSpin ) 
+      return E_POINTER;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+   *pSpin = plotWindow -> openGLState.rotationSpin;
+   return S_OK;
+   }
+
+
+   HRESULT OpenGLImplementor::get_ViewThetaDegrees(double *pTheta) {
+   if ( ! pTheta )
+      return E_POINTER;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+   if ( 0.0 == piOver2 )
+      piOver2 = 2.0 * atan(1.0);
+   *pTheta = plotWindow -> openGLState.rotationTheta * 90.0 / piOver2;
+   return S_OK;
+   }
+
+
+   HRESULT OpenGLImplementor::get_ViewPhiDegrees(double *pPhi) {
+   if ( ! pPhi )
+      return E_POINTER;
+   if ( ! plotWindow )
+      return E_UNEXPECTED;
+   if ( 0.0 == piOver2 )
+      piOver2 = 2.0 * atan(1.0);
+   *pPhi = plotWindow -> openGLState.rotationPhi * 90.0 / piOver2;
+   return S_OK;
+   }
+
+
+   HRESULT OpenGLImplementor::get_ViewSpinDegrees(double *pSpin) {
+   if ( ! pSpin ) 
+      return E_POINTER;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+   if ( 0.0 == piOver2 )
+      piOver2 = 2.0 * atan(1.0);
+   *pSpin = plotWindow -> openGLState.rotationSpin * 90.0 / piOver2;
+   return S_OK;
+   }
+
+
+   HRESULT OpenGLImplementor::get_PlotView(long *pView) {
+   if ( ! pView ) 
+      return E_POINTER;
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
+   *pView = plotWindow -> openGLState.plotView;
    return S_OK;
    }
 
@@ -624,8 +683,11 @@ Sleep(10);
 
    HRESULT OpenGLImplementor::WindowToData(DataPoint *dpSource,DataPoint *dpTarget) {
 
-   if ( ! dpSource || ! dpTarget ) return E_POINTER;
-   if ( ! plotWindow ) return E_UNEXPECTED;
+   if ( ! dpSource || ! dpTarget ) 
+      return E_POINTER;
+
+   if ( ! plotWindow ) 
+      return E_UNEXPECTED;
 
    strCall_WindowToData ps;
 

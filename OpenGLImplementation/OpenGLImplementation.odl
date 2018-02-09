@@ -162,9 +162,16 @@ library OpenGLImplementor {
       HRESULT ClipPlane(struct DataPoint *dpStartLine,struct DataPoint *dpEndLine,struct DataPoint *dpCorner1,struct DataPoint *dpCorner2);
 
       [propget] HRESULT BackgroundColor([out,retval]IGProperty** pIPropertyBackgroundColor);
-      [propget] HRESULT ViewTheta([out,retval]double* pViewTheta);
-      [propget] HRESULT ViewPhi([out,retval]double* pViewPhi);
-      [propget] HRESULT ViewSpin([out,retval]double *pViewSpin);
+
+      [propget] HRESULT ViewThetaRadians([out,retval]double* pViewTheta);
+      [propget] HRESULT ViewPhiRadians([out,retval]double* pViewPhi);
+      [propget] HRESULT ViewSpinRadians([out,retval]double *pViewSpin);
+
+      [propget] HRESULT ViewThetaDegrees([out,retval]double* pViewTheta);
+      [propget] HRESULT ViewPhiDegrees([out,retval]double* pViewPhi);
+      [propget] HRESULT ViewSpinDegrees([out,retval]double *pViewSpin);
+
+      [propget] HRESULT PlotView([out,retval] long *pPlotView);
 
       HRESULT Finalize();
 

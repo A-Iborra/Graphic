@@ -269,6 +269,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="handler.cpp" />
+    <ClCompile Include="IConnectionPoint.cpp" />
+    <ClCompile Include="IConnectionPointContainer.cpp" />
+    <ClCompile Include="IEnumConnectionPoints.cpp" />
+    <ClCompile Include="IEnumerateConnections.cpp" />
     <ClCompile Include="\Common\Utils\COMUtils.cpp" />
     <ClCompile Include="\Common\Utils\mathUtils.cpp" />
     <ClCompile Include="\Common\Utils\registryUtils.cpp" />

@@ -144,6 +144,11 @@
    pWhenChangedCallbackArg = pArg;
    whenChangedCallbackCookie = callbackCookie;
 
+   if ( pIOpenGLImplementation )
+      pIOpenGLImplementation -> Release();
+
+   pIOpenGLImplementation = (IOpenGLImplementation *)pvIOpenGLImplementation;
+
    if ( pIEvaluator )
       pIEvaluator -> Release();
 
@@ -499,19 +504,29 @@
    }
  
  
-   HRESULT DataSet::pushDataPoint(DataPoint *data) {
-   DataList *t = new DataList;
-   memcpy(t -> colorRGB,&currentColor,sizeof(currentColor));
-   t -> previous = topData;
-   t -> next = (DataList *)NULL;
+   HRESULT DataSet::pushDataPoint(DataPoint *data,void (__stdcall *pAction)(void *,void *),void *pvArg1,void *pvArg2) {
+
+   DataList *p = new DataList;
+
+   memcpy(p -> colorRGB,&currentColor,sizeof(currentColor));
+
+   p -> pvAction = (void *)pAction;
+   p -> pvArg1 = pvArg1;
+   p -> pvArg2 = pvArg2;
+
+   p -> previous = topData;
+
+   p -> next = (DataList *)NULL;
+
    if ( topData )
-      topData -> next = t;
+      topData -> next = p;
    else {
-      firstData = t;
+      firstData = p;
       firstData -> previous = (DataList *)NULL;
       firstData -> next = (DataList *)NULL;
    }
-   topData = t;
+
+   topData = p;
    topData -> data.x = data -> x;
    topData -> data.y = data -> y;
    topData -> data.z = data -> z;
@@ -533,8 +548,10 @@
  
  
    HRESULT DataSet::popDataPoint(DataPoint *data) {
+
    if ( ! data ) 
       return E_POINTER;
+
    if ( ! topData ) 
       return E_UNEXPECTED;
 
@@ -557,6 +574,7 @@
    topData = t;
    if ( topData ) 
       topData -> next = (DataList *)NULL;
+
    return S_OK;
    }
  
@@ -699,23 +717,23 @@
 
    HRESULT DataSet::insert(DataList *insertBefore,DataPoint *d) {
 
-   DataList *t = new DataList;
+   DataList *p = new DataList;
 
-   memcpy(t -> colorRGB,&currentColor,sizeof(currentColor));
+   memcpy(p -> colorRGB,&currentColor,sizeof(currentColor));
  
-   t -> data.x = d -> x;
-   t -> data.y = d -> y;
-   t -> data.z = d -> z;
-   t -> previous = insertBefore -> previous;
-   t -> next = insertBefore;
+   p -> data.x = d -> x;
+   p -> data.y = d -> y;
+   p -> data.z = d -> z;
+   p -> previous = insertBefore -> previous;
+   p -> next = insertBefore;
  
    if ( insertBefore -> previous ) {
-      insertBefore -> previous -> next = t;
-      insertBefore -> previous = t;
+      insertBefore -> previous -> next = p;
+      insertBefore -> previous = p;
    }
  
    if ( insertBefore == firstData )
-      firstData = t;
+      firstData = p;
    
    return S_OK;
    }
@@ -849,23 +867,19 @@
 
 
    HRESULT DataSet::GetDomain(DataPoint *pMinPoint,DataPoint *pMaxPoint) {
-   if ( ! pMinPoint ) return E_POINTER;
-   if ( ! pMaxPoint ) return E_POINTER;
-#if 0
-   get_minX(&pMinPoint -> x);
-   get_minY(&pMinPoint -> y);
-   get_minZ(&pMinPoint -> z);
-   get_maxX(&pMaxPoint -> x);
-   get_maxY(&pMaxPoint -> y);
-   get_maxZ(&pMaxPoint -> z);
-#else
+
+   if ( ! pMinPoint )
+      return E_POINTER;
+
+   if ( ! pMaxPoint ) 
+      return E_POINTER;
+
    pMinPoint -> x = xMin;
    pMinPoint -> y = yMin;
    pMinPoint -> z = zMin;
    pMaxPoint -> x = xMax;
    pMaxPoint -> y = yMax;
    pMaxPoint -> z = zMax;
-#endif
 
    if ( pMinPoint -> x == pMaxPoint -> x ) {
       if ( pPropertyXFloor ) 
@@ -945,6 +959,37 @@
    }
 
 
+   HRESULT DataSet::GetFirstNaturalPoint(DataPoint *pDataPoint) {
+
+   if ( ! pDataPoint )
+      return E_POINTER;
+
+   DataList *p = firstData;
+
+   while ( p ) {
+
+      if ( p -> data.x == DBL_MAX || p -> data.x == -DBL_MAX ||
+           p -> data.y == DBL_MAX || p -> data.y == -DBL_MAX ||
+           p -> data.z == DBL_MAX || p -> data.z == -DBL_MAX ) {
+         p = p -> next;
+         continue;
+      }
+
+      pDataPoint -> x = p -> data.x;
+      pDataPoint -> y = p -> data.y;
+      pDataPoint -> z = p -> data.z;
+
+      return S_OK;
+   }
+
+   pDataPoint -> x = DBL_MAX;
+   pDataPoint -> y = DBL_MAX;
+   pDataPoint -> z = DBL_MAX;
+
+   return S_OK;
+   }
+
+
    HRESULT DataSet::Scale(DataPoint* f) {
 
    if ( ! f ) return E_POINTER;
@@ -989,8 +1034,7 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> Scale(f);
 
    return S_OK;
@@ -1008,7 +1052,8 @@
    if ( f -> x == 0.0 && f -> y == 0.0 && f -> z == 0.0 ) return S_OK;
 
    DataList *p = firstData;
-   if ( ! p ) return E_UNEXPECTED;
+   if ( ! p ) 
+      return E_UNEXPECTED;
 
    xMin = DBL_MAX;
    xMax = -DBL_MAX;
@@ -1050,26 +1095,21 @@
 
    HRESULT DataSet::TranslateGDI(POINT* f) {
 
-   if ( ! gdiData ) return E_UNEXPECTED;
+   if ( ! gdiData ) 
+      return E_UNEXPECTED;
 
    DataList *p = gdiData;
-   xMin = DBL_MAX;
-   xMax = -DBL_MAX;
-   yMin = DBL_MAX;
-   yMax = -DBL_MAX;
+
    while ( p ) {
 
-      if ( p -> data.x != DBL_MAX && p -> data.x != -DBL_MAX ) {
+      if ( p -> data.x != DBL_MAX && p -> data.x != -DBL_MAX ) 
          p -> data.x += (double)f -> x;
-         xMin = min(xMin,p -> data.x);
-         xMax = max(xMax,p -> data.x);
-      }
 
-      if ( p -> data.y != DBL_MAX && p -> data.y != -DBL_MAX ) {
+      if ( p -> data.y != DBL_MAX && p -> data.y != -DBL_MAX ) 
          p -> data.y += (double)f -> y;
-         yMin = min(yMin,p -> data.y);
-         yMax = max(yMax,p -> data.y);
-      }
+
+      //if ( p -> data.z != DBL_MAX && p -> data.z != -DBL_MAX ) 
+      //   p -> data.z += (double)f -> z;
 
       p = p -> next;
    }
@@ -1083,22 +1123,23 @@
 
    HRESULT DataSet::Rotate(char axis,double angle) {
 
-   if ( ! firstData ) return E_UNEXPECTED;
+   if ( ! firstData ) 
+      return E_UNEXPECTED;
 
    if ( xMin == DBL_MAX && xMax == -DBL_MAX &&
         yMin == DBL_MAX && yMax == -DBL_MAX &&
-        zMin == DBL_MAX && zMax == -DBL_MAX ) return E_UNEXPECTED;
+        zMin == DBL_MAX && zMax == -DBL_MAX )
+      return E_UNEXPECTED;
+
+   DataPoint dpCenter{-(xMax + xMin) / 2.0,-(yMax + yMin) / 2.0,-(zMax + zMin) / 2.0};
+
+   Translate(&dpCenter);
 
    double rMatrix[9];
-   rotateMatrix(axis,angle,rMatrix);
-   DataList *p = firstData;
 
-   xMin = DBL_MAX;
-   yMin = DBL_MAX;
-   zMin = DBL_MAX;
-   xMax = -DBL_MAX;
-   yMax = -DBL_MAX;
-   zMax = -DBL_MAX;
+   rotateMatrix(axis,angle,rMatrix);
+
+   DataList *p = firstData;
 
    while ( p ) {
 
@@ -1111,15 +1152,14 @@
 
       MxPoint(rMatrix,&p -> data,&p -> data);
 
-      xMin = min(xMin,p -> data.x);
-      yMin = min(yMin,p -> data.y);
-      zMin = min(zMin,p -> data.z);
-      xMax = max(xMax,p -> data.x);
-      yMax = max(yMax,p -> data.y);
-      zMax = max(zMax,p -> data.z);
-
       p = p -> next;
    }
+
+   dpCenter.x = -dpCenter.x;//(xMax + xMin) / 2.0;
+   dpCenter.y = -dpCenter.y;//(yMax + yMin) / 2.0;
+   dpCenter.z = -dpCenter.z;//(zMax + zMin) / 2.0;
+
+   Translate(&dpCenter);
 
    for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> Rotate(axis,angle);
@@ -1137,8 +1177,11 @@
         zMin == DBL_MAX && zMax == -DBL_MAX ) return E_UNEXPECTED;
 
    double rMatrix[9];
+
    double v[] = {vector -> x,vector -> y,vector -> z};
+
    rotateMatrixVector(angle,v,rMatrix);
+
    DataList *p = firstData;
 
    xMin = DBL_MAX;
@@ -1185,7 +1228,9 @@
         zMin == DBL_MAX && zMax == -DBL_MAX ) return E_UNEXPECTED;
 
    double sMatrix[9];
+
    shearMatrix(axis,ratio,sMatrix);
+
    DataList *p = firstData;
 /*
    xMin = DBL_MAX;
@@ -1216,8 +1261,7 @@
       p = p -> next;
    }
 
-   //IDataSet* pDataSet = (IDataSet *)NULL;
-   for ( IDataSet *pDataSet : otherDomains ) //while ( pDataSet = otherDomains.GetNext(pDataSet) ) 
+   for ( IDataSet *pDataSet : otherDomains )
       pDataSet -> Shear(axis,ratio);
 
    return S_OK;
@@ -1265,9 +1309,7 @@
    }
 
 
-   HRESULT DataSet::GenerateGDICoordinates(void *pvOpenGL) {
-
-   IOpenGLImplementation *pOpenGL = (IOpenGLImplementation *)pvOpenGL;
+   HRESULT DataSet::GenerateGDICoordinates() {
 
    if ( xMin == DBL_MAX && xMax == -DBL_MAX &&
         yMin == DBL_MAX && yMax == -DBL_MAX &&
@@ -1289,22 +1331,105 @@
    memset(gdiData,0,cp * sizeof(DataList));
 
    DataList *p = gdiData;
-   for ( long k = 0; k < cp - 1; k++ ) {
-      memcpy(p -> colorRGB,&currentColor,sizeof(currentColor));
+
+   for ( long k = 0; k < cp; k++ ) {
+      p -> colorRGB[0] = currentColor[0];
+      p -> colorRGB[1] = currentColor[1];
+      p -> colorRGB[2] = currentColor[2];
       p -> next = p + 1;
-      p -> next -> previous = p;
+      if ( k < cp - 1 )
+         p -> next -> previous = p;
       p = p -> next;
    }
 
-   memcpy((&gdiData[cp - 1]) -> colorRGB,&currentColor,sizeof(currentColor));
    gdiData[cp - 1].next = NULL;
-   gdiData[0].previous = NULL;
 
-   pOpenGL -> DataListToWindow(firstData,gdiData);
+   pIOpenGLImplementation -> DataListToWindow(firstData,gdiData);
 
    return S_OK;
    }
 
+
+   HRESULT DataSet::ConvertGDIToWorld() {
+
+   DataList *p = firstData;
+
+   xMin = DBL_MAX;
+   yMin = DBL_MAX;
+   zMin = DBL_MAX;
+   xMax = -DBL_MAX;
+   yMax = -DBL_MAX;
+   zMax = -DBL_MAX;
+
+   while ( p ) {
+
+      if ( p -> data.x == DBL_MAX || p -> data.x == -DBL_MAX ||
+           p -> data.y == DBL_MAX || p -> data.y == -DBL_MAX ||
+           p -> data.z == DBL_MAX || p -> data.z == -DBL_MAX ) {
+         p = p -> next;
+         continue;
+      }
+
+      pIOpenGLImplementation -> WindowToData(&p -> data,&p -> data);
+
+//      MxPoint(sMatrix,&p -> data,&p -> data);
+
+      xMin = min(xMin,p -> data.x);
+      yMin = min(yMin,p -> data.y);
+      zMin = min(zMin,p -> data.z);
+      xMax = max(xMax,p -> data.x);
+      yMax = max(yMax,p -> data.y);
+      zMax = max(zMax,p -> data.z);
+
+      p = p -> next;
+  
+    }
+
+   return S_OK;
+   }
+
+
+   HRESULT DataSet::SaveAsGDICoordinates() {
+
+   if ( xMin == DBL_MAX && xMax == -DBL_MAX &&
+        yMin == DBL_MAX && yMax == -DBL_MAX &&
+        zMin == DBL_MAX && zMax == -DBL_MAX ) 
+      return E_UNEXPECTED;
+
+   long cp;
+
+   get_countPoints(&cp);
+
+   if ( ! cp ) 
+      return E_UNEXPECTED;
+   
+   if ( gdiData ) 
+      delete [] gdiData;
+
+   gdiData = new DataList[cp];
+
+   memset(gdiData,0,cp * sizeof(DataList));
+
+   DataList *p = gdiData;
+   DataList *pSource = firstData;
+   for ( long k = 0; k < cp; k++ ) {
+      p -> data.x = pSource -> data.x;
+      p -> data.y = pSource -> data.y;
+      p -> data.z = pSource -> data.z;
+      p -> colorRGB[0] = pSource -> colorRGB[0];
+      p -> colorRGB[1] = pSource -> colorRGB[1];
+      p -> colorRGB[2] = pSource -> colorRGB[2];
+      p -> next = p + 1;
+      if ( k < cp - 1 )
+         p -> next -> previous = p;
+      p = p -> next;
+      pSource = pSource -> next;
+   }
+
+   gdiData[cp - 1].next = NULL;
+
+   return S_OK;
+   }
 
    HRESULT DataSet::PushExtents() {
 

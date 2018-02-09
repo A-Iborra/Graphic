@@ -34,13 +34,6 @@
    HRESULT rc = CoCreateInstance(CLSID_GSystemGraphic,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IOleObject,reinterpret_cast<void **>(&pIOleObject_Graphic));
 
    pIOleObject_Graphic -> QueryInterface(IID_IGSGraphic,reinterpret_cast<void **>(&pIGraphic));
-#if 0
-
-   pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
-
-   pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
-
-#endif
 
    CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
 
@@ -82,10 +75,10 @@
 
    pIGraphic -> put_UseStatusBar(VARIANT_TRUE);
 
-#if 1
    pIOleObject_Graphic -> QueryInterface(IID_IOleInPlaceObject,reinterpret_cast<void **>(&pIOleInPlaceObject_Graphic));
+
    pIOleObject_Graphic -> SetClientSite(static_cast<IOleClientSite *>(pIOleClientSite));
-#endif
+
    SetWindowPos(hwndFrame,HWND_TOP,rcFrame.left,rcFrame.top,rcFrame.right - rcFrame.left,rcFrame.bottom - rcFrame.top,SWP_SHOWWINDOW);
 
    return;

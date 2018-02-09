@@ -33,6 +33,8 @@
    drawTickLabels = TRUE;
    doAutoPrecision = TRUE;
  
+//drawTickLabels = FALSE;
+
    propertyLabel -> put_szValue("");
    propertyDrawLabel -> put_boolValue(FALSE);
    propertyAxisLabelColorTrackLineColor -> put_boolValue(TRUE);

@@ -101,6 +101,9 @@
 
    delete pBoundingBox;
 
+   if ( pIOpenGLImplementation )
+      pIOpenGLImplementation -> Release();
+
    if ( pIEvaluator )
       pIEvaluator -> Release();
 

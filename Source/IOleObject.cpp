@@ -5,7 +5,7 @@
 #include "Graphic.h"
 
 #include <OleCtl.h>
-#include "utils.h"
+#include "utilities.h"
 
    STDMETHODIMP G::SetClientSite(IOleClientSite *pcs) {
  
@@ -45,6 +45,8 @@
    initWindows();
 
    ShowWindow(hwndFrame,SW_SHOW);
+
+   isInitializing = FALSE;
    
    return S_OK;
    }
@@ -89,7 +91,7 @@
    SIZEL tempSizel;
    RECT rect = {0,0,0,0};
 
-   hiMetricToPixel(pSizel,&tempSizel);
+   hiMetricToPixels(pSizel,&tempSizel);
    rect.right = tempSizel.cx;
    rect.bottom = tempSizel.cy;
 

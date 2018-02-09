@@ -34,6 +34,8 @@
       long windowCX,windowCY;
       double xScaleFactor,yScaleFactor,zScaleFactor;
       double extentsXMin,extentsYMin,extentsZMin,extentsXMax,extentsYMax,extentsZMax;
+      double rotationTheta,rotationPhi,rotationSpin;
+      long plotView;
    };
 
    struct lightingParameters {
@@ -295,9 +297,16 @@
       STDMETHOD(ClipPlane)(DataPoint *,DataPoint *,DataPoint *,DataPoint *);
  
       STDMETHOD(get_BackgroundColor)(IGProperty** pIPropertyBackgroundColor);
-      STDMETHOD(get_ViewTheta)(double* pViewTheta);
-      STDMETHOD(get_ViewPhi)(double* pViewPhi);
-      STDMETHOD(get_ViewSpin)(double *);
+
+      STDMETHOD(get_ViewThetaRadians)(double* pViewTheta);
+      STDMETHOD(get_ViewPhiRadians)(double* pViewPhi);
+      STDMETHOD(get_ViewSpinRadians)(double *);
+
+      STDMETHOD(get_ViewThetaDegrees)(double* pViewTheta);
+      STDMETHOD(get_ViewPhiDegrees)(double* pViewPhi);
+      STDMETHOD(get_ViewSpinDegrees)(double *);
+
+      STDMETHOD(get_PlotView)(long *);
 
       STDMETHOD(SetColor)(float *);
       STDMETHOD(SetLineWeight)(float);
