@@ -24,6 +24,27 @@
 
       p -> hwndOrientation = hwnd;
 
+      SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETSEL,(WPARAM)FALSE,MAKELPARAM(0,100));
+
+      if ( ! p -> showPositionSettings ) {
+
+         RECT rcBox,rcParent;
+
+         GetWindowRect(hwnd,&rcParent);
+
+         GetClientRect(GetDlgItem(hwnd,IDDI_TEXT_POSITION_GROUP),&rcBox);
+
+         for ( long id = IDDI_TEXT_POSITION_GROUP; id <= IDDI_TEXT_ZCOORDINATE; id++ )
+            ShowWindow(GetDlgItem(hwnd,id),SW_HIDE);
+
+         for ( long id = IDDI_TEXT_FORMATTING_GROUP; id <= IDDI_TEXT_FORMAT_RIGHT; id++ ) {
+            RECT rcItem;
+            GetWindowRect(GetDlgItem(hwnd,id),&rcItem);
+            SetWindowPos(GetDlgItem(hwnd,id),HWND_TOP,rcItem.left - rcParent.left,rcItem.top - rcParent.top - rcBox.bottom,0,0,SWP_NOSIZE);
+         }
+
+      }
+
       }
       return LRESULT(TRUE);
  
@@ -39,29 +60,33 @@
       SendDlgItemMessage(hwnd,IDDI_TEXT_ZYPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
       SendDlgItemMessage(hwnd,IDDI_TEXT_SCREENPLANE,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0L);
 
+      long buttonId;
+
       switch ( p -> coordinatePlane ) {
       case CoordinatePlane_XY:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_XYPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_XYPLANE;
          break;
       case CoordinatePlane_XZ:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_XZPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_XZPLANE;
          break;
       case CoordinatePlane_YX:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_YXPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_YXPLANE;
          break;
       case CoordinatePlane_YZ:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_YZPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_YZPLANE;
          break;
       case CoordinatePlane_ZX:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_ZXPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_ZXPLANE;
          break;
       case CoordinatePlane_ZY:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_ZYPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_ZYPLANE;
          break;
       case CoordinatePlane_screen:
-         SendDlgItemMessage(hwnd,IDDI_TEXT_SCREENPLANE,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
+         buttonId = IDDI_TEXT_SCREENPLANE;
          break;
       }
+
+      SendDlgItemMessage(hwnd,buttonId,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
 
       if ( p -> flipVertical ) 
          SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_TB,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
@@ -69,7 +94,6 @@
       if ( p -> flipHorizontal ) 
          SendDlgItemMessage(hwnd,IDDI_TEXT_FLIP_LR,BM_SETCHECK,(WPARAM)BST_CHECKED,0L);
 
-      SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETSEL,(WPARAM)FALSE,MAKELPARAM(0,100));
       SendDlgItemMessage(hwnd,IDDI_TEXT_PLANEHEIGHT,TBM_SETPOS,(WPARAM)TRUE,(LPARAM)static_cast<long>(100.0 * (1.0 - p -> planeHeight)));
 
       char szTemp[32];

@@ -363,12 +363,14 @@
 
    pIText -> put_PartOfWorldDomain(FALSE);
 
+   pIText -> AdviseGSGraphicServices(pIGSGraphicServices);
+
    pIText -> Initialize(pIOpenGLImplementation,pIEvaluator,
                            pIDataSetDomain,
                            pPropertyXFloor,pPropertyXCeiling,
                            pPropertyYFloor,pPropertyYCeiling,
                            pPropertyZFloor,pPropertyZCeiling,
-                           NULL,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,(ULONG_PTR)whenChangedCallbackCookie);
+                           NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,(ULONG_PTR)whenChangedCallbackCookie);
 
    DataPoint dpMin,dpMax;
 

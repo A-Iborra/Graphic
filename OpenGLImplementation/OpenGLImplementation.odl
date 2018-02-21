@@ -183,7 +183,7 @@ library OpenGLImplementor {
 
 // Selection 
 
-      HRESULT GetPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
+      HRESULT GetPickBoxHits(POINTL *ptl,long pickWindowWidth,long pickWindowHeight,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
 
 // Segments ? 
 

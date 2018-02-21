@@ -149,8 +149,6 @@
 
       SendMessage(GetDlgItem(hwnd,IDDI_TEXT_FONTSIZEUNITSLIST),CB_SETCURSEL,fontSizeUnits,0L);
 
-      p -> propertyOpenGLRendering -> setWindowItemChecked(hwnd,IDDI_TEXT_RENDEROPENGL);
-
       SET_SPINNERS
 
       holdUpdates = FALSE;
@@ -225,10 +223,6 @@
 
       switch ( LOWORD(wParam) ) {
  
-      case IDDI_TEXT_RENDEROPENGL:
-         p -> propertyOpenGLRendering -> getWindowItemChecked(hwnd,IDDI_TEXT_RENDEROPENGL);
-         break;
-
       case IDDI_TEXT_FONTLIST: {
  
          switch ( HIWORD(wParam) ) {

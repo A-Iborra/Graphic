@@ -72,6 +72,16 @@
    if ( ! pCount )
       return E_POINTER;
    *pCount = 3;
+
+   if ( ! showContentPropertyPage )
+      *pCount--;
+
+   if ( ! showStylePropertyPage )
+      *pCount--;
+
+   if ( ! showOrientationPropertyPage )
+      *pCount--;
+
    return S_OK;
    }
 
@@ -80,32 +90,43 @@
 
    PROPSHEETPAGE *pPropSheetPages = (PROPSHEETPAGE *)pPages;
 
-   pPropSheetPages[0].dwFlags = PSP_USETITLE;
-   pPropSheetPages[0].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[0].hInstance = hModule;
-   pPropSheetPages[0].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_CONTENT);
-   pPropSheetPages[0].pfnDlgProc = (DLGPROC)Text::contentHandler;
-   pPropSheetPages[0].pszTitle = "Content";
-   pPropSheetPages[0].lParam = (LPARAM)this;
-   pPropSheetPages[0].pfnCallback = NULL;
+   long index = 0;
 
-   pPropSheetPages[1].dwFlags = PSP_USETITLE;
-   pPropSheetPages[1].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[1].hInstance = hModule;
-   pPropSheetPages[1].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_STYLE);
-   pPropSheetPages[1].pfnDlgProc = (DLGPROC)Text::styleHandler;
-   pPropSheetPages[1].pszTitle = "Style";
-   pPropSheetPages[1].lParam = (LPARAM)this;
-   pPropSheetPages[1].pfnCallback = NULL;
+   if ( showContentPropertyPage ) {
+      pPropSheetPages[index].dwFlags = PSP_USETITLE;
+      pPropSheetPages[index].dwSize = sizeof(PROPSHEETPAGE);
+      pPropSheetPages[index].hInstance = hModule;
+      pPropSheetPages[index].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_CONTENT);
+      pPropSheetPages[index].pfnDlgProc = (DLGPROC)Text::contentHandler;
+      pPropSheetPages[index].pszTitle = "Content";
+      pPropSheetPages[index].lParam = (LPARAM)this;
+      pPropSheetPages[index].pfnCallback = NULL;
+      index++;
+   }
 
-   pPropSheetPages[2].dwFlags = PSP_USETITLE;
-   pPropSheetPages[2].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[2].hInstance = hModule;
-   pPropSheetPages[2].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_ORIENTATION);
-   pPropSheetPages[2].pfnDlgProc = (DLGPROC)Text::orientationHandler;
-   pPropSheetPages[2].pszTitle = "Orientation";
-   pPropSheetPages[2].lParam = (LPARAM)this;
-   pPropSheetPages[2].pfnCallback = NULL;
+   if ( showStylePropertyPage ) {
+      pPropSheetPages[index].dwFlags = PSP_USETITLE;
+      pPropSheetPages[index].dwSize = sizeof(PROPSHEETPAGE);
+      pPropSheetPages[index].hInstance = hModule;
+      pPropSheetPages[index].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_STYLE);
+      pPropSheetPages[index].pfnDlgProc = (DLGPROC)Text::styleHandler;
+      pPropSheetPages[index].pszTitle = "Style";
+      pPropSheetPages[index].lParam = (LPARAM)this;
+      pPropSheetPages[index].pfnCallback = NULL;
+      index++;
+   }
+
+   if ( showOrientationPropertyPage ) {
+      pPropSheetPages[index].dwFlags = PSP_USETITLE;
+      pPropSheetPages[index].dwSize = sizeof(PROPSHEETPAGE);
+      pPropSheetPages[index].hInstance = hModule;
+      pPropSheetPages[index].pszTemplate = MAKEINTRESOURCE(IDDIALOG_TEXT_ORIENTATION);
+      pPropSheetPages[index].pfnDlgProc = (DLGPROC)Text::orientationHandler;
+      pPropSheetPages[index].pszTitle = "Orientation";
+      pPropSheetPages[index].lParam = (LPARAM)this;
+      pPropSheetPages[index].pfnCallback = NULL;
+      index++;
+   }
 
    return S_OK;
    }

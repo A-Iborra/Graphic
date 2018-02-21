@@ -39,24 +39,22 @@
 
    pIOpenGLImplementation -> get_PlotView(&plotView);
 
-   short partOfWorldDomain;
-
-   get_PartOfWorldDomain(&partOfWorldDomain);
-
    long fontSizeUnits;
 
    propertySizeUnits -> get_longValue(&fontSizeUnits);
 
    DataPoint dpMinGDI,dpMaxGDI;
 
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-
    memset(&logicalFont,0,sizeof(LOGFONT));
       
    createFont(&logicalFont);
 
    hOriginalFont = (HFONT)SelectObject(hdc,hFont);
+
+   if ( ! ( CoordinatePlane_screen == coordinatePlane ) ) 
+      put_PartOfWorldDomain(VARIANT_TRUE);
+   else
+      put_PartOfWorldDomain(VARIANT_FALSE);
 
    if ( ! renderText() ) 
       return S_OK;
@@ -122,7 +120,7 @@ Beep(2000,100);
 }
 
       if ( format & TEXT_COORDINATES_FROM_TOP ) 
-         dpTranslateFormatGDI.x -= textWidth;
+         dpTranslateFormatGDI.x -= textHeight;
 
       pIDataSet -> Translate(&dpTranslateFormatGDI);
 
@@ -137,12 +135,6 @@ Beep(2000,100);
 
       horizontalAxis = 'Y';
       verticalAxis = 'X';
-
-      //if ( flipHorizontal )
-      //   pIDataSet -> Rotate('Y',180.0);
-
-      //if ( flipVertical )
-      //   pIDataSet -> Rotate('X',180.0);
 
       }
       break;
@@ -233,25 +225,26 @@ Beep(2000,100);
 
    case CoordinatePlane_screen: {
 
-      if ( flipVertical ) 
-         pIDataSet -> Rotate('X',180.0);
+      dpScaleGDIToWorld.x = 1.0;
+      dpScaleGDIToWorld.y = -1.0;
+      dpScaleGDIToWorld.z = 1.0;
 
-      if ( flipHorizontal )
-         pIDataSet -> Rotate('Y',180.0);
+      if ( format & TEXT_FORMAT_CENTER )
+         dpTranslateFormatGDI.x -= textWidth / 2.0;
+      
+      if ( format & TEXT_FORMAT_RIGHT ) 
+         dpTranslateFormatGDI.x -= textWidth;
 
-      if ( gcPlotView3D == plotView ) {
-         double viewTheta,viewPhi;
-         pIOpenGLImplementation -> get_ViewThetaDegrees(&viewTheta);
-         pIOpenGLImplementation -> get_ViewPhiDegrees(&viewPhi);
-         pIDataSet -> Rotate('y',90.0);
-         pIDataSet -> Rotate('X',90.0);
-         pIDataSet -> Rotate('Y',-viewPhi);
-         pIDataSet -> Rotate('Z',viewTheta);
-      }
+      if ( format & TEXT_COORDINATES_FROM_CENTER ) 
+         dpTranslateFormatGDI.y -= textHeight / 2.0;
 
-      dpScaleGDIToWorld.x = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
-      dpScaleGDIToWorld.y = (dpMaxWorld.y - dpMinWorld.y) / (double)viewPort[3];
-      dpScaleGDIToWorld.z = (dpMaxWorld.x - dpMinWorld.x) / (double)viewPort[2];
+      if ( format & TEXT_COORDINATES_FROM_TOP ) 
+         dpTranslateFormatGDI.y -= textHeight;
+
+      pIDataSet -> Translate(&dpTranslateFormatGDI);
+
+      verticalAxis = 'X';
+      horizontalAxis = 'Y';
 
       }
       break;
@@ -265,23 +258,31 @@ Beep(2000,100);
 
    pIDataSet -> SaveAsGDICoordinates();
 
-   pIDataSet -> GetDomain(&dpMinGDI,&dpMaxGDI);
-
-   dpCenterGDI.x = (dpMaxGDI.x + dpMinGDI.x) / 2.0;
-   dpCenterGDI.y = (dpMaxGDI.y + dpMinGDI.y) / 2.0;
-   dpCenterGDI.z = (dpMaxGDI.z + dpMinGDI.z) / 2.0;
-
-   pIDataSet -> Scale(&dpScaleGDIToWorld);
-
    propertyPositionX -> get_doubleValue(&dpStart.x);
    propertyPositionY -> get_doubleValue(&dpStart.y);
    propertyPositionZ -> get_doubleValue(&dpStart.z);
 
-   pIDataSet -> Translate(&dpStart);
+   pIDataSet -> Scale(&dpScaleGDIToWorld);
+
+   if ( ! ( CoordinatePlane_screen == coordinatePlane ) )
+
+      pIDataSet -> Translate(&dpStart);
+
+   else {
+
+      DataPoint dpStartGDI;
+
+      pIOpenGLImplementation -> DataToWindow(&dpStart,UNIT_PIXEL,&dpStartGDI);
+
+      pIDataSet -> Translate(&dpStartGDI);
+
+   }
 
    pIDataSet -> GenerateBoundingBox(pIDataSetBoundingBox);
 
    SelectObject(hdc,hOriginalFont);
+
+pIDataSet -> GetDomain(&dpMinGDI,&dpMaxGDI);
 
    return S_OK;
    }
@@ -294,46 +295,28 @@ Beep(2000,100);
  
    HRESULT Text::Erase() {
 
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-
-   if ( partOfMainGraphic && doOpenGLRendering ) {
+   if ( partOfMainGraphic ) {
       pIOpenGLImplementation -> Push();
       pIOpenGLImplementation -> SetUp(pIDataSet);
       pIBasePlot -> Erase();
       pIOpenGLImplementation -> Pop();
    }
 
-   if ( ! doOpenGLRendering ) {
-      HDC hdc = pIOpenGLImplementation -> TargetDC();
-      RECT rcBox;
-      get_GDIBoundingBox(&rcBox);
-      rcBox.bottom += 2;
-      COLORREF thePixel = GetPixel(hdc,2,2);
-      HBRUSH hb = CreateSolidBrush(thePixel);
-      FillRect(hdc,&rcBox,hb);
-      DeleteObject(hb);
-   }
+   HDC hdc = pIOpenGLImplementation -> TargetDC();
+   RECT rcBox;
+   get_GDIBoundingBox(&rcBox);
+   rcBox.bottom += 2;
+   COLORREF thePixel = GetPixel(hdc,2,2);
+   HBRUSH hb = CreateSolidBrush(thePixel);
+   FillRect(hdc,&rcBox,hb);
+   DeleteObject(hb);
 
    return S_OK;
    }
 
 
    HRESULT Text::Redraw() {
-
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-
-   if ( ! doOpenGLRendering ) 
-      return Draw();
-
-   if ( partOfMainGraphic ) {
-      pIOpenGLImplementation -> Push();
-      pIOpenGLImplementation -> SetUp(pIDataSet);
-      pIBasePlot -> Redraw();
-      pIOpenGLImplementation -> Pop();
-   }
-
+   return Draw();
    return S_OK;
    }
 
@@ -363,8 +346,6 @@ Beep(2000,100);
    CoordinatePlane oldCoordinatePlane = coordinatePlane;
    SAFEARRAY *pOldStart = NULL;
 
-   DataPoint oldDirectionForward = {directionForward.x,directionForward.y,directionForward.z};
-
    get_Position(&pOldStart);
 
    get_PartOfWorldDomain(&oldPartOfWorldDomain);
@@ -378,10 +359,6 @@ Beep(2000,100);
    put_PositionX(0.0);
    put_PositionY(0.0);
    put_PositionZ(0.0);
-
-   directionForward.x = 1.0;
-   directionForward.y = 0.0;
-   directionForward.z = 0.0;
 
    format = (TextFormat)TEXT_FORMAT_CENTER;
 
@@ -419,10 +396,6 @@ Beep(2000,100);
    format = oldFormat;
 
    coordinatePlane = oldCoordinatePlane;
-
-   directionForward.x = oldDirectionForward.x;
-   directionForward.y = oldDirectionForward.y;
-   directionForward.z = oldDirectionForward.z;
 
    put_PartOfWorldDomain(oldPartOfWorldDomain);
 

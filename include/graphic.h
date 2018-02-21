@@ -170,6 +170,8 @@
 
      STDMETHOD(ActivateLighting)();
 
+     STDMETHOD(AnyOpenGLHere)(RECT *pRect);
+
 //  IGSystemStatusBar
 
      STDMETHOD(put_StatusText)(long paneIndex,char* theText);
@@ -468,7 +470,8 @@
       void saveBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
       void restoreBox(POINTL *pAnchor,POINTL *pFloat,HDC hdcTarget,HBITMAP *pBitmaps);
 
-      int getSegments(long **pSegments);
+      int getSegments(long **ppSegments);
+      int getSegmentsExcludingAxiis(long **ppSegments);
 
       void setColorBackground();
       void changeType();
@@ -644,8 +647,6 @@
       IGProperty* propertyYCeiling{NULL};
       IGProperty* propertyZFloor{NULL};
       IGProperty* propertyZCeiling{NULL};
-
-      IGProperty* propertyRenderOpenGLAxisText;
 
       IGProperty* propertyPlotServicesObject{NULL};
 

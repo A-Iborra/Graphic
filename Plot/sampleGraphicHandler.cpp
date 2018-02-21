@@ -260,24 +260,10 @@
 
    p -> Draw();
 
-   IText *pIText = NULL;
-   while ( pIText = p -> textList.GetNext(pIText) ) {
-      boolean isOpenGLRendered;
-      pIText -> get_TextRenderOpenGL(&isOpenGLRendered);
-      if ( ! isOpenGLRendered )
-         continue;
-      if ( pIText == pIText_MoveCandidate )
-         continue;
-      pIText -> Draw();
-   }
-
    p -> pIOpenGLImplementation -> Finalize();
 
+   IText *pIText = NULL;
    while ( pIText = p -> textList.GetNext(pIText) ) {
-      boolean isOpenGLRendered;
-      pIText -> get_TextRenderOpenGL(&isOpenGLRendered);
-      if ( isOpenGLRendered )
-         continue;
       if ( pIText == pIText_MoveCandidate )
          continue;
       pIText -> Draw();

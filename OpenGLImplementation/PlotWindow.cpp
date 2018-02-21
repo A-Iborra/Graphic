@@ -646,7 +646,7 @@ OPENGL_ERROR_CHECK
       openGLState.yScaleFactor = 2.0 / (openGLState.extentsYMax - openGLState.extentsYMin);
       openGLState.zScaleFactor = 2.0 / (openGLState.extentsZMax - openGLState.extentsZMin);
 
-#if 0
+#if 1
       glRotated(phi,1.0,0.0,0.0);
       glRotated(-theta,0.0,1.0,0.0);
       glRotated(-90.0,1.0,0.0,0.0);
@@ -729,6 +729,14 @@ OPENGL_ERROR_CHECK
    }
 
    initialized = true;
+
+//glBegin(GL_LINE_STRIP);
+//glVertex3d(openGLState.extentsXMin,openGLState.extentsYMin,openGLState.extentsZMin);
+//glVertex3d(openGLState.extentsXMax,openGLState.extentsYMin,openGLState.extentsZMin);
+//glVertex3d(openGLState.extentsXMax,openGLState.extentsYMax,openGLState.extentsZMin);
+//glVertex3d(openGLState.extentsXMin,openGLState.extentsYMax,openGLState.extentsZMin);
+//glVertex3d(openGLState.extentsXMin,openGLState.extentsYMin,openGLState.extentsZMin);
+//glEnd();
 
    return;
    }
@@ -1003,7 +1011,7 @@ openGLLighting.lightPosition[k][3] = 1.0;
    }
 
 
-   HRESULT PlotWindow::getPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *pHitTable,long hitTableSize,long *pCallLists,unsigned int *pHitTableHits) {
+   HRESULT PlotWindow::getPickBoxHits(POINTL *ptl,long pickWindowWidth,long pickWindowHeight,unsigned int *pHitTable,long hitTableSize,long *pCallLists,unsigned int *pHitTableHits) {
 
    if ( lineMode || polygonMode ) 
       return S_FALSE;
@@ -1011,6 +1019,7 @@ openGLLighting.lightPosition[k][3] = 1.0;
    double x,y;
  
    x = (double)ptl -> x;
+
    y = (double)openGLState.windowCY - (double)ptl -> y;
  
    if ( ptl -> x < openGLState.viewPort[0] )
@@ -1048,7 +1057,7 @@ openGLLighting.lightPosition[k][3] = 1.0;
  
    glLoadIdentity();
 
-   gluPickMatrix(x,y,pickWindowSize,pickWindowSize,openGLState.viewPort);
+   gluPickMatrix(x,y,pickWindowWidth,pickWindowHeight,openGLState.viewPort);
 
    if ( gcPlotView3D == plotView )
       glOrtho(-2.0,2.0,-2.0,2.0,-4.0,4.0);

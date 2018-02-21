@@ -980,6 +980,7 @@
       pDataPoint -> z = p -> data.z;
 
       return S_OK;
+
    }
 
    pDataPoint -> x = DBL_MAX;
@@ -1130,6 +1131,9 @@
         yMin == DBL_MAX && yMax == -DBL_MAX &&
         zMin == DBL_MAX && zMax == -DBL_MAX )
       return E_UNEXPECTED;
+
+   if ( ! ( 'X' == axis ) && ! ( 'Y' == axis ) && ! ( 'Z' == axis ) && ! ( 'x' == axis ) && ! ( 'y' == axis ) && ! ( 'z' == axis ) )
+      return E_INVALIDARG;
 
    DataPoint dpCenter{-(xMax + xMin) / 2.0,-(yMax + yMin) / 2.0,-(zMax + zMin) / 2.0};
 
@@ -1587,12 +1591,12 @@
    return S_OK;
    }
 
-
    STDMETHODIMP DataSet::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
    if ( pIPlot )
       pIPlot -> AdviseGSGraphicServices(pvIGSGraphicServices);
    if ( ! pvIGSGraphicServices ) {
-      if ( ! pIGSGraphicServices ) return E_UNEXPECTED;
+      if ( ! pIGSGraphicServices ) 
+         return S_OK;
       pIGSGraphicServices = NULL;
    }
    pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;

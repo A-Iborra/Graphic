@@ -29,13 +29,6 @@
    pParent -> propertyPositionY -> put_stringValue(L"0.0");
    pParent -> propertyPositionZ -> put_stringValue(L"0.0");
 
-   pParent -> directionForward.x = 1.0;
-   pParent -> directionForward.y = 0.0;
-   pParent -> directionForward.z = 0.0;
-   pParent -> directionUp.x = 0.0;
-   pParent -> directionUp.y = 1.0;
-   pParent -> directionUp.z = 0.0;
-
    pParent -> propertyCoordinatePlane -> put_longValue(CoordinatePlane_XY);
 
    pParent -> propertyPlaneHeight -> put_doubleValue(0.0);
@@ -48,11 +41,7 @@
 
    pParent -> propertySizeUnits -> put_longValue(TEXT_SIZE_POINTS);
 
-#ifndef USE_OPENGL_RENDERING
-   pParent -> partOfWorldDomain = FALSE;
-#else
    pParent -> partOfWorldDomain = TRUE;
-#endif
 
    pParent -> partOfMainGraphic = TRUE;
 
@@ -62,10 +51,6 @@
    }
  
    HRESULT Text::_IGPropertiesClient::Loaded() {
-   pParent -> put_PartOfWorldDomain(pParent -> partOfWorldDomain);
-#ifndef USE_OPENGL_RENDERING
-   pParent -> put_PartOfWorldDomain(FALSE);
-#endif
    return S_OK;
    }
  

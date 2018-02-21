@@ -315,6 +315,8 @@ library Graphic {
 
       HRESULT ActivateLighting();
 
+      HRESULT AnyOpenGLHere(RECT *pRect);
+
    };
 
    [

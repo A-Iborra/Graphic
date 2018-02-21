@@ -10,6 +10,9 @@
    static long pointCount;
    static long contourIndex;
 
+   static POINT ptMinGDI{4096,4096};
+   static POINT ptMaxGDI{-4096,-4096};
+
    static HDC hdc;
 
    static double mapX(FIXED fx) {
@@ -36,7 +39,7 @@
 
    hdc = pIOpenGLImplementation -> TargetDC();
 
-   int oldPolyFillMode = SetPolyFillMode(hdc, ALTERNATE);
+   int oldPolyFillMode = SetPolyFillMode(hdc,ALTERNATE);
 
    float fv[4];
    BYTE *pb = (BYTE *)fv;
@@ -44,12 +47,14 @@
    propertyTextColor -> get_binaryValue(4 * sizeof(long),(BYTE **)&pb);
 
    BYTE vb[3];
-   COLORREF cr;
+
    vb[0] = (BYTE)(255.0f*fv[0]);
    vb[1] = (BYTE)(255.0f*fv[1]);
    vb[2] = (BYTE)(255.0f*fv[2]);
 
    HGDIOBJ oldBrush = SelectObject(hdc,(HBRUSH)CreateSolidBrush(RGB(vb[0],vb[1],vb[2])));
+
+   HGDIOBJ oldPen = SelectObject(hdc,(HPEN)CreatePen(PS_SOLID,1,RGB(vb[0],vb[1],vb[2])));
 
    void (__stdcall *pActionFunction)(void *,void *) = NULL;
 
@@ -57,62 +62,57 @@
 
    pIDataSet -> peek(pItem,&pItem);
 
+   bool nextIsMove = false;
+
    while ( pItem ) {
 
       DataPoint dpGDI{0.0,0.0,0.0};
 
       if ( -DBL_MAX == pItem -> data.x ) {
 
-         while ( pItem && -DBL_MAX == pItem -> data.x ) {
-            if ( ! ( NULL == pItem -> pvAction ) ) {
-               pActionFunction = (void (__stdcall *)(void *,void *))pItem -> pvAction;
-               pActionFunction(pItem -> pvArg1,pItem -> pvArg2);
-            }
-            pIDataSet -> peek(pItem,&pItem);
-         }
-
-         if ( ! pItem )
-            break;
-
-         pIOpenGLImplementation -> DataToWindow(&pItem -> data,UNIT_PIXEL,&dpGDI);
-
-         ptPoints[pointCount].x = dpGDI.x;
-         ptPoints[pointCount].y = dpGDI.y;
-
-         pointCount++;
-
          if ( ! ( NULL == pItem -> pvAction ) ) {
             pActionFunction = (void (__stdcall *)(void *,void *))pItem -> pvAction;
             pActionFunction(pItem -> pvArg1,pItem -> pvArg2);
          }
 
+         nextIsMove = true;
+
+         pIDataSet -> peek(pItem,&pItem);
+
+         if ( ! pItem )
+            break;
+
+         continue;
+
       }
+
+      if ( coordinatePlane == CoordinatePlane_screen ) {
+         ptPoints[pointCount].x = (long)pItem -> data.x;
+         ptPoints[pointCount].y = (long)pItem -> data.y;
+      } else {
+         pIOpenGLImplementation -> DataToWindow(&pItem -> data,UNIT_PIXEL,&dpGDI);
+         ptPoints[pointCount].x = (long)dpGDI.x;
+         ptPoints[pointCount].y = (long)dpGDI.y;
+      }
+
+      contourPointsCount[contourIndex]++;
+
+      ptMinGDI.x = min(ptPoints[pointCount].x,ptMinGDI.x);
+      ptMinGDI.y = min(ptPoints[pointCount].y,ptMinGDI.y);
+      ptMaxGDI.x = max(ptPoints[pointCount].x,ptMaxGDI.x);
+      ptMaxGDI.y = max(ptPoints[pointCount].y,ptMaxGDI.y);
+
+      pointCount++;
 
       pIDataSet -> peek(pItem,&pItem);
-
-      if ( ! pItem )
-         break;
-
-      if ( ! ( -DBL_MAX == pItem -> data.x ) ) {
-
-         pIOpenGLImplementation -> DataToWindow(&pItem -> data,UNIT_PIXEL,&dpGDI);
-
-         ptPoints[pointCount].x = dpGDI.x;
-         ptPoints[pointCount].y = dpGDI.y;
-
-         pointCount++;
-      }
-
-      if ( ! ( NULL == pItem -> pvAction ) ) {
-         pActionFunction = (void (__stdcall *)(void *,void *))pItem -> pvAction;
-         pActionFunction(pItem -> pvArg1,pItem -> pvArg2);
-      }
 
    }
 
    SetPolyFillMode(hdc,oldPolyFillMode);
 
    DeleteObject(SelectObject(hdc,oldBrush));
+
+   DeleteObject(SelectObject(hdc,oldPen));
 
    return;
    }
@@ -139,11 +139,7 @@
       hOriginalFont = (HFONT)SelectObject(hdc,hFont);
    }
 
-   TEXTMETRIC fontMetrics;
-
-   memset(&fontMetrics,0,sizeof(TEXTMETRIC));
-
-   GetTextMetrics(hdc,&fontMetrics);
+   OUTLINETEXTMETRIC outlineTextMetric = {0};
 
    int charWidth;
    char *pC;
@@ -183,7 +179,11 @@
             }
          }
          startPoint.x = 0;
-         startPoint.y -= fontMetrics.tmHeight;
+         if ( 0 == outlineTextMetric.otmSize ) {
+            outlineTextMetric.otmSize = sizeof(OUTLINETEXTMETRIC);
+            GetOutlineTextMetrics(hdc,outlineTextMetric.otmSize,&outlineTextMetric);
+         }
+         startPoint.y -= outlineTextMetric.otmTextMetrics.tmHeight;
       } else {
          renderGlyph(hdc,*pC,startPoint);
          GetCharWidth32(hdc,*pC,*pC,&charWidth);
@@ -235,7 +235,7 @@
    dp.z = zText;
 
    pIDataSet -> pushDataPoint(&movePoint,renderTextNewGlyph,(void *)this,(void *)NULL);
- 
+
    while ( 0 < cbCharacter ) {
  
       pPolyCurve = reinterpret_cast<TTPOLYCURVE *>(reinterpret_cast<BYTE *>(pPolygonHeader) + sizeof(TTPOLYGONHEADER));
@@ -245,10 +245,12 @@
       Ax = mapX(pPolygonHeader -> pfxStart.x);
       Ay = mapY(pPolygonHeader -> pfxStart.y);
  
+      pIDataSet -> pushDataPoint(&movePoint,renderTextNewContour,(void *)this,(void *)NULL);
+
       dp.x = xText + Ax;
       dp.y = yText + Ay;
-      pIDataSet -> pushDataPoint(&dp,renderTextNewContour,(void *)this,(void *)NULL);
- 
+      pIDataSet -> pushDataPoint(&dp);
+
       while ( 0 < cbPolygon ) {
  
          switch ( pPolyCurve -> wType ) {
@@ -293,55 +295,16 @@
                   pIDataSet -> pushDataPoint(&dp);
                }
 
-               Ax = Cx;
-               Ay = Cy;
+               Ax = x;
+               Ay = y;
 
             }
- 
+
             }
             break;
 
          default:
             Beep(2000,100);
-#if 0
-// The Cubic form ?
-        //B(t) = (1-t)**3 p0 + 3(1 - t)**2 t P1 + 3(1-t)t**2 P2 + t**3 P3
-
-        x = (1-t)*(1-t)*(1-t)*p0x + 3*(1-t)*(1-t)*t*p1x + 3*(1-t)*t*t*p2x + t*t*t*p3x;
-        y = (1-t)*(1-t)*(1-t)*p0y + 3*(1-t)*(1-t)*t*p1y + 3*(1-t)*t*t*p2y + t*t*t*p3y
-
-// Also
-
-/**
- * Performs deCasteljau's algorithm for a bezier curve defined by the given control points.
- *
- * A cubic for example requires four points. So it should get at least an array of 8 values
- *
- * @param controlpoints (x,y) coord list of the Bezier curve.
- * @param returnArray Array to store the solved points. (can be null)
- * @param t Amount through the curve we are looking at.
- * @return returnArray
- */
-public static float[] deCasteljau(float[] controlpoints, float[] returnArray, float t) {
-    int m = controlpoints.length;
-    int sizeRequired = (m/2) * ((m/2) + 1);
-    if (returnArray == null) returnArray = new float[sizeRequired];
-    if (sizeRequired > returnArray.length) returnArray = Arrays.copyOf(controlpoints, sizeRequired); //insure capacity
-    else System.arraycopy(controlpoints,0,returnArray,0,controlpoints.length);
-    int index = m; //start after the control points.
-    int skip = m-2; //skip if first compare is the last control point.
-    for (int i = 0, s = returnArray.length - 2; i < s; i+=2) {
-        if (i == skip) {
-            m = m - 2;
-            skip += m;
-            continue;
-        }
-        returnArray[index++] = (t * (returnArray[i + 2] - returnArray[i])) + returnArray[i];
-        returnArray[index++] = (t * (returnArray[i + 3] - returnArray[i + 1])) + returnArray[i + 1];
-    }
-    return returnArray;
-}
-#endif
             break;
 
          }
@@ -358,15 +321,16 @@ public static float[] deCasteljau(float[] controlpoints, float[] returnArray, fl
       dp.y = yText + mapY(pPolygonHeader -> pfxStart.y);
 
       cbCharacter -= pPolygonHeader -> cb;
- 
-      if ( cbCharacter )
-         pIDataSet -> pushDataPoint(&dp,renderTextEndContour,(void *)this,(void *)NULL);
-      else
-         pIDataSet -> pushDataPoint(&dp,renderTextEndGlyph,(void *)this,NULL);
+
+      pIDataSet -> pushDataPoint(&dp);
+
+      pIDataSet -> pushDataPoint(&movePoint,renderTextEndContour,(void *)this,(void *)NULL);
  
       pPolygonHeader = reinterpret_cast<TTPOLYGONHEADER *>(pPolyCurve);
 
    }
+
+   pIDataSet -> pushDataPoint(&movePoint,renderTextEndGlyph,(void *)this,NULL);
  
    delete [] b;
  
@@ -377,6 +341,12 @@ public static float[] deCasteljau(float[] controlpoints, float[] returnArray, fl
    pointCount = 0;
    contourIndex = -1;
    contourPointsCount[0] = 0;
+   memset(ptPoints,0,sizeof(ptPoints));
+   memset(contourPointsCount,0,sizeof(contourPointsCount));
+   ptMinGDI.x = 4096;
+   ptMinGDI.y = 4096;
+   ptMaxGDI.x = -4096;
+   ptMaxGDI.y = -4096;
    return;
    }
 
@@ -386,14 +356,30 @@ public static float[] deCasteljau(float[] controlpoints, float[] returnArray, fl
    }
 
    void Text::renderTextEndContour(void *pvThis,void *pvArg) {
-   contourPointsCount[contourIndex] = pointCount;
-   if ( 0 < contourIndex )
-      contourPointsCount[contourIndex] -= contourPointsCount[contourIndex - 1];
    return;
    }
 
    void Text::renderTextEndGlyph(void *pvThis,void *pvArg) {
-   renderTextEndContour(pvThis,pvArg);
-   PolyPolygon (hdc, (LPPOINT)ptPoints,contourPointsCount,contourIndex + 1);
+
+   RECT rcBounds;
+   rcBounds.left = ptMinGDI.x;
+   rcBounds.top = ptMinGDI.y;
+   rcBounds.right = ptMaxGDI.x;
+   rcBounds.bottom = ptMaxGDI.y;
+
+//HPEN hPen = CreatePen(PS_SOLID,1,RGB(255,0,0));
+//HGDIOBJ oldPen = SelectObject(hdc,hPen);
+//MoveToEx(hdc,rcBounds.left,rcBounds.top,NULL);
+//LineTo(hdc,rcBounds.right,rcBounds.top);
+//LineTo(hdc,rcBounds.right,rcBounds.bottom);
+//LineTo(hdc,rcBounds.left,rcBounds.bottom);
+//LineTo(hdc,rcBounds.left,rcBounds.top);
+//DeleteObject(SelectObject(hdc,oldPen));
+
+   if ( S_OK == ((Text *)pvThis) -> pIGSGraphicServices -> AnyOpenGLHere(&rcBounds) )
+      return;
+
+   PolyPolygon(hdc,(LPPOINT)ptPoints,contourPointsCount,contourIndex + 1);
+
    return;
    }

@@ -307,9 +307,7 @@ library Plot {
 
      HRESULT Redraw();
 
-     HRESULT DrawOpenGLText();
-
-     HRESULT DrawGDIText();
+     HRESULT DrawText();
 
      HRESULT Erase();
 

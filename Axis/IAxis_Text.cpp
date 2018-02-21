@@ -18,18 +18,15 @@
    }
 
    STDMETHODIMP Axis::put_LabelText(BSTR bstrLabel) {
-   propertyLabel -> put_stringValue(bstrLabel);
-   if ( wcslen(bstrLabel) )
-      drawAxisLabel = true;
-   else
-      drawAxisLabel = false;
+   pLabel -> put_Text(bstrLabel);
    return S_OK;
    }
 
 
    STDMETHODIMP Axis::get_LabelText(BSTR *pbstrLabel) {
-   if ( ! pbstrLabel ) return E_POINTER;
-   propertyLabel -> get_stringValue(pbstrLabel);
+   if ( ! pbstrLabel ) 
+      return E_POINTER;
+   pLabel -> get_Text(pbstrLabel);
    return S_OK;
    }
 
@@ -70,7 +67,7 @@
       theTickLabels.insert(theTickLabels.end(),pIText);
    }
 
-#if 0
+#if 1
    bool overlap = false;
 
    while ( pIText = textList.GetNext(pIText) ) {
@@ -134,7 +131,7 @@
    }
 #endif
 
-   if ( drawAxisLabel ) {
+   if ( S_OK == pLabel -> HasContent() ) {
 
       double decent,maxDecentX = DBL_MAX,maxDecentY = DBL_MAX;
       DataPoint dp;
@@ -154,30 +151,27 @@
 
       pLabel -> put_SizeProperty(propertyAxisLabelSize,propertyAxisLabelSizeUnits);
 
-      BSTR bstrLabel;
-      propertyLabel -> get_stringValue(&bstrLabel);
-      pLabel -> put_Text(bstrLabel);
-      SysFreeString(bstrLabel);
-      pLabel -> TextColorProperty(propertyLabelColor);
-      pLabel -> put_CoordinatePlane(CoordinatePlane_XY);
       switch ( type ) {
       case 'X':
          dp.x = origin.x + (endPoint.x - origin.x)/2.0;
          dp.y = maxDecentY;
          if ( drawTickLabels ) 
             dp.y -= tickBelow;
-         pLabel -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+         dp.z = origin.z;
          break;
       case 'Y':
          dp.x = maxDecentX;
          dp.y = origin.y + (endPoint.y - origin.y)/2.0;
          if ( drawTickLabels ) 
             dp.x -= tickAbove;
-         pLabel -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_BOTTOM);
-         pLabel -> put_CoordinatePlane(CoordinatePlane_YX);
+         dp.z = origin.z;
+         break;
+      case 'Z':
+         dp.x = maxDecentX;
+         dp.y = maxDecentY;
+         dp.z = origin.z + (endPoint.z - origin.z)/2.0;
          break;
       }
-      dp.z = origin.z;
       pLabel -> put_PositionX(dp.x);
       pLabel -> put_PositionY(dp.y);
       pLabel -> put_PositionZ(dp.z);

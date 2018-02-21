@@ -22,19 +22,8 @@
  
    pParentPropertyPlotView -> get_longValue((long*)&plotView);
 
-   if ( plotView != gcPlotView3D && type == 'Z' ) {
-#if 0
-      DataPoint dp = {0.0,0.0,0.0};
-      pIPlot -> ResetData();
-      pIPlot -> TakeDataPoint(&dp);
-      t = NULL;
-      while ( t = textList.GetFirst() ) {
-         textList.Remove(t);
-         t -> Release();
-      }
-#endif
+   if ( plotView != gcPlotView3D && type == 'Z' )
       return 0;
-   }
  
    long nTicks,tickNumber,tickStyle,tickLengthUnits;
    double axisPrecision,usedTickLength,gridSpace;
@@ -46,8 +35,6 @@
    static double piover2 = 0.0;
    DataPoint dp,movePoint = {-DBL_MAX,-DBL_MAX,-DBL_MAX};
    int power = 0,precision = 0;
-
-   DataPoint directionX = {1.0,0.0,0.0},directionY = {0.0,1.0,0.0};
 
    short originAtMinpoint,endpointAtMaxpoint;
 
@@ -462,12 +449,16 @@
                CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
                textList.Add(pText,NULL,tickNumber);
             }
- 
+
+            pText -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
             pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                  pParentPropertyXFloor,pParentPropertyXCeiling,
                                  pParentPropertyYFloor,pParentPropertyYCeiling,
                                  pParentPropertyZFloor,pParentPropertyZCeiling,
-                                 pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+                                 NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+
+            pText -> AdviseGSGraphicServices(pIGSGraphicServices);
 
             pText -> CopyFrom(pRepresentativeText);
 
@@ -483,13 +474,10 @@
                bstrAxisValue = axisValue(xAtAxis,max - min,&precision,maxError,&foundError,&answer,FALSE,&power);
 
             pText -> put_Text(bstrAxisValue);
-            pText -> TextColorProperty(propertyTickLabelColor);
+            pText -> TextColorProperty(currentPropertyTickLabelColor);
             pText -> put_PositionX(dp.x);
             pText -> put_PositionY(dp.y);
             pText -> put_PositionZ(dp.z);
-            pText -> put_CoordinatePlane(CoordinatePlane_XY);
-            pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
-            pText -> put_PartOfWorldDomain(TRUE);
 
             SysFreeString(bstrAxisValue);
 
@@ -596,19 +584,21 @@
 
          if ( drawTickLabels ) {
  
-            dp.x = xAtAxis - tickBelow * cosPhi * sinTheta;
-            dp.y = yAtAxis + tickBelow * cosPhi * cosTheta;
+            dp.x = xAtAxis - 1.10 * tickBelow * cosPhi * sinTheta;
+            dp.y = yAtAxis + 1.10 * tickBelow * cosPhi * cosTheta;
  
             if ( ! ( pText = textList.Get(tickNumber) ) ) {
                CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
                textList.Add(pText,NULL,tickNumber);
             }
- 
+
+            pText -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
             pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                  pParentPropertyXFloor,pParentPropertyXCeiling,
                                  pParentPropertyYFloor,pParentPropertyYCeiling,
                                  pParentPropertyZFloor,pParentPropertyZCeiling,
-                                 pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
+                                 NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
 
             pText -> CopyFrom(pRepresentativeText);
 
@@ -628,10 +618,6 @@
             pText -> put_PositionX(dp.x);
             pText -> put_PositionY(dp.y);
             pText -> put_PositionZ(dp.z);
-            pText -> put_CoordinatePlane(CoordinatePlane_YX);
-            pText -> put_FlipHorizontal(VARIANT_TRUE);
-            pText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
-            pText -> put_PartOfWorldDomain(TRUE);
 
             SysFreeString(bstrAxisValue);
  
@@ -740,12 +726,14 @@
                   CoCreateInstance(CLSID_Text,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pText));
                   textList.Add(pText,NULL,tickNumber);
                }
- 
+
+               pText -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
                pText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                        pParentPropertyXFloor,pParentPropertyXCeiling,
                                        pParentPropertyYFloor,pParentPropertyYCeiling,
                                        pParentPropertyZFloor,pParentPropertyZCeiling,
-                                       pParentPropertyOpenGLText,NULL,NULL,
+                                       NULL,NULL,
                                        pWhenChangedCallback,pWhenChangedCallbackArg,whenChangedCallbackCookie);
 
                pText -> CopyFrom(pRepresentativeText);
@@ -767,10 +755,6 @@
                pText -> put_PositionX(dp.x);
                pText -> put_PositionY(dp.y);
                pText -> put_PositionZ(dp.z);
-               pText -> put_CoordinatePlane(CoordinatePlane_XZ);
-               pText -> put_FlipVertical(VARIANT_TRUE);
-               pText -> put_Format(TEXT_FORMAT_RIGHT | TEXT_COORDINATES_FROM_CENTER);
-               pText -> put_PartOfWorldDomain(TRUE);
  
             }
 

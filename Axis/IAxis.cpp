@@ -566,7 +566,6 @@
                               IGProperty* pPropertyXFloor,IGProperty* pPropertyXCeiling,
                               IGProperty* pPropertyYFloor,IGProperty* pPropertyYCeiling,
                               IGProperty* pPropertyZFloor,IGProperty* pPropertyZCeiling,
-                              IGProperty* pPropOpenGLText,
                               IDataSet* pds,void * pvNewOpenGLImplementation,IEvaluator *iev,void (__stdcall *pChangedCallback)(void *,ULONG_PTR),void *pChangedArg,ULONG_PTR changedCookie) {
 
    type = axisType;
@@ -592,8 +591,6 @@
    pParentPropertyZFloor = pPropertyZFloor;
    pParentPropertyZCeiling = pPropertyZCeiling;
 
-   pParentPropertyOpenGLText = pPropOpenGLText;
-
    pIOpenGLImplementation = (IOpenGLImplementation *)pvNewOpenGLImplementation;
 
    pIEvaluator = iev;
@@ -614,58 +611,50 @@
  
    CoCreateInstance(CLSID_Plot,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IPlot,reinterpret_cast<void **>(&pIPlot));
  
+   pIPlot -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
    pIPlot -> Initialize(pIDataSetDomain,pIOpenGLImplementation,pIEvaluator,propertyLineColor,propertyLineWeight,pParentPropertyPlotView,propertyPlotType,
                            NULL,NULL,
                            pPropertyXFloor,pPropertyXCeiling,
                            pPropertyYFloor,pPropertyYCeiling,
                            pPropertyZFloor,pPropertyZCeiling,
                            pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
- 
+
    pIPlot -> put_ActionTable(static_cast<IGraphicSegmentAction*>(this));
 
    pIPlot -> put_OverrideOwnerPlotView(FALSE);
 
    pIPlot -> put_OverrideOwnerPlotType(FALSE);
 
+   pLabel -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
    pLabel -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                            pParentPropertyXFloor,pParentPropertyXCeiling,
                            pParentPropertyYFloor,pParentPropertyYCeiling,
                            pParentPropertyZFloor,pParentPropertyZCeiling,
-                           pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
+                           NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
    initWindows();
+
+   pRepresentativeText -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
 
    pRepresentativeText -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,
                                        pParentPropertyXFloor,pParentPropertyXCeiling,
                                        pParentPropertyYFloor,pParentPropertyYCeiling,
                                        pParentPropertyZFloor,pParentPropertyZCeiling,
-                                       pParentPropertyOpenGLText,NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
+                                       NULL,NULL,pWhenChangedCallback,pWhenChangedCallbackArg,changedCookie);
 
-   switch ( axisType ) {
-   case 'X':
-      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
-      break;
-
-   case 'Y':
-      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
-      break;
-
-   case 'Z':
-      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
-      break;
-
-   default:
-      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
-      break;
-   }
+   pRepresentativeText -> put_PartOfWorldDomain(TRUE);
 
    return S_OK;
    }
 
 
    HRESULT Axis::get_DataSet(IDataSet **ppds) {
-   if ( ! ppds ) return E_POINTER;
-   if ( ! pIPlot ) return E_UNEXPECTED;
+   if ( ! ppds )
+      return E_POINTER;
+   if ( ! pIPlot ) 
+      return E_UNEXPECTED;
    return pIPlot -> get_IDataSet(ppds);
    }
 
@@ -677,6 +666,10 @@
    IDataSet *pIDataSetAxis = NULL;
    get_DataSet(&pIDataSetAxis);
    while ( pIText = textList.GetNext(pIText) ) {
+      short isPartOfWorldDomain;
+      pIText -> get_PartOfWorldDomain(&isPartOfWorldDomain);
+      if ( ! isPartOfWorldDomain )
+         continue;
       DataPoint minPoint,maxPoint;
       IDataSet *pIDataSetText = NULL;
       pIText -> get_DataSet(&pIDataSetText);
@@ -684,13 +677,17 @@
       pIDataSetAxis -> ResetLimits(&minPoint);
       pIDataSetAxis -> ResetLimits(&maxPoint);
    }
-   if ( pLabel && drawAxisLabel ) {
-      DataPoint minPoint,maxPoint;
-      IDataSet *pIDataSetText = NULL;
-      pLabel -> get_DataSet(&pIDataSetText);
-      pIDataSetText -> GetDomain(&minPoint,&maxPoint);
-      pIDataSetAxis -> ResetLimits(&minPoint);
-      pIDataSetAxis -> ResetLimits(&maxPoint);
+   if ( pLabel && (S_OK == pLabel -> HasContent()) ) {
+      short isPartOfWorldDomain;
+      pLabel -> get_PartOfWorldDomain(&isPartOfWorldDomain);
+      if ( isPartOfWorldDomain ) {
+         DataPoint minPoint,maxPoint;
+         IDataSet *pIDataSetText = NULL;
+         pLabel -> get_DataSet(&pIDataSetText);
+         pIDataSetText -> GetDomain(&minPoint,&maxPoint);
+         pIDataSetAxis -> ResetLimits(&minPoint);
+         pIDataSetAxis -> ResetLimits(&maxPoint);
+      }
    }
    return S_OK;
    }
@@ -706,15 +703,10 @@
 
    HRESULT Axis::DrawLabels() {
    IText *pIText = NULL;
-   boolean isOpenGL;
    while ( pIText = textList.GetNext(pIText) ) 
       pIText -> Draw();
    if ( ! pLabel ) 
       return S_OK;
-   pLabel -> get_TextRenderOpenGL(&isOpenGL);
-   if ( isOpenGL )
-      return S_OK;
-   pLabel -> PrepData();
    pLabel -> Draw();
    return S_OK;
    }
@@ -756,5 +748,16 @@
    QueryInterface(IID_IUnknown,(void **)&pUnknown);
    pIGProperties -> ShowProperties(hwndParent,pUnknown);
    pUnknown -> Release();
+   return S_OK;
+   }
+
+
+   STDMETHODIMP Axis::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
+   if ( ! pvIGSGraphicServices ) {
+      if ( ! pIGSGraphicServices ) 
+         return S_OK;
+      pIGSGraphicServices = NULL;
+   }
+   pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;
    return S_OK;
    }

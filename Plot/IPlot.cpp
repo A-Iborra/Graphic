@@ -338,29 +338,11 @@
    plotter((void*)this);
    return S_OK;
    }
- 
- 
-   HRESULT Plot::DrawOpenGLText() {
-   IText *pIText = NULL;
-   while ( pIText = textList.GetNext(pIText) ) {
-      boolean isOpenGL;
-      pIText -> get_TextRenderOpenGL(&isOpenGL);
-      if ( ! isOpenGL )
-         continue;
-      pIText -> PrepData();
-      pIText -> Draw();
-   }
-   return S_OK;
-   }
 
 
-   HRESULT Plot::DrawGDIText() {
+   HRESULT Plot::DrawText() {
    IText *pIText = NULL;
    while ( pIText = textList.GetNext(pIText) ) {
-      boolean isOpenGL;
-      pIText -> get_TextRenderOpenGL(&isOpenGL);
-      if ( isOpenGL )
-         continue;
       pIText -> PrepData();
       pIText -> Draw();
    }
@@ -418,7 +400,8 @@
 
    STDMETHODIMP Plot::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
    if ( ! pvIGSGraphicServices ) {
-      if ( ! pIGSGraphicServices ) return E_UNEXPECTED;
+      if ( ! pIGSGraphicServices ) 
+         return S_OK;
       pIGSGraphicServices = NULL;
    }
    pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;

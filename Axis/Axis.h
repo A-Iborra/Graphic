@@ -133,8 +133,8 @@
    // Methods
 
      STDMETHOD(Initialize)(char theType,IAxis*,IAxis*,IAxis*,IGProperty*,IGProperty*,
-                              IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,
-                              IDataSet*,void *pvIOpenGLImplementation,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
+                              IGProperty*,IGProperty*,IGProperty*,IGProperty*,IGProperty*,
+                              IDataSet *,void *pvIOpenGLImplementation,IEvaluator*,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
      STDMETHOD(get_DataSet)(IDataSet **);
 
@@ -152,6 +152,8 @@
      STDMETHOD(AdviseGSystemStatusBar)(IGSystemStatusBar*);
 
      STDMETHOD(ShowProperties)(HWND hwndParent);
+
+     STDMETHOD(AdviseGSGraphicServices)(void *);
 
 // IGraphicSegmentAction
 
@@ -204,8 +206,6 @@
      IGProperty* pParentPropertyZFloor{NULL};
      IGProperty* pParentPropertyZCeiling{NULL};
 
-     IGProperty* pParentPropertyOpenGLText;
-
      IDataSet *pIDataSetDomain;
      IText *pLabel;
      IText *pRepresentativeText;
@@ -219,6 +219,7 @@
      IOpenGLImplementation *pIOpenGLImplementation;
      IEvaluator *pIEvaluator;
      IGSystemStatusBar* pIGSystemStatusBar;
+     IGSGraphicServices *pIGSGraphicServices;
 
      IGProperties *pIGProperties;
 
@@ -248,16 +249,16 @@
 
      IGProperty *propertyPropertiesPosition;
 
-     IGProperty *propertyLabel;
-     IGProperty *propertyDrawLabel;
      IGProperty *propertyAxisLabelSize;
      IGProperty *propertyAxisLabelSizeUnits;
      IGProperty *propertyLabelColor;
      IGProperty *propertyAxisLabelColorTrackLineColor;
+
      IGProperty *propertyLabelPositionNatural;
      IGProperty *propertyLabelPositionXValue;
      IGProperty *propertyLabelPositionYValue;
      IGProperty *propertyLabelPositionZValue;
+
      IGProperty *propertyLabelAnglePerpendicular;
      IGProperty *propertyLabelAngleParallel;
      IGProperty *propertyLabelAngleOther;
@@ -279,10 +280,13 @@
 
      IGProperty *propertyPlotType;
 
+     IGProperty *propertyRepresentativeText;
+     IGProperty *propertyLabel;
+
      unsigned int refCount;
      short axisTickColorTrackLineColor,axisLabelColorTrackLineColor;
      short drawTickLabels,doAutoPrecision,determinesDomain;
-     short drawAxisLabel,labelPositionNatural,labelAnglePerpendicular,labelAngleParallel,labelAngleOther;
+     short labelPositionNatural,labelAnglePerpendicular,labelAngleParallel,labelAngleOther;
 
      static LRESULT CALLBACK handler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK styleHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);

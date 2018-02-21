@@ -103,7 +103,7 @@
  
       STDMETHOD(setViewPort)(int*);
 
-      STDMETHOD(getPickBoxHits)(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
+      STDMETHOD(getPickBoxHits)(POINTL *ptl,long pickWindowWidth,long pickWindowHeight,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits);
 
       HBITMAP getMergedBackground(HWND,HDC);
 
@@ -316,7 +316,7 @@
       STDMETHOD(SetColor3dv)(double *v);
 
 // Selection ? 
-      STDMETHOD(GetPickBoxHits)(POINTL *,long,unsigned int *,long,long *,unsigned int *);
+      STDMETHOD(GetPickBoxHits)(POINTL *,long,long,unsigned int *,long,long *,unsigned int *);
  
 // Segments ? 
       STDMETHOD(OpenSegment)(long segmentID,IGProperty* pPropColor,IGProperty* pPropLineWeight);
@@ -657,7 +657,8 @@
 
    struct strCall_GetPickBoxHits {
       POINTL *ptl;
-      long pickWindowSize;
+      long pickWindowWidth;
+      long pickWindowHeight;
       unsigned int *hitTable;
       long hitTableSize;
       long *pCallLists;

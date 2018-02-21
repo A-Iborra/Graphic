@@ -19,6 +19,7 @@
      pIOpenGLImplementation(NULL),
      pIEvaluator(NULL),
      pIGSystemStatusBar(NULL),
+     pIGSGraphicServices(NULL),
 
      pParentPropertyPlotView(NULL),
      pParentPropertyXFloor(NULL),
@@ -27,7 +28,6 @@
      pParentPropertyYCeiling(NULL),
      pParentPropertyZFloor(NULL),
      pParentPropertyZCeiling(NULL),
-     pParentPropertyOpenGLText(NULL),
 
      pIPlot(NULL),
      pLabel(NULL),
@@ -53,7 +53,9 @@
      gridLinesPerTick(0),
      tickPctAbove(0.0),
      ticksOnAllNormalPlanes(FALSE),
-     drawAxisLabel(false),
+
+     axisTickColorTrackLineColor(1),
+     axisLabelColorTrackLineColor(1),
 
      pWhenChangedCallback(NULL),
      pWhenChangedCallbackArg(NULL),
@@ -127,10 +129,12 @@
    pIGProperties -> Add(L"properties position",&propertyPropertiesPosition );
 
    pIGProperties -> Add(L"label",&propertyLabel);
-   pIGProperties -> Add(L"draw label",&propertyDrawLabel);
+   propertyLabel -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
+
    pIGProperties -> Add(L"label size",&propertyAxisLabelSize);
    pIGProperties -> Add(L"label size units",&propertyAxisLabelSizeUnits);
    pIGProperties -> Add(L"label color",&propertyLabelColor);
+
    pIGProperties -> Add(L"label position natural",&propertyLabelPositionNatural);
    pIGProperties -> Add(L"label position x",&propertyLabelPositionXValue);
    pIGProperties -> Add(L"label position y",&propertyLabelPositionYValue);
@@ -162,7 +166,9 @@
 
    pIGProperties -> Add(L"plot type",&propertyPlotType);
 
-   pIGProperties -> DirectAccess(L"draw label",TYPE_BOOL,&drawAxisLabel,sizeof(drawAxisLabel));
+   pIGProperties -> Add(L"representative text",&propertyRepresentativeText);
+   propertyRepresentativeText -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
+
    pIGProperties -> DirectAccess(L"draw text",TYPE_BOOL,&drawTickLabels,sizeof(drawTickLabels));
 
    pIGProperties -> DirectAccess(L"auto precision", TYPE_BOOL,&doAutoPrecision,sizeof(doAutoPrecision));
@@ -186,18 +192,6 @@
    CoCreateInstance(CLSID_Text,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pLabel));
 
    CoCreateInstance(CLSID_Text,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IText,reinterpret_cast<void **>(&pRepresentativeText));
-
-   pRepresentativeText -> put_Description(L"Values to appear along the axis, separated by commas.\nTo include a comma, specify \\, (backslash - comma).");
-
-   pRepresentativeText -> put_EnablePositionSettings(FALSE);
-
-   pRepresentativeText -> put_PartOfWorldDomain(FALSE);
-
-   pRepresentativeText -> put_PartOfMainGraphic(FALSE);
-
-   pIGProperties -> AddPropertyPage(pRepresentativeText);
-
-   pIGProperties -> AddObject(pRepresentativeText);
 
    refCount = 0;
 

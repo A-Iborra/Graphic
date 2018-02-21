@@ -73,7 +73,7 @@
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
-                           propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)pIAxis);
+                           pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)pIAxis);
    return S_OK;
    }
 

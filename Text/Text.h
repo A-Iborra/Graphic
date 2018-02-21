@@ -21,6 +21,8 @@
 #include "plot_i.h"
 #include "text_i.h"
 
+#include "GraphicControl_i.h"
+
 #include "list.h"
 #include "General.h"
 
@@ -62,9 +64,6 @@
 
      STDMETHOD(put_Text)(BSTR setText);
      STDMETHOD(get_Text)(BSTR *getText);
-
-     STDMETHOD(put_TextRenderOpenGL)(boolean doRender);
-     STDMETHOD(get_TextRenderOpenGL)(boolean *pDoRender);
 
      STDMETHOD(put_Format)(long setFormat);
      STDMETHOD(get_Format)(long* getFormat);
@@ -133,8 +132,18 @@
 
      STDMETHOD(put_ShowContentPropertyPage)(VARIANT_BOOL);
      STDMETHOD(get_ShowContentPropertyPage)(VARIANT_BOOL*);
+
+     STDMETHOD(put_ShowStylePropertyPage)(VARIANT_BOOL);
+     STDMETHOD(get_ShowStylePropertyPage)(VARIANT_BOOL*);
+
+     STDMETHOD(put_ShowOrientationPropertyPage)(VARIANT_BOOL);
+     STDMETHOD(get_ShowOrientationPropertyPage)(VARIANT_BOOL*);
+
      STDMETHOD(put_EnablePositionSettings)(VARIANT_BOOL);
      STDMETHOD(get_EnablePositionSettings)(VARIANT_BOOL*);
+
+     STDMETHOD(put_ShowPositionSettings)(VARIANT_BOOL);
+     STDMETHOD(get_ShowPositionSettings)(VARIANT_BOOL*);
 
      STDMETHOD(put_TextNotify)(ITextNotify *);
 
@@ -142,7 +151,7 @@
                               IGProperty *pPropXFloor,IGProperty* pPropXCeiling,
                               IGProperty *pPropYFloor,IGProperty* pPropYCeiling,
                               IGProperty *pPropZFloor,IGProperty* pPropZCeiling,
-                              IGProperty *,char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
+                              char *text,DataPoint *position,void (__stdcall *pWhenChangedCallback)(void *,ULONG_PTR),void *,ULONG_PTR);
 
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
@@ -161,6 +170,10 @@
      STDMETHOD(LineUp)();
 
      STDMETHOD(get_DataSet)(IDataSet **);
+
+     STDMETHOD(HasContent)();
+
+     STDMETHOD(AdviseGSGraphicServices)(void *);
 
 //     IOleObject 
 
@@ -268,7 +281,7 @@
 
      } iPropertiesClient;
 
-     friend class _IGPropertiesClient;
+     //friend class _IGPropertiesClient;
 
      IUnknown *pIUnknownOuter;
 
@@ -290,6 +303,7 @@
      IDataSet *pIDataSetBoundingBox;
      IDataSet *pIDataSetWorld;
      IGSystemStatusBar* pIGSystemStatusBar;
+     IGSGraphicServices *pIGSGraphicServices;
      ITextNotify *pITextNotify;
 
      SIZEL containerSize;
@@ -311,10 +325,8 @@
 
      TextFormat format;
      CoordinatePlane coordinatePlane;
-     DataPoint directionForward,directionUp;
      DataPoint dpStart;
      DataPoint dpSelectOffsetRestore;
-     DataPoint dpCenterGDI;
      DataPoint dpTranslateFormatGDI;
      char szFace[MAX_PATH];
      double planeHeight;
@@ -324,7 +336,10 @@
      BOOL flipHorizontal,flipVertical;
      BOOL partOfWorldDomain;
      BOOL showContentPropertyPage;
+     BOOL showStylePropertyPage;
+     BOOL showOrientationPropertyPage;
      BOOL enablePositionSettings;
+     BOOL showPositionSettings;
      BOOL partOfMainGraphic;
 
      unsigned int refCount;
@@ -345,23 +360,24 @@
      IGProperty *propertyPositionY;
      IGProperty *propertyPositionZ;
 
-     IGProperty *propertyForwardDirection;
-     IGProperty *propertyUpDirection;
-
      IGProperty *propertyCoordinatePlane;
      IGProperty *propertyPlaneHeight;
      IGProperty *propertyFlipHorizontal;
      IGProperty *propertyFlipVertical;
 
      IGProperty *propertyPartOfWorldDomain;
+
      IGProperty *propertyShowContentPropertyPage;
+     IGProperty *propertyShowStylePropertyPage;
+     IGProperty *propertyShowOrientationPropertyPage;
+
      IGProperty *propertyEnablePositionSettings;
+     IGProperty *propertyShowPositionSettings;
 
      IGProperty *propertyDescription;
      IGProperty *propertyPartOfMainGraphic;
 
      IGProperty *propertyContent;
-     IGProperty *propertyOpenGLRendering;
 
      IGProperty *propertyRotation;
 

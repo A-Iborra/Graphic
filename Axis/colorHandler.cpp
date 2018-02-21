@@ -110,11 +110,6 @@
       EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_TICK_LABEL_COLOR_BLUE),! p -> axisTickColorTrackLineColor);
       EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_TICK_LABEL_COLOR_BLUE_SPIN),! p -> axisTickColorTrackLineColor);
 
-      long n;
-      p -> propertyLabel -> get_size(&n);
-
-      p -> propertyDrawLabel -> put_boolValue(1 < n ? TRUE : FALSE);
-
       p -> propertyAxisLabelColorTrackLineColor -> setWindowItemChecked(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_TRACK);
 
       EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_TRACK),TRUE);
@@ -371,21 +366,23 @@ UpdateWindow(hwnd);
          LOAD_VALUES(p -> currentPropertyTickLabelColor,IDDI_AXIS_COLOR_TICK_LABEL_COLOR_RED);
          break;
 
-      case IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_TRACK:
+      case IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_TRACK: {
          p -> propertyAxisLabelColorTrackLineColor -> getWindowChecked(hwndControl);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_CHOOSE),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_RED),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_RED_SPIN),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_GREEN),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_GREEN_SPIN),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_BLUE),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
-         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_BLUE_SPIN),p -> drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         BOOL drawAxisLabel = (S_OK == p -> pLabel -> HasContent());
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_CHOOSE),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_RED),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_RED_SPIN),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_GREEN),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_GREEN_SPIN),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_BLUE),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
+         EnableWindow(GetDlgItem(p -> hwndColorSettings,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_BLUE_SPIN),drawAxisLabel ? ! p -> axisLabelColorTrackLineColor  : FALSE);
          if ( p -> axisLabelColorTrackLineColor ) {
             p -> currentPropertyAxisLabelColor = p -> propertyLineColor;
          } else {
             p -> currentPropertyAxisLabelColor = p -> propertyLabelColor;
          }
          LOAD_VALUES(p -> currentPropertyAxisLabelColor,IDDI_AXIS_COLOR_AXIS_LABEL_COLOR_RED);
+         }
          break;
 
       default:

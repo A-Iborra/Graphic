@@ -27,7 +27,7 @@
 
    if ( pCallLists ) {
 
-      pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits);
+      pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,pickBoxSize.cy,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits);
 
       delete [] pCallLists;
 
@@ -54,13 +54,6 @@
          IText *pText = NULL;
 
          while ( pText = pTextList -> GetNext(pText) ) {
-
-            boolean isOpenGLRendered = false;
-
-            pText -> get_TextRenderOpenGL(&isOpenGLRendered);
-
-            if ( isOpenGLRendered )
-               continue;
 
             RECT rcText;
 
@@ -102,7 +95,7 @@
 
    hitTable = new unsigned int[HIT_TABLE_SIZE];
 
-   if ( S_FALSE == pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits) ) {
+   if ( S_FALSE == pIOpenGLImplementation -> GetPickBoxHits(ptl,pickBoxSize.cx,pickBoxSize.cy,hitTable,HIT_TABLE_SIZE,pCallLists,&hitTableHits) ) {
       delete [] pCallLists;
       delete [] hitTable;
       hitTable = NULL;
@@ -134,10 +127,6 @@
       IText *pText = NULL;
 
       while ( pText = pTextList -> GetNext(pText) ) {
-         boolean isOpenGLRendered = false;
-         pText -> get_TextRenderOpenGL(&isOpenGLRendered);
-         if ( isOpenGLRendered )
-            continue;
          RECT rcText;
          pText -> get_GDIBoundingBox(&rcText);
          if ( ptl -> x < rcText.left || ptl -> x > rcText.right || ptl -> y < rcText.top || ptl -> y > rcText.bottom )

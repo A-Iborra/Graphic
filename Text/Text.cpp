@@ -33,6 +33,7 @@
        pIBasePlot(0),
        pIBasePlotBoundingBox(0),
        pIGSystemStatusBar(0),
+       pIGSGraphicServices(0),
        pITextNotify(0),
 
        hwndFrame(0),
@@ -59,6 +60,9 @@
        flipHorizontal(FALSE),
        flipVertical(FALSE),
        showContentPropertyPage(TRUE),
+       showStylePropertyPage(TRUE),
+       showOrientationPropertyPage(TRUE),
+
        enablePositionSettings(TRUE),
        partOfMainGraphic(TRUE),
 
@@ -77,7 +81,6 @@
    refCount = 100;
 
    memset(&dpStart,0,sizeof(DataPoint));
-   memset(&dpCenterGDI,0,sizeof(DataPoint));
    memset(&dpSelectOffsetRestore,0,sizeof(DataPoint));
    memset(&dpTranslateFormatGDI,0,sizeof(DataPoint));
    memset(&ptSelectPoint,0,sizeof(POINT));
@@ -124,9 +127,6 @@
    propertyPositionY -> put_type(TYPE_STRING);
    propertyPositionZ -> put_type(TYPE_STRING);
 
-   pIProperties -> Add(L"direction forward",&propertyForwardDirection);
-   pIProperties -> Add(L"direction up",&propertyUpDirection);
-
    pIProperties -> Add(L"coordinate plane",&propertyCoordinatePlane);
    pIProperties -> Add(L"plane height",&propertyPlaneHeight);
    pIProperties -> Add(L"flip l-r",&propertyFlipHorizontal);
@@ -144,18 +144,19 @@
    pIProperties -> Add(L"content",&propertyContent);
    propertyContent -> put_type(TYPE_STRING);
 
-   pIProperties -> Add(L"opengl rendering",&propertyOpenGLRendering);
-   //pIProperties -> DirectAccess(L"opengl rendering",TYPE_BOOL,(void *)&doOpenGLRendering,sizeof(doOpenGLRendering));
-
    propertyFormat -> directAccess(TYPE_LONG,reinterpret_cast<void*>(&format),sizeof(format));
-
-   propertyForwardDirection -> directAccess(TYPE_BINARY,reinterpret_cast<void*>(&directionForward),sizeof(directionForward));
 
    pIProperties -> DirectAccess(L"text font",TYPE_SZSTRING,reinterpret_cast<void*>(szFace),MAX_PATH);
    pIProperties -> DirectAccess(L"text size",TYPE_DOUBLE,reinterpret_cast<void*>(&fontSize),sizeof(double));
    pIProperties -> DirectAccess(L"text font weight",TYPE_DOUBLE,reinterpret_cast<void*>(&fontWeight),sizeof(double));
 
    pIProperties -> Add(L"rotation",&propertyRotation);
+
+   pIProperties -> Add(L"show content properties",&propertyShowContentPropertyPage);
+   pIProperties -> Add(L"show style properties",&propertyShowStylePropertyPage);
+   pIProperties -> Add(L"show orientation properties",&propertyShowStylePropertyPage);
+
+   pIProperties -> Add(L"show position settings",&propertyShowPositionSettings);
 
    propertyRotation -> directAccess(TYPE_DOUBLE,&rotation,sizeof(double));
 
@@ -164,8 +165,13 @@
    propertyFlipVertical -> directAccess(TYPE_BOOL,reinterpret_cast<void*>(&flipVertical),sizeof(flipVertical));
    propertyPlaneHeight -> directAccess(TYPE_DOUBLE,reinterpret_cast<void*>(&planeHeight),sizeof(planeHeight));
    propertyPartOfWorldDomain -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&partOfWorldDomain),sizeof(partOfWorldDomain));
+
    propertyShowContentPropertyPage -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&showContentPropertyPage),sizeof(showContentPropertyPage));
+   propertyShowStylePropertyPage -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&showStylePropertyPage),sizeof(showStylePropertyPage));
+   propertyShowStylePropertyPage -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&showOrientationPropertyPage),sizeof(showOrientationPropertyPage));
+
    propertyEnablePositionSettings -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&enablePositionSettings),sizeof(enablePositionSettings));
+   propertyShowPositionSettings -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&showPositionSettings),sizeof(showPositionSettings));
    propertyPartOfMainGraphic -> directAccess(TYPE_BOOL,reinterpret_cast<void *>(&partOfMainGraphic),sizeof(partOfMainGraphic));
 
    CoCreateInstance(CLSID_BasePlot,pIUnknownOuter,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IBasePlot,reinterpret_cast<void **>(&pIBasePlot));

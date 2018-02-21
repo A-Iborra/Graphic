@@ -10,7 +10,32 @@
 
 
    HRESULT Axis::SavePrep() {
+
    propertyTextCount -> put_longValue(textList.Count());
+
+   propertyRepresentativeText -> clearStorageObjects();
+
+   IUnknown *pIUnknown;
+
+   pRepresentativeText -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+
+   propertyRepresentativeText -> addStorageObject(pIUnknown);
+
+   propertyRepresentativeText -> writeStorageObjects();
+
+   pIUnknown -> Release();
+
+
+   propertyLabel -> clearStorageObjects();
+
+   pLabel -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+
+   propertyLabel -> addStorageObject(pIUnknown);
+
+   propertyLabel -> writeStorageObjects();
+
+   pIUnknown -> Release();
+
    return S_OK;
    }
 
@@ -35,8 +60,11 @@
  
 //drawTickLabels = FALSE;
 
-   propertyLabel -> put_szValue("");
-   propertyDrawLabel -> put_boolValue(FALSE);
+   //propertyLabel -> put_szValue("");
+
+   pLabel -> put_Text(L"");
+   pLabel -> TextColorProperty(propertyLabelColor);
+
    propertyAxisLabelColorTrackLineColor -> put_boolValue(TRUE);
 
    propertyAxisLabelSize -> put_doubleValue(16.0);
@@ -64,13 +92,13 @@
    propertyOriginYValue -> put_szValue("Oy");
    propertyOriginZValue -> put_szValue("Oz");
 
+   pRepresentativeText -> TextColorProperty(propertyTickLabelColor);
+
+   pLabel -> TextColorProperty(propertyLabelColor);
+
    switch ( type ) {
    case 'x':
    case 'X': {
-      //float v[] = {CLR_RED};
-      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyEndpointXValue -> put_szValue("Mx");
       propertyEndpointYValue -> put_szValue("Oy");
       propertyEndpointZValue -> put_szValue("Oz");
@@ -79,15 +107,17 @@
       propertyLabelPositionZValue -> put_szValue("0z");
       propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BELOW);
       propertyTicksAllPlanes -> put_boolValue(FALSE);
+      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
+      pRepresentativeText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+
+      pLabel -> put_CoordinatePlane(CoordinatePlane_XY);
+      pLabel -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+
       }
       break;
  
    case 'y':
    case 'Y': {
-      //float v[] = {CLR_GREEN};
-      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyLabelPositionXValue -> put_szValue("Ox");    
       propertyLabelPositionYValue -> put_szValue("Oy + (My-Oy)/2");    
       propertyLabelPositionZValue -> put_szValue("0z");    
@@ -96,15 +126,18 @@
       propertyEndpointZValue -> put_szValue("Oz");
       propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BELOW);
       propertyTicksAllPlanes -> put_boolValue(FALSE);
+      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_YX);
+      pRepresentativeText -> put_FlipHorizontal(VARIANT_TRUE);
+      pRepresentativeText -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_TOP);
+
+      pLabel -> put_CoordinatePlane(CoordinatePlane_YX);
+      pLabel -> put_Format(TEXT_FORMAT_CENTER | TEXT_COORDINATES_FROM_BOTTOM);
+
       }
       break;
  
    case 'z':
    case 'Z': {
-      //float v[] = {CLR_BLUE};
-      //propertyLineColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyTickLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
-      //propertyLabelColor -> put_binaryValue(sizeof(v),(BYTE*)v);
       propertyLabelPositionXValue -> put_szValue("Ox");    
       propertyLabelPositionYValue -> put_szValue("Oy");    
       propertyLabelPositionZValue -> put_szValue("0z + (Mz-Oz)/2");    
@@ -114,10 +147,18 @@
       propertyTickStraddleStyle -> put_longValue(TICK_STRADDLE_BOTH);
       propertyTicksAllPlanes -> put_boolValue(TRUE);
       propertyTickLength -> put_doubleValue(DEFAULT_ZAXIS_TICK_PERCENT);
+      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XZ);
+      pRepresentativeText -> put_FlipVertical(VARIANT_TRUE);
+      pRepresentativeText -> put_Format(TEXT_FORMAT_RIGHT | TEXT_COORDINATES_FROM_CENTER);
+
+      pLabel -> put_CoordinatePlane(CoordinatePlane_XZ);
+      pLabel -> put_Format(TEXT_FORMAT_RIGHT | TEXT_COORDINATES_FROM_CENTER);
+
       }
       break;
  
    default:
+      pRepresentativeText -> put_CoordinatePlane(CoordinatePlane_XY);
       break;
  
    }
@@ -132,12 +173,18 @@
    propertyTextCount -> put_longValue(0);
  
    propertyPlotType -> put_longValue(gcPlotType2DExternal1);
+
+   if ( axisTickColorTrackLineColor )
+      currentPropertyTickLabelColor = propertyLineColor;
+   else 
+      currentPropertyTickLabelColor = propertyTickLabelColor;
    
    return S_OK;//Loaded();
    }
  
  
    HRESULT Axis::Loaded() {
+
    long textCount = 0;
    char szDefaultFont[32];
  
@@ -147,27 +194,45 @@
       propertyDefaultFont -> put_szValue("Arial");
  
    propertyTextCount -> get_longValue(&textCount);
-#if 0
-   IText *t;
-   for ( long tickNumber = 0; tickNumber < textCount; tickNumber++ ) {
- 
-      CoCreateInstance(CLSID_Text,
-                       NULL,
-                       CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,
-                       IID_IText,
-                       reinterpret_cast<void **>(&t));
 
-      t -> Initialize(pIOpenGLImplementation,pIEvaluator,pIDataSetDomain,pParentPropertyFloor,pParentPropertyCeiling,NULL,NULL);
+   propertyLabel -> clearStorageObjects();
 
-      textList.Add(t,NULL,tickNumber + 1);
- 
-   }
-#endif 
-   long n;
+   IUnknown *pIUnknown;
 
-   propertyLabel -> get_size(&n);
+   pLabel -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
 
-   propertyDrawLabel -> put_boolValue(1 < n ? TRUE : FALSE);
+   propertyLabel -> addStorageObject(pIUnknown);
+
+   propertyLabel -> readStorageObjects();
+
+   pIUnknown -> Release();
+
+
+   propertyRepresentativeText -> clearStorageObjects();
+
+   pRepresentativeText -> QueryInterface(IID_IUnknown,reinterpret_cast<void **>(&pIUnknown));
+
+   propertyRepresentativeText -> addStorageObject(pIUnknown);
+
+   propertyRepresentativeText -> readStorageObjects();
+
+   pIUnknown -> Release();
+
+
+   pRepresentativeText -> put_Description(L"Values to appear along the axis, separated by commas.\nTo include a comma, specify \\, (backslash - comma).");
+
+   pRepresentativeText -> put_EnablePositionSettings(FALSE);
+
+   pRepresentativeText -> put_ShowPositionSettings(FALSE);
+
+   pRepresentativeText -> put_PartOfWorldDomain(FALSE);
+
+   pRepresentativeText -> put_PartOfMainGraphic(FALSE);
+
+   if ( axisTickColorTrackLineColor )
+      currentPropertyTickLabelColor = propertyLineColor;
+   else 
+      currentPropertyTickLabelColor = propertyTickLabelColor;
 
    return S_OK;
    }

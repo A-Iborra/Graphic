@@ -438,7 +438,6 @@
 #define IDDI_GRAPHIC_FUNCTIONS_ALLOWCTLVISPROPS                            7850
 
 #define IDDIALOG_GRAPHIC_AXIIS                                             7900
-#define IDDI_GRAPHIC_AXIIS_USE_OPENGL                                      7901
 #define IDDI_GRAPHIC_AXIIS_XAXIS_TEXT                                      7910
 #define IDDI_GRAPHIC_AXIIS_XAXIS_EDIT                                      7915
 #define IDDI_GRAPHIC_AXIIS_YAXIS_TEXT                                      7920
@@ -508,17 +507,19 @@
 #define IDDI_AXIS_TEXT_AXISTICKLABELPRECISION_VALUE                        8358
 #define IDDI_AXIS_TEXT_AXISPRECISIONSPIN                                   8359
 
-#define IDDI_AXIS_TEXT_LABEL_POSITION_NATURAL                              8370
-#define IDDI_AXIS_TEXT_LABEL_POSITION_X                                    8371
-#define IDDI_AXIS_TEXT_LABEL_POSITION_Y                                    8372
-#define IDDI_AXIS_TEXT_LABEL_POSITION_Z                                    8373
+//#define IDDI_AXIS_TEXT_LABEL_POSITION_NATURAL                              8370
+//#define IDDI_AXIS_TEXT_LABEL_POSITION_X                                    8371
+//#define IDDI_AXIS_TEXT_LABEL_POSITION_Y                                    8372
+//#define IDDI_AXIS_TEXT_LABEL_POSITION_Z                                    8373
 #define IDDI_AXIS_TEXT_LABEL_ANGLE_PERPENDICULAR                           8374
 #define IDDI_AXIS_TEXT_LABEL_ANGLE_PARALLEL                                8375
 #define IDDI_AXIS_TEXT_LABEL_ANGLE_ISOTHER                                 8376
 #define IDDI_AXIS_TEXT_LABEL_ANGLE_OTHER                                   8377
 
-#define IDDI_AXIS_TEXT_TICK_LABEL_SIZE                                     8380
-#define IDDI_AXIS_TEXT_TICK_LABEL_SIZE_UNITS                               8381
+#define IDDI_AXIS_TEXT_LABEL_PROPERTIES                                    8380
+
+#define IDDI_AXIS_TEXT_TICK_LABEL_SIZE                                     8390
+#define IDDI_AXIS_TEXT_TICK_LABEL_SIZE_UNITS                               8391
 
 #define IDDIALOG_AXIS_COLOR                                                8400
 
@@ -688,7 +689,6 @@
 #define IDDI_TEXT_DESCRIPTION                                             12111
 
 #define IDDIALOG_TEXT_STYLE                                               12200
-#define IDDI_TEXT_RENDEROPENGL                                            12205
 #define IDDI_TEXT_FONTLIST                                                12210
 #define IDDI_TEXT_FONTSTYLELIST                                           12220
 #define IDDI_TEXT_FONTSIZE                                                12230
@@ -707,16 +707,26 @@
 
 #define IDDI_TEXT_SCREENPLANE                                             12320
 #define IDDI_TEXT_PLANEHEIGHT                                             12321
-#define IDDI_TEXT_XCOORDINATE                                             12322
-#define IDDI_TEXT_YCOORDINATE                                             12323
-#define IDDI_TEXT_ZCOORDINATE                                             12324
-#define IDDI_TEXT_BACKSIDE                                                12325
-#define IDDI_TEXT_FORMAT_FROM_TOP                                         12330
-#define IDDI_TEXT_FORMAT_FROM_CENTER                                      12331
-#define IDDI_TEXT_FORMAT_FROM_BOTTOM                                      12332
-#define IDDI_TEXT_FORMAT_LEFT                                             12333
-#define IDDI_TEXT_FORMAT_CENTER                                           12334
-#define IDDI_TEXT_FORMAT_RIGHT                                            12335
+
+#define IDDI_TEXT_POSITION_GROUP                                          12322
+#define IDDI_TEXT_POSITION_LABEL1                                         12323
+#define IDDI_TEXT_POSITION_LABEL2                                         12324
+#define IDDI_TEXT_POSITION_LABEL3                                         12325
+#define IDDI_TEXT_XCOORDINATE                                             12326
+#define IDDI_TEXT_YCOORDINATE                                             12327
+#define IDDI_TEXT_ZCOORDINATE                                             12328
+
+#define IDDI_TEXT_BACKSIDE                                                12329
+
+#define IDDI_TEXT_FORMATTING_GROUP                                        12330
+#define IDDI_TEXT_FORMATTING_LABEL1                                       12331
+#define IDDI_TEXT_FORMAT_FROM_TOP                                         12332
+#define IDDI_TEXT_FORMAT_FROM_CENTER                                      12333
+#define IDDI_TEXT_FORMAT_FROM_BOTTOM                                      12334
+#define IDDI_TEXT_FORMATTING_LABEL2                                       12335
+#define IDDI_TEXT_FORMAT_LEFT                                             12336
+#define IDDI_TEXT_FORMAT_CENTER                                           12337
+#define IDDI_TEXT_FORMAT_RIGHT                                            12338
 
 #define IDDI_TEXT_TEXTCOLOR_BACKGROUND                                    12360
 #define IDDI_TEXT_TEXTCOLOR_RED                                           12361

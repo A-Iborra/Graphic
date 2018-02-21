@@ -202,10 +202,10 @@ library Axis {
       HRESULT Initialize([in]char type,[in]IAxis *pXAxis,[in]IAxis *pYAxis,[in]IAxis *pZAxis,
                               [in] IGProperty* pIPropertyPlotView, 
                               [in] IGProperty* pPropertyXFloor,[in] IGProperty *pPropertyXCeiling,
-                              [in] IGProperty* pProeprtyYFloor,[in] IGProperty *pProeprtyYCeiling,
+                              [in] IGProperty* pProeprtyYFloor,[in] IGProperty *pPropertyYCeiling,
                               [in] IGProperty* pPropertyZFloor,[in] IGProperty *pPropertyZCeiling,
-                              [in] IGProperty* pPropertyOpenGLText,
-                              [in] IDataSet* pIDomainDataSet,[in] void *,[in] IEvaluator*,[in] void (*pWhenChangedCallback)(void *pvArg,ULONG_PTR cookie),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
+                              [in] IDataSet* pIDomainDataSet,[in] void *pvIOpenGLImplementation,[in] IEvaluator* pIEvaluator,
+                              [in] void (*pWhenChangedCallback)(void *pvArg,ULONG_PTR cookie),void *pWhenChangedArg,ULONG_PTR whenChangedCookie);
 
       [propget,id(axisMethodGetDataSet),helpstring("Retrieve a pointer to the axis dataset")]
       HRESULT DataSet([out,retval] IDataSet **);
@@ -238,6 +238,8 @@ library Axis {
 
       [id(axisMethodEditProperties),helpstring("Edit the axis properties. hwndParent can be NULL")]
       HRESULT ShowProperties(HWND hwndParent);
+
+      HRESULT AdviseGSGraphicServices(/*IGSGraphicServices */void *pvIGSGraphicServices);
 
    };
 

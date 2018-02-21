@@ -31,28 +31,11 @@
    }
  
  
-   HRESULT Text::put_TextRenderOpenGL(boolean doRender) {
-   propertyOpenGLRendering -> put_boolValue(doRender);
-   if ( ! doRender && pIDataSetWorld )
-      pIDataSetWorld -> RemoveIncludedDomain(pIDataSet);
-   return S_OK;
-   }
-
-   HRESULT Text::get_TextRenderOpenGL(boolean *pDoRender) {
-   if ( ! pDoRender )
-      return E_POINTER;
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-   *pDoRender = doOpenGLRendering ? true : false;
-   return S_OK;
-   }
-
-
    HRESULT Text::Initialize(IOpenGLImplementation *pimp,IEvaluator *piev,IDataSet* pidsw,
                               IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
                               IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
                               IGProperty* pPropZFloor,IGProperty* pPropZCeiling,
-                              IGProperty* pPropRenderUsingOpenGL,char *intext,DataPoint *inPosition,
+                              char *intext,DataPoint *inPosition,
                                     void (__stdcall *pWhenChanged)(void *,ULONG_PTR),void *pWhenChangedArg,ULONG_PTR changedCallbackCookie) {
    pIOpenGLImplementation = pimp;
  
@@ -67,23 +50,11 @@
    pWhenChangedCallbackArg = pWhenChangedArg;
    whenChangedCallbackCookie = changedCallbackCookie;
 
-   if ( pPropRenderUsingOpenGL ) {
-      if ( propertyOpenGLRendering ) {
-         propertyOpenGLRendering -> Release();
-         pIProperties -> Remove(L"opengl rendering");
-      }
-      propertyOpenGLRendering = pPropRenderUsingOpenGL;
-      propertyOpenGLRendering -> AddRef();
-   }
-
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-
-   pIBasePlot -> Initialize(doOpenGLRendering ? pIDataSetWorld : NULL,pIOpenGLImplementation,pIEvaluator,
+   pIBasePlot -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
                               propertyTextColor,propertyLineWeight,
                               pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
 
-   pIBasePlotBoundingBox -> Initialize(doOpenGLRendering ? pIDataSetWorld : NULL,pIOpenGLImplementation,pIEvaluator,
+   pIBasePlotBoundingBox -> Initialize(NULL,pIOpenGLImplementation,pIEvaluator,
                                           propertyTextColor,propertyLineWeight,
                                           pPropXFloor,pPropXCeiling,pPropYFloor,pPropYCeiling,pPropZFloor,pPropZCeiling);
 
@@ -650,12 +621,9 @@
 
    HRESULT Text::put_PartOfWorldDomain(VARIANT_BOOL b) {
    partOfWorldDomain = b;
-   if (  b ) {
-      short doOpenGLRendering;
-      propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-      if ( pIDataSetWorld && doOpenGLRendering )
-         pIDataSetWorld -> IncludeDomain(pIDataSet);
-   } else {
+   if (  b )
+      pIDataSetWorld -> IncludeDomain(pIDataSet);
+   else {
       if ( pIDataSetWorld )
          pIDataSetWorld -> RemoveIncludedDomain(pIDataSet);
    }
@@ -666,12 +634,7 @@
    HRESULT Text::get_PartOfWorldDomain(VARIANT_BOOL *pb) {
    if ( ! pb ) 
       return E_POINTER;
-   short doOpenGLRendering;
-   propertyOpenGLRendering -> get_boolValue(&doOpenGLRendering);
-   if ( ! doOpenGLRendering )
-      *pb = false;
-   else
-      *pb = partOfWorldDomain;
+   *pb = partOfWorldDomain;
    return S_OK;
    }
 
@@ -686,6 +649,26 @@
    return S_OK;
    }
 
+   HRESULT Text::put_ShowStylePropertyPage(VARIANT_BOOL b) {
+   showStylePropertyPage = b;
+   return S_OK;
+   }
+   HRESULT Text::get_ShowStylePropertyPage(VARIANT_BOOL *pb) {
+   if ( ! pb ) return E_POINTER;
+   *pb = showStylePropertyPage;
+   return S_OK;
+   }
+
+   HRESULT Text::put_ShowOrientationPropertyPage(VARIANT_BOOL b) {
+   showOrientationPropertyPage = b;
+   return S_OK;
+   }
+   HRESULT Text::get_ShowOrientationPropertyPage(VARIANT_BOOL *pb) {
+   if ( ! pb ) return E_POINTER;
+   *pb = showOrientationPropertyPage;
+   return S_OK;
+   }
+
    HRESULT Text::put_EnablePositionSettings(VARIANT_BOOL b) {
    enablePositionSettings = b;
    return S_OK;
@@ -696,6 +679,15 @@
    return S_OK;
    }
 
+   HRESULT Text::put_ShowPositionSettings(VARIANT_BOOL b) {
+   showPositionSettings = b;
+   return S_OK;
+   }
+   HRESULT Text::get_ShowPositionSettings(VARIANT_BOOL *pb) {
+   if ( ! pb ) return E_POINTER;
+   *pb = showPositionSettings;
+   return S_OK;
+   }
 
    HRESULT Text::put_Description(BSTR bstrDescription) {
    propertyDescription -> put_stringValue(bstrDescription);
@@ -736,6 +728,10 @@
 
 
    HRESULT Text::TextColorProperty(IGProperty* pSource) {
+   if ( propertyTextColor ) {
+      pIProperties -> Remove(L"text color");
+      propertyTextColor -> Release();
+   }
    propertyTextColor = pSource;
    pIBasePlot -> put_ColorProperty(pSource);
    pIBasePlotBoundingBox -> put_ColorProperty(pSource);
@@ -899,3 +895,21 @@ return E_FAIL;
    *pResult = pIDataSet;
    return S_OK;
    }
+
+   STDMETHODIMP Text::HasContent() {
+   if ( ! propertyContent -> pointer() || ! ((char *)propertyContent -> pointer())[0] )
+      return S_FALSE;
+   return S_OK;
+   }
+   
+
+   STDMETHODIMP Text::AdviseGSGraphicServices(void *pvIGSGraphicServices) {
+   if ( ! pvIGSGraphicServices ) {
+      if ( ! pIGSGraphicServices ) 
+         return S_OK;
+      pIGSGraphicServices = NULL;
+   }
+   pIGSGraphicServices = (IGSGraphicServices *)pvIGSGraphicServices;
+   return S_OK;
+   }
+

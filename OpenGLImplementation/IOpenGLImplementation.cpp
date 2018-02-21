@@ -828,10 +828,11 @@ Sleep(10);
    }
 
 
-   HRESULT OpenGLImplementor::GetPickBoxHits(POINTL *ptl,long pickWindowSize,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
+   HRESULT OpenGLImplementor::GetPickBoxHits(POINTL *ptl,long pickWindowWidth,long pickWindowHeight,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
    strCall_GetPickBoxHits *ps = new strCall_GetPickBoxHits();
    ps -> ptl = ptl;
-   ps -> pickWindowSize = pickWindowSize;
+   ps -> pickWindowWidth = pickWindowWidth;
+   ps -> pickWindowHeight = pickWindowHeight;
    ps -> hitTable = hitTable;
    ps -> hitTableSize = hitTableSize;
    ps -> pCallLists = pCallLists;

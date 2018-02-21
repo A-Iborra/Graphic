@@ -141,27 +141,40 @@
 
    void G::reInitializeAxiis() {
 
+   IGSGraphicServices *pIGSGraphicServices = NULL;
+
+   QueryInterface(IID_IGSGraphicServices,reinterpret_cast<void **>(&pIGSGraphicServices));
+
+   xaxis -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
    xaxis -> Initialize('X',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
-                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)xaxis);
+                              pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)xaxis);
+
+   yaxis -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
 
    yaxis -> Initialize('Y',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
-                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)yaxis);
+                              pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)yaxis);
+
+   zaxis -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
 
    zaxis -> Initialize('Z',xaxis,yaxis,zaxis,propertyPlotView,
                               propertyXFloor,propertyXCeiling,
                               propertyYFloor,propertyYCeiling,
                               propertyZFloor,propertyZCeiling,
-                              propertyRenderOpenGLAxisText,pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)zaxis);
+                              pIDataSetMaster,pIOpenGLImplementation,pIEvaluator,someObjectChanged,(void *)this,(ULONG_PTR)zaxis);
 
    pIViewSet -> Initialize(pIOpenGLImplementation,pIEvaluator,
                               propertyPlotView,
                               propertyViewTheta,propertyViewPhi,propertyViewSpin,
                               propertyZFloor,propertyZCeiling,pIDataSetMaster,xaxis,yaxis,zaxis);
+
+   pIGSGraphicServices -> Release();
+
    return;
    }

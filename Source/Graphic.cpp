@@ -340,11 +340,6 @@
    
    pIGProperties -> Add(L"use graphics cursor",&propertyUseGraphicsCursor);
 
-   pIGProperties -> Add(L"opengl axis text",&propertyRenderOpenGLAxisText);
-   propertyRenderOpenGLAxisText -> put_type(TYPE_BOOL);
-   propertyRenderOpenGLAxisText -> put_size(sizeof(BOOL));
-   propertyRenderOpenGLAxisText -> put_boolValue(FALSE);
-   
    pIGProperties -> DirectAccess(L"auto clear",TYPE_BOOL,&autoClear,sizeof(autoClear));
    pIGProperties -> DirectAccess(L"plot view",TYPE_LONG,&plotView,sizeof(plotView));
 
@@ -832,9 +827,17 @@ Beep(2000,100);
                            propertyXFloor,propertyXCeiling,
                            propertyYFloor,propertyYCeiling,
                            propertyZFloor,propertyZCeiling,
-                           propertyRenderOpenGLAxisText,NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
+                           NULL,NULL,someObjectChanged,(void *)this,(ULONG_PTR)pIText);
 
    pIText -> AdviseGSystemStatusBar(pIGSystemStatusBar);
+
+   IGSGraphicServices *pIGSGraphicServices = NULL;
+
+   QueryInterface(IID_IGSGraphicServices,reinterpret_cast<void **>(&pIGSGraphicServices));
+
+   pIText -> AdviseGSGraphicServices(reinterpret_cast<void *>(pIGSGraphicServices));
+
+   pIGSGraphicServices -> Release();
 
    textList.Add(pIText);
 
@@ -979,11 +982,11 @@ Beep(2000,100);
       cntSegments += k;
    }
 
-   IText *pIText = NULL;
-   while ( pIText = textList.GetNext(pIText) ) {
-      pIText -> get_SegmentCount(&k);
-      cntSegments += k;
-   }
+   //IText *pIText = NULL;
+   //while ( pIText = textList.GetNext(pIText) ) {
+   //   pIText -> get_SegmentCount(&k);
+   //   cntSegments += k;
+   //}
 
    if ( ! cntSegments ) 
       return 0;
@@ -1005,11 +1008,54 @@ Beep(2000,100);
       pLong += k;
    }
 
-   while ( pIText = textList.GetNext(pIText) ) {
-      pIText -> get_SegmentCount(&k);
-      pIText -> GetSegments(pLong);
+   //while ( pIText = textList.GetNext(pIText) ) {
+   //   pIText -> get_SegmentCount(&k);
+   //   pIText -> GetSegments(pLong);
+   //   pLong += k;
+   //}
+
+   return cntSegments;
+   }
+
+   int G::getSegmentsExcludingAxiis(long **pSegments) {
+
+   *pSegments = NULL;
+
+   long cntSegments = 0;
+   long k;
+
+   IPlot *pIPlot = NULL;
+   while ( pIPlot = visiblePlotList.GetNext(pIPlot) ) {
+      pIPlot -> get_SegmentCount(&k);
+      cntSegments += k;
+   }
+
+   //IText *pIText = NULL;
+   //while ( pIText = textList.GetNext(pIText) ) {
+   //   pIText -> get_SegmentCount(&k);
+   //   cntSegments += k;
+   //}
+
+   if ( ! cntSegments ) 
+      return 0;
+
+   *pSegments = new long[cntSegments + 1];
+   memset(*pSegments,0,(cntSegments + 1) * sizeof(long));
+   long *pLong = *pSegments;
+
+   k = 0;
+
+   while ( pIPlot = visiblePlotList.GetNext(pIPlot) ) {
+      pIPlot -> get_SegmentCount(&k);
+      pIPlot -> GetSegments(pLong);
       pLong += k;
    }
+
+   //while ( pIText = textList.GetNext(pIText) ) {
+   //   pIText -> get_SegmentCount(&k);
+   //   pIText -> GetSegments(pLong);
+   //   pLong += k;
+   //}
 
    return cntSegments;
    }

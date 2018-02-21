@@ -22,8 +22,6 @@
 
       p -> hwndAxisSettings = hwnd;
 
-      p -> propertyRenderOpenGLAxisText -> setWindowChecked(GetDlgItem(hwnd,IDDI_GRAPHIC_AXIIS_USE_OPENGL));
-
       BSTR bstrLabel;
 
       p -> xaxis -> get_LabelText(&bstrLabel);
@@ -51,9 +49,6 @@
    case WM_COMMAND: {
       int notifyCode = HIWORD(wParam);
       switch ( LOWORD(wParam) ) {
-      case IDDI_GRAPHIC_AXIIS_USE_OPENGL:
-         p -> propertyRenderOpenGLAxisText -> getWindowChecked(GetDlgItem(hwnd,IDDI_GRAPHIC_AXIIS_USE_OPENGL));
-         break;
 
       case IDDI_GRAPHIC_AXIIS_XAXIS_EDIT: {
          p -> xaxis -> ShowProperties(hwnd);

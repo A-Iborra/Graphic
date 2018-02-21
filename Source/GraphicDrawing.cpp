@@ -197,7 +197,7 @@
 
    if ( 0 == allowedPlotCount ) {
       DataPoint dpMin = {0.0,0.0,0.0};
-      DataPoint dpMax = {1.0,1.0,1.0};
+      DataPoint dpMax = {1.0,2.0,3.0};
       p -> pIDataSetMaster -> pushDataPoint(&dpMin);
       p -> pIDataSetMaster -> pushDataPoint(&dpMax);
    }
@@ -239,14 +239,9 @@
       delete pair.first;
    }
 
-   // I can now use text in the world domain to adjust the ultimate world domain extents
-#if 0
    IText *pIText = NULL;
-   while ( pIText = p -> textList.GetNext(pIText) ) {
+   while ( pIText = p -> textList.GetNext(pIText) ) 
       pIText -> PrepData();
-      pIText -> Draw();
-   } 
-#endif
 
    p -> pIOpenGLImplementation -> SetUp(p -> pIDataSetMaster);
 
@@ -265,19 +260,7 @@
       for ( int k = 0; k < n; k++ )
          p -> plotList.GetByIndex(k) -> QueryInterface(IID_IPlot,(void**)(&ppIPlots[k]));
       p -> plotList.GetFirst() -> Plotter(n,&ppIPlots);
-      for ( int k = 0; k < p -> plotList.Count(); k++ )
-         p -> plotList.GetByIndex(k) -> DrawOpenGLText();
    }
-
-   //IText *pIText = NULL;
-   //while ( pIText = p -> textList.GetNext(pIText) ) {
-   //   boolean doOpenGLRendering = FALSE;
-   //   pIText -> get_TextRenderOpenGL(&doOpenGLRendering);
-   //   if ( ! doOpenGLRendering ) 
-   //      continue;
-   //   pIText -> PrepData();
-   //   pIText -> Draw();
-   //} 
 
    p -> pIOpenGLImplementation -> Finalize();
 
@@ -285,15 +268,13 @@
    while ( ax = p -> axisList.GetNext(ax) )
       ax -> DrawLabels();
 
-   IText *pIText = NULL;
-   while ( pIText = p -> textList.GetNext(pIText) ) {
-      pIText -> PrepData();
+   pIText = NULL;
+   while ( pIText = p -> textList.GetNext(pIText) ) 
       pIText -> Draw();
-   } 
 
    if ( 0 < p -> plotList.Count() ) {
       for ( int k = 0; k < p -> plotList.Count(); k++ )
-         p -> plotList.GetByIndex(k) -> DrawGDIText();
+         p -> plotList.GetByIndex(k) -> DrawText();
    }
 
    if ( p -> showStatusBar ) {

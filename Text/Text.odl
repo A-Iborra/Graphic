@@ -59,10 +59,12 @@ library Text {
       textPropertyDescription = 35,
       textpropertyPartOfMainGraphic = 36,
       textPropertyShowContentPropertyPage = 37,
-      textPropertyEnablePositionSettings = 38,
-      textPropertyTextNotify = 39,
-      textPropertyPositionString = 40,
-      textPropertyRender = 41 };
+      textPropertyShowStylePropertyPage = 38,
+      textPropertyShowOrientationPropertyPage = 39,
+      textPropertyEnablePositionSettings = 40,
+      textPropertyShowPositionSettings = 41,
+      textPropertyTextNotify = 42,
+      textPropertyPositionString = 43};
 
    enum TextMethodsID {
       textMethodInitialize = 101,
@@ -85,10 +87,6 @@ library Text {
 
      [propput,id(textPropertyText),helpstring("")] HRESULT Text([in] BSTR setText);
      [propget,id(textPropertyText),helpstring("")] HRESULT Text([out,retval] BSTR *getText);
-
-     [propput,id(textPropertyRender),helpstring("To draw text in OpenGL, by rendering the data as if it where a plot, set this property to true (best for 3-D views)")] 
-         HRESULT TextRenderOpenGL([in] boolean);
-     [propget,id(textPropertyRender),helpstring("")] HRESULT TextRenderOpenGL([out,retval] boolean *);
 
      [propput,id(textPropertyFormat),helpstring("")] HRESULT Format([in] long setTextFormat);
      [propget,id(textPropertyFormat),helpstring("")] HRESULT Format([out,retval] long * getTextFormat);
@@ -121,21 +119,6 @@ library Text {
 
      [propput,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([in] POINTL *putWindowPoint);
      [propget,id(textPropertyWindowPosition),helpstring("")] HRESULT WindowPosition([out,retval] POINTL *getWindowPoint);
-
-#if 0
-     [propput,id(textPropertyDirectionForward),helpstring("The combination of the text direction vector and the coordinate plan chosen determine the 3-d positioning of the text")]
-       HRESULT DirectionForward([in]SAFEARRAY(double) direction);
-     [propget,id(textPropertyDirectionForward),helpstring("")] HRESULT DirectionForward([out,retval] SAFEARRAY(double) *pDirection);
-
-     [propput,id(textPropertyDirectionForwardX),helpstring("")] HRESULT DirectionForwardX([in]double directionX);
-     [propget,id(textPropertyDirectionForwardX),helpstring("")] HRESULT DirectionForwardX([out,retval] double *pDirectionX);
-
-     [propput,id(textPropertyDirectionForwardY),helpstring("")] HRESULT DirectionForwardY([in]double directionY);
-     [propget,id(textPropertyDirectionForwardY),helpstring("")] HRESULT DirectionForwardY([out,retval] double *pDirectionY);
-
-     [propput,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([in]double directionZ);
-     [propget,id(textPropertyDirectionForwardZ),helpstring("")] HRESULT DirectionForwardZ([out,retval] double *pDirectionZ);
-#endif
 
      [propput,id(textPropertyColor),helpstring("")] HRESULT Color([in]SAFEARRAY(double) color);
      [propget,id(textPropertyColor),helpstring("")] HRESULT Color([out,retval]SAFEARRAY(double) *pColor);
@@ -184,15 +167,30 @@ library Text {
      [helpstring("Set the property that supplies the color of text."),id(101)] 
      HRESULT TextColorProperty([in]IGProperty* pIPropertyTextColor);
 
-     [propput,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property pages")]
+     [propput,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property page")]
      HRESULT ShowContentPropertyPage([in]VARIANT_BOOL bShow);
-     [propget,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property pages")]
+     [propget,id(textPropertyShowContentPropertyPage),helpstring("Prevent the text property pages from showing the content property page")]
      HRESULT ShowContentPropertyPage([out,retval]VARIANT_BOOL *pbShow);
+
+     [propput,id(textPropertyShowStylePropertyPage),helpstring("Prevent the text property pages from showing the style property page")]
+     HRESULT ShowStylePropertyPage([in]VARIANT_BOOL bShow);
+     [propget,id(textPropertyShowStylePropertyPage),helpstring("Prevent the text property pages from showing the style property page")]
+     HRESULT ShowStylePropertyPage([out,retval]VARIANT_BOOL *pbShow);
+
+     [propput,id(textPropertyShowOrientationPropertyPage),helpstring("Prevent the text property pages from showing the orientation property page")]
+     HRESULT ShowOrientationPropertyPage([in]VARIANT_BOOL bShow);
+     [propget,id(textPropertyShowOrientationPropertyPage),helpstring("Prevent the text property pages from showing the orientation property page")]
+     HRESULT ShowOrientationPropertyPage([out,retval]VARIANT_BOOL *pbShow);
 
      [propput,id(textPropertyEnablePositionSettings),helpstring("Enable or disable the absolute positioning settings on the text's property settings dialog")]
      HRESULT EnablePositionSettings([in]VARIANT_BOOL bEnable);
      [propget,id(textPropertyEnablePositionSettings),helpstring("Enable or disable the absolute positioning settings on the text's property settings dialog")]
      HRESULT EnablePositionSettings([out,retval]VARIANT_BOOL *pbEnable);
+
+     [propput,id(textPropertyShowPositionSettings),helpstring("Show or hide the absolute positioning settings on the text's property settings dialog")]
+     HRESULT ShowPositionSettings([in]VARIANT_BOOL bEnable);
+     [propget,id(textPropertyShowPositionSettings),helpstring("Show or hide the absolute positioning settings on the text's property settings dialog")]
+     HRESULT ShowPositionSettings([out,retval]VARIANT_BOOL *pbEnable);
 
      [propput,id(textPropertyTextNotify),helpstring("")]
      HRESULT TextNotify(ITextNotify* pITextNotify);
@@ -201,7 +199,7 @@ library Text {
                                     IGProperty* pPropXFloor,IGProperty* pPropXCeiling,
                                     IGProperty* pPropYFloor,IGProperty* pPropYCeiling,
                                     IGProperty* pPropZFloor,IGProperty* pPropZCeiling,
-                                    IGProperty* pPropOpenGLRendering,char *text,struct DataPoint *position,
+                                    char *text,struct DataPoint *position,
                                     [in] void (*pWhenChangedCallback)(void *,ULONG_PTR),[in] void *pWhenChangedArg,[in] ULONG_PTR whenChangedCookie);
 
      [id(103)] HRESULT PrepData();
@@ -233,6 +231,10 @@ library Text {
 
      [propget,id(112),helpstring("Retrieve a pointer to the text dataset")]
      HRESULT DataSet([out,retval] IDataSet **);
+
+     HRESULT HasContent();
+
+     HRESULT AdviseGSGraphicServices(/*IGSGraphicServices*/ void *);
 
 
    };

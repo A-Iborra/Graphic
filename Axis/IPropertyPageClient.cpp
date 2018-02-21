@@ -86,9 +86,26 @@
 
 
    HRESULT Axis::get_PropertyPageCount(long *pCount) {
+
    if ( ! pCount )
       return E_POINTER;
+
    *pCount = 4;
+
+   IGPropertyPageClient *pIGPropertyPageClient = NULL;
+   
+   pRepresentativeText -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pIGPropertyPageClient));
+
+   long countAdditional = 0;
+
+   pIGPropertyPageClient -> get_PropertyPageCount(&countAdditional);
+
+   countAdditional -= 2;
+
+   *pCount += countAdditional;
+
+   pIGPropertyPageClient -> Release();
+
    return S_OK;
    }
 
@@ -124,14 +141,39 @@
    pPropSheetPages[2].lParam = (LPARAM)this;
    pPropSheetPages[2].pfnCallback = NULL;
 
-   pPropSheetPages[3].dwFlags = PSP_USETITLE;
-   pPropSheetPages[3].dwSize = sizeof(PROPSHEETPAGE);
-   pPropSheetPages[3].hInstance = hModule;
-   pPropSheetPages[3].pszTemplate = MAKEINTRESOURCE(IDDIALOG_AXIS_COLOR);
-   pPropSheetPages[3].pfnDlgProc = (DLGPROC)colorHandler;
-   pPropSheetPages[3].pszTitle = "Color";
-   pPropSheetPages[3].lParam = (LPARAM)this;
-   pPropSheetPages[3].pfnCallback = NULL;
+   IGPropertyPageClient *pIGPropertyPageClient = NULL;
+   
+   pRepresentativeText -> QueryInterface(IID_IGPropertyPageClient,reinterpret_cast<void **>(&pIGPropertyPageClient));
+
+   pRepresentativeText -> put_ShowContentPropertyPage(VARIANT_FALSE);
+   pRepresentativeText -> put_ShowStylePropertyPage(VARIANT_FALSE);
+   pRepresentativeText -> put_ShowOrientationPropertyPage(VARIANT_TRUE);
+
+   long countAdditional = 0;
+
+   pIGPropertyPageClient -> get_PropertyPageCount(&countAdditional);
+
+   countAdditional -= 2;
+
+   pIGPropertyPageClient -> GetPropertySheets((void *)&pPropSheetPages[3]);
+
+   for ( int k = 0; k < countAdditional; k++ ) {
+      if ( 0 == strcmp(pPropSheetPages[3 + k].pszTitle,"Orientation") ) {
+         pPropSheetPages[3 + k].pszTitle = "Text Orientation";
+         break;
+      }
+   }
+
+   pIGPropertyPageClient -> Release();
+
+   pPropSheetPages[3 + countAdditional].dwFlags = PSP_USETITLE;
+   pPropSheetPages[3 + countAdditional].dwSize = sizeof(PROPSHEETPAGE);
+   pPropSheetPages[3 + countAdditional].hInstance = hModule;
+   pPropSheetPages[3 + countAdditional].pszTemplate = MAKEINTRESOURCE(IDDIALOG_AXIS_COLOR);
+   pPropSheetPages[3 + countAdditional].pfnDlgProc = (DLGPROC)colorHandler;
+   pPropSheetPages[3 + countAdditional].pszTitle = "Color";
+   pPropSheetPages[3 + countAdditional].lParam = (LPARAM)this;
+   pPropSheetPages[3 + countAdditional].pfnCallback = NULL;
 
    return S_OK;
    }

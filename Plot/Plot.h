@@ -54,8 +54,7 @@
      STDMETHOD(RemoveText)(void *t);
      STDMETHOD(PrepData)();
      STDMETHOD(Draw)();
-     STDMETHOD(DrawOpenGLText)();
-     STDMETHOD(DrawGDIText)();
+     STDMETHOD(DrawText)();
      STDMETHOD(Redraw)();
      STDMETHOD(Erase)();
      STDMETHOD(Plotter)(long cntPlots,IPlot*** thePlotList);
