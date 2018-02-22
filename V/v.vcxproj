@@ -119,7 +119,6 @@
       <PrecompiledHeaderOutputFile>.\Release/v.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -164,7 +163,6 @@
       <PrecompiledHeaderOutputFile>.\Release/v.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -277,11 +275,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
-    <ClCompile Include="\Common\Utils\mathUtils.cpp" />
-    <ClCompile Include="\Common\Utils\registryUtils.cpp" />
-    <ClCompile Include="\Common\Utils\Utils.cpp" />
-    <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
     <ClCompile Include="COMImplementation.cpp" />
     <ClCompile Include="dllMain.cpp" />
     <ClCompile Include="IPropertiesClient.cpp" />

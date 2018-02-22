@@ -63,19 +63,10 @@
     <ClCompile Include="COMImplementation.cpp">
       <Filter>Source Files\COM Implementation Files</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+    <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\COMUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\source\utilities.cpp">
+    <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\mathUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

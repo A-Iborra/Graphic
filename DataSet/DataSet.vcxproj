@@ -108,7 +108,6 @@
       <PrecompiledHeaderOutputFile>./DataSet.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -146,7 +145,6 @@
       <PrecompiledHeaderOutputFile>./DataSet.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -260,7 +258,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Common\source\utilities.cpp" />
     <ClCompile Include="excelCommon.cpp" />
     <ClCompile Include="exportToExcel.cpp" />
     <ClCompile Include="functionDataSetHandler.cpp" />
@@ -291,10 +288,6 @@
     <ClCompile Include="IRunnableObject.cpp" />
     <ClCompile Include="IUnknown.cpp" />
     <ClCompile Include="IViewObject.cpp" />
-    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
-    <ClCompile Include="\Common\Utils\mathUtils.cpp" />
-    <ClCompile Include="\Common\Utils\registryUtils.cpp" />
-    <ClCompile Include="\Common\Utils\Utils.cpp" />
     <ClCompile Include="COMImplementation.cpp" />
     <ClCompile Include="DataSet.cpp" />
     <ClCompile Include="IDataSet.cpp" />

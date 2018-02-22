@@ -48,18 +48,6 @@
     <ClCompile Include="IEvaluator.cpp">
       <Filter>Source Files\COM Interface files</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\source\VList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

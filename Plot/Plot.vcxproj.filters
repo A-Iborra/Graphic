@@ -87,32 +87,14 @@
     <ClCompile Include="sampleGraphicHandler.cpp">
       <Filter>Source Files\handlers</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="typeHandler.cpp">
       <Filter>Source Files\handlers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\source\utilities.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IPlotServices.cpp">
       <Filter>Source Files\COM Interface Files</Filter>
     </ClCompile>
     <ClCompile Include="textHandler.cpp">
       <Filter>Source Files\handlers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

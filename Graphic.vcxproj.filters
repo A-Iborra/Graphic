@@ -42,16 +42,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
+    <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\VariantUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphic.cpp">
@@ -135,9 +126,6 @@
     <ClCompile Include="Source\COMImplementation.cpp">
       <Filter>Source Files\COM Implementation Files</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
-      <Filter>Source Files\COM Implementation Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\ContainedObjectIOleInPlaceSite.cpp">
       <Filter>Source Files\COM Interface Files\COM Container Interface Files</Filter>
     </ClCompile>
@@ -198,14 +186,11 @@
     <ClCompile Include="Source\IGraphicServices.cpp">
       <Filter>Source Files\COM Interface Files\IGraphic Interface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\source\utilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Utils\imageUtilities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\IGSGraphicEvents.cpp">
       <Filter>Source Files\IGSGraphicEvents</Filter>
+    </ClCompile>
+    <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\COMUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -25,11 +25,6 @@
       <Filter>COM Files</Filter>
     </ClCompile>
     <ClCompile Include="V.cpp" />
-    <ClCompile Include="\Common\Utils\COMUtils.cpp" />
-    <ClCompile Include="\Common\Utils\mathUtils.cpp" />
-    <ClCompile Include="\Common\Utils\registryUtils.cpp" />
-    <ClCompile Include="\Common\Utils\Utils.cpp" />
-    <ClCompile Include="\Common\Utils\VariantUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="V.def">

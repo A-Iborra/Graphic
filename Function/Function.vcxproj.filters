@@ -32,18 +32,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\VariantUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\source\VList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -92,7 +80,7 @@
     <ClCompile Include="Source\COMImplementation.cpp">
       <Filter>Source Files\COM Implementation</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
+    <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\COMUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\defineFunction.cpp">
@@ -123,9 +111,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Function.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\source\utilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

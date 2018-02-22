@@ -30,15 +30,6 @@
     <ClCompile Include="dllMain.cpp">
       <Filter>Source Files\COM Implementation</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Utils\COMUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="COM Interfaces\IGSystemPlotType.cpp">
       <Filter>Source Files\COM Interfaces</Filter>
     </ClCompile>
@@ -51,9 +42,6 @@
     <ClCompile Include="Implementations\wireFrame.cpp">
       <Filter>Source Files\Implementations</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Implementations\stacks.cpp">
       <Filter>Source Files\Implementations</Filter>
     </ClCompile>
@@ -65,9 +53,6 @@
     </ClCompile>
     <ClCompile Include="COM Interfaces\IPropertyPageClient.cpp">
       <Filter>Source Files\COM Interfaces</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\source\utilities.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="blocksPropertiesHandler.cpp">
       <Filter>Source Files</Filter>

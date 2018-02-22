@@ -36,18 +36,6 @@
     <ClCompile Include="IDataSet.cpp">
       <Filter>Source Files\COM Files\IDataSet Interface</Filter>
     </ClCompile>
-    <ClCompile Include="\Common\Utils\COMUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\mathUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\registryUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="\Common\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IOleObject.cpp">
       <Filter>Source Files\COM Files</Filter>
     </ClCompile>
@@ -131,9 +119,6 @@
     </ClCompile>
     <ClCompile Include="IGSFunctioNaterEvents.cpp">
       <Filter>Source Files\COM Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\source\utilities.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="populateData.cpp">
       <Filter>Source Files</Filter>
