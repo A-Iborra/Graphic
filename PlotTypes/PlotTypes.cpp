@@ -20,6 +20,7 @@
    itemName[4] = SysAllocString(L"Histogram");
    itemName[5] = SysAllocString(L"Blocks");
    itemName[6] = SysAllocString(L"Balls");
+   itemName[7] = SysAllocString(L"Normals");
 
    itemIs3DOnly[1] = false;
    itemIs3DOnly[2] = true;
@@ -27,13 +28,15 @@
    itemIs3DOnly[4] = false;
    itemIs3DOnly[5] = false;
    itemIs3DOnly[6] = false;
+   itemIs3DOnly[7] = true;
 
    itemUseMaterialShading[1] = false;
-   itemUseMaterialShading[2] = true;
+   itemUseMaterialShading[2] = false;
    itemUseMaterialShading[3] = true;
    itemUseMaterialShading[4] = true;
    itemUseMaterialShading[5] = true;
    itemUseMaterialShading[6] = true;
+   itemUseMaterialShading[7] = false;
 
    itemHasProperties[1] = true;
    itemHasProperties[2] = true;
@@ -41,6 +44,7 @@
    itemHasProperties[4] = true;
    itemHasProperties[5] = true;
    itemHasProperties[6] = true;
+   itemHasProperties[7] = true;
 
    executePrep = new std::function<void(void *,void *,void*)>( [=](void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet)
       {
@@ -71,6 +75,9 @@
    itemExecute[6] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
             [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { balls(pProperties,segmentID); });
 
+   itemExecute[7] = new std::function<void(long,commonProperties *pProperties,void *,void *,void *)>( 
+            [=](long segmentID,commonProperties *pProperties,void *pvIPlot,void *pvIOpenGLImplementation,void *pvIDataSet) { normals(pProperties,segmentID); });
+
    CoCreateInstance(CLSID_InnoVisioNateProperties,NULL,CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER,IID_IGProperties,reinterpret_cast<void **>(&pIGProperties));
  
    itemPropertyPageClients[1] = new _IGPropertyPageClient(this,IDDIALOG_NATURAL,propertiesHandler,"Natural");
@@ -79,6 +86,7 @@
    itemPropertyPageClients[4] = new _IGPropertyPageClient(this,IDDIALOG_HISTOGRAM,propertiesHandler,"Histogram");
    itemPropertyPageClients[5] = new _IGPropertyPageClient(this,IDDIALOG_BLOCKS,blocksPropertiesHandler,"Block");
    itemPropertyPageClients[6] = new _IGPropertyPageClient(this,IDDIALOG_BALLS,propertiesHandler,"Balls");
+   itemPropertyPageClients[7] = new _IGPropertyPageClient(this,IDDIALOG_NATURAL,propertiesHandler,"Normals");
 
    pIGProperties -> Add(L"all binary",&propertyAllBinary);
 

@@ -52,6 +52,8 @@
 
       p -> propertyTickStraddleStyle -> get_longValue(&v);
 
+      p -> propertyIsHidden -> setWindowItemChecked(hwnd,IDDI_AXIS_STYLE_HIDE);
+
       switch ( v ) {
       case TICK_STRADDLE_ABOVE:
          SendMessage(GetDlgItem(hwnd,IDDI_AXIS_STYLE_TICKSABOVE),BM_SETCHECK,(WPARAM)BST_CHECKED,0);
@@ -147,6 +149,10 @@
 
       case IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES:
          p -> propertyTicksAllPlanes -> getWindowItemChecked(hwnd,IDDI_AXIS_STYLE_TICKS_ON_BOTH_PLANES);
+         break;
+
+      case IDDI_AXIS_STYLE_HIDE:
+         p -> propertyIsHidden -> getWindowItemChecked(hwnd,IDDI_AXIS_STYLE_HIDE);
          break;
 
       default:

@@ -129,6 +129,8 @@
      STDMETHOD(get_TickPercentAbove)(double *);
      STDMETHOD(put_GridLinesPerTick)(long);
      STDMETHOD(get_GridLinesPerTick)(long*);
+     STDMETHOD(put_IsHidden)(VARIANT_BOOL);
+     STDMETHOD(get_IsHidden)(VARIANT_BOOL *);
 
    // Methods
 
@@ -233,6 +235,7 @@
      IGProperty *propertyTickCount;
      IGProperty *propertyTicksAllPlanes;
      IGProperty *propertyGridLinesPerTick;
+     IGProperty *propertyIsHidden;
      IGProperty *propertyAxisPrecision;
      IGProperty *propertyCustomColors;
 
@@ -287,6 +290,7 @@
      short axisTickColorTrackLineColor,axisLabelColorTrackLineColor;
      short drawTickLabels,doAutoPrecision,determinesDomain;
      short labelPositionNatural,labelAnglePerpendicular,labelAngleParallel,labelAngleOther;
+     short isHidden;
 
      static LRESULT CALLBACK handler(HWND,UINT,WPARAM,LPARAM);
      static LRESULT CALLBACK styleHandler(HWND hwnd,UINT msg,WPARAM mp1,LPARAM mp2);

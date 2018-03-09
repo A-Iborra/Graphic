@@ -313,6 +313,8 @@
 
       STDMETHOD(Normal3dv)(double *normal);
  
+      STDMETHOD(NormalDp)(DataPoint *);
+
       STDMETHOD(SetColor3dv)(double *v);
 
 // Selection ? 

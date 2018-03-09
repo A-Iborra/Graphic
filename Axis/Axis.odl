@@ -46,11 +46,12 @@ library Axis {
       axisPropertyTickCount = 15,
       axisPropertyTickSize = 16,
       axisPropertyTickPercentAbove = 17,
-      axisPropertyTickPrecision = 18,
-      axisPropertyGridLinesPerTick = 19,
-      axispropertyLineWeight = 20,
-      axisPropertyLineColor = 21,
-      axisPropertyDefinesDomain = 22 };
+      axisPropertyIsHidden = 18,
+      axisPropertyTickPrecision = 19,
+      axisPropertyGridLinesPerTick = 20,
+      axispropertyLineWeight = 21,
+      axisPropertyLineColor = 22,
+      axisPropertyDefinesDomain = 23 };
 
    enum AxisMethodsID {
       axisMethodInitialize = 101,
@@ -194,6 +195,11 @@ library Axis {
       HRESULT GridLinesPerTick([in]long gridLines);
       [propget,id(axisPropertyGridLinesPerTick),helpstring("Sets the number of grid lines (lines parallel to complementary axis of length equal to complimentary domain) for each space between tick points. Specify 0 for no grid lines.")]
       HRESULT GridLinesPerTick([out,retval]long *pGridLines);
+
+      [propput,id(axisPropertyIsHidden),helpstring("Hides or shows the axis")]
+      HRESULT IsHidden([in] VARIANT_BOOL isHidden);
+      [propget,id(axisPropertyIsHidden),helpstring("Is the axis hidden ?")]
+      HRESULT IsHidden([out,retval] VARIANT_BOOL *pIsHidden);
 
       // Methods
 

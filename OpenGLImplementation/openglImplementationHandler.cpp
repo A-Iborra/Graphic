@@ -171,6 +171,7 @@
    case WM_OPENGLIMPLEMENTATION_SETCOLOR: {
       GLfloat *pfv = (GLfloat *)wParam;
       glColor3fv(pfv);
+OPENGL_ERROR_CHECK
       }
       break;
 

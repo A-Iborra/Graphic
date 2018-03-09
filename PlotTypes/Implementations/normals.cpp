@@ -5,10 +5,10 @@
 #include "PlotTypes.h"
 #include "utils.h"
 
-   void PlotTypes::surface(commonProperties *pProperties,long segmentID) {
+   void PlotTypes::normals(commonProperties *pProperties,long segmentID) {
    
    DataPoint v[5];
-   DataList *dlTemp,*dlNext,*dl;
+   DataList *pDLTemp,*pDLNext,*pDL;
    DataPoint firstPoint,secondPoint,thirdPoint,fourthPoint;
    int endOfData,kAccross;
 
@@ -19,31 +19,32 @@
    kAccross = 0;
    endOfData = FALSE;
     
-   dl = (DataList *)NULL;
+   pDL = (DataList *)NULL;
 
-   pIDataSet -> get(dl,&firstPoint,&dl);
+   pIDataSet -> get(pDL,&firstPoint,&pDL);
 
-   pIOpenGLImplementation -> BeginOpenGLMode(GL_QUADS);
+   pIOpenGLImplementation -> BeginOpenGLMode(GL_LINES);
       
-   while ( dl ) {
+   while ( pDL ) {
          
-      dlNext = dl;
+      pDLNext = pDL;
 
-      pIDataSet -> get(dlNext,&secondPoint,&dlTemp);
+      pIDataSet -> get(pDLNext,&secondPoint,&pDLTemp);
 
-      if ( ! dlTemp ) break;
+      if ( ! pDLTemp ) 
+         break;
          
-      if ( secondPoint.x != firstPoint.x ) {
+      if ( ! ( secondPoint.x == firstPoint.x ) ) {
          kAccross = 0;
-         pIDataSet -> get(dl,&firstPoint,&dl);
+         pIDataSet -> get(pDL,&firstPoint,&pDL);
          continue;
       }
          
       fourthPoint = secondPoint;
          
       while ( secondPoint.x == firstPoint.x ) {
-         pIDataSet -> get(dlNext,&secondPoint,&dlNext);
-         if ( ! dlNext ) {
+         pIDataSet -> get(pDLNext,&secondPoint,&pDLNext);
+         if ( ! pDLNext ) {
             endOfData = TRUE;
             break;
          }
@@ -52,22 +53,22 @@
       if ( endOfData ) break;
          
       for ( int j = 0; j < kAccross; j++ ) {
-         if ( ! dlNext ) {
+         if ( ! pDLNext ) {
             endOfData = TRUE;
             break;
          }
-         pIDataSet -> get(dlNext,&secondPoint,&dlNext);
+         pIDataSet -> get(pDLNext,&secondPoint,&pDLNext);
       }
    
       if ( endOfData ) break;
     
-      pIDataSet -> get(dlNext,&thirdPoint,&dlTemp);
+      pIDataSet -> get(pDLNext,&thirdPoint,&pDLTemp);
          
       v[0] = firstPoint;
       v[1] = secondPoint;
       v[2] = thirdPoint;
       v[3] = fourthPoint;
-   
+
       // x-product of the vector from 0->1 with 0->3
 
       VminusV(&v[1],&v[0],&xProd0);
@@ -100,17 +101,15 @@
       VxV(&xProd0,&xProd1,&avgNormal[3]);
       unitVector(&avgNormal[3],&avgNormal[3]);
 
-      //pIOpenGLImplementation -> Normal3dv(avgNormal[4]);
-
       for ( int vk = 0; vk < 4; vk++ ) {
          pIOpenGLImplementation -> Vertex(&v[vk]);
          VplusV(&v[vk],&avgNormal[vk],&avgNormal[vk]);
-         pIOpenGLImplementation -> NormalDp(&avgNormal[vk]);
+         pIOpenGLImplementation -> Vertex(&avgNormal[vk]);
       }
 
       kAccross++;
    
-      pIDataSet -> get(dl,&firstPoint,&dl);
+      pIDataSet -> get(pDL,&firstPoint,&pDL);
     
    }
 

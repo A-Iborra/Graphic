@@ -465,6 +465,7 @@
 #define IDNI_AXIS_CANCEL                                                   8104
 
 #define IDDIALOG_AXIS_STYLE                                                8200
+#define IDDI_AXIS_STYLE_HIDE                                               8200
 #define IDDI_AXIS_STYLE_LINEWEIGHT                                         8201
 #define IDDI_AXIS_STYLE_LINEWEIGHT_SPIN                                    8202
 #define IDDI_AXIS_STYLE_LINEWEIGHT_UNITS                                   8203

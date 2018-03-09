@@ -668,6 +668,14 @@ Sleep(10);
    return S_OK;
    }
  
+   HRESULT OpenGLImplementor::NormalDp(DataPoint *pDPNormal) {
+   double *pNormal = new double[3];
+   pNormal[0] = pDPNormal -> x;
+   pNormal[1] = pDPNormal -> y;
+   pNormal[2] = pDPNormal -> z;
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_NORMAL3D,pNormal)
+   return S_OK;
+   }
 
    HRESULT OpenGLImplementor::SetColor3dv(double *pDoubleColors) {
    GLfloat *pColors = new GLfloat[4];

@@ -35,12 +35,5 @@
 
    pIOpenGLImplementation -> CloseSegment(segmentID,TRUE);
 
-#if 0
-   IText *t = NULL;
-
-   while ( t = textList.GetNext(t) ) 
-      t -> Draw();
-#endif
-
    return;
    }

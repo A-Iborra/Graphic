@@ -84,9 +84,6 @@
 
 /* Front facing on the Y-Z plane */
 
-//pIOpenGLImplementation -> EndOpenGLMode();
-//pIOpenGLImplementation -> BeginOpenGLMode(GL_LINE_STRIP);
-   
       firstPoint = secondPoint;
     
       secondPoint.y = homePoint.y + yWidth;
@@ -110,9 +107,6 @@
 
       for ( vk = 0; vk < 4; vk++ ) 
          pIOpenGLImplementation -> Vertex(&v[vk]);
-
-//pIOpenGLImplementation -> EndOpenGLMode();
-//pIOpenGLImplementation -> BeginOpenGLMode(GL_LINE_STRIP);
 
 /* Front facing on the X-Z plane */
 
@@ -177,9 +171,6 @@
       for ( vk = 0; vk < 4; vk++ ) 
          pIOpenGLImplementation -> Vertex(&v[vk]);
 
-    
-      //DRAW_PLANE
-    
 /* Up facing on the X-Y plane */
 
       firstPoint.x = homePoint.x - xWidth;

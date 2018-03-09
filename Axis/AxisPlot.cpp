@@ -18,6 +18,9 @@
       textList.Remove(pText);
    }
  
+   if ( isHidden )
+      return 0;
+
    PlotViews plotView;
  
    pParentPropertyPlotView -> get_longValue((long*)&plotView);

@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="GraphicHost.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Common\source\utilities.cpp" />
@@ -159,6 +160,12 @@
     <ClCompile Include="IOleClentSite.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="frameHandler.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="GraphicHost.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

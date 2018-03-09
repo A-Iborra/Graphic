@@ -178,6 +178,7 @@ library OpenGLImplementor {
       HRESULT SetColor(float *);
       HRESULT SetLineWeight(float);
       HRESULT Normal3dv(double *normal);
+      HRESULT NormalDp(struct DataPoint *pDP);
 
       HRESULT SetColor3dv(double *);
 

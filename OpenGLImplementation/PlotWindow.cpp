@@ -832,7 +832,7 @@ OPENGL_ERROR_CHECK
       return S_OK;
    }
 
-   if ( ! openGLLighting.lightCount ) {
+   if ( 0 == openGLLighting.lightCount ) {
       disableLighting();
       return S_OK;
    }
@@ -844,11 +844,10 @@ OPENGL_ERROR_CHECK
       if ( ! pPropLightEnabled[k] )
          continue;
 
-      short b;
+      pPropLightEnabled[k] -> get_boolValue(&anyEnabled);
 
-      pPropLightEnabled[k] -> get_boolValue(&b);
-
-      anyEnabled = anyEnabled | b;
+      if ( anyEnabled )
+         break;
 
    }
 
@@ -874,21 +873,34 @@ OPENGL_ERROR_CHECK
          BYTE *pb = (BYTE *)&openGLLighting.fvAmbientLight[k][0];
          pPropAmbientLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
 openGLLighting.fvAmbientLight[k][3] = 1.0;
-         openGLLighting.hasAmbient[k] = true;
+         openGLLighting.hasAmbient[k] = false;
+         if ( 0.0 < openGLLighting.fvAmbientLight[k][0] ||
+               0.0 < openGLLighting.fvAmbientLight[k][1] ||
+               0.0 < openGLLighting.fvAmbientLight[k][2] )
+            openGLLighting.hasAmbient[k] = true;
       }
 
       if ( pPropDiffuseLight && pPropDiffuseLight[k] ) {
          BYTE *pb = (BYTE *)&openGLLighting.fvDiffuseLight[k][0];
          pPropDiffuseLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
 openGLLighting.fvDiffuseLight[k][3] = 1.0;
-         openGLLighting.hasDiffuse[k] = true;
+         openGLLighting.hasDiffuse[k] = false;
+         if ( 0.0 < openGLLighting.fvDiffuseLight[k][0] ||
+               0.0 < openGLLighting.fvDiffuseLight[k][1] ||
+               0.0 < openGLLighting.fvDiffuseLight[k][2] )
+            openGLLighting.hasDiffuse[k] = true;
       }
 
       if ( pPropSpecularLight && pPropSpecularLight[k] ) {
          BYTE *pb = (BYTE *)&openGLLighting.fvSpecularLight[k][0];
          pPropSpecularLight[k] -> get_binaryValue(4 * sizeof(float),(BYTE**)&pb);
 openGLLighting.fvSpecularLight[k][3] = 1.0;
-         openGLLighting.hasSpecular[k] = true;
+         openGLLighting.hasSpecular[k] = false;
+         if ( 0.0 < openGLLighting.fvSpecularLight[k][0] ||
+               0.0 < openGLLighting.fvSpecularLight[k][1] ||
+               0.0 < openGLLighting.fvSpecularLight[k][2] )
+            openGLLighting.hasSpecular[k] = true;
+
       }
 
       if ( pPropLightPos && pPropLightPos[k] ) {

@@ -118,6 +118,8 @@
 
       void balls(commonProperties *pProperties,long segmentID);
 
+      void normals(commonProperties *pProperties,long segmentID);
+
    private:
 
       IPlot *pIPlot{NULL};

@@ -43,6 +43,7 @@
      pIDataSetDomain(NULL),
      drawTickLabels(TRUE),
      doAutoPrecision(TRUE),
+     isHidden(FALSE),
 
      tickCount(0),
      tickAbove(0.0),
@@ -168,6 +169,9 @@
 
    pIGProperties -> Add(L"representative text",&propertyRepresentativeText);
    propertyRepresentativeText -> put_type(TYPE_OBJECT_STORAGE_ARRAY);
+
+   pIGProperties -> Add(L"is hidden",&propertyIsHidden);
+   propertyIsHidden -> directAccess(TYPE_BOOL,&isHidden,sizeof(isHidden));
 
    pIGProperties -> DirectAccess(L"draw text",TYPE_BOOL,&drawTickLabels,sizeof(drawTickLabels));
 

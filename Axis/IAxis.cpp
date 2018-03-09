@@ -561,6 +561,17 @@
    return S_OK;
    }
 
+   HRESULT Axis::put_IsHidden(VARIANT_BOOL doHide) {
+   isHidden = doHide == VARIANT_TRUE ? 1 : 0;
+   return S_OK;
+   }
+
+   HRESULT Axis::get_IsHidden(VARIANT_BOOL *pDoHide) {
+   if ( ! pDoHide )
+      return E_POINTER;
+   *pDoHide = isHidden ? VARIANT_TRUE : VARIANT_FALSE;
+   return S_OK;
+   }
 
    HRESULT Axis::Initialize(char axisType,IAxis *pX,IAxis *pY,IAxis *pZ,IGProperty* pPlotView,
                               IGProperty* pPropertyXFloor,IGProperty* pPropertyXCeiling,
