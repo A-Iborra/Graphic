@@ -97,27 +97,26 @@ I recommend running Visual Studio as administrator so that, as each artifact is 
 
 ### Get other components
 ----
-Please also clone the Common repository on this site and put it off the root of a drive - by the way, the same as THIS repository.
 
-For example - I have configured the build systems to expect a "\Common" directory to be visible on the same drive that this repository is cloned to. It probably doesn't matter where you put this repository,
-but I think it probably best to to put it in "\Graphic" if you have issues.
+Please also clone the Common repository on this site and put it on your drive as a sibling of this repository.
+
+I have created the GSYSTEM_HOME Environment variable for these projects. If, in Visual Studio, you go to the Property Manager window pane, and click on the "Compiler Options" Property Sheet name for any of the projects - you will see this value set in the "User Macros" page.
+
+You could also define GSYSTEM_HOME system wide via control panel - system settings.
+
+For example - I have configured the build systems to expect a "\Common" directory to be visible as a sibling of where this repository is cloned to. It probably doesn't matter where you put this repository,
+but I think it probably best to to put it in "\Graphic" on some drive, then define GSYSTEM_HOME to be that drive letter.
 
 You MAY want to also clone the Properties repository, again, to the "\Properties" directory on some drive. The properties component is used very heavily throughout this and all of my work. It is a powerful tool 
 to provide persistence and UI capabilities to these systems, but it is also relatively static - it has hardly changed in more than 20 years since it's initial development and you can usually assume it doesn't need to be built.
 When you ran the installer, the Properties.ocx component was installed and registered.
 
-### Circular dependencies
-----
-Well - there's no getting around it - there <strong>ARE</strong> circular dependencies here.
-
-The fact is, this is a system of rich objects - sometimes defined in terms of each other - and that is how I want them to be. For example, a dataset has a related plot, a plot has a related dataset, a function is a dataset, and so on. 
-I cannot allow a technical issue such as the occassional build difficulty dictate the nature of my objects - if somebody knows a better way, and it doesn't drive my thinking or architecture in some artificial way - I'm all ears, but
-for now I live with it.
-
 Note that the systems interrelate through the generated <fileName>_i.h and <fileName>_i.c files from the MIDL compiler. I DO check these into the repositories for the very reason that they need to be there for the first build. Note, 
-however, that because they are generated, a build "clean" or "rebuild all" will delete them. As I say, if anyone knows a better way - that does NOT drive the object model, I'd love to hear it.
+however, that because they are generated, a build "clean" or "rebuild all" will delete them, which will cause dependency problems. If this happens - you may need to selectively build each one until you can get all of them built.
 
-<strong>By the way</strong> ALL binary artifacts build into subdirectories of "\Common\Artifacts" and generated files will be found under \Common in the appropriate place, for example, in \Common\include for the "..._i.h" files.
+Of course, I will try to get rid of this inter-dependency when I can.
+
+<strong>By the way</strong> ALL binary artifacts build into subdirectories of "%GSYSTEM_HOME%\Common\Artifacts" and generated files will be found under %GYSTEM_HOME%\Common in the appropriate place, for example, in D:\Common\include for the "..._i.h" files, where I have assumed that GSYSTEM_HOME = "D:\".
 
 Anyway - there ARE issues with MIDL puking on just about everything with absolutely no useful information. I have not always been able to get interfaces formally into '.odl files - for example, sometimes I have to resort
 to passing void pointers in leiue of the interface because I just can't figure out what it is that MIDL is complaining about - it's diagnostics are a total crock and it's way past time that we should be given the respect, by MS 
