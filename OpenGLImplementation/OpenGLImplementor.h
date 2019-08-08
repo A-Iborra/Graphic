@@ -113,6 +113,16 @@
 
       HRESULT GetPixels(long x1,long y1,long x2,long y2,long cyWindow,BYTE *pResult);
 
+
+      //
+      // These methods are intended for clients wanting to use OpenGL directly
+      //
+      STDMETHOD(OpenGLChoosePixelFormat)(int *pAttributes,int *pPixelFormat);
+
+      STDMETHOD(OpenGLCreateContext)(int *pAttributes,UINT_PTR *pContext);
+
+      STDMETHOD(OpenGLMakeCurrent)(UINT_PTR deviceContext,UINT_PTR renderingContext);
+
    private:
  
       int createRenderingContext();
@@ -267,6 +277,8 @@
 
       STDMETHOD(GetPixels)(long x1,long y1,long x2,long y2,BYTE *pResult);
 
+      STDMETHOD(EnableOpenGLCapability)(int GlEnum,BOOL isEnabled);
+
 // Window State ? 
       STDMETHOD(get_HDC)(HDC *getDC);
       STDMETHOD(get_HWND)(HWND *getHWND);
@@ -277,6 +289,7 @@
 // Data State ? 
       STDMETHOD(GetExtents)(double *minx,double *miny,double *minz,double *maxx,double *maxy,double *maxz);
  
+
 // Drawing ?
       STDMETHOD(Erase)(IGProperty *pPropBackgroundColor = NULL);
       STDMETHOD(ResetDepth)();
@@ -330,6 +343,19 @@
       STDMETHOD(EndSegment)();
       STDMETHOD(PlaySegment)(long segmentID);
       STDMETHOD(DeleteSegment)(long segmentID);
+
+
+// OpenGL Passthru methods: These are for redirecting straight openGL calls a client is using to this implementation
+
+      STDMETHOD(OpenGLClearColor)(float *pRGBAVector);
+
+      STDMETHOD(OpenGLClearDepth)(double *pv);
+
+      STDMETHOD(ChoosePixelFormat)(int *pAttributes,int *pResult);
+
+      STDMETHOD(OpenGLCreateContext)(int *pAttributes,UINT_PTR *pResult);
+
+      STDMETHOD(OpenGLMakeCurrent)(UINT_PTR deviceContext,UINT_PTR renderingContext,BOOL *pResult);
 
 //     IOleObject 
  
@@ -767,5 +793,41 @@
 #define WM_OPENGLIMPLEMENTATION_READPIXELS               WM_USER + 108
 
 #define WM_OPENGLIMPLEMENTATION_ISRENDERED               WM_USER + 109
+
+   struct strCall_SetCapability {
+      int glEnum;
+      BOOL isEnabled;
+   };
+
+#define WM_OPENGLIMPLEMENTATION_SET_CAPABILITY           WM_USER + 110
+
+#define WM_OPENGLIMPLEMENTATION_GL_CLEAR_COLOR           WM_USER + 111
+
+#define WM_OPENGLIMPLEMENTATION_GL_CLEAR_DEPTH           WM_USER + 112
+
+   struct strCall_ChoosePixelFormat {
+      int *pAttributes;
+      int *pPixelFormat;
+      HRESULT result;
+   };
+
+#define WM_OPENGLIMPLEMENTATION_GL_CHOOSE_PIXEL_FORMAT   WM_USER + 113
+
+   struct strCall_CreateContext {
+      int *pAttributes;
+      UINT_PTR *pContext;
+      HRESULT result;
+   };
+
+#define WM_OPENGLIMPLEMENTATION_GL_CREATE_CONTEXT        WM_USER + 114
+
+   struct strCall_MakeCurrent {
+      UINT_PTR deviceContext;
+      UINT_PTR renderingContext;
+      BOOL *pResult;
+   };
+
+#define WM_OPENGLIMPLEMENTATION_GL_MAKE_CURRENT          WM_USER + 115
+
 
 #define WM_OPENGLIMPLEMENTATION_STOP                     WM_USER + 256

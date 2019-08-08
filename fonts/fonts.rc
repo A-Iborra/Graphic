@@ -1,0 +1,56 @@
+#include "windows.h"
+
+#include "resource.h"
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    3 "Graphic Control"
+END
+
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "InnoVisioNate, Inc.\0"
+            VALUE "FileDescription", "Graphic\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "Graphic\0"
+            VALUE "LegalCopyright", "Copyright © 1998,1999,2000,2001,2002,2008,2017,2018\0"
+            VALUE "OriginalFilename", "Graphic.ocx\0"
+            VALUE "ProductName", "InnoVisioNate, Inc. Graphic\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "OLESelfRegister", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+// Menus
+
+IDR_MAIN_MENU MENU
+{
+    POPUP "&File"
+    BEGIN
+        MENUITEM "NEW",  IDC_NEW
+        MENUITEM "EXIT", IDC_EXIT
+        MENUITEM "SHOWCONTROLPOINTS", IDC_SHOWCONTROLPOINTS
+        MENUITEM "FILL",   IDC_FILL
+        MENUITEM "OUTLINE",IDC_OUTLINE
+        MENUITEM "NORMAL", IDC_NORMAL
+        MENUITEM "PINCH",  IDC_PINCH
+        MENUITEM "PUNCH",  IDC_PUNCH
+    END
+}

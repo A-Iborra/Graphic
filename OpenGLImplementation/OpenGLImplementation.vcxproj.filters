@@ -69,6 +69,12 @@
     <ClCompile Include="%GSYSTEM_HOME%\Common\Utils\mathUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IOpenGLImplementation_OpenGL.cpp">
+      <Filter>Source Files\COM Interface Files\IOpenGLImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="PlotWindow_OpenGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenGLImplementation.def">

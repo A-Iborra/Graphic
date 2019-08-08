@@ -836,6 +836,19 @@ Sleep(10);
    }
 
 
+   HRESULT OpenGLImplementor::EnableOpenGLCapability(int glEnum,BOOL isEnabled) {
+
+   strCall_SetCapability setCap = {0};
+
+   setCap.glEnum = glEnum;
+   setCap.isEnabled = isEnabled;
+
+   SYNCHRONOUS_CALL(WM_OPENGLIMPLEMENTATION_SET_CAPABILITY,&setCap);
+
+   return S_OK;
+   }
+
+
    HRESULT OpenGLImplementor::GetPickBoxHits(POINTL *ptl,long pickWindowWidth,long pickWindowHeight,unsigned int *hitTable,long hitTableSize,long *pCallLists,unsigned int *hitTableHits) {
    strCall_GetPickBoxHits *ps = new strCall_GetPickBoxHits();
    ps -> ptl = ptl;

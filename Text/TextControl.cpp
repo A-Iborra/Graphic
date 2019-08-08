@@ -116,12 +116,13 @@
   } 
 
   HRESULT STDMETHODCALLTYPE TextFactory::CreateInstance(IUnknown *punkOuter, REFIID riid, void **ppv) { 
-  HRESULT hres;
+  HRESULT HR;
   *ppv = NULL; 
-  Text *t = new Text(punkOuter);
-  hres = t -> QueryInterface(riid,ppv);
-  if ( !*ppv ) delete t;
-  return hres;
+  Text *pText = new Text(punkOuter);
+  HR = pText -> QueryInterface(riid,ppv);
+  if ( ! * ppv ) 
+     delete pText;
+  return HR;
   } 
 
   long __stdcall TextFactory::LockServer(int fLock) { 

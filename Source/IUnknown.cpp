@@ -122,6 +122,10 @@
          return pIGSGraphicEvents -> QueryInterface(riid,ppv);
       else
 
+      if ( riid == IID_IOpenGLImplementation )
+         return pIOpenGLImplementation -> QueryInterface(riid,ppv);
+      else
+
       // Container Interfaces
 
 /*

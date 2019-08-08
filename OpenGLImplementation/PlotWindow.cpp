@@ -129,11 +129,11 @@
   
    if ( 0 == pixelFormat ) {
 
-      pixelFormat = ChoosePixelFormat(deviceContext,&pfd);
+      pixelFormat = ::ChoosePixelFormat(deviceContext,&pfd);
 
       if ( ! pixelFormat ) {
          pfd.dwFlags = pfd.dwFlags & ~ PFD_GENERIC_ACCELERATED;
-         pixelFormat = ChoosePixelFormat(deviceContext,&pfd);
+         pixelFormat = ::ChoosePixelFormat(deviceContext,&pfd);
       }
 
    }

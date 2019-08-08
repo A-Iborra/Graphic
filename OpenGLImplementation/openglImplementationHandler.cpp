@@ -192,6 +192,36 @@ OPENGL_ERROR_CHECK
       }
       break;
 
+   case WM_OPENGLIMPLEMENTATION_GL_CLEAR_COLOR: {
+      float *pv = (float *)wParam;
+      glClearColor(pv[0],pv[1],pv[2],pv[3]);
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_GL_CLEAR_DEPTH: {
+      double *pv = (double *)wParam;
+      glClearDepth(pv[0]);
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_GL_CHOOSE_PIXEL_FORMAT: {
+      strCall_ChoosePixelFormat *pCPF = (strCall_ChoosePixelFormat *)wParam;
+      pCPF -> result = p -> plotWindow -> OpenGLChoosePixelFormat(pCPF -> pAttributes,pCPF -> pPixelFormat);
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_GL_CREATE_CONTEXT: {
+      strCall_CreateContext *pCreateContext = (strCall_CreateContext *)wParam;
+      pCreateContext -> result = p -> plotWindow -> OpenGLCreateContext(pCreateContext -> pAttributes,pCreateContext -> pContext);
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_GL_MAKE_CURRENT: {
+      strCall_MakeCurrent *pMakeCurrent = (strCall_MakeCurrent *)wParam;
+      *pMakeCurrent -> pResult = wglMakeCurrent((HDC)pMakeCurrent -> deviceContext,(HGLRC)pMakeCurrent -> renderingContext);
+      }
+      break;
+
    case WM_OPENGLIMPLEMENTATION_TRANSLATE: {
       DataPoint* dp = (DataPoint *)wParam;
       p -> plotWindow -> translate(dp);
@@ -939,6 +969,18 @@ MessageBox(NULL,ex.what(),"",MB_OK);
       glGetIntegerv(GL_SCISSOR_BOX,bufferSize);
       
       p -> plotWindow -> GetPixels(ps -> x1,ps -> y1,ps -> x2,ps -> y2,bufferSize[3],ps -> pResult);
+
+      }
+      break;
+
+   case WM_OPENGLIMPLEMENTATION_SET_CAPABILITY: {
+
+      strCall_SetCapability *pCap = (strCall_SetCapability *)wParam;
+
+      if ( pCap -> isEnabled )
+         glEnable(pCap -> glEnum);
+      else
+         glDisable(pCap -> glEnum);
 
       }
       break;

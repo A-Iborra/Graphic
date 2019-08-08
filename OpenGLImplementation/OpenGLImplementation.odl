@@ -125,6 +125,8 @@ library OpenGLImplementor {
       [helpstring("Get the pixels in the OpenGL frame buffer within the bounded (pixel) coordinates. The caller must allocate the storage location in pResult")]
       HRESULT GetPixels(long x1,long y1,long x2,long y2,BYTE *pResult);
 
+      HRESULT EnableOpenGLCapability(int GlEnum,bool isEnabled);
+
 // Window State ?
  
       [propget] 
@@ -196,6 +198,17 @@ library OpenGLImplementor {
       HRESULT EndSegment();
       HRESULT PlaySegment(long segmentID);
       HRESULT DeleteSegment(long segmentID);
+
+// OpenGL Passthru methods: These are for redirecting straight openGL calls a client is using to this implementation
+
+      HRESULT OpenGLClearColor(float *pRGBAVector);
+      HRESULT OpenGLClearDepth(double *pv);
+
+      HRESULT ChoosePixelFormat(int *pAttributes,int *pResult);
+
+      HRESULT OpenGLCreateContext(int *pAttributes,UINT_PTR *pResult);
+
+      HRESULT OpenGLMakeCurrent(UINT_PTR deviceContext,UINT_PTR renderingContext,BOOL *pResult);
 
    };
 
